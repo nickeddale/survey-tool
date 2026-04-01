@@ -5,7 +5,7 @@ asyncpg<0.30,>=0.29
 alembic<2.0,>=1.13
 pydantic-settings<3.0,>=2.2
 python-jose[cryptography]<4.0,>=3.3
-passlib[bcrypt]<2.0,>=1.7
+bcrypt<6.0,>=4.0
 
 [dev]
 pytest<9.0,>=8.1
