@@ -47,3 +47,9 @@ class QuestionGroup(Base):
     )
 
     survey = relationship("Survey", back_populates="groups")
+    questions = relationship(
+        "Question",
+        back_populates="group",
+        cascade="all, delete-orphan",
+        lazy="raise",
+    )

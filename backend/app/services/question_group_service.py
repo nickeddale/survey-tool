@@ -2,6 +2,7 @@ import uuid
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.models.question_group import QuestionGroup
 from app.models.survey import Survey
@@ -60,8 +61,14 @@ async def create_group(
     )
     session.add(group)
     await session.flush()
-    await session.refresh(group)
-    return group
+
+    # Reload with questions eagerly loaded
+    result = await session.execute(
+        select(QuestionGroup)
+        .where(QuestionGroup.id == group.id)
+        .options(selectinload(QuestionGroup.questions))
+    )
+    return result.scalar_one()
 
 
 async def get_group_by_id(
@@ -79,6 +86,7 @@ async def get_group_by_id(
             QuestionGroup.survey_id == survey_id,
             Survey.user_id == user_id,
         )
+        .options(selectinload(QuestionGroup.questions))
     )
     return result.scalar_one_or_none()
 
@@ -96,6 +104,7 @@ async def list_groups(
         select(QuestionGroup)
         .where(QuestionGroup.survey_id == survey_id)
         .order_by(QuestionGroup.sort_order)
+        .options(selectinload(QuestionGroup.questions))
     )
     return list(result.scalars().all())
 
@@ -112,8 +121,14 @@ async def update_group(
 
     session.add(group)
     await session.flush()
-    await session.refresh(group)
-    return group
+
+    # Reload with questions eagerly loaded
+    result = await session.execute(
+        select(QuestionGroup)
+        .where(QuestionGroup.id == group.id)
+        .options(selectinload(QuestionGroup.questions))
+    )
+    return result.scalar_one()
 
 
 async def delete_group(
@@ -165,5 +180,6 @@ async def reorder_groups(
         select(QuestionGroup)
         .where(QuestionGroup.survey_id == survey_id)
         .order_by(QuestionGroup.sort_order)
+        .options(selectinload(QuestionGroup.questions))
     )
     return list(result2.scalars().all())
