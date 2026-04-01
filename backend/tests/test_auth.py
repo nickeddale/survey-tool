@@ -74,6 +74,13 @@ async def test_register_duplicate_email_returns_409(client: AsyncClient):
     await client.post(REGISTER_URL, json=VALID_PAYLOAD)
     response = await client.post(REGISTER_URL, json=VALID_PAYLOAD)
     assert response.status_code == 409
+    body = response.json()
+    assert body == {
+        "detail": {
+            "code": "CONFLICT",
+            "message": "A user with this email already exists",
+        }
+    }
 
 
 @pytest.mark.asyncio

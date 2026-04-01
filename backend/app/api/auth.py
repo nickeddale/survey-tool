@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
@@ -52,7 +53,7 @@ async def register(
 ) -> UserResponse:
     existing = await get_user_by_email(session, payload.email)
     if existing is not None:
-        raise ConflictError("A user with this email already exists.")
+        raise ConflictError("A user with this email already exists")
 
     user = User(
         email=payload.email,
@@ -60,7 +61,10 @@ async def register(
         name=payload.name,
     )
     session.add(user)
-    await session.flush()
+    try:
+        await session.flush()
+    except IntegrityError:
+        raise ConflictError("A user with this email already exists")
     await session.refresh(user)
 
     return UserResponse.model_validate(user)
