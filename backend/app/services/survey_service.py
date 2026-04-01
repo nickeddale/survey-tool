@@ -1,10 +1,12 @@
 import uuid
 from datetime import datetime, timezone
 
+from fastapi import HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.models.question_group import QuestionGroup
 from app.models.survey import Survey
 
 
@@ -112,11 +114,91 @@ async def update_survey(
     survey: Survey,
     **kwargs,
 ) -> Survey:
-    """Update only the provided fields of a survey."""
+    """Update only the provided fields of a survey. Raises 422 if survey is not in draft status."""
+    check_survey_editable(survey)
     for field, value in kwargs.items():
         if value is not None:
             setattr(survey, field, value)
 
+    survey.updated_at = datetime.now(timezone.utc)
+    session.add(survey)
+    await session.flush()
+    await session.refresh(survey)
+    return survey
+
+
+def check_survey_editable(survey: Survey) -> None:
+    """Raise HTTP 422 if the survey is not in draft status."""
+    if survey.status != "draft":
+        raise HTTPException(
+            status_code=422,
+            detail="Survey is not editable: only draft surveys can be modified",
+        )
+
+
+async def activate_survey(
+    session: AsyncSession,
+    survey: Survey,
+) -> Survey:
+    """Transition survey from draft -> active. Raises 422 if not draft or has no questions."""
+    if survey.status != "draft":
+        raise HTTPException(
+            status_code=422,
+            detail="Survey cannot be activated: it is not in draft status",
+        )
+
+    # Check survey has at least one question group with at least one question
+    result = await session.execute(
+        select(func.count(QuestionGroup.id)).where(
+            QuestionGroup.survey_id == survey.id
+        )
+    )
+    group_count = result.scalar_one()
+    if group_count == 0:
+        raise HTTPException(
+            status_code=422,
+            detail="Survey cannot be activated: it has no questions",
+        )
+
+    survey.status = "active"
+    survey.updated_at = datetime.now(timezone.utc)
+    session.add(survey)
+    await session.flush()
+    await session.refresh(survey)
+    return survey
+
+
+async def close_survey(
+    session: AsyncSession,
+    survey: Survey,
+) -> Survey:
+    """Transition survey from active -> closed. Raises 422 if not active."""
+    if survey.status != "active":
+        raise HTTPException(
+            status_code=422,
+            detail="Survey cannot be closed: it is not in active status",
+        )
+
+    survey.status = "closed"
+    survey.updated_at = datetime.now(timezone.utc)
+    session.add(survey)
+    await session.flush()
+    await session.refresh(survey)
+    return survey
+
+
+async def archive_survey(
+    session: AsyncSession,
+    survey: Survey,
+) -> Survey:
+    """Transition survey from closed -> archived. Raises 422 if not closed."""
+    if survey.status != "closed":
+        raise HTTPException(
+            status_code=422,
+            detail="Survey cannot be archived: it is not in closed status",
+        )
+
+    survey.status = "archived"
     survey.updated_at = datetime.now(timezone.utc)
     session.add(survey)
     await session.flush()

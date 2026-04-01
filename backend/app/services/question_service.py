@@ -8,6 +8,7 @@ from sqlalchemy.orm import selectinload
 from app.models.question import Question
 from app.models.question_group import QuestionGroup
 from app.models.survey import Survey
+from app.services.survey_service import check_survey_editable
 
 
 def _with_subquestions():
@@ -106,9 +107,17 @@ async def create_question(
     settings: dict | None = None,
     parent_id: uuid.UUID | None = None,
 ) -> Question | None:
-    """Create a new question. Returns None if group/survey not found or not owned."""
+    """Create a new question. Returns None if group/survey not found or not owned.
+    Raises 422 if survey is not in draft status."""
     if not await _verify_group_ownership(session, survey_id, group_id, user_id):
         return None
+
+    survey_result = await session.execute(
+        select(Survey).where(Survey.id == survey_id)
+    )
+    survey = survey_result.scalar_one_or_none()
+    if survey is not None:
+        check_survey_editable(survey)
 
     # Auto-generate code if not provided
     if code is None:
@@ -218,7 +227,15 @@ async def update_question(
     question: Question,
     **kwargs,
 ) -> Question:
-    """Update only the provided fields of a question."""
+    """Update only the provided fields of a question. Raises 422 if survey is not in draft status."""
+    survey_result = await session.execute(
+        select(Survey)
+        .join(QuestionGroup, QuestionGroup.survey_id == Survey.id)
+        .where(QuestionGroup.id == question.group_id)
+    )
+    survey = survey_result.scalar_one_or_none()
+    if survey is not None:
+        check_survey_editable(survey)
     for field, value in kwargs.items():
         setattr(question, field, value)
 
