@@ -46,7 +46,7 @@ class QuestionGroup(Base):
         server_default=text("now()"),
     )
 
-    survey = relationship("Survey", back_populates="groups")
+    survey = relationship("Survey", back_populates="groups", lazy="raise")
     questions = relationship(
         "Question",
         back_populates="group",
