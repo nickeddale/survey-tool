@@ -104,9 +104,16 @@ def upgrade() -> None:
         ["parent_id"],
         unique=False,
     )
+    op.create_index(
+        "idx_questions_group_id_sort",
+        "questions",
+        ["group_id", "sort_order"],
+        unique=False,
+    )
 
 
 def downgrade() -> None:
+    op.drop_index("idx_questions_group_id_sort", table_name="questions")
     op.drop_index(op.f("ix_questions_parent_id"), table_name="questions")
     op.drop_index(op.f("ix_questions_group_id"), table_name="questions")
     op.drop_table("questions")

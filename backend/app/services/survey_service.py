@@ -63,9 +63,12 @@ async def get_survey_full_by_id(
     result = await session.execute(
         select(Survey)
         .options(
-            selectinload(Survey.groups).selectinload(QuestionGroup.questions).selectinload(
-                Question.subquestions
-            )
+            selectinload(Survey.groups)
+            .selectinload(QuestionGroup.questions)
+            .selectinload(Question.subquestions),
+            selectinload(Survey.groups)
+            .selectinload(QuestionGroup.questions)
+            .selectinload(Question.answer_options),
         )
         .where(
             Survey.id == survey_id,

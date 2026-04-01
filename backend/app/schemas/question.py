@@ -5,6 +5,7 @@ from typing import Any
 from pydantic import BaseModel, field_validator
 
 from app.models.question import VALID_QUESTION_TYPES
+from app.schemas.answer_option import AnswerOptionResponse
 
 
 class QuestionCreate(BaseModel):
@@ -67,6 +68,7 @@ class QuestionResponse(BaseModel):
     settings: dict[str, Any] | None
     created_at: datetime
     subquestions: list["QuestionResponse"] = []
+    answer_options: list[AnswerOptionResponse] = []
 
 
 # Resolve forward reference for self-referential subquestions

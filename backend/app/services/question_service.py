@@ -11,6 +11,15 @@ from app.models.survey import Survey
 from app.services.survey_service import check_survey_editable
 
 
+def _with_eager_loads():
+    """Return selectinload options for subquestions (2 levels deep) and answer_options."""
+    return (
+        selectinload(Question.subquestions).selectinload(Question.subquestions),
+        selectinload(Question.subquestions).selectinload(Question.answer_options),
+        selectinload(Question.answer_options),
+    )
+
+
 def _with_subquestions():
     """Return selectinload options that eagerly load subquestions 2 levels deep."""
     return selectinload(Question.subquestions).selectinload(Question.subquestions)
@@ -168,11 +177,11 @@ async def create_question(
         await session.rollback()
         raise
 
-    # Reload with subquestions eagerly loaded
+    # Reload with subquestions and answer_options eagerly loaded
     result = await session.execute(
         select(Question)
         .where(Question.id == question.id)
-        .options(_with_subquestions())
+        .options(*_with_eager_loads())
     )
     return result.scalar_one()
 
@@ -184,7 +193,7 @@ async def get_question_by_id(
     question_id: uuid.UUID,
     user_id: uuid.UUID,
 ) -> Question | None:
-    """Get a question by id, enforcing ownership. Includes subquestions."""
+    """Get a question by id, enforcing ownership. Includes subquestions and answer_options."""
     result = await session.execute(
         select(Question)
         .join(QuestionGroup, QuestionGroup.id == Question.group_id)
@@ -195,7 +204,7 @@ async def get_question_by_id(
             QuestionGroup.survey_id == survey_id,
             Survey.user_id == user_id,
         )
-        .options(_with_subquestions())
+        .options(*_with_eager_loads())
     )
     return result.scalar_one_or_none()
 
@@ -217,7 +226,7 @@ async def list_questions(
             Question.parent_id.is_(None),
         )
         .order_by(Question.sort_order)
-        .options(_with_subquestions())
+        .options(*_with_eager_loads())
     )
     return list(result.scalars().all())
 
@@ -242,11 +251,11 @@ async def update_question(
     session.add(question)
     await session.flush()
 
-    # Reload with subquestions
+    # Reload with subquestions and answer_options
     result = await session.execute(
         select(Question)
         .where(Question.id == question.id)
-        .options(_with_subquestions())
+        .options(*_with_eager_loads())
     )
     return result.scalar_one()
 
@@ -327,6 +336,6 @@ async def reorder_questions(
         select(Question)
         .where(Question.group_id == group_id)
         .order_by(Question.sort_order)
-        .options(_with_subquestions())
+        .options(*_with_eager_loads())
     )
     return list(result2.scalars().all())
