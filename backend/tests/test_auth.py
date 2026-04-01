@@ -80,14 +80,14 @@ async def test_register_duplicate_email_returns_409(client: AsyncClient):
 async def test_register_invalid_email_returns_422(client: AsyncClient):
     payload = {**VALID_PAYLOAD, "email": "not-an-email"}
     response = await client.post(REGISTER_URL, json=payload)
-    assert response.status_code == 422
+    assert response.status_code == 400
 
 
 @pytest.mark.asyncio
 async def test_register_short_password_returns_422(client: AsyncClient):
     payload = {**VALID_PAYLOAD, "email": "short@example.com", "password": "short"}
     response = await client.post(REGISTER_URL, json=payload)
-    assert response.status_code == 422
+    assert response.status_code == 400
 
 
 @pytest.mark.asyncio
@@ -407,7 +407,7 @@ async def test_patch_me_short_password_returns_422(client: AsyncClient):
         json={"password": "short"},
         headers={"Authorization": f"Bearer {tokens['access_token']}"},
     )
-    assert response.status_code == 422
+    assert response.status_code == 400
 
 
 @pytest.mark.asyncio

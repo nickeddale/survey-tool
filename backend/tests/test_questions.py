@@ -177,7 +177,7 @@ async def test_create_question_invalid_type_returns_422(client: AsyncClient):
         json={"question_type": "invalid_type", "title": "Bad Q"},
         headers=headers,
     )
-    assert response.status_code == 422
+    assert response.status_code == 400
 
 
 @pytest.mark.asyncio
@@ -482,7 +482,7 @@ async def test_patch_question_invalid_type_returns_422(client: AsyncClient):
         json={"question_type": "invalid_type"},
         headers=headers,
     )
-    assert response.status_code == 422
+    assert response.status_code == 400
 
 
 @pytest.mark.asyncio

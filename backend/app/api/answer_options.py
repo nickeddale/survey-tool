@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -22,6 +22,7 @@ from app.services.answer_option_service import (
     reorder_answer_options,
     update_answer_option,
 )
+from app.utils.errors import ConflictError, NotFoundError
 
 router = APIRouter(
     prefix="/surveys/{survey_id}/questions/{question_id}/options",
@@ -33,10 +34,7 @@ def _parse_uuid(value: str, label: str = "resource") -> uuid.UUID:
     try:
         return uuid.UUID(value)
     except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"{label} not found",
-        )
+        raise NotFoundError(f"{label} not found")
 
 
 @router.post(
@@ -66,16 +64,10 @@ async def create(
             assessment_value=payload.assessment_value,
         )
     except IntegrityError:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="An option with that code already exists for this question",
-        )
+        raise ConflictError("An option with that code already exists for this question")
 
     if option is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey or question not found",
-        )
+        raise NotFoundError("Survey or question not found")
     return AnswerOptionResponse.model_validate(option)
 
 
@@ -98,10 +90,7 @@ async def list_all(
         user_id=current_user.id,
     )
     if options is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey or question not found",
-        )
+        raise NotFoundError("Survey or question not found")
 
     total = len(options)
     start = (page - 1) * per_page
@@ -140,10 +129,7 @@ async def reorder(
         items=items,
     )
     if options is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey, question, or option IDs not found",
-        )
+        raise NotFoundError("Survey, question, or option IDs not found")
     return [AnswerOptionResponse.model_validate(o) for o in options]
 
 
@@ -167,10 +153,7 @@ async def get_one(
         user_id=current_user.id,
     )
     if option is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Answer option not found",
-        )
+        raise NotFoundError("Answer option not found")
     return AnswerOptionResponse.model_validate(option)
 
 
@@ -195,19 +178,13 @@ async def patch(
         user_id=current_user.id,
     )
     if option is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Answer option not found",
-        )
+        raise NotFoundError("Answer option not found")
 
     update_fields = payload.model_dump(exclude_unset=True)
     try:
         option = await update_answer_option(session, option, **update_fields)
     except IntegrityError:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="An option with that code already exists for this question",
-        )
+        raise ConflictError("An option with that code already exists for this question")
     return AnswerOptionResponse.model_validate(option)
 
 
@@ -231,8 +208,5 @@ async def delete(
         user_id=current_user.id,
     )
     if option is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Answer option not found",
-        )
+        raise NotFoundError("Answer option not found")
     await delete_answer_option(session, option)

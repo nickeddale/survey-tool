@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -20,6 +20,7 @@ from app.services.question_group_service import (
     reorder_groups,
     update_group,
 )
+from app.utils.errors import NotFoundError
 
 router = APIRouter(prefix="/surveys/{survey_id}/groups", tags=["question_groups"])
 
@@ -28,10 +29,7 @@ def _parse_uuid(value: str, label: str = "resource") -> uuid.UUID:
     try:
         return uuid.UUID(value)
     except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"{label} not found",
-        )
+        raise NotFoundError(f"{label} not found")
 
 
 @router.post(
@@ -56,10 +54,7 @@ async def create(
         relevance=payload.relevance,
     )
     if group is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey not found",
-        )
+        raise NotFoundError("Survey not found")
     return QuestionGroupResponse.model_validate(group)
 
 
@@ -72,10 +67,7 @@ async def list_all(
     parsed_survey_id = _parse_uuid(survey_id, "Survey")
     groups = await list_groups(session, survey_id=parsed_survey_id, user_id=current_user.id)
     if groups is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey not found",
-        )
+        raise NotFoundError("Survey not found")
     return [QuestionGroupResponse.model_validate(g) for g in groups]
 
 
@@ -95,10 +87,7 @@ async def reorder(
         order=order,
     )
     if groups is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey not found or group IDs do not belong to this survey",
-        )
+        raise NotFoundError("Survey not found or group IDs do not belong to this survey")
     return [QuestionGroupResponse.model_validate(g) for g in groups]
 
 
@@ -118,10 +107,7 @@ async def get_one(
         user_id=current_user.id,
     )
     if group is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Group not found",
-        )
+        raise NotFoundError("Group not found")
     return QuestionGroupResponse.model_validate(group)
 
 
@@ -142,10 +128,7 @@ async def patch(
         user_id=current_user.id,
     )
     if group is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Group not found",
-        )
+        raise NotFoundError("Group not found")
     update_fields = payload.model_dump(exclude_unset=True)
     group = await update_group(session, group, **update_fields)
     return QuestionGroupResponse.model_validate(group)
@@ -167,8 +150,5 @@ async def delete(
         user_id=current_user.id,
     )
     if group is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Group not found",
-        )
+        raise NotFoundError("Group not found")
     await delete_group(session, group)
