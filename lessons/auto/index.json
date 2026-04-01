@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-01T07:28:44.779Z",
+  "lastUpdated": "2026-04-01T08:11:40.252Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -44,51 +44,86 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
+      "ticketId": "ISS-003",
+      "title": "Task 1.3: User Model and Registration Endpoint",
+      "date": "2026-04-01",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
     "testing": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
-      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md"
+      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md",
+      "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
-      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md"
+      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md",
+      "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
-      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md"
+      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md",
+      "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
-      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md"
+      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md",
+      "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md"
     ],
     "bug-fix": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
-      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md"
+      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md",
+      "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
-      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md"
+      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md",
+      "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
-      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md"
+      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md",
+      "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
-      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md"
+      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md",
+      "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
-      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md"
+      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md",
+      "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
-      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md"
+      "2026-04-01-iss-002-task-12-database-engine-and-alembic-setup.md",
+      "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md"
+    ],
+    "security": [
+      "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md"
     ]
   },
   "fileIndex": {}

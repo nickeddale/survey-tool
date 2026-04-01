@@ -20,7 +20,7 @@ config.set_main_option("sqlalchemy.url", settings.database_url)
 
 # Import all models here so that Base.metadata is populated for autogenerate.
 # Add new model imports below as they are created in future tasks.
-# e.g.:  from app.models.user import User  # noqa: F401
+from app.models.user import User  # noqa: F401
 
 target_metadata = Base.metadata
 
