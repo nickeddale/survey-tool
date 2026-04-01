@@ -1,5 +1,20 @@
 """Pytest fixtures for the test suite."""
 
+import os
+
+# Force the asyncpg scheme in DATABASE_URL before any app modules are imported.
+# The container environment sets the psycopg2 scheme by default which fails with
+# the async SQLAlchemy engine at module-import time (app/database.py validates).
+_env_url = os.environ.get("DATABASE_URL", "")
+if _env_url.startswith("postgresql://"):
+    os.environ["DATABASE_URL"] = _env_url.replace(
+        "postgresql://", "postgresql+asyncpg://", 1
+    )
+elif not _env_url:
+    os.environ["DATABASE_URL"] = (
+        "postgresql+asyncpg://postgres:postgres@test-postgres:5432/devtracker"
+    )
+
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
