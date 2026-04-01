@@ -58,10 +58,15 @@ async def get_survey_full_by_id(
     survey_id: uuid.UUID,
     user_id: uuid.UUID,
 ) -> Survey | None:
-    """Get a survey with eagerly-loaded groups, enforcing user ownership."""
+    """Get a survey with eagerly-loaded groups and questions, enforcing user ownership."""
+    from app.models.question import Question  # local import to avoid circular
     result = await session.execute(
         select(Survey)
-        .options(selectinload(Survey.groups))
+        .options(
+            selectinload(Survey.groups).selectinload(QuestionGroup.questions).selectinload(
+                Question.subquestions
+            )
+        )
         .where(
             Survey.id == survey_id,
             Survey.user_id == user_id,

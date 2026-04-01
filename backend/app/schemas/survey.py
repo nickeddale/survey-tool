@@ -54,3 +54,60 @@ class SurveyListResponse(BaseModel):
     total: int
     page: int
     per_page: int
+
+
+# ---------------------------------------------------------------------------
+# Clone / Export / Import schemas
+# ---------------------------------------------------------------------------
+
+
+class SurveyCloneRequest(BaseModel):
+    title: str | None = None
+
+
+class SurveyExportAnswerOption(BaseModel):
+    code: str
+    title: str
+    sort_order: int
+    assessment_value: int
+
+
+class SurveyExportQuestion(BaseModel):
+    code: str
+    question_type: str
+    title: str
+    description: str | None = None
+    is_required: bool = False
+    sort_order: int = 1
+    relevance: str | None = None
+    validation: dict[str, Any] | None = None
+    settings: dict[str, Any] | None = None
+    answer_options: list[SurveyExportAnswerOption] = []
+    subquestions: list["SurveyExportQuestion"] = []
+
+
+SurveyExportQuestion.model_rebuild()
+
+
+class SurveyExportGroup(BaseModel):
+    title: str
+    description: str | None = None
+    sort_order: int = 1
+    relevance: str | None = None
+    questions: list[SurveyExportQuestion] = []
+
+
+class SurveyExportResponse(BaseModel):
+    title: str
+    description: str | None = None
+    status: str
+    welcome_message: str | None = None
+    end_message: str | None = None
+    default_language: str = "en"
+    settings: dict[str, Any] | None = None
+    groups: list[SurveyExportGroup] = []
+
+
+class SurveyImportRequest(BaseModel):
+    title: str | None = None
+    data: dict[str, Any]

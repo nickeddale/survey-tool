@@ -7,11 +7,19 @@ from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
 from app.schemas.survey import (
+    SurveyCloneRequest,
     SurveyCreate,
+    SurveyExportResponse,
     SurveyFullResponse,
+    SurveyImportRequest,
     SurveyListResponse,
     SurveyResponse,
     SurveyUpdate,
+)
+from app.services.export_service import (
+    clone_survey,
+    export_survey,
+    import_survey,
 )
 from app.services.survey_service import (
     activate_survey,
@@ -226,3 +234,60 @@ async def archive(
 
     survey = await archive_survey(session, survey)
     return SurveyResponse.model_validate(survey)
+
+
+@router.post(
+    "/{survey_id}/clone",
+    response_model=SurveyResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def clone(
+    survey_id: str,
+    payload: SurveyCloneRequest = SurveyCloneRequest(),
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> SurveyResponse:
+    try:
+        parsed_id = uuid.UUID(survey_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Survey not found",
+        )
+
+    new_survey = await clone_survey(session, parsed_id, current_user.id, title=payload.title)
+    return SurveyResponse.model_validate(new_survey)
+
+
+@router.get("/{survey_id}/export", response_model=SurveyExportResponse)
+async def export(
+    survey_id: str,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> SurveyExportResponse:
+    try:
+        parsed_id = uuid.UUID(survey_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Survey not found",
+        )
+
+    data = await export_survey(session, parsed_id, current_user.id)
+    return SurveyExportResponse(**data)
+
+
+@router.post(
+    "/import",
+    response_model=SurveyResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def import_survey_endpoint(
+    payload: SurveyImportRequest,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> SurveyResponse:
+    new_survey = await import_survey(
+        session, current_user.id, payload.data, title=payload.title
+    )
+    return SurveyResponse.model_validate(new_survey)
