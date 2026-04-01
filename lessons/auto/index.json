@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-01T13:04:48.703Z",
+  "lastUpdated": "2026-04-01T13:09:59.517Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -317,6 +317,26 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md",
+      "ticketId": "ISS-016",
+      "title": "1.3: User Model and Registration Endpoint",
+      "date": "2026-04-01",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -335,7 +355,8 @@
       "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
-      "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md"
+      "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
+      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -352,7 +373,8 @@
       "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
-      "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md"
+      "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
+      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -369,7 +391,8 @@
       "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
-      "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md"
+      "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
+      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -386,7 +409,8 @@
       "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
-      "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md"
+      "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
+      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -409,7 +433,8 @@
       "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
-      "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md"
+      "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
+      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -426,7 +451,8 @@
       "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
-      "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md"
+      "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
+      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -462,7 +488,8 @@
       "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
-      "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md"
+      "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
+      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -479,7 +506,8 @@
       "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
-      "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md"
+      "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
+      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -493,7 +521,8 @@
       "2026-04-01-iss-011-task-111-survey-clone-and-exportimport.md",
       "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
-      "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md"
+      "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
+      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md"
     ]
   },
   "fileIndex": {}
