@@ -63,8 +63,15 @@ def upgrade() -> None:
         ["question_id"],
         unique=False,
     )
+    op.create_index(
+        "idx_answer_options_question_id_sort",
+        "answer_options",
+        ["question_id", "sort_order"],
+        unique=False,
+    )
 
 
 def downgrade() -> None:
+    op.drop_index("idx_answer_options_question_id_sort", table_name="answer_options")
     op.drop_index(op.f("ix_answer_options_question_id"), table_name="answer_options")
     op.drop_table("answer_options")
