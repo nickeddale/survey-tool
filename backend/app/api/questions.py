@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -22,6 +22,7 @@ from app.services.question_service import (
     reorder_questions,
     update_question,
 )
+from app.utils.errors import ConflictError, NotFoundError
 
 router = APIRouter(
     prefix="/surveys/{survey_id}/groups/{group_id}/questions",
@@ -33,10 +34,7 @@ def _parse_uuid(value: str, label: str = "resource") -> uuid.UUID:
     try:
         return uuid.UUID(value)
     except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"{label} not found",
-        )
+        raise NotFoundError(f"{label} not found")
 
 
 @router.post(
@@ -72,21 +70,12 @@ async def create(
             parent_id=payload.parent_id,
         )
     except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=str(exc),
-        )
+        raise ConflictError(str(exc))
     except IntegrityError:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="A question with that code already exists in this survey",
-        )
+        raise ConflictError("A question with that code already exists in this survey")
 
     if question is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey or group not found",
-        )
+        raise NotFoundError("Survey or group not found")
     return QuestionResponse.model_validate(question)
 
 
@@ -109,10 +98,7 @@ async def list_all(
         user_id=current_user.id,
     )
     if questions is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey or group not found",
-        )
+        raise NotFoundError("Survey or group not found")
 
     total = len(questions)
     start = (page - 1) * per_page
@@ -155,10 +141,7 @@ async def reorder(
         items=items,
     )
     if questions is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey, group, or question IDs not found",
-        )
+        raise NotFoundError("Survey, group, or question IDs not found")
     return [QuestionResponse.model_validate(q) for q in questions]
 
 
@@ -182,10 +165,7 @@ async def get_one(
         user_id=current_user.id,
     )
     if question is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Question not found",
-        )
+        raise NotFoundError("Question not found")
     return QuestionResponse.model_validate(question)
 
 
@@ -210,10 +190,7 @@ async def patch(
         user_id=current_user.id,
     )
     if question is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Question not found",
-        )
+        raise NotFoundError("Question not found")
 
     update_fields = payload.model_dump(exclude_unset=True)
     question = await update_question(session, question, **update_fields)
@@ -240,8 +217,5 @@ async def delete(
         user_id=current_user.id,
     )
     if question is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Question not found",
-        )
+        raise NotFoundError("Question not found")
     await delete_question(session, question)

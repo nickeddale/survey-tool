@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -36,6 +36,7 @@ from app.services.auth_service import (
     revoke_refresh_token,
     verify_password,
 )
+from app.utils.errors import ConflictError, NotFoundError, UnauthorizedError
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -51,10 +52,7 @@ async def register(
 ) -> UserResponse:
     existing = await get_user_by_email(session, payload.email)
     if existing is not None:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="A user with this email already exists.",
-        )
+        raise ConflictError("A user with this email already exists.")
 
     user = User(
         email=payload.email,
@@ -75,17 +73,9 @@ async def login(
 ) -> TokenResponse:
     user = await get_user_by_email(session, payload.email)
     if user is None or not verify_password(payload.password, user.password_hash):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise UnauthorizedError("Invalid email or password")
     if not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User account is inactive",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise UnauthorizedError("User account is inactive")
 
     access_token = create_access_token({"sub": str(user.id)})
     refresh_token = generate_refresh_token()
@@ -108,18 +98,10 @@ async def refresh(
     record = await get_refresh_token_by_hash(session, token_hash)
 
     if record is None or record.revoked:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or revoked refresh token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise UnauthorizedError("Invalid or revoked refresh token")
 
     if record.expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Refresh token has expired",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise UnauthorizedError("Refresh token has expired")
 
     # Revoke the old token (rotation)
     await revoke_refresh_token(session, record)
@@ -220,10 +202,7 @@ async def delete_key(
     try:
         parsed_id = uuid.UUID(key_id)
     except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="API key not found",
-        )
+        raise NotFoundError("API key not found")
 
     result = await session.execute(
         select(ApiKey).where(
@@ -232,8 +211,5 @@ async def delete_key(
     )
     record = result.scalar_one_or_none()
     if record is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="API key not found",
-        )
+        raise NotFoundError("API key not found")
     await revoke_api_key(session, record)

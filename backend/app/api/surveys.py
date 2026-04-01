@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -32,8 +32,16 @@ from app.services.survey_service import (
     list_surveys,
     update_survey,
 )
+from app.utils.errors import NotFoundError
 
 router = APIRouter(prefix="/surveys", tags=["surveys"])
+
+
+def _parse_survey_id(value: str) -> uuid.UUID:
+    try:
+        return uuid.UUID(value)
+    except ValueError:
+        raise NotFoundError("Survey not found")
 
 
 @router.post(
@@ -92,21 +100,10 @@ async def get_one(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> SurveyFullResponse:
-    try:
-        parsed_id = uuid.UUID(survey_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey not found",
-        )
-
+    parsed_id = _parse_survey_id(survey_id)
     survey = await get_survey_full_by_id(session, parsed_id, current_user.id)
     if survey is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey not found",
-        )
-
+        raise NotFoundError("Survey not found")
     return SurveyFullResponse.model_validate(survey)
 
 
@@ -117,20 +114,10 @@ async def patch(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> SurveyResponse:
-    try:
-        parsed_id = uuid.UUID(survey_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey not found",
-        )
-
+    parsed_id = _parse_survey_id(survey_id)
     survey = await get_survey_by_id(session, parsed_id, current_user.id)
     if survey is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey not found",
-        )
+        raise NotFoundError("Survey not found")
 
     update_fields = payload.model_dump(exclude_unset=True)
     survey = await update_survey(session, survey, **update_fields)
@@ -143,21 +130,10 @@ async def delete(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> None:
-    try:
-        parsed_id = uuid.UUID(survey_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey not found",
-        )
-
+    parsed_id = _parse_survey_id(survey_id)
     survey = await get_survey_by_id(session, parsed_id, current_user.id)
     if survey is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey not found",
-        )
-
+        raise NotFoundError("Survey not found")
     await delete_survey(session, survey)
 
 
@@ -167,21 +143,10 @@ async def activate(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> SurveyResponse:
-    try:
-        parsed_id = uuid.UUID(survey_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey not found",
-        )
-
+    parsed_id = _parse_survey_id(survey_id)
     survey = await get_survey_by_id(session, parsed_id, current_user.id)
     if survey is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey not found",
-        )
-
+        raise NotFoundError("Survey not found")
     survey = await activate_survey(session, survey)
     return SurveyResponse.model_validate(survey)
 
@@ -192,21 +157,10 @@ async def close(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> SurveyResponse:
-    try:
-        parsed_id = uuid.UUID(survey_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey not found",
-        )
-
+    parsed_id = _parse_survey_id(survey_id)
     survey = await get_survey_by_id(session, parsed_id, current_user.id)
     if survey is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey not found",
-        )
-
+        raise NotFoundError("Survey not found")
     survey = await close_survey(session, survey)
     return SurveyResponse.model_validate(survey)
 
@@ -217,21 +171,10 @@ async def archive(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> SurveyResponse:
-    try:
-        parsed_id = uuid.UUID(survey_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey not found",
-        )
-
+    parsed_id = _parse_survey_id(survey_id)
     survey = await get_survey_by_id(session, parsed_id, current_user.id)
     if survey is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey not found",
-        )
-
+        raise NotFoundError("Survey not found")
     survey = await archive_survey(session, survey)
     return SurveyResponse.model_validate(survey)
 
@@ -247,14 +190,7 @@ async def clone(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> SurveyResponse:
-    try:
-        parsed_id = uuid.UUID(survey_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey not found",
-        )
-
+    parsed_id = _parse_survey_id(survey_id)
     new_survey = await clone_survey(session, parsed_id, current_user.id, title=payload.title)
     return SurveyResponse.model_validate(new_survey)
 
@@ -265,14 +201,7 @@ async def export(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> SurveyExportResponse:
-    try:
-        parsed_id = uuid.UUID(survey_id)
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Survey not found",
-        )
-
+    parsed_id = _parse_survey_id(survey_id)
     data = await export_survey(session, parsed_id, current_user.id)
     return SurveyExportResponse(**data)
 
