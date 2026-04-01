@@ -14,6 +14,9 @@ from app.schemas.survey import (
     SurveyUpdate,
 )
 from app.services.survey_service import (
+    activate_survey,
+    archive_survey,
+    close_survey,
     create_survey,
     delete_survey,
     get_survey_by_id,
@@ -148,3 +151,78 @@ async def delete(
         )
 
     await delete_survey(session, survey)
+
+
+@router.post("/{survey_id}/activate", response_model=SurveyResponse)
+async def activate(
+    survey_id: str,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> SurveyResponse:
+    try:
+        parsed_id = uuid.UUID(survey_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Survey not found",
+        )
+
+    survey = await get_survey_by_id(session, parsed_id, current_user.id)
+    if survey is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Survey not found",
+        )
+
+    survey = await activate_survey(session, survey)
+    return SurveyResponse.model_validate(survey)
+
+
+@router.post("/{survey_id}/close", response_model=SurveyResponse)
+async def close(
+    survey_id: str,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> SurveyResponse:
+    try:
+        parsed_id = uuid.UUID(survey_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Survey not found",
+        )
+
+    survey = await get_survey_by_id(session, parsed_id, current_user.id)
+    if survey is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Survey not found",
+        )
+
+    survey = await close_survey(session, survey)
+    return SurveyResponse.model_validate(survey)
+
+
+@router.post("/{survey_id}/archive", response_model=SurveyResponse)
+async def archive(
+    survey_id: str,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> SurveyResponse:
+    try:
+        parsed_id = uuid.UUID(survey_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Survey not found",
+        )
+
+    survey = await get_survey_by_id(session, parsed_id, current_user.id)
+    if survey is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Survey not found",
+        )
+
+    survey = await archive_survey(session, survey)
+    return SurveyResponse.model_validate(survey)

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-01T11:16:00.104Z",
+  "lastUpdated": "2026-04-01T11:24:44.929Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -193,6 +193,26 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-01-iss-010-task-110-survey-status-transitions.md",
+      "ticketId": "ISS-010",
+      "title": "Task 1.10: Survey Status Transitions",
+      "date": "2026-04-01",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -205,7 +225,8 @@
       "2026-04-01-iss-006-task-16-survey-model-and-crud-endpoints.md",
       "2026-04-01-iss-007-task-17-question-group-model-and-crud-endpoints.md",
       "2026-04-01-iss-008-task-18-question-model-and-crud-endpoints.md",
-      "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md"
+      "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md",
+      "2026-04-01-iss-010-task-110-survey-status-transitions.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -216,7 +237,8 @@
       "2026-04-01-iss-006-task-16-survey-model-and-crud-endpoints.md",
       "2026-04-01-iss-007-task-17-question-group-model-and-crud-endpoints.md",
       "2026-04-01-iss-008-task-18-question-model-and-crud-endpoints.md",
-      "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md"
+      "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md",
+      "2026-04-01-iss-010-task-110-survey-status-transitions.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -227,7 +249,8 @@
       "2026-04-01-iss-006-task-16-survey-model-and-crud-endpoints.md",
       "2026-04-01-iss-007-task-17-question-group-model-and-crud-endpoints.md",
       "2026-04-01-iss-008-task-18-question-model-and-crud-endpoints.md",
-      "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md"
+      "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md",
+      "2026-04-01-iss-010-task-110-survey-status-transitions.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -238,7 +261,8 @@
       "2026-04-01-iss-006-task-16-survey-model-and-crud-endpoints.md",
       "2026-04-01-iss-007-task-17-question-group-model-and-crud-endpoints.md",
       "2026-04-01-iss-008-task-18-question-model-and-crud-endpoints.md",
-      "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md"
+      "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md",
+      "2026-04-01-iss-010-task-110-survey-status-transitions.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -254,7 +278,8 @@
       "2026-04-01-iss-006-task-16-survey-model-and-crud-endpoints.md",
       "2026-04-01-iss-007-task-17-question-group-model-and-crud-endpoints.md",
       "2026-04-01-iss-008-task-18-question-model-and-crud-endpoints.md",
-      "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md"
+      "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md",
+      "2026-04-01-iss-010-task-110-survey-status-transitions.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -265,7 +290,8 @@
       "2026-04-01-iss-006-task-16-survey-model-and-crud-endpoints.md",
       "2026-04-01-iss-007-task-17-question-group-model-and-crud-endpoints.md",
       "2026-04-01-iss-008-task-18-question-model-and-crud-endpoints.md",
-      "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md"
+      "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md",
+      "2026-04-01-iss-010-task-110-survey-status-transitions.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -291,7 +317,8 @@
       "2026-04-01-iss-006-task-16-survey-model-and-crud-endpoints.md",
       "2026-04-01-iss-007-task-17-question-group-model-and-crud-endpoints.md",
       "2026-04-01-iss-008-task-18-question-model-and-crud-endpoints.md",
-      "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md"
+      "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md",
+      "2026-04-01-iss-010-task-110-survey-status-transitions.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -302,7 +329,8 @@
       "2026-04-01-iss-006-task-16-survey-model-and-crud-endpoints.md",
       "2026-04-01-iss-007-task-17-question-group-model-and-crud-endpoints.md",
       "2026-04-01-iss-008-task-18-question-model-and-crud-endpoints.md",
-      "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md"
+      "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md",
+      "2026-04-01-iss-010-task-110-survey-status-transitions.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -311,7 +339,8 @@
       "2026-04-01-iss-006-task-16-survey-model-and-crud-endpoints.md",
       "2026-04-01-iss-007-task-17-question-group-model-and-crud-endpoints.md",
       "2026-04-01-iss-008-task-18-question-model-and-crud-endpoints.md",
-      "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md"
+      "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md",
+      "2026-04-01-iss-010-task-110-survey-status-transitions.md"
     ]
   },
   "fileIndex": {}

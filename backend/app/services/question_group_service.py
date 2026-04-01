@@ -6,6 +6,7 @@ from sqlalchemy.orm import selectinload
 
 from app.models.question_group import QuestionGroup
 from app.models.survey import Survey
+from app.services.survey_service import check_survey_editable
 
 
 async def _verify_survey_ownership(
@@ -21,6 +22,21 @@ async def _verify_survey_ownership(
         )
     )
     return result.scalar_one_or_none() is not None
+
+
+async def _get_owned_survey(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+    user_id: uuid.UUID,
+) -> Survey | None:
+    """Fetch the survey if owned by user_id, else return None."""
+    result = await session.execute(
+        select(Survey).where(
+            Survey.id == survey_id,
+            Survey.user_id == user_id,
+        )
+    )
+    return result.scalar_one_or_none()
 
 
 async def _next_sort_order(
@@ -45,9 +61,12 @@ async def create_group(
     sort_order: int | None = None,
     relevance: str | None = None,
 ) -> QuestionGroup | None:
-    """Create a new question group scoped to a survey. Returns None if survey not found/owned."""
-    if not await _verify_survey_ownership(session, survey_id, user_id):
+    """Create a new question group scoped to a survey. Returns None if survey not found/owned.
+    Raises 422 if survey is not in draft status."""
+    survey = await _get_owned_survey(session, survey_id, user_id)
+    if survey is None:
         return None
+    check_survey_editable(survey)
 
     if sort_order is None:
         sort_order = await _next_sort_order(session, survey_id)
@@ -114,7 +133,13 @@ async def update_group(
     group: QuestionGroup,
     **kwargs,
 ) -> QuestionGroup:
-    """Update only the provided fields of a group."""
+    """Update only the provided fields of a group. Raises 422 if survey is not in draft status."""
+    survey_result = await session.execute(
+        select(Survey).where(Survey.id == group.survey_id)
+    )
+    survey = survey_result.scalar_one_or_none()
+    if survey is not None:
+        check_survey_editable(survey)
     for field, value in kwargs.items():
         if value is not None:
             setattr(group, field, value)
