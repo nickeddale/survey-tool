@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-01T14:13:37.722Z",
+  "lastUpdated": "2026-04-01T14:23:06.907Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -520,6 +520,27 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-01-iss-026-113-backend-test-infrastructure-and-initial-test-s.md",
+      "ticketId": "ISS-026",
+      "title": "1.13: Backend Test Infrastructure and Initial Test Suite",
+      "date": "2026-04-01",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -548,7 +569,8 @@
       "2026-04-01-iss-022-19-answer-option-model-and-crud-endpoints.md",
       "2026-04-01-iss-023-110-survey-status-transitions.md",
       "2026-04-01-iss-024-111-survey-clone-and-exportimport.md",
-      "2026-04-01-iss-025-112-api-error-handling-pagination-and-middleware.md"
+      "2026-04-01-iss-025-112-api-error-handling-pagination-and-middleware.md",
+      "2026-04-01-iss-026-113-backend-test-infrastructure-and-initial-test-s.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -575,7 +597,8 @@
       "2026-04-01-iss-022-19-answer-option-model-and-crud-endpoints.md",
       "2026-04-01-iss-023-110-survey-status-transitions.md",
       "2026-04-01-iss-024-111-survey-clone-and-exportimport.md",
-      "2026-04-01-iss-025-112-api-error-handling-pagination-and-middleware.md"
+      "2026-04-01-iss-025-112-api-error-handling-pagination-and-middleware.md",
+      "2026-04-01-iss-026-113-backend-test-infrastructure-and-initial-test-s.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -602,7 +625,8 @@
       "2026-04-01-iss-022-19-answer-option-model-and-crud-endpoints.md",
       "2026-04-01-iss-023-110-survey-status-transitions.md",
       "2026-04-01-iss-024-111-survey-clone-and-exportimport.md",
-      "2026-04-01-iss-025-112-api-error-handling-pagination-and-middleware.md"
+      "2026-04-01-iss-025-112-api-error-handling-pagination-and-middleware.md",
+      "2026-04-01-iss-026-113-backend-test-infrastructure-and-initial-test-s.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -629,7 +653,8 @@
       "2026-04-01-iss-022-19-answer-option-model-and-crud-endpoints.md",
       "2026-04-01-iss-023-110-survey-status-transitions.md",
       "2026-04-01-iss-024-111-survey-clone-and-exportimport.md",
-      "2026-04-01-iss-025-112-api-error-handling-pagination-and-middleware.md"
+      "2026-04-01-iss-025-112-api-error-handling-pagination-and-middleware.md",
+      "2026-04-01-iss-026-113-backend-test-infrastructure-and-initial-test-s.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -663,7 +688,8 @@
       "2026-04-01-iss-022-19-answer-option-model-and-crud-endpoints.md",
       "2026-04-01-iss-023-110-survey-status-transitions.md",
       "2026-04-01-iss-024-111-survey-clone-and-exportimport.md",
-      "2026-04-01-iss-025-112-api-error-handling-pagination-and-middleware.md"
+      "2026-04-01-iss-025-112-api-error-handling-pagination-and-middleware.md",
+      "2026-04-01-iss-026-113-backend-test-infrastructure-and-initial-test-s.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -690,7 +716,8 @@
       "2026-04-01-iss-022-19-answer-option-model-and-crud-endpoints.md",
       "2026-04-01-iss-023-110-survey-status-transitions.md",
       "2026-04-01-iss-024-111-survey-clone-and-exportimport.md",
-      "2026-04-01-iss-025-112-api-error-handling-pagination-and-middleware.md"
+      "2026-04-01-iss-025-112-api-error-handling-pagination-and-middleware.md",
+      "2026-04-01-iss-026-113-backend-test-infrastructure-and-initial-test-s.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -703,7 +730,8 @@
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
       "2026-04-01-iss-018-15-api-key-model-and-crud-endpoints.md",
-      "2026-04-01-iss-023-110-survey-status-transitions.md"
+      "2026-04-01-iss-023-110-survey-status-transitions.md",
+      "2026-04-01-iss-026-113-backend-test-infrastructure-and-initial-test-s.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -738,7 +766,8 @@
       "2026-04-01-iss-022-19-answer-option-model-and-crud-endpoints.md",
       "2026-04-01-iss-023-110-survey-status-transitions.md",
       "2026-04-01-iss-024-111-survey-clone-and-exportimport.md",
-      "2026-04-01-iss-025-112-api-error-handling-pagination-and-middleware.md"
+      "2026-04-01-iss-025-112-api-error-handling-pagination-and-middleware.md",
+      "2026-04-01-iss-026-113-backend-test-infrastructure-and-initial-test-s.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -765,7 +794,8 @@
       "2026-04-01-iss-022-19-answer-option-model-and-crud-endpoints.md",
       "2026-04-01-iss-023-110-survey-status-transitions.md",
       "2026-04-01-iss-024-111-survey-clone-and-exportimport.md",
-      "2026-04-01-iss-025-112-api-error-handling-pagination-and-middleware.md"
+      "2026-04-01-iss-025-112-api-error-handling-pagination-and-middleware.md",
+      "2026-04-01-iss-026-113-backend-test-infrastructure-and-initial-test-s.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -789,7 +819,8 @@
       "2026-04-01-iss-022-19-answer-option-model-and-crud-endpoints.md",
       "2026-04-01-iss-023-110-survey-status-transitions.md",
       "2026-04-01-iss-024-111-survey-clone-and-exportimport.md",
-      "2026-04-01-iss-025-112-api-error-handling-pagination-and-middleware.md"
+      "2026-04-01-iss-025-112-api-error-handling-pagination-and-middleware.md",
+      "2026-04-01-iss-026-113-backend-test-infrastructure-and-initial-test-s.md"
     ]
   },
   "fileIndex": {}
