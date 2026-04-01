@@ -17,6 +17,7 @@ from app.services.survey_service import (
     create_survey,
     delete_survey,
     get_survey_by_id,
+    get_survey_full_by_id,
     list_surveys,
     update_survey,
 )
@@ -88,7 +89,7 @@ async def get_one(
             detail="Survey not found",
         )
 
-    survey = await get_survey_by_id(session, parsed_id, current_user.id)
+    survey = await get_survey_full_by_id(session, parsed_id, current_user.id)
     if survey is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

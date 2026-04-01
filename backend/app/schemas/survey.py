@@ -4,6 +4,8 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from app.schemas.question_group import QuestionGroupResponse
+
 
 class SurveyCreate(BaseModel):
     title: str
@@ -42,7 +44,7 @@ class SurveyResponse(BaseModel):
 
 
 class SurveyFullResponse(SurveyResponse):
-    groups: list = []
+    groups: list[QuestionGroupResponse] = []
     questions: list = []
     options: list = []
 

@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.models.survey import Survey
 
@@ -43,6 +44,23 @@ async def get_survey_by_id(
     """Get a survey by id, enforcing user ownership (returns None if not found or wrong owner)."""
     result = await session.execute(
         select(Survey).where(
+            Survey.id == survey_id,
+            Survey.user_id == user_id,
+        )
+    )
+    return result.scalar_one_or_none()
+
+
+async def get_survey_full_by_id(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+    user_id: uuid.UUID,
+) -> Survey | None:
+    """Get a survey with eagerly-loaded groups, enforcing user ownership."""
+    result = await session.execute(
+        select(Survey)
+        .options(selectinload(Survey.groups))
+        .where(
             Survey.id == survey_id,
             Survey.user_id == user_id,
         )

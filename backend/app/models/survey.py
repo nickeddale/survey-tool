@@ -69,3 +69,10 @@ class Survey(Base):
     )
 
     user = relationship("User", back_populates="surveys")
+    groups = relationship(
+        "QuestionGroup",
+        back_populates="survey",
+        cascade="all, delete-orphan",
+        lazy="raise",
+        order_by="QuestionGroup.sort_order",
+    )
