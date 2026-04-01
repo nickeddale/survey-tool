@@ -8,6 +8,7 @@ from app.models.answer_option import AnswerOption
 from app.models.question import Question
 from app.models.question_group import QuestionGroup
 from app.models.survey import Survey
+from app.services.survey_service import check_survey_editable
 
 
 async def _verify_question_ownership(
@@ -61,6 +62,17 @@ async def _next_code(
         n += 1
 
 
+async def _get_survey_for_question(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+) -> Survey | None:
+    """Fetch the survey by id."""
+    result = await session.execute(
+        select(Survey).where(Survey.id == survey_id)
+    )
+    return result.scalar_one_or_none()
+
+
 async def create_answer_option(
     session: AsyncSession,
     survey_id: uuid.UUID,
@@ -71,9 +83,14 @@ async def create_answer_option(
     sort_order: int | None = None,
     assessment_value: int = 0,
 ) -> AnswerOption | None:
-    """Create a new answer option. Returns None if question/survey not found or not owned."""
+    """Create a new answer option. Returns None if question/survey not found or not owned.
+    Raises 422 if survey is not in draft status."""
     if not await _verify_question_ownership(session, survey_id, question_id, user_id):
         return None
+
+    survey = await _get_survey_for_question(session, survey_id)
+    if survey is not None:
+        check_survey_editable(survey)
 
     if code is None:
         code = await _next_code(session, question_id)
@@ -147,7 +164,16 @@ async def update_answer_option(
     option: AnswerOption,
     **kwargs,
 ) -> AnswerOption:
-    """Update only the provided fields of an answer option."""
+    """Update only the provided fields of an answer option. Raises 422 if survey is not in draft status."""
+    survey_result = await session.execute(
+        select(Survey)
+        .join(Question, Question.id == option.question_id)
+        .join(QuestionGroup, QuestionGroup.id == Question.group_id)
+        .where(QuestionGroup.survey_id == Survey.id)
+    )
+    survey = survey_result.scalar_one_or_none()
+    if survey is not None:
+        check_survey_editable(survey)
     for field, value in kwargs.items():
         setattr(option, field, value)
 
@@ -164,7 +190,16 @@ async def delete_answer_option(
     session: AsyncSession,
     option: AnswerOption,
 ) -> None:
-    """Delete an answer option."""
+    """Delete an answer option. Raises 422 if survey is not in draft status."""
+    survey_result = await session.execute(
+        select(Survey)
+        .join(QuestionGroup, QuestionGroup.survey_id == Survey.id)
+        .join(Question, Question.group_id == QuestionGroup.id)
+        .where(Question.id == option.question_id)
+    )
+    survey = survey_result.scalar_one_or_none()
+    if survey is not None:
+        check_survey_editable(survey)
     await session.delete(option)
     await session.flush()
 

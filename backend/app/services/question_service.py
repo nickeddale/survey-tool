@@ -264,7 +264,15 @@ async def delete_question(
     session: AsyncSession,
     question: Question,
 ) -> None:
-    """Delete a question (cascade to subquestions handled by DB FK and ORM cascade)."""
+    """Delete a question (cascade to subquestions handled by DB FK and ORM cascade). Raises 422 if survey is not in draft status."""
+    survey_result = await session.execute(
+        select(Survey)
+        .join(QuestionGroup, QuestionGroup.survey_id == Survey.id)
+        .where(QuestionGroup.id == question.group_id)
+    )
+    survey = survey_result.scalar_one_or_none()
+    if survey is not None:
+        check_survey_editable(survey)
     await session.delete(question)
     await session.flush()
 

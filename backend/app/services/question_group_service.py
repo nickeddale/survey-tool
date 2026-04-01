@@ -160,7 +160,13 @@ async def delete_group(
     session: AsyncSession,
     group: QuestionGroup,
 ) -> None:
-    """Delete a group (cascade to questions handled by DB FK)."""
+    """Delete a group (cascade to questions handled by DB FK). Raises 422 if survey is not in draft status."""
+    survey_result = await session.execute(
+        select(Survey).where(Survey.id == group.survey_id)
+    )
+    survey = survey_result.scalar_one_or_none()
+    if survey is not None:
+        check_survey_editable(survey)
     await session.delete(group)
     await session.flush()
 
