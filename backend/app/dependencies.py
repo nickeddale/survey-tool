@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from fastapi import Depends, Request
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,6 +17,8 @@ from app.services.api_key_service import (
 from app.utils.errors import ForbiddenError, UnauthorizedError
 
 bearer_scheme = HTTPBearer(auto_error=False)
+
+_WWW_AUTH = "Bearer"
 
 
 async def get_current_user(
@@ -50,14 +52,29 @@ async def get_current_user(
     try:
         payload = decode_access_token(credentials.credentials)
         user_id_str: str | None = payload.get("sub")
-        if user_id_str is None:
-            raise UnauthorizedError("Could not validate credentials")
+        token_type: str | None = payload.get("type")
+        if user_id_str is None or token_type != "access":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail={"code": "UNAUTHORIZED", "message": "Could not validate credentials"},
+                headers={"WWW-Authenticate": _WWW_AUTH},
+            )
         user_id = uuid.UUID(user_id_str)
+    except HTTPException:
+        raise
     except (JWTError, ValueError):
-        raise UnauthorizedError("Could not validate credentials")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"code": "UNAUTHORIZED", "message": "Could not validate credentials"},
+            headers={"WWW-Authenticate": _WWW_AUTH},
+        )
 
     user = await get_user_by_id(session, user_id)
     if user is None or not user.is_active:
-        raise UnauthorizedError("Could not validate credentials")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"code": "UNAUTHORIZED", "message": "Could not validate credentials"},
+            headers={"WWW-Authenticate": _WWW_AUTH},
+        )
 
     return user

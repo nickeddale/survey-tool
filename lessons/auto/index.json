@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-01T13:09:59.517Z",
+  "lastUpdated": "2026-04-01T13:15:35.480Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -337,6 +337,27 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-01-iss-017-14-jwt-authentication-login-refresh-middleware.md",
+      "ticketId": "ISS-017",
+      "title": "1.4: JWT Authentication (Login, Refresh, Middleware)",
+      "date": "2026-04-01",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "refactoring",
+        "bug-fix",
+        "feature",
+        "security",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -356,7 +377,8 @@
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
       "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
-      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md"
+      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md",
+      "2026-04-01-iss-017-14-jwt-authentication-login-refresh-middleware.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -374,7 +396,8 @@
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
       "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
-      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md"
+      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md",
+      "2026-04-01-iss-017-14-jwt-authentication-login-refresh-middleware.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -392,7 +415,8 @@
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
       "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
-      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md"
+      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md",
+      "2026-04-01-iss-017-14-jwt-authentication-login-refresh-middleware.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -410,13 +434,15 @@
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
       "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
-      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md"
+      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md",
+      "2026-04-01-iss-017-14-jwt-authentication-login-refresh-middleware.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
       "2026-04-01-iss-004-task-14-jwt-authentication-login-refresh-middlewar.md",
       "2026-04-01-iss-008-task-18-question-model-and-crud-endpoints.md",
-      "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md"
+      "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
+      "2026-04-01-iss-017-14-jwt-authentication-login-refresh-middleware.md"
     ],
     "bug-fix": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -434,7 +460,8 @@
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
       "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
-      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md"
+      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md",
+      "2026-04-01-iss-017-14-jwt-authentication-login-refresh-middleware.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -452,7 +479,8 @@
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
       "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
-      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md"
+      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md",
+      "2026-04-01-iss-017-14-jwt-authentication-login-refresh-middleware.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -489,7 +517,8 @@
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
       "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
-      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md"
+      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md",
+      "2026-04-01-iss-017-14-jwt-authentication-login-refresh-middleware.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -507,7 +536,8 @@
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
       "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
-      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md"
+      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md",
+      "2026-04-01-iss-017-14-jwt-authentication-login-refresh-middleware.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -522,7 +552,8 @@
       "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
       "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
-      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md"
+      "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md",
+      "2026-04-01-iss-017-14-jwt-authentication-login-refresh-middleware.md"
     ]
   },
   "fileIndex": {}
