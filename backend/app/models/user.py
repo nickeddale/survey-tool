@@ -53,3 +53,6 @@ class User(Base):
     api_keys = relationship(
         "ApiKey", back_populates="user", cascade="all, delete-orphan"
     )
+    surveys = relationship(
+        "Survey", back_populates="user", cascade="all, delete-orphan"
+    )
