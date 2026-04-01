@@ -15,8 +15,17 @@ from app.services.api_key_service import (
     update_last_used,
 )
 from app.utils.errors import ForbiddenError, UnauthorizedError
+from app.utils.pagination import PaginationParams
 
 bearer_scheme = HTTPBearer(auto_error=False)
+
+
+def pagination_params(page: int = 1, per_page: int = 20) -> PaginationParams:
+    """Reusable FastAPI dependency for pagination query parameters."""
+    params = PaginationParams.__new__(PaginationParams)
+    params.page = max(1, page)
+    params.per_page = min(max(1, per_page), 100)
+    return params
 
 _WWW_AUTH = "Bearer"
 
