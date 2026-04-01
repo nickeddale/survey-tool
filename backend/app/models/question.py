@@ -113,3 +113,9 @@ class Question(Base):
         cascade="all, delete-orphan",
         lazy="raise",
     )
+    answer_options = relationship(
+        "AnswerOption",
+        back_populates="question",
+        cascade="all, delete-orphan",
+        lazy="raise",
+    )
