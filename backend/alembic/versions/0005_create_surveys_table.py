@@ -78,9 +78,13 @@ def upgrade() -> None:
     op.create_index(
         op.f("ix_surveys_title"), "surveys", ["title"], unique=False
     )
+    op.create_index(
+        "idx_surveys_user_id_status", "surveys", ["user_id", "status"], unique=False
+    )
 
 
 def downgrade() -> None:
+    op.drop_index("idx_surveys_user_id_status", table_name="surveys")
     op.drop_index(op.f("ix_surveys_title"), table_name="surveys")
     op.drop_index(op.f("ix_surveys_status"), table_name="surveys")
     op.drop_index(op.f("ix_surveys_user_id"), table_name="surveys")
