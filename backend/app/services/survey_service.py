@@ -6,6 +6,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.models.question import Question
 from app.models.question_group import QuestionGroup
 from app.models.survey import Survey
 
@@ -155,14 +156,17 @@ async def activate_survey(
             detail="Survey cannot be activated: it is not in draft status",
         )
 
-    # Check survey has at least one question group with at least one question
+    # Check survey has at least one question (not just groups)
     result = await session.execute(
-        select(func.count(QuestionGroup.id)).where(
-            QuestionGroup.survey_id == survey.id
+        select(func.count(Question.id))
+        .join(QuestionGroup, QuestionGroup.id == Question.group_id)
+        .where(
+            QuestionGroup.survey_id == survey.id,
+            Question.parent_id.is_(None),
         )
     )
-    group_count = result.scalar_one()
-    if group_count == 0:
+    question_count = result.scalar_one()
+    if question_count == 0:
         raise HTTPException(
             status_code=422,
             detail="Survey cannot be activated: it has no questions",
