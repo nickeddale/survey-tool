@@ -1,12 +1,16 @@
+import uuid
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.database import get_db
 from app.dependencies import get_current_user
+from app.models.api_key import ApiKey
 from app.models.user import User
+from app.schemas.api_key import ApiKeyCreate, ApiKeyCreateResponse, ApiKeyResponse
 from app.schemas.user import (
     LoginRequest,
     LogoutRequest,
@@ -15,6 +19,11 @@ from app.schemas.user import (
     UserCreate,
     UserResponse,
     UserUpdateRequest,
+)
+from app.services.api_key_service import (
+    create_api_key,
+    list_api_keys_for_user,
+    revoke_api_key,
 )
 from app.services.auth_service import (
     create_access_token,
@@ -162,3 +171,69 @@ async def update_me(
     await session.refresh(current_user)
 
     return UserResponse.model_validate(current_user)
+
+
+@router.post(
+    "/keys",
+    response_model=ApiKeyCreateResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_key(
+    payload: ApiKeyCreate,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> ApiKeyCreateResponse:
+    record, raw_key = await create_api_key(
+        session,
+        user_id=current_user.id,
+        name=payload.name,
+        scopes=payload.scopes,
+        expires_at=payload.expires_at,
+    )
+    return ApiKeyCreateResponse(
+        id=record.id,
+        name=record.name,
+        key=raw_key,
+        key_prefix=record.key_prefix,
+        scopes=record.scopes,
+        is_active=record.is_active,
+        expires_at=record.expires_at,
+        created_at=record.created_at,
+    )
+
+
+@router.get("/keys", response_model=list[ApiKeyResponse])
+async def list_keys(
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> list[ApiKeyResponse]:
+    keys = await list_api_keys_for_user(session, current_user.id)
+    return [ApiKeyResponse.model_validate(k) for k in keys]
+
+
+@router.delete("/keys/{key_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_key(
+    key_id: str,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> None:
+    try:
+        parsed_id = uuid.UUID(key_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="API key not found",
+        )
+
+    result = await session.execute(
+        select(ApiKey).where(
+            ApiKey.id == parsed_id, ApiKey.user_id == current_user.id
+        )
+    )
+    record = result.scalar_one_or_none()
+    if record is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="API key not found",
+        )
+    await revoke_api_key(session, record)
