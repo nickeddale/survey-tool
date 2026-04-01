@@ -166,6 +166,20 @@ async def test_login_access_token_contains_sub(client: AsyncClient):
 
 
 @pytest.mark.asyncio
+async def test_login_access_token_contains_type_access(client: AsyncClient):
+    await client.post(REGISTER_URL, json=VALID_PAYLOAD)
+    response = await client.post(
+        LOGIN_URL,
+        json={"email": VALID_PAYLOAD["email"], "password": VALID_PAYLOAD["password"]},
+    )
+    body = response.json()
+    payload = jwt.decode(
+        body["access_token"], settings.jwt_secret, algorithms=[settings.jwt_algorithm]
+    )
+    assert payload.get("type") == "access"
+
+
+@pytest.mark.asyncio
 async def test_login_expires_in_matches_config(client: AsyncClient):
     await client.post(REGISTER_URL, json=VALID_PAYLOAD)
     response = await client.post(
