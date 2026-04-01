@@ -1,0 +1,174 @@
+import uuid
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.database import get_db
+from app.dependencies import get_current_user
+from app.models.user import User
+from app.schemas.question_group import (
+    QuestionGroupCreate,
+    QuestionGroupReorderRequest,
+    QuestionGroupResponse,
+    QuestionGroupUpdate,
+)
+from app.services.question_group_service import (
+    create_group,
+    delete_group,
+    get_group_by_id,
+    list_groups,
+    reorder_groups,
+    update_group,
+)
+
+router = APIRouter(prefix="/surveys/{survey_id}/groups", tags=["question_groups"])
+
+
+def _parse_uuid(value: str, label: str = "resource") -> uuid.UUID:
+    try:
+        return uuid.UUID(value)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"{label} not found",
+        )
+
+
+@router.post(
+    "",
+    response_model=QuestionGroupResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create(
+    survey_id: str,
+    payload: QuestionGroupCreate,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> QuestionGroupResponse:
+    parsed_survey_id = _parse_uuid(survey_id, "Survey")
+    group = await create_group(
+        session,
+        survey_id=parsed_survey_id,
+        user_id=current_user.id,
+        title=payload.title,
+        description=payload.description,
+        sort_order=payload.sort_order,
+        relevance=payload.relevance,
+    )
+    if group is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Survey not found",
+        )
+    return QuestionGroupResponse.model_validate(group)
+
+
+@router.get("", response_model=list[QuestionGroupResponse])
+async def list_all(
+    survey_id: str,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> list[QuestionGroupResponse]:
+    parsed_survey_id = _parse_uuid(survey_id, "Survey")
+    groups = await list_groups(session, survey_id=parsed_survey_id, user_id=current_user.id)
+    if groups is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Survey not found",
+        )
+    return [QuestionGroupResponse.model_validate(g) for g in groups]
+
+
+@router.patch("/reorder", response_model=list[QuestionGroupResponse])
+async def reorder(
+    survey_id: str,
+    payload: QuestionGroupReorderRequest,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> list[QuestionGroupResponse]:
+    parsed_survey_id = _parse_uuid(survey_id, "Survey")
+    order = [{"id": item.id, "sort_order": item.sort_order} for item in payload.order]
+    groups = await reorder_groups(
+        session,
+        survey_id=parsed_survey_id,
+        user_id=current_user.id,
+        order=order,
+    )
+    if groups is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Survey not found or group IDs do not belong to this survey",
+        )
+    return [QuestionGroupResponse.model_validate(g) for g in groups]
+
+
+@router.get("/{group_id}", response_model=QuestionGroupResponse)
+async def get_one(
+    survey_id: str,
+    group_id: str,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> QuestionGroupResponse:
+    parsed_survey_id = _parse_uuid(survey_id, "Survey")
+    parsed_group_id = _parse_uuid(group_id, "Group")
+    group = await get_group_by_id(
+        session,
+        survey_id=parsed_survey_id,
+        group_id=parsed_group_id,
+        user_id=current_user.id,
+    )
+    if group is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Group not found",
+        )
+    return QuestionGroupResponse.model_validate(group)
+
+
+@router.patch("/{group_id}", response_model=QuestionGroupResponse)
+async def patch(
+    survey_id: str,
+    group_id: str,
+    payload: QuestionGroupUpdate,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> QuestionGroupResponse:
+    parsed_survey_id = _parse_uuid(survey_id, "Survey")
+    parsed_group_id = _parse_uuid(group_id, "Group")
+    group = await get_group_by_id(
+        session,
+        survey_id=parsed_survey_id,
+        group_id=parsed_group_id,
+        user_id=current_user.id,
+    )
+    if group is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Group not found",
+        )
+    update_fields = payload.model_dump(exclude_unset=True)
+    group = await update_group(session, group, **update_fields)
+    return QuestionGroupResponse.model_validate(group)
+
+
+@router.delete("/{group_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete(
+    survey_id: str,
+    group_id: str,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> None:
+    parsed_survey_id = _parse_uuid(survey_id, "Survey")
+    parsed_group_id = _parse_uuid(group_id, "Group")
+    group = await get_group_by_id(
+        session,
+        survey_id=parsed_survey_id,
+        group_id=parsed_group_id,
+        user_id=current_user.id,
+    )
+    if group is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Group not found",
+        )
+    await delete_group(session, group)
