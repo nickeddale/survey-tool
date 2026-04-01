@@ -1,7 +1,11 @@
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
+
+if TYPE_CHECKING:
+    from app.schemas.question import QuestionResponse
 
 
 class QuestionGroupCreate(BaseModel):
@@ -28,7 +32,7 @@ class QuestionGroupResponse(BaseModel):
     sort_order: int
     relevance: str | None
     created_at: datetime
-    questions: list = []
+    questions: list["QuestionResponse"] = []
 
 
 class QuestionGroupReorderItem(BaseModel):
@@ -38,3 +42,8 @@ class QuestionGroupReorderItem(BaseModel):
 
 class QuestionGroupReorderRequest(BaseModel):
     order: list[QuestionGroupReorderItem]
+
+
+# Resolve forward reference
+from app.schemas.question import QuestionResponse  # noqa: E402
+QuestionGroupResponse.model_rebuild()
