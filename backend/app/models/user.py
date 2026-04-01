@@ -2,7 +2,7 @@ import uuid
 
 from sqlalchemy import Boolean, DateTime, String, text
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
@@ -45,4 +45,8 @@ class User(Base):
         nullable=False,
         server_default=text("now()"),
         onupdate=text("now()"),
+    )
+
+    refresh_tokens = relationship(
+        "RefreshToken", back_populates="user", cascade="all, delete-orphan"
     )
