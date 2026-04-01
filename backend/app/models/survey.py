@@ -3,10 +3,16 @@ from datetime import datetime
 
 import sqlalchemy as sa
 from sqlalchemy import DateTime, ForeignKey, String, text
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import ENUM, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+
+survey_status = ENUM(
+    "draft", "active", "closed", "archived",
+    name="survey_status",
+    create_type=False,
+)
 
 
 class Survey(Base):
@@ -26,16 +32,17 @@ class Survey(Base):
     title: Mapped[str] = mapped_column(
         String(255),
         nullable=False,
+        index=True,
     )
     description: Mapped[str | None] = mapped_column(
         sa.Text,
         nullable=True,
     )
     status: Mapped[str] = mapped_column(
-        sa.String(50),
+        survey_status,
         nullable=False,
         default="draft",
-        server_default=text("'draft'"),
+        server_default=text("'draft'::survey_status"),
         index=True,
     )
     welcome_message: Mapped[str | None] = mapped_column(
