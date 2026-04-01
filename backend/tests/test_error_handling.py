@@ -8,6 +8,7 @@ from app.utils.errors import (
     ConflictError,
     ForbiddenError,
     NotFoundError,
+    RateLimitedError,
     UnauthorizedError,
     UnprocessableError,
     ValidationError,
@@ -56,6 +57,12 @@ class TestErrorClasses:
         assert err.status_code == 403
         assert err.code == "FORBIDDEN"
 
+    def test_rate_limited_error_attributes(self):
+        err = RateLimitedError("Too many requests")
+        assert err.status_code == 429
+        assert err.code == "RATE_LIMITED"
+        assert err.message == "Too many requests"
+
 
 # ---------------------------------------------------------------------------
 # Integration tests via HTTP client (no DB needed)
@@ -94,6 +101,10 @@ async def plain_client():
     @test_router.get("/forbidden")
     async def raise_forbidden():
         raise ForbiddenError("Forbidden")
+
+    @test_router.get("/rate-limited")
+    async def raise_rate_limited():
+        raise RateLimitedError("Too many requests")
 
     @test_router.get("/unhandled")
     async def raise_unhandled():
@@ -217,3 +228,35 @@ async def test_pydantic_validation_error_returns_400(plain_client):
     assert resp.status_code == 400
     body = resp.json()
     assert body["detail"]["code"] == "VALIDATION_ERROR"
+
+
+@pytest.mark.asyncio
+async def test_rate_limited_error_response(plain_client):
+    """RateLimitedError raises 429 RATE_LIMITED in standard format."""
+    resp = await plain_client.get("/test-errors/rate-limited")
+    assert resp.status_code == 429
+    body = resp.json()
+    assert body["detail"]["code"] == "RATE_LIMITED"
+    assert body["detail"]["message"] == "Too many requests"
+
+
+@pytest.mark.asyncio
+async def test_cors_header_present(plain_client):
+    """CORS middleware adds Access-Control-Allow-Origin for matching origins."""
+    resp = await plain_client.get(
+        "/health",
+        headers={"Origin": "http://localhost:3000"},
+    )
+    assert resp.status_code == 200
+    assert "access-control-allow-origin" in resp.headers
+
+
+@pytest.mark.asyncio
+async def test_error_response_format_has_detail_code_message(plain_client):
+    """All error responses must follow {detail: {code, message}} format."""
+    resp = await plain_client.get("/test-errors/not-found")
+    body = resp.json()
+    assert "detail" in body
+    assert isinstance(body["detail"], dict)
+    assert "code" in body["detail"]
+    assert "message" in body["detail"]
