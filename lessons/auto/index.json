@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-01T14:03:12.629Z",
+  "lastUpdated": "2026-04-01T14:08:41.975Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -480,6 +480,26 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-01-iss-024-111-survey-clone-and-exportimport.md",
+      "ticketId": "ISS-024",
+      "title": "1.11: Survey Clone and Export/Import",
+      "date": "2026-04-01",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -506,7 +526,8 @@
       "2026-04-01-iss-020-17-question-group-model-and-crud-endpoints.md",
       "2026-04-01-iss-021-18-question-model-and-crud-endpoints.md",
       "2026-04-01-iss-022-19-answer-option-model-and-crud-endpoints.md",
-      "2026-04-01-iss-023-110-survey-status-transitions.md"
+      "2026-04-01-iss-023-110-survey-status-transitions.md",
+      "2026-04-01-iss-024-111-survey-clone-and-exportimport.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -531,7 +552,8 @@
       "2026-04-01-iss-020-17-question-group-model-and-crud-endpoints.md",
       "2026-04-01-iss-021-18-question-model-and-crud-endpoints.md",
       "2026-04-01-iss-022-19-answer-option-model-and-crud-endpoints.md",
-      "2026-04-01-iss-023-110-survey-status-transitions.md"
+      "2026-04-01-iss-023-110-survey-status-transitions.md",
+      "2026-04-01-iss-024-111-survey-clone-and-exportimport.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -556,7 +578,8 @@
       "2026-04-01-iss-020-17-question-group-model-and-crud-endpoints.md",
       "2026-04-01-iss-021-18-question-model-and-crud-endpoints.md",
       "2026-04-01-iss-022-19-answer-option-model-and-crud-endpoints.md",
-      "2026-04-01-iss-023-110-survey-status-transitions.md"
+      "2026-04-01-iss-023-110-survey-status-transitions.md",
+      "2026-04-01-iss-024-111-survey-clone-and-exportimport.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -581,7 +604,8 @@
       "2026-04-01-iss-020-17-question-group-model-and-crud-endpoints.md",
       "2026-04-01-iss-021-18-question-model-and-crud-endpoints.md",
       "2026-04-01-iss-022-19-answer-option-model-and-crud-endpoints.md",
-      "2026-04-01-iss-023-110-survey-status-transitions.md"
+      "2026-04-01-iss-023-110-survey-status-transitions.md",
+      "2026-04-01-iss-024-111-survey-clone-and-exportimport.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -613,7 +637,8 @@
       "2026-04-01-iss-020-17-question-group-model-and-crud-endpoints.md",
       "2026-04-01-iss-021-18-question-model-and-crud-endpoints.md",
       "2026-04-01-iss-022-19-answer-option-model-and-crud-endpoints.md",
-      "2026-04-01-iss-023-110-survey-status-transitions.md"
+      "2026-04-01-iss-023-110-survey-status-transitions.md",
+      "2026-04-01-iss-024-111-survey-clone-and-exportimport.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -638,7 +663,8 @@
       "2026-04-01-iss-020-17-question-group-model-and-crud-endpoints.md",
       "2026-04-01-iss-021-18-question-model-and-crud-endpoints.md",
       "2026-04-01-iss-022-19-answer-option-model-and-crud-endpoints.md",
-      "2026-04-01-iss-023-110-survey-status-transitions.md"
+      "2026-04-01-iss-023-110-survey-status-transitions.md",
+      "2026-04-01-iss-024-111-survey-clone-and-exportimport.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -684,7 +710,8 @@
       "2026-04-01-iss-020-17-question-group-model-and-crud-endpoints.md",
       "2026-04-01-iss-021-18-question-model-and-crud-endpoints.md",
       "2026-04-01-iss-022-19-answer-option-model-and-crud-endpoints.md",
-      "2026-04-01-iss-023-110-survey-status-transitions.md"
+      "2026-04-01-iss-023-110-survey-status-transitions.md",
+      "2026-04-01-iss-024-111-survey-clone-and-exportimport.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -709,7 +736,8 @@
       "2026-04-01-iss-020-17-question-group-model-and-crud-endpoints.md",
       "2026-04-01-iss-021-18-question-model-and-crud-endpoints.md",
       "2026-04-01-iss-022-19-answer-option-model-and-crud-endpoints.md",
-      "2026-04-01-iss-023-110-survey-status-transitions.md"
+      "2026-04-01-iss-023-110-survey-status-transitions.md",
+      "2026-04-01-iss-024-111-survey-clone-and-exportimport.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -731,7 +759,8 @@
       "2026-04-01-iss-020-17-question-group-model-and-crud-endpoints.md",
       "2026-04-01-iss-021-18-question-model-and-crud-endpoints.md",
       "2026-04-01-iss-022-19-answer-option-model-and-crud-endpoints.md",
-      "2026-04-01-iss-023-110-survey-status-transitions.md"
+      "2026-04-01-iss-023-110-survey-status-transitions.md",
+      "2026-04-01-iss-024-111-survey-clone-and-exportimport.md"
     ]
   },
   "fileIndex": {}
