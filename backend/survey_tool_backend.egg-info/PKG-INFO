@@ -1,0 +1,18 @@
+Metadata-Version: 2.4
+Name: survey-tool-backend
+Version: 0.1.0
+Summary: Survey Tool Backend API
+Requires-Python: >=3.11
+Requires-Dist: fastapi<0.112,>=0.111
+Requires-Dist: uvicorn[standard]<0.30,>=0.29
+Requires-Dist: sqlalchemy[asyncio]<3.0,>=2.0
+Requires-Dist: asyncpg<0.30,>=0.29
+Requires-Dist: alembic<2.0,>=1.13
+Requires-Dist: pydantic-settings<3.0,>=2.2
+Requires-Dist: python-jose[cryptography]<4.0,>=3.3
+Requires-Dist: passlib[bcrypt]<2.0,>=1.7
+Provides-Extra: dev
+Requires-Dist: pytest<9.0,>=8.1; extra == "dev"
+Requires-Dist: pytest-asyncio<0.24,>=0.23; extra == "dev"
+Requires-Dist: httpx<0.28,>=0.27; extra == "dev"
+Requires-Dist: pytest-cov<6.0,>=5.0; extra == "dev"
