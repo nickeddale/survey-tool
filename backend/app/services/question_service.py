@@ -9,43 +9,8 @@ from app.models.question import Question
 from app.models.question_group import QuestionGroup
 from app.models.survey import Survey
 from app.services.survey_service import check_survey_editable
-from app.services.validators.choice_validators import (
-    validate_checkbox_settings,
-    validate_dropdown_settings,
-    validate_radio_settings,
-)
-from app.services.validators.matrix_validators import (
-    validate_matrix_settings,
-    validate_matrix_dropdown_settings,
-    validate_matrix_dynamic_settings,
-)
-from app.services.validators.scalar_validators import (
-    validate_numeric_settings,
-    validate_rating_settings,
-    validate_boolean_settings,
-    validate_date_settings,
-)
-
-_CHOICE_TYPE_VALIDATORS = {
-    "single_choice": validate_radio_settings,
-    "dropdown": validate_dropdown_settings,
-    "multiple_choice": validate_checkbox_settings,
-}
-
-# Matrix validators accept (settings, answer_options, subquestions) — different signature.
-_MATRIX_TYPE_VALIDATORS = {
-    "matrix": validate_matrix_settings,
-    "matrix_dropdown": validate_matrix_dropdown_settings,
-    "matrix_dynamic": validate_matrix_dynamic_settings,
-}
-
-# Scalar validators accept only (settings) — no answer_options or subquestions.
-_SCALAR_TYPE_VALIDATORS = {
-    "numeric": validate_numeric_settings,
-    "rating": validate_rating_settings,
-    "boolean": validate_boolean_settings,
-    "date": validate_date_settings,
-}
+from app.services.validators import validate_question_config
+from app.utils.errors import UnprocessableError
 
 
 def _with_eager_loads():
@@ -194,21 +159,17 @@ async def create_question(
     if existing.scalar_one_or_none() is not None:
         raise ValueError(f"Question code '{code}' already exists in this survey")
 
-    # Validate settings for choice question types.
-    # At creation time there are no answer_options yet, so we validate with an
-    # empty list — meaning settings cannot be provided on a new question that
-    # has no options (the "at least one option" check fires immediately).
-    if settings is not None and question_type in _CHOICE_TYPE_VALIDATORS:
-        _CHOICE_TYPE_VALIDATORS[question_type](settings, [])
-
-    # Validate settings for matrix question types.
+    # Validate settings and validation JSONB via the unified engine.
     # At creation time there are no answer_options or subquestions yet.
-    if settings is not None and question_type in _MATRIX_TYPE_VALIDATORS:
-        _MATRIX_TYPE_VALIDATORS[question_type](settings, [], [])
-
-    # Validate settings for scalar question types (no answer_options needed).
-    if settings is not None and question_type in _SCALAR_TYPE_VALIDATORS:
-        _SCALAR_TYPE_VALIDATORS[question_type](settings)
+    config_errors = validate_question_config(
+        question_type=question_type,
+        settings=settings,
+        validation=validation,
+        answer_options=[],
+        subquestions=[],
+    )
+    if config_errors:
+        raise UnprocessableError(config_errors[0].message)
 
     question = Question(
         group_id=group_id,
@@ -299,23 +260,19 @@ async def update_question(
     if survey is not None:
         check_survey_editable(survey)
 
-    # Validate settings when question type is a choice type and settings are being updated.
+    # Validate settings and validation JSONB via the unified engine.
     new_settings = kwargs.get("settings", question.settings)
+    new_validation = kwargs.get("validation", question.validation)
     effective_type = kwargs.get("question_type", question.question_type)
-    if new_settings is not None and effective_type in _CHOICE_TYPE_VALIDATORS:
-        _CHOICE_TYPE_VALIDATORS[effective_type](new_settings, list(question.answer_options))
-
-    # Validate settings for matrix question types.
-    if new_settings is not None and effective_type in _MATRIX_TYPE_VALIDATORS:
-        _MATRIX_TYPE_VALIDATORS[effective_type](
-            new_settings,
-            list(question.answer_options),
-            list(question.subquestions),
-        )
-
-    # Validate settings for scalar question types (no answer_options needed).
-    if new_settings is not None and effective_type in _SCALAR_TYPE_VALIDATORS:
-        _SCALAR_TYPE_VALIDATORS[effective_type](new_settings)
+    config_errors = validate_question_config(
+        question_type=effective_type,
+        settings=new_settings,
+        validation=new_validation,
+        answer_options=list(question.answer_options),
+        subquestions=list(question.subquestions),
+    )
+    if config_errors:
+        raise UnprocessableError(config_errors[0].message)
 
     for field, value in kwargs.items():
         setattr(question, field, value)
@@ -458,7 +415,6 @@ async def create_subquestion(
         return None
 
     if parent.question_type not in MATRIX_QUESTION_TYPES:
-        from app.utils.errors import UnprocessableError
         raise UnprocessableError(
             f"Subquestions can only be added to matrix question types "
             f"(got '{parent.question_type}')"
