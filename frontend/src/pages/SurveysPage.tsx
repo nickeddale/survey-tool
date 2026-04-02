@@ -4,6 +4,10 @@ import { Plus, Eye, Pencil, Trash2 } from 'lucide-react'
 import surveyService from '../services/surveyService'
 import type { SurveyResponse } from '../types/survey'
 import { ApiError } from '../types/api'
+import { Button } from '../components/ui/button'
+import { Input } from '../components/ui/input'
+import { Badge } from '../components/ui/badge'
+import { Skeleton } from '../components/ui/skeleton'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -33,12 +37,13 @@ const STATUS_STYLES: Record<string, string> = {
 function StatusBadge({ status }: { status: string }) {
   const cls = STATUS_STYLES[status] ?? 'bg-muted text-muted-foreground'
   return (
-    <span
-      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize ${cls}`}
+    <Badge
+      variant="secondary"
+      className={`capitalize ${cls} hover:${cls}`}
       data-testid={`status-badge-${status}`}
     >
       {status}
-    </span>
+    </Badge>
   )
 }
 
@@ -47,7 +52,7 @@ function LoadingSkeleton() {
     <div aria-label="Loading" aria-busy="true" data-testid="loading-skeleton">
       <div className="space-y-3">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-14 rounded-lg bg-muted animate-pulse" />
+          <Skeleton key={i} className="h-14 rounded-lg" />
         ))}
       </div>
     </div>
@@ -201,13 +206,10 @@ function SurveysPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-foreground">Surveys</h1>
-        <button
-          onClick={() => navigate('/surveys/new')}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
-        >
+        <Button onClick={() => navigate('/surveys/new')}>
           <Plus size={16} />
           Create New Survey
-        </button>
+        </Button>
       </div>
 
       {/* Error alert */}
@@ -219,13 +221,13 @@ function SurveysPage() {
 
       {/* Filter bar */}
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
-        <input
+        <Input
           type="text"
           placeholder="Search surveys..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           aria-label="Search surveys"
-          className="flex-1 px-3 py-2 text-sm border border-border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          className="flex-1"
         />
         <select
           value={statusFilter}
@@ -252,12 +254,9 @@ function SurveysPage() {
               : "You haven't created any surveys yet."}
           </p>
           {!debouncedSearch && statusFilter === 'all' && (
-            <button
-              onClick={() => navigate('/surveys/new')}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
-            >
+            <Button onClick={() => navigate('/surveys/new')}>
               Create your first survey
-            </button>
+            </Button>
           )}
         </div>
       ) : (
@@ -298,29 +297,35 @@ function SurveysPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => navigate(`/surveys/${survey.id}`)}
                           aria-label={`View ${survey.title}`}
-                          className="p-1.5 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
                         >
                           <Eye size={15} />
-                        </button>
+                        </Button>
                         {survey.status === 'draft' && (
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => navigate(`/surveys/${survey.id}/edit`)}
                             aria-label={`Edit ${survey.title}`}
-                            className="p-1.5 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                            className="h-8 w-8 text-muted-foreground hover:text-foreground"
                           >
                             <Pencil size={15} />
-                          </button>
+                          </Button>
                         )}
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => handleDelete(survey)}
                           aria-label={`Delete ${survey.title}`}
-                          className="p-1.5 rounded hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive"
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
                         >
                           <Trash2 size={15} />
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -335,37 +340,36 @@ function SurveysPage() {
               Page {page} of {totalPages} &mdash; {total} survey{total !== 1 ? 's' : ''}
             </p>
             <div className="flex items-center gap-1" aria-label="Pagination">
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
                 aria-label="Previous page"
-                className="px-3 py-1.5 text-sm border border-border rounded-md bg-background hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 Prev
-              </button>
+              </Button>
               {pageNumbers().map((n) => (
-                <button
+                <Button
                   key={n}
+                  variant={n === page ? 'default' : 'outline'}
+                  size="sm"
                   onClick={() => setPage(n)}
                   aria-label={`Page ${n}`}
                   aria-current={n === page ? 'page' : undefined}
-                  className={`px-3 py-1.5 text-sm border rounded-md transition-colors ${
-                    n === page
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'border-border bg-background hover:bg-muted'
-                  }`}
                 >
                   {n}
-                </button>
+                </Button>
               ))}
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
                 aria-label="Next page"
-                className="px-3 py-1.5 text-sm border border-border rounded-md bg-background hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 Next
-              </button>
+              </Button>
             </div>
           </div>
         </>

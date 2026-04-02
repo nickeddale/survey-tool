@@ -4,6 +4,9 @@ import { ArrowLeft, Pencil, Copy, Download, Trash2, ChevronRight, ChevronDown } 
 import surveyService from '../services/surveyService'
 import type { SurveyFullResponse, QuestionGroupResponse, QuestionResponse } from '../types/survey'
 import { ApiError } from '../types/api'
+import { Button } from '../components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
+import { Skeleton } from '../components/ui/skeleton'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -47,10 +50,10 @@ function LoadingSkeleton() {
   return (
     <div aria-label="Loading survey" aria-busy="true" data-testid="loading-skeleton">
       <div className="space-y-4">
-        <div className="h-8 w-64 rounded bg-muted animate-pulse" />
-        <div className="h-4 w-48 rounded bg-muted animate-pulse" />
-        <div className="h-32 rounded-lg bg-muted animate-pulse" />
-        <div className="h-32 rounded-lg bg-muted animate-pulse" />
+        <Skeleton className="h-8 w-64 rounded" />
+        <Skeleton className="h-4 w-48 rounded" />
+        <Skeleton className="h-32 rounded-lg" />
+        <Skeleton className="h-32 rounded-lg" />
       </div>
     </div>
   )
@@ -77,11 +80,6 @@ function ConfirmModal({
   onConfirm,
   onCancel,
 }: ConfirmModalProps) {
-  const confirmCls =
-    confirmVariant === 'danger'
-      ? 'bg-destructive text-destructive-foreground hover:opacity-90'
-      : 'bg-primary text-primary-foreground hover:opacity-90'
-
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
@@ -90,34 +88,32 @@ function ConfirmModal({
       aria-labelledby="modal-title"
       data-testid="confirm-modal"
     >
-      <div className="bg-card border border-border rounded-lg shadow-lg max-w-md w-full mx-4 p-6">
-        <h2 id="modal-title" className="text-lg font-semibold text-foreground mb-2">
-          {title}
-        </h2>
-        <p className="text-sm text-muted-foreground mb-4">{message}</p>
-        {error && (
-          <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
-            {error}
+      <Card className="max-w-md w-full mx-4 shadow-lg">
+        <CardContent className="p-6">
+          <h2 id="modal-title" className="text-lg font-semibold text-foreground mb-2">
+            {title}
+          </h2>
+          <p className="text-sm text-muted-foreground mb-4">{message}</p>
+          {error && (
+            <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+              {error}
+            </div>
+          )}
+          <div className="flex gap-3 justify-end">
+            <Button variant="outline" onClick={onCancel} disabled={isLoading}>
+              Cancel
+            </Button>
+            <Button
+              variant={confirmVariant === 'danger' ? 'destructive' : 'default'}
+              onClick={onConfirm}
+              disabled={isLoading}
+              data-testid="confirm-button"
+            >
+              {isLoading ? 'Please wait...' : confirmLabel}
+            </Button>
           </div>
-        )}
-        <div className="flex gap-3 justify-end">
-          <button
-            onClick={onCancel}
-            disabled={isLoading}
-            className="px-4 py-2 text-sm border border-border rounded-md bg-background text-foreground hover:bg-muted transition-colors disabled:opacity-50"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={isLoading}
-            className={`px-4 py-2 text-sm rounded-md font-medium transition-opacity disabled:opacity-50 ${confirmCls}`}
-            data-testid="confirm-button"
-          >
-            {isLoading ? 'Please wait...' : confirmLabel}
-          </button>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
@@ -497,21 +493,17 @@ function SurveyDetailPage() {
   if (notFound) {
     return (
       <div className="max-w-2xl mx-auto">
-        <div
-          className="p-6 bg-card border border-border rounded-lg text-center"
-          data-testid="survey-not-found"
-        >
-          <h2 className="text-xl font-semibold text-foreground mb-2">Survey Not Found</h2>
-          <p className="text-muted-foreground text-sm mb-4">
-            The survey you are looking for does not exist or has been deleted.
-          </p>
-          <button
-            onClick={() => navigate('/surveys')}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
-          >
-            Back to Surveys
-          </button>
-        </div>
+        <Card data-testid="survey-not-found">
+          <CardContent className="p-6 text-center">
+            <h2 className="text-xl font-semibold text-foreground mb-2">Survey Not Found</h2>
+            <p className="text-muted-foreground text-sm mb-4">
+              The survey you are looking for does not exist or has been deleted.
+            </p>
+            <Button onClick={() => navigate('/surveys')}>
+              Back to Surveys
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     )
   }
@@ -563,13 +555,15 @@ function SurveyDetailPage() {
 
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={() => navigate('/surveys')}
           aria-label="Back to surveys"
-          className="p-1.5 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+          className="h-8 w-8 text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft size={18} />
-        </button>
+        </Button>
         <div className="flex-1 min-w-0">
           <h1 className="text-2xl font-bold text-foreground truncate">{survey.title}</h1>
         </div>
@@ -587,122 +581,126 @@ function SurveyDetailPage() {
       <div className="flex flex-wrap items-center gap-2 mb-6">
         {/* Status transition actions */}
         {survey.status === 'draft' && (
-          <button
+          <Button
             onClick={() => openModal('activate')}
-            className="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
+            className="bg-green-600 text-white hover:bg-green-700"
             data-testid="activate-button"
           >
             Activate
-          </button>
+          </Button>
         )}
         {survey.status === 'active' && (
-          <button
+          <Button
             onClick={() => openModal('close')}
-            className="px-4 py-2 bg-yellow-600 text-white rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
+            className="bg-yellow-600 text-white hover:bg-yellow-700"
             data-testid="close-button"
           >
             Close
-          </button>
+          </Button>
         )}
         {survey.status === 'closed' && (
-          <button
+          <Button
+            variant="destructive"
             onClick={() => openModal('archive')}
-            className="px-4 py-2 bg-destructive text-destructive-foreground rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
             data-testid="archive-button"
           >
             Archive
-          </button>
+          </Button>
         )}
 
         <div className="flex-1" />
 
         {/* Always-available actions */}
         {survey.status === 'draft' && (
-          <button
+          <Button
+            variant="outline"
             onClick={() => navigate(`/surveys/${survey.id}/edit`)}
             aria-label="Edit survey"
-            className="flex items-center gap-1.5 px-3 py-2 text-sm border border-border rounded-md bg-background text-foreground hover:bg-muted transition-colors"
             data-testid="edit-button"
           >
             <Pencil size={14} />
             Edit
-          </button>
+          </Button>
         )}
-        <button
+        <Button
+          variant="outline"
           onClick={() => openModal('clone')}
           aria-label="Clone survey"
-          className="flex items-center gap-1.5 px-3 py-2 text-sm border border-border rounded-md bg-background text-foreground hover:bg-muted transition-colors"
           data-testid="clone-button"
         >
           <Copy size={14} />
           Clone
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
           onClick={handleExport}
           aria-label="Export survey"
-          className="flex items-center gap-1.5 px-3 py-2 text-sm border border-border rounded-md bg-background text-foreground hover:bg-muted transition-colors"
           data-testid="export-button"
         >
           <Download size={14} />
           Export
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
           onClick={() => openModal('delete')}
           aria-label="Delete survey"
-          className="flex items-center gap-1.5 px-3 py-2 text-sm border border-destructive/30 rounded-md bg-background text-destructive hover:bg-destructive/10 transition-colors"
+          className="border-destructive/30 text-destructive hover:bg-destructive/10"
           data-testid="delete-button"
         >
           <Trash2 size={14} />
           Delete
-        </button>
+        </Button>
       </div>
 
       {/* Metadata card */}
-      <div className="bg-card border border-border rounded-lg p-6 mb-6 space-y-4">
-        <h2 className="text-lg font-semibold text-foreground">Survey Information</h2>
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-lg">Survey Information</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {survey.description && (
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Description</p>
+              <p className="text-sm text-foreground">{survey.description}</p>
+            </div>
+          )}
 
-        {survey.description && (
-          <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Description</p>
-            <p className="text-sm text-foreground">{survey.description}</p>
-          </div>
-        )}
+          {survey.welcome_message && (
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Welcome Message</p>
+              <p className="text-sm text-foreground">{survey.welcome_message}</p>
+            </div>
+          )}
 
-        {survey.welcome_message && (
-          <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Welcome Message</p>
-            <p className="text-sm text-foreground">{survey.welcome_message}</p>
-          </div>
-        )}
+          {survey.end_message && (
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">End Message</p>
+              <p className="text-sm text-foreground">{survey.end_message}</p>
+            </div>
+          )}
 
-        {survey.end_message && (
-          <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">End Message</p>
-            <p className="text-sm text-foreground">{survey.end_message}</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Language</p>
+              <p className="text-sm text-foreground">
+                {LANGUAGE_LABELS[survey.default_language] ?? survey.default_language}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Questions</p>
+              <p className="text-sm text-foreground">{totalQuestions}</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Created</p>
+              <p className="text-sm text-foreground">{formattedDate(survey.created_at)}</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Last Updated</p>
+              <p className="text-sm text-foreground">{formattedDate(survey.updated_at)}</p>
+            </div>
           </div>
-        )}
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
-          <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Language</p>
-            <p className="text-sm text-foreground">
-              {LANGUAGE_LABELS[survey.default_language] ?? survey.default_language}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Questions</p>
-            <p className="text-sm text-foreground">{totalQuestions}</p>
-          </div>
-          <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Created</p>
-            <p className="text-sm text-foreground">{formattedDate(survey.created_at)}</p>
-          </div>
-          <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Last Updated</p>
-            <p className="text-sm text-foreground">{formattedDate(survey.updated_at)}</p>
-          </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Question groups tree */}
       <div>
@@ -714,20 +712,19 @@ function SurveyDetailPage() {
         </h2>
 
         {survey.groups.length === 0 ? (
-          <div
-            className="text-center py-10 bg-card border border-border rounded-lg"
-            data-testid="no-groups-state"
-          >
-            <p className="text-muted-foreground text-sm">No question groups have been added to this survey.</p>
-            {survey.status === 'draft' && (
-              <button
-                onClick={() => navigate(`/surveys/${survey.id}/edit`)}
-                className="mt-3 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
-              >
-                Edit Survey
-              </button>
-            )}
-          </div>
+          <Card data-testid="no-groups-state">
+            <CardContent className="text-center py-10">
+              <p className="text-muted-foreground text-sm">No question groups have been added to this survey.</p>
+              {survey.status === 'draft' && (
+                <Button
+                  className="mt-3"
+                  onClick={() => navigate(`/surveys/${survey.id}/edit`)}
+                >
+                  Edit Survey
+                </Button>
+              )}
+            </CardContent>
+          </Card>
         ) : (
           <div className="space-y-3" data-testid="groups-tree">
             {survey.groups.map((group) => (

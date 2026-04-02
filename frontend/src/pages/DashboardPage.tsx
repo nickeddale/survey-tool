@@ -4,6 +4,9 @@ import { Plus } from 'lucide-react'
 import surveyService, { DashboardStats } from '../services/surveyService'
 import type { SurveyResponse } from '../types/survey'
 import { ApiError } from '../types/api'
+import { Button } from '../components/ui/button'
+import { Card, CardContent } from '../components/ui/card'
+import { Skeleton } from '../components/ui/skeleton'
 
 // ---------------------------------------------------------------------------
 // Status badge
@@ -38,14 +41,14 @@ function LoadingSkeleton() {
       {/* Stat cards skeleton */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
+          <Skeleton key={i} className="h-24 rounded-lg" />
         ))}
       </div>
 
       {/* Recent surveys skeleton */}
       <div className="space-y-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="h-16 rounded-lg bg-muted animate-pulse" />
+          <Skeleton key={i} className="h-16 rounded-lg" />
         ))}
       </div>
     </div>
@@ -58,10 +61,12 @@ function LoadingSkeleton() {
 
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
-    <div className="bg-card border border-border rounded-lg p-4 flex flex-col gap-1">
-      <span className="text-2xl font-bold text-foreground">{value}</span>
-      <span className="text-sm text-muted-foreground capitalize">{label}</span>
-    </div>
+    <Card>
+      <CardContent className="p-4 flex flex-col gap-1">
+        <span className="text-2xl font-bold text-foreground">{value}</span>
+        <span className="text-sm text-muted-foreground capitalize">{label}</span>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -77,13 +82,15 @@ function SurveyCard({ survey }: { survey: SurveyResponse }) {
   })
 
   return (
-    <div className="bg-card border border-border rounded-lg px-4 py-3 flex items-center justify-between gap-4">
-      <div className="flex items-center gap-3 min-w-0">
-        <StatusBadge status={survey.status} />
-        <span className="text-sm font-medium text-foreground truncate">{survey.title}</span>
-      </div>
-      <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0">{updatedDate}</span>
-    </div>
+    <Card>
+      <CardContent className="px-4 py-3 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <StatusBadge status={survey.status} />
+          <span className="text-sm font-medium text-foreground truncate">{survey.title}</span>
+        </div>
+        <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0">{updatedDate}</span>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -135,13 +142,10 @@ function DashboardPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-        <button
-          onClick={() => navigate('/surveys/new')}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
-        >
+        <Button onClick={() => navigate('/surveys/new')}>
           <Plus size={16} />
           Create New Survey
-        </button>
+        </Button>
       </div>
 
       {error && (
@@ -169,17 +173,16 @@ function DashboardPage() {
           <div>
             <h2 className="text-lg font-semibold text-foreground mb-3">Recent Surveys</h2>
             {recentSurveys.length === 0 ? (
-              <div className="text-center py-12 bg-card border border-border rounded-lg">
-                <p className="text-muted-foreground text-sm mb-4">
-                  You haven&apos;t created any surveys yet.
-                </p>
-                <button
-                  onClick={() => navigate('/surveys/new')}
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
-                >
-                  Create your first survey
-                </button>
-              </div>
+              <Card>
+                <CardContent className="text-center py-12">
+                  <p className="text-muted-foreground text-sm mb-4">
+                    You haven&apos;t created any surveys yet.
+                  </p>
+                  <Button onClick={() => navigate('/surveys/new')}>
+                    Create your first survey
+                  </Button>
+                </CardContent>
+              </Card>
             ) : (
               <div className="space-y-2">
                 {recentSurveys.map((survey) => (
