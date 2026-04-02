@@ -14,11 +14,23 @@ from app.services.validators.choice_validators import (
     validate_dropdown_settings,
     validate_radio_settings,
 )
+from app.services.validators.matrix_validators import (
+    validate_matrix_settings,
+    validate_matrix_dropdown_settings,
+    validate_matrix_dynamic_settings,
+)
 
 _CHOICE_TYPE_VALIDATORS = {
     "single_choice": validate_radio_settings,
     "dropdown": validate_dropdown_settings,
     "multiple_choice": validate_checkbox_settings,
+}
+
+# Matrix validators accept (settings, answer_options, subquestions) — different signature.
+_MATRIX_TYPE_VALIDATORS = {
+    "matrix": validate_matrix_settings,
+    "matrix_dropdown": validate_matrix_dropdown_settings,
+    "matrix_dynamic": validate_matrix_dynamic_settings,
 }
 
 
@@ -175,6 +187,11 @@ async def create_question(
     if settings is not None and question_type in _CHOICE_TYPE_VALIDATORS:
         _CHOICE_TYPE_VALIDATORS[question_type](settings, [])
 
+    # Validate settings for matrix question types.
+    # At creation time there are no answer_options or subquestions yet.
+    if settings is not None and question_type in _MATRIX_TYPE_VALIDATORS:
+        _MATRIX_TYPE_VALIDATORS[question_type](settings, [], [])
+
     question = Question(
         group_id=group_id,
         parent_id=parent_id,
@@ -269,6 +286,14 @@ async def update_question(
     effective_type = kwargs.get("question_type", question.question_type)
     if new_settings is not None and effective_type in _CHOICE_TYPE_VALIDATORS:
         _CHOICE_TYPE_VALIDATORS[effective_type](new_settings, list(question.answer_options))
+
+    # Validate settings for matrix question types.
+    if new_settings is not None and effective_type in _MATRIX_TYPE_VALIDATORS:
+        _MATRIX_TYPE_VALIDATORS[effective_type](
+            new_settings,
+            list(question.answer_options),
+            list(question.subquestions),
+        )
 
     for field, value in kwargs.items():
         setattr(question, field, value)
@@ -372,3 +397,95 @@ async def reorder_questions(
         .options(*_with_eager_loads())
     )
     return list(result2.scalars().all())
+
+
+MATRIX_QUESTION_TYPES = frozenset({"matrix", "matrix_dropdown", "matrix_dynamic"})
+
+
+async def create_subquestion(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+    question_id: uuid.UUID,
+    user_id: uuid.UUID,
+    title: str,
+    code: str | None = None,
+    description: str | None = None,
+    is_required: bool = False,
+    sort_order: int | None = None,
+) -> Question | None:
+    """Create a subquestion for a matrix parent question.
+
+    Validates that the parent question exists, belongs to the user, and is a matrix type.
+    Auto-generates code as {parent_code}_SQ001, _SQ002, etc.
+    Returns None if the parent question is not found or not owned by the user.
+    """
+    # Fetch the parent question with ownership check via survey join
+    result = await session.execute(
+        select(Question)
+        .join(QuestionGroup, QuestionGroup.id == Question.group_id)
+        .join(Survey, Survey.id == QuestionGroup.survey_id)
+        .where(
+            Question.id == question_id,
+            QuestionGroup.survey_id == survey_id,
+            Survey.user_id == user_id,
+        )
+        .options(*_with_eager_loads())
+    )
+    parent = result.scalar_one_or_none()
+    if parent is None:
+        return None
+
+    if parent.question_type not in MATRIX_QUESTION_TYPES:
+        from app.utils.errors import UnprocessableError
+        raise UnprocessableError(
+            f"Subquestions can only be added to matrix question types "
+            f"(got '{parent.question_type}')"
+        )
+
+    check_survey_editable(
+        (await session.execute(
+            select(Survey)
+            .join(QuestionGroup, QuestionGroup.survey_id == Survey.id)
+            .where(QuestionGroup.id == parent.group_id)
+        )).scalar_one()
+    )
+
+    # Auto-generate subquestion code
+    if code is None:
+        code = await _generate_subquestion_code(session, parent.id, parent.code)
+
+    if sort_order is None:
+        sort_order = await _next_sort_order(session, parent.group_id)
+
+    subquestion = Question(
+        group_id=parent.group_id,
+        parent_id=parent.id,
+        question_type=parent.question_type,
+        code=code,
+        title=title,
+        description=description,
+        is_required=is_required,
+        sort_order=sort_order,
+    )
+    # Save parent ID before flushing (expiry must not happen while we still need parent.id)
+    parent_id_val = parent.id
+
+    session.add(subquestion)
+    try:
+        await session.flush()
+    except IntegrityError:
+        await session.rollback()
+        raise
+
+    # Expire the parent from the identity map so the subsequent select fetches
+    # fresh data (including the newly-created subquestion in subquestions list).
+    session.expire(parent)
+
+    # Reload parent with updated subquestions list
+    result2 = await session.execute(
+        select(Question)
+        .where(Question.id == parent_id_val)
+        .options(*_with_eager_loads())
+        .execution_options(populate_existing=True)
+    )
+    return result2.scalar_one()
