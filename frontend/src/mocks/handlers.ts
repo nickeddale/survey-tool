@@ -481,6 +481,30 @@ export const handlers = [
     return HttpResponse.json(updated, { status: 200 })
   }),
 
+  // PATCH /api/v1/surveys/:id/groups/:groupId/questions/reorder
+  http.patch(`${BASE}/surveys/:surveyId/groups/:groupId/questions/reorder`, ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  // PATCH /api/v1/surveys/:id/questions/:questionId (move to different group)
+  http.patch(`${BASE}/surveys/:surveyId/questions/:questionId`, ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    return new HttpResponse(null, { status: 204 })
+  }),
+
   // DELETE /api/v1/surveys/:id
   http.delete(`${BASE}/surveys/:id`, ({ request }) => {
     const authHeader = request.headers.get('Authorization')
