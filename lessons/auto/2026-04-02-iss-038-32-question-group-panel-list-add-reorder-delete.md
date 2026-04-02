@@ -2,93 +2,66 @@
 date: "2026-04-02"
 ticket_id: "ISS-038"
 ticket_title: "3.2: Question Group Panel (List, Add, Reorder, Delete)"
-categories: ["testing", "api", "ui", "refactoring", "bug-fix", "feature", "performance", "security", "config", "ci-cd"]
+categories: ["testing", "api", "ui", "refactoring", "bug-fix", "feature", "ci-cd"]
 outcome: "success"
 complexity: "medium"
 files_modified: []
 ---
 
-```markdown
+```yaml
 ---
 date: "2026-04-02"
 ticket_id: "ISS-038"
 ticket_title: "3.2: Question Group Panel (List, Add, Reorder, Delete)"
-categories: ["react", "testing", "zustand", "msw", "survey-builder"]
+categories: ["react", "survey-builder", "ui-components", "state-management"]
 outcome: "success"
 complexity: "medium"
 files_modified:
-  - "frontend/src/components/survey-builder/GroupPanel.tsx"
-  - "frontend/src/components/survey-builder/__tests__/GroupPanel.test.tsx"
-  - "frontend/src/pages/SurveyBuilderPage.tsx"
-  - "frontend/src/store/builderStore.ts"
-  - "frontend/src/services/surveyService.ts"
-  - "frontend/src/types/survey.ts"
+  - "src/components/survey-builder/GroupPanel.tsx"
+  - "src/components/survey-builder/__tests__/GroupPanel.test.tsx"
+  - "src/pages/SurveyBuilderPage.tsx"
+  - "src/store/builderStore.ts"
+  - "src/services/surveyService.ts"
+  - "src/types/survey.ts"
 ---
 
 # Lessons Learned: 3.2: Question Group Panel (List, Add, Reorder, Delete)
 
 ## What Worked Well
-- Shadcn/ui Collapsible provided expand/collapse behavior with minimal boilerplate, fitting cleanly into the group panel structure.
-- Zustand builderStore actions (addGroup/removeGroup/updateGroup/reorderGroups) gave the component a clean, predictable state interface with no prop drilling.
-- surveyService abstraction kept API calls out of the component and made MSW mocking straightforward.
-- Inline title editing pattern (click → input focused → Enter/blur → PATCH) was self-contained and required no external state management beyond local component state.
-- Pre-populating auth state via `useAuthStore.setState()` instead of relying on AuthProvider initialization eliminated act() warning noise across all tests.
+- GroupPanel.tsx was already substantially complete with collapsible panels, inline title editing, delete confirmation, drag handle, and read-only mode — exploration-first approach correctly identified this before writing redundant code
+- Radix UI Collapsible integrated cleanly with shadcn/ui without custom animation wiring
+- Zustand builderStore actions (addGroup, removeGroup, updateGroup, reorderGroups) provided a clean boundary between UI state and API calls
+- MSW-based tests allowed realistic API interaction testing without a running backend
+- Inline title editing pattern (click → input → Enter/blur to save, Escape to cancel) was self-contained within the component with no prop-drilling
 
 ## What Was Challenging
-- Ensuring act() compliance with userEvent.setup() required wrapping every `user.click/type` call — easy to miss one and introduce subtle test contamination that only manifests in later tests.
-- Delete confirmation dialog cascade warning text is an acceptance criterion, not just UX copy — asserting on it explicitly required discipline to treat dialog content as a testable contract.
-- MSW error handler shape divergence (simplified `{message}` vs real backend `{detail: {code, message}}`) is a silent failure mode: tests pass but the component would mishandle real API errors.
-- Sort order correctness required confirming groups are sorted in the store selector rather than inside GroupPanel render — sorting inside the component re-sorts on every render and interferes with optimistic drag-reorder state.
+- Verifying completeness against acceptance criteria required reading multiple files (GroupPanel, SurveyBuilderPage, builderStore, surveyService) since state, API, and UI are split across layers
+- Confirming the "empty group placeholder" and "question count" were both rendered required careful component-level inspection rather than just checking store shape
+- Drag-and-drop reorder (sort_order) is coordinated between SurveyBuilderPage and builderStore, making the data flow less obvious from the component alone
 
 ## Key Technical Insights
-1. **Sort in the selector, not the component.** Sorting groups by sort_order inside the Zustand store selector (or before passing as props) rather than inside GroupPanel's render function prevents re-sort conflicts with optimistic drag-reorder state updates.
-2. **Delete dialog text is a tested contract.** The cascade warning in the confirmation dialog is an explicit acceptance criterion — assert on it in tests so copy changes are caught as regressions, not silent UX degradation.
-3. **MSW error envelopes must match the real backend shape.** The backend returns `{detail: {code: string, message: string}}`. Using `{message: '...'}` in test handlers produces false-positive tests that diverge from real API behavior.
-4. **AuthProvider initialization must be suppressed in unit tests.** When setTokens() is called in beforeEach, AuthProvider mounts with pendingInit=true and fires initialize() asynchronously, producing act() warnings. Fix: remove the refresh token from localStorage and pre-populate auth store state directly after setTokens().
-5. **Every userEvent interaction needs an act() wrapper.** userEvent.setup() dispatches events outside React's act() boundary. Bare `await user.click()` leaves the React 18 scheduler with unflushed work that contaminates subsequent tests. Wrap universally: `await act(async () => { await user.click(...) })`.
-6. **vi.useRealTimers() in afterEach is non-negotiable.** Leaked fake timers silently block MSW promise resolution, causing all downstream tests to time out with no clear error pointing to the leak source.
+1. Radix UI Collapsible requires explicit `open`/`onOpenChange` props for controlled mode; uncontrolled mode loses expand state on re-render when the parent re-sorts groups by sort_order.
+2. Inline editing with a conditional `<input>` / `<span>` swap avoids a separate modal and keeps UX snappy, but requires careful `onBlur` handling — blur fires before Enter's `onKeyDown` in some browsers, so save logic must be idempotent.
+3. Delete confirmation dialogs that mention cascading effects (questions being deleted) should include the group name in the dialog body to prevent accidental deletion of the wrong group when multiple groups exist.
+4. PATCH for title save should be debounced or deferred to blur/Enter only — do not call PATCH on every keystroke, as the survey builder canvas re-renders on store updates and causes cursor-jump in the input.
+5. sort_order rendering in SurveyBuilderPage: always derive display order from a sorted copy of the groups array rather than relying on insertion order in the store map.
 
 ## Reusable Patterns
-- **Auth pre-population in beforeEach:**
-  ```ts
-  setTokens(accessToken, refreshToken);
-  localStorage.removeItem('devtracker_refresh_token');
-  useAuthStore.setState({ user: mockUser, isAuthenticated: true, isLoading: false });
-  ```
-- **act() wrapper for every userEvent call:**
-  ```ts
-  await act(async () => { await user.click(element) });
-  await act(async () => { await user.type(input, 'text') });
-  ```
-- **Timer cleanup in afterEach:**
-  ```ts
-  afterEach(() => { vi.useRealTimers(); });
-  ```
-- **MSW error handler with correct backend envelope:**
-  ```ts
-  http.delete('/api/v1/surveys/:id/groups/:gid', () =>
-    HttpResponse.json({ detail: { code: 'NOT_FOUND', message: 'Group not found' } }, { status: 404 })
-  )
-  ```
-- **MemoryRouter future flags to suppress warnings:**
-  ```tsx
-  <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-  ```
-- **Inline edit pattern:** local `isEditing` + `editValue` state; on blur or Enter, call PATCH API then update store; on Escape, reset without saving.
-- **Delete confirmation with cascade warning:** assert `screen.getByText(/questions.*deleted|deleted.*questions/i)` or the exact warning string to lock in the acceptance criterion.
+- Click-to-edit inline title: `isEditing` local state, conditional render of `<input>` vs `<span>`, save on Enter/blur, cancel on Escape — reuse for question titles in the Question Editor panel.
+- Delete confirmation dialog with cascade warning: extract to a generic `<ConfirmDeleteDialog title entity cascadeDescription />` component to reuse across groups, questions, and surveys.
+- MSW handler pattern for PATCH endpoints: return the request body merged with existing fixture data so tests can assert the saved value without a real DB.
+- Collapsible group panel with header row (drag handle + toggle + actions): this layout pattern will repeat for question items; extract the header row layout to a shared primitive.
 
 ## Files to Review for Similar Tasks
-- `frontend/src/components/survey-builder/GroupPanel.tsx` — collapsible panel with inline edit, delete dialog, empty-state placeholder, drag handle
-- `frontend/src/components/survey-builder/__tests__/GroupPanel.test.tsx` — MSW + userEvent + act() patterns for interactive component tests
-- `frontend/src/pages/SurveyBuilderPage.tsx` — Add Group integration: POST API call + builderStore.addGroup()
-- `frontend/src/store/builderStore.ts` — addGroup/removeGroup/updateGroup/reorderGroups actions; sort_order selector pattern
-- `frontend/src/services/surveyService.ts` — createGroup/updateGroup/deleteGroup/reorderGroups API methods
+- `src/components/survey-builder/GroupPanel.tsx` — canonical example of collapsible panel with inline editing and delete dialog in this codebase
+- `src/store/builderStore.ts` — reference for how optimistic UI updates are structured before the API call resolves
+- `src/services/surveyService.ts` — reference for group CRUD method signatures (createGroup, updateGroup, deleteGroup, reorderGroups)
+- `src/components/survey-builder/__tests__/GroupPanel.test.tsx` — MSW + Vitest patterns for testing collapsible UI, inline edits, and confirmation dialogs
 
 ## Gotchas and Pitfalls
-- **Bare userEvent calls contaminate subsequent tests.** A single `await user.click()` without act() wrapping can cause `result.current` to be null in the next renderHook call. Wrap every call, every time.
-- **Refresh token in localStorage triggers AuthProvider init.** Even in unit tests, if a refresh token is present in localStorage when AuthProvider mounts, it fires initialize() and causes act() warnings throughout the test. Always clear it after setTokens().
-- **Fake timer leaks are silent.** A test that calls vi.useFakeTimers() without a corresponding vi.useRealTimers() in afterEach will cause all subsequent MSW-dependent tests to hang with timeout errors that appear unrelated to the leak.
-- **Sorting inside the component breaks drag-reorder.** GroupPanel must receive pre-sorted groups; sorting internally means optimistic drag state (reorder before API confirm) is immediately overwritten by the re-render sort.
-- **Dialog cascade text must be asserted, not assumed.** If the warning string is refactored without updating the test, the dialog continues to open but the acceptance criterion silently breaks. Test the text explicitly.
-- **Simplified MSW error shapes produce false positives.** `{message: 'error'}` passes component error-handling tests but the real component code path (which reads `error.detail.message`) is never exercised. Always mirror the exact backend error envelope.
+- Do not use Radix Accordion as a drop-in for Collapsible when multiple groups must be independently expanded — Accordion enforces single-open-at-a-time by default; use Collapsible per group instead.
+- `onBlur` on the title input fires when focus moves to the delete button inside the same panel; guard against treating that as a "cancel" or premature "save" by checking `relatedTarget` or deferring blur handling with `setTimeout(0)`.
+- MSW handlers for DELETE endpoints must return a 204 (no body) — returning 200 with `{}` causes some fetch wrappers to attempt JSON parsing and throw unexpectedly.
+- When testing drag-handle reorder, avoid asserting on DOM order directly; instead assert on the sort_order values passed to the reorderGroups store action, since DOM order depends on the parent component's sort logic.
+- Cascade delete warning text must be present in the confirmation dialog for the acceptance criterion to pass — a generic "Are you sure?" is insufficient; include explicit mention of questions being deleted.
 ```
