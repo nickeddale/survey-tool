@@ -362,13 +362,17 @@ describe('SurveysPage', () => {
         expect(screen.getByText('Survey 1')).toBeInTheDocument()
       })
 
+      // Allow debounce timer (300ms) to settle before navigating pages
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 400))
+      })
+
       await user.click(screen.getByLabelText('Next page'))
 
       await waitFor(() => {
         expect(screen.getByText('Survey 11')).toBeInTheDocument()
+        expect(screen.queryByText('Survey 1')).not.toBeInTheDocument()
       })
-
-      expect(screen.queryByText('Survey 1')).not.toBeInTheDocument()
     })
 
     it('page number buttons are rendered', async () => {
