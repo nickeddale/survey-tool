@@ -10,6 +10,7 @@ import SurveysPage from './pages/SurveysPage'
 import SurveyDetailPage from './pages/SurveyDetailPage'
 import SurveyFormPage from './pages/SurveyFormPage'
 import SurveyBuilderPage from './pages/SurveyBuilderPage'
+import SurveyPreviewPage from './pages/SurveyPreviewPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 function App() {
@@ -32,10 +33,12 @@ function App() {
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/surveys/new" element={<SurveyFormPage />} />
               <Route path="/surveys/:id/edit" element={<SurveyFormPage />} />
-              <Route path="/surveys/:id/builder" element={<SurveyBuilderPage />} />
               <Route path="/surveys/:id" element={<SurveyDetailPage />} />
               <Route path="/surveys" element={<SurveysPage />} />
             </Route>
+            {/* Full-screen pages outside AppLayout */}
+            <Route path="/surveys/:id/builder" element={<SurveyBuilderPage />} />
+            <Route path="/surveys/:id/preview" element={<SurveyPreviewPage />} />
           </Route>
 
           <Route path="*" element={<NotFoundPage />} />

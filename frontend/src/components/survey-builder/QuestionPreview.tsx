@@ -22,6 +22,7 @@ import type { FC } from 'react'
 
 export interface QuestionPreviewProps {
   question: BuilderQuestion
+  interactive?: boolean
 }
 
 type QuestionType =
@@ -91,13 +92,13 @@ function UnknownTypePreview({ question }: QuestionPreviewProps) {
 // Main component
 // ---------------------------------------------------------------------------
 
-export function QuestionPreview({ question }: QuestionPreviewProps) {
+export function QuestionPreview({ question, interactive = false }: QuestionPreviewProps) {
   const PreviewComponent =
     questionPreviewMap[question.question_type as QuestionType] ?? UnknownTypePreview
 
   return (
     <div
-      className="rounded-lg border border-border bg-background p-4 space-y-3 pointer-events-none"
+      className={`rounded-lg border border-border bg-background p-4 space-y-3${interactive ? '' : ' pointer-events-none'}`}
       data-testid={`question-preview-${question.id}`}
     >
       {/* Question header */}
