@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { http, HttpResponse } from 'msw'
@@ -21,7 +21,7 @@ function LocationDisplay() {
 
 function renderDashboard() {
   return render(
-    <MemoryRouter initialEntries={['/dashboard']}>
+    <MemoryRouter initialEntries={['/dashboard']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AuthProvider>
         <Routes>
           <Route path="/dashboard" element={<DashboardPage />} />
@@ -45,8 +45,11 @@ describe('DashboardPage', () => {
     clearTokens()
     localStorage.clear()
     resetAuthStore()
-    // Provide valid tokens so survey API calls attach auth header
+    // Provide access token (in memory) without storing refresh token in localStorage.
+    // This prevents AuthProvider from calling initialize() on mount, which would
+    // trigger async state updates outside act().
     setTokens(mockTokens.access_token, mockTokens.refresh_token)
+    localStorage.removeItem('devtracker_refresh_token')
   })
 
   describe('loading state', () => {
@@ -179,11 +182,13 @@ describe('DashboardPage', () => {
       })
 
       const createButton = screen.getByRole('button', { name: /create new survey/i })
-      await userEvent.click(createButton)
-
-      await waitFor(() => {
-        expect(screen.getByTestId('location').textContent).toBe('/surveys/new')
+      const user = userEvent.setup()
+      await act(async () => {
+        await user.click(createButton)
       })
+
+      const location = await screen.findByTestId('location')
+      expect(location.textContent).toBe('/surveys/new')
     })
   })
 

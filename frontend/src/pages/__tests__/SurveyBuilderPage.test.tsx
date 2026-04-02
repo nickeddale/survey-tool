@@ -374,22 +374,25 @@ describe('Group reorder — store action', () => {
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
     // Load a second group into the store to test reordering
-    const { addGroup, reorderGroups } = useBuilderStore.getState()
-    addGroup({
-      id: 'g2',
-      survey_id: DRAFT_SURVEY_ID,
-      title: 'Second Group',
-      description: null,
-      sort_order: 2,
-      relevance: null,
-      created_at: '2024-01-08T12:00:00Z',
-      questions: [],
+    act(() => {
+      useBuilderStore.getState().addGroup({
+        id: 'g2',
+        survey_id: DRAFT_SURVEY_ID,
+        title: 'Second Group',
+        description: null,
+        sort_order: 2,
+        relevance: null,
+        created_at: '2024-01-08T12:00:00Z',
+        questions: [],
+      })
     })
 
     await waitFor(() => expect(screen.getByTestId('canvas-group-g2')).toBeInTheDocument())
 
     // Reorder: move g2 before g1
-    reorderGroups(['g2', 'g1'])
+    act(() => {
+      useBuilderStore.getState().reorderGroups(['g2', 'g1'])
+    })
 
     await waitFor(() => {
       const groups = useBuilderStore.getState().groups
