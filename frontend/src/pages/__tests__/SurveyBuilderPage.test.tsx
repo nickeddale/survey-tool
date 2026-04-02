@@ -312,6 +312,112 @@ describe('QuestionEditor integration', () => {
 })
 
 // ---------------------------------------------------------------------------
+// Add Group flow
+// ---------------------------------------------------------------------------
+
+describe('Add Group flow', () => {
+  it('renders Add Group button in canvas when survey has groups', async () => {
+    renderBuilder()
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+    expect(screen.getByTestId('add-group-button')).toBeInTheDocument()
+  })
+
+  it('calls POST /groups and adds group to store when Add Group clicked', async () => {
+    const capturedRequests: Array<{ body: Record<string, unknown> }> = []
+    server.use(
+      http.post(`/api/v1/surveys/${DRAFT_SURVEY_ID}/groups`, async ({ request }) => {
+        const body = (await request.json()) as Record<string, unknown>
+        capturedRequests.push({ body })
+        return HttpResponse.json(
+          {
+            id: 'g-new',
+            survey_id: DRAFT_SURVEY_ID,
+            title: body.title as string,
+            description: null,
+            sort_order: 2,
+            relevance: null,
+            created_at: '2024-01-10T10:00:00Z',
+          },
+          { status: 201 },
+        )
+      }),
+    )
+
+    renderBuilder()
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('add-group-button'))
+    })
+
+    await waitFor(() => {
+      expect(capturedRequests).toHaveLength(1)
+      expect(capturedRequests[0].body).toMatchObject({ title: 'Group 2' })
+    })
+
+    await waitFor(() => expect(screen.getByTestId('group-panel-g-new')).toBeInTheDocument())
+    expect(useBuilderStore.getState().groups.find((g) => g.id === 'g-new')).toBeDefined()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Group reorder flow
+// ---------------------------------------------------------------------------
+
+describe('Group reorder — store action', () => {
+  it('reorderGroups store action changes group order', async () => {
+    renderBuilder()
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    // Load a second group into the store to test reordering
+    const { addGroup, reorderGroups } = useBuilderStore.getState()
+    addGroup({
+      id: 'g2',
+      survey_id: DRAFT_SURVEY_ID,
+      title: 'Second Group',
+      description: null,
+      sort_order: 2,
+      relevance: null,
+      created_at: '2024-01-08T12:00:00Z',
+      questions: [],
+    })
+
+    await waitFor(() => expect(screen.getByTestId('group-panel-g2')).toBeInTheDocument())
+
+    // Reorder: move g2 before g1
+    reorderGroups(['g2', 'g1'])
+
+    await waitFor(() => {
+      const groups = useBuilderStore.getState().groups
+      expect(groups[0].id).toBe('g2')
+      expect(groups[1].id).toBe('g1')
+    })
+  })
+
+  it('calls PATCH /groups/reorder when reorderGroups API is called', async () => {
+    const capturedRequests: Array<{ body: Record<string, unknown> }> = []
+    server.use(
+      http.patch(`/api/v1/surveys/${DRAFT_SURVEY_ID}/groups/reorder`, async ({ request }) => {
+        const body = (await request.json()) as Record<string, unknown>
+        capturedRequests.push({ body })
+        return HttpResponse.json([], { status: 200 })
+      }),
+    )
+
+    await act(async () => {
+      await import('../../services/surveyService').then(({ default: svc }) =>
+        svc.reorderGroups(DRAFT_SURVEY_ID, { group_ids: ['g1', 'g2'] }),
+      )
+    })
+
+    await waitFor(() => {
+      expect(capturedRequests).toHaveLength(1)
+      expect(capturedRequests[0].body).toMatchObject({ group_ids: ['g1', 'g2'] })
+    })
+  })
+})
+
+// ---------------------------------------------------------------------------
 // Navigation
 // ---------------------------------------------------------------------------
 

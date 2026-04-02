@@ -13,9 +13,25 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Lock, Plus, Type, List, AlignLeft, CheckSquare, ToggleLeft, Hash } from 'lucide-react'
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import type { DragEndEvent } from '@dnd-kit/core'
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import surveyService from '../services/surveyService'
 import { useBuilderStore } from '../store/builderStore'
-import type { SelectedItem } from '../store/builderStore'
+import type { SelectedItem, BuilderGroup } from '../store/builderStore'
 import { ApiError } from '../types/api'
 import { Button } from '../components/ui/button'
 import { Card, CardContent } from '../components/ui/card'
@@ -128,6 +144,64 @@ function QuestionPalette({ readOnly }: { readOnly: boolean }) {
 }
 
 // ---------------------------------------------------------------------------
+// Sub-components: Sortable group panel wrapper
+// ---------------------------------------------------------------------------
+
+interface SortableGroupPanelProps {
+  surveyId: string
+  group: BuilderGroup
+  readOnly: boolean
+  selectedItem: SelectedItem
+  onSelectItem: (item: SelectedItem) => void
+}
+
+function SortableGroupPanel({
+  surveyId,
+  group,
+  readOnly,
+  selectedItem,
+  onSelectItem,
+}: SortableGroupPanelProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: group.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  const isGroupSelected = selectedItem?.type === 'group' && selectedItem.id === group.id
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <GroupPanel
+        surveyId={surveyId}
+        group={group}
+        readOnly={readOnly}
+        isSelected={isGroupSelected}
+        isDragging={isDragging}
+        dragListeners={listeners}
+        dragAttributes={attributes}
+        onSelect={(groupId) =>
+          onSelectItem(isGroupSelected ? null : { type: 'group', id: groupId })
+        }
+        onSelectQuestion={(questionId) => {
+          const isQuestionSelected =
+            selectedItem?.type === 'question' && selectedItem.id === questionId
+          onSelectItem(isQuestionSelected ? null : { type: 'question', id: questionId })
+        }}
+      />
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Sub-components: Center panel — survey canvas
 // ---------------------------------------------------------------------------
 
@@ -141,7 +215,15 @@ interface SurveyCanvasProps {
 function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem }: SurveyCanvasProps) {
   const groups = useBuilderStore((s) => s.groups)
   const addGroup = useBuilderStore((s) => s.addGroup)
+  const reorderGroups = useBuilderStore((s) => s.reorderGroups)
   const [isAddingGroup, setIsAddingGroup] = useState(false)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  )
 
   const handleAddGroup = useCallback(async () => {
     if (readOnly || isAddingGroup) return
@@ -160,6 +242,35 @@ function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem }: Survey
   }, [readOnly, isAddingGroup, surveyId, groups.length, addGroup])
 
   const sortedGroups = [...groups].sort((a, b) => a.sort_order - b.sort_order)
+
+  const handleDragEnd = useCallback(
+    async (event: DragEndEvent) => {
+      const { active, over } = event
+      if (!over || active.id === over.id) return
+
+      const oldIndex = sortedGroups.findIndex((g) => g.id === active.id)
+      const newIndex = sortedGroups.findIndex((g) => g.id === over.id)
+      if (oldIndex === -1 || newIndex === -1) return
+
+      // Build new ordered id list
+      const newOrder = [...sortedGroups]
+      const [moved] = newOrder.splice(oldIndex, 1)
+      newOrder.splice(newIndex, 0, moved)
+      const orderedIds = newOrder.map((g) => g.id)
+
+      // Optimistic update
+      reorderGroups(orderedIds)
+
+      // Persist to API
+      try {
+        await surveyService.reorderGroups(surveyId, { group_ids: orderedIds })
+      } catch {
+        // Revert to previous order on failure
+        reorderGroups(sortedGroups.map((g) => g.id))
+      }
+    },
+    [sortedGroups, reorderGroups, surveyId],
+  )
 
   return (
     <main
@@ -189,26 +300,27 @@ function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem }: Survey
           </Card>
         )}
 
-        {sortedGroups.map((group) => {
-          const isGroupSelected = selectedItem?.type === 'group' && selectedItem.id === group.id
-          return (
-            <GroupPanel
-              key={group.id}
-              surveyId={surveyId}
-              group={group}
-              readOnly={readOnly}
-              isSelected={isGroupSelected}
-              onSelect={(groupId) =>
-                onSelectItem(isGroupSelected ? null : { type: 'group', id: groupId })
-              }
-              onSelectQuestion={(questionId) => {
-                const isQuestionSelected =
-                  selectedItem?.type === 'question' && selectedItem.id === questionId
-                onSelectItem(isQuestionSelected ? null : { type: 'question', id: questionId })
-              }}
-            />
-          )
-        })}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={sortedGroups.map((g) => g.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {sortedGroups.map((group) => (
+              <SortableGroupPanel
+                key={group.id}
+                surveyId={surveyId}
+                group={group}
+                readOnly={readOnly}
+                selectedItem={selectedItem}
+                onSelectItem={onSelectItem}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
 
         {groups.length > 0 && !readOnly && (
           <Button

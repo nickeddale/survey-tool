@@ -2,7 +2,7 @@
 date: "2026-04-02"
 ticket_id: "ISS-038"
 ticket_title: "3.2: Question Group Panel (List, Add, Reorder, Delete)"
-categories: ["testing", "api", "ui", "refactoring", "bug-fix", "feature", "ci-cd"]
+categories: ["testing", "api", "ui", "refactoring", "feature", "ci-cd"]
 outcome: "success"
 complexity: "medium"
 files_modified: []
@@ -13,55 +13,57 @@ files_modified: []
 date: "2026-04-02"
 ticket_id: "ISS-038"
 ticket_title: "3.2: Question Group Panel (List, Add, Reorder, Delete)"
-categories: ["react", "survey-builder", "ui-components", "state-management"]
+categories: ["frontend", "drag-and-drop", "react", "testing", "survey-builder"]
 outcome: "success"
 complexity: "medium"
 files_modified:
-  - "src/components/survey-builder/GroupPanel.tsx"
-  - "src/components/survey-builder/__tests__/GroupPanel.test.tsx"
-  - "src/pages/SurveyBuilderPage.tsx"
-  - "src/store/builderStore.ts"
-  - "src/services/surveyService.ts"
-  - "src/types/survey.ts"
+  - "frontend/src/components/survey-builder/GroupPanel.tsx"
+  - "frontend/src/components/survey-builder/__tests__/GroupPanel.test.tsx"
+  - "frontend/src/pages/SurveyBuilderPage.tsx"
+  - "frontend/src/pages/__tests__/SurveyBuilderPage.test.tsx"
+  - "frontend/package.json"
+  - "frontend/package-lock.json"
 ---
 
 # Lessons Learned: 3.2: Question Group Panel (List, Add, Reorder, Delete)
 
 ## What Worked Well
-- GroupPanel.tsx was already substantially complete with collapsible panels, inline title editing, delete confirmation, drag handle, and read-only mode — exploration-first approach correctly identified this before writing redundant code
-- Radix UI Collapsible integrated cleanly with shadcn/ui without custom animation wiring
-- Zustand builderStore actions (addGroup, removeGroup, updateGroup, reorderGroups) provided a clean boundary between UI state and API calls
-- MSW-based tests allowed realistic API interaction testing without a running backend
-- Inline title editing pattern (click → input → Enter/blur to save, Escape to cancel) was self-contained within the component with no prop-drilling
+- Separating drag-and-drop concerns cleanly: `GroupPanel` accepts `dragListeners` and `dragAttributes` as props, keeping the component unaware of `@dnd-kit` internals. The `SortableGroupPanel` wrapper in `SurveyBuilderPage` owns the sortable hook and passes down only the needed handlers.
+- Optimistic reordering with rollback: `handleDragEnd` updates the store immediately via `reorderGroups()`, then persists to the API. On failure it reverts to the previous order, providing instant visual feedback with graceful error recovery.
+- Splitting integration tests across two files: `GroupPanel.test.tsx` covers isolated component behaviour (collapsible, inline edit, delete dialog, drag prop spreading); `SurveyBuilderPage.test.tsx` covers page-level flows (Add Group API call, reorder store action, reorder API call).
+- `SortableContext` receives `items` as an array of string IDs derived from `sortedGroups`; pairing this with `verticalListSortingStrategy` gives correct index-based reordering with no additional configuration.
+- Using `fireEvent` rather than `userEvent` for header click and keyboard events avoids act() warnings from `userEvent.setup()` pointer simulation mode — consistent with the established project testing pattern.
 
 ## What Was Challenging
-- Verifying completeness against acceptance criteria required reading multiple files (GroupPanel, SurveyBuilderPage, builderStore, surveyService) since state, API, and UI are split across layers
-- Confirming the "empty group placeholder" and "question count" were both rendered required careful component-level inspection rather than just checking store shape
-- Drag-and-drop reorder (sort_order) is coordinated between SurveyBuilderPage and builderStore, making the data flow less obvious from the component alone
+- Drag-and-drop is inherently difficult to test at the DOM level with `@dnd-kit` in JSDOM. Rather than simulating pointer drag events (which require `PointerSensor` to fire and are fragile in JSDOM), the reorder logic was tested by calling the store's `reorderGroups` action directly and verifying the API call via MSW. The actual DnD interaction was verified manually rather than through automated tests.
+- The `SortableGroupPanel` wrapper must be a stable component defined outside `SurveyCanvas` to avoid re-mounting on every render; defining it inline as an anonymous function would cause `useSortable` to unmount and remount on each state change.
+- Inline title editing requires careful event propagation control: the title input's `onClick`, the rename button's `onClick`, and the delete button's `onClick` all call `e.stopPropagation()` to prevent the header's `onSelect` from firing simultaneously.
 
 ## Key Technical Insights
-1. Radix UI Collapsible requires explicit `open`/`onOpenChange` props for controlled mode; uncontrolled mode loses expand state on re-render when the parent re-sorts groups by sort_order.
-2. Inline editing with a conditional `<input>` / `<span>` swap avoids a separate modal and keeps UX snappy, but requires careful `onBlur` handling — blur fires before Enter's `onKeyDown` in some browsers, so save logic must be idempotent.
-3. Delete confirmation dialogs that mention cascading effects (questions being deleted) should include the group name in the dialog body to prevent accidental deletion of the wrong group when multiple groups exist.
-4. PATCH for title save should be debounced or deferred to blur/Enter only — do not call PATCH on every keystroke, as the survey builder canvas re-renders on store updates and causes cursor-jump in the input.
-5. sort_order rendering in SurveyBuilderPage: always derive display order from a sorted copy of the groups array rather than relying on insertion order in the store map.
+1. **Props-based DnD integration pattern**: Keep leaf components (e.g. `GroupPanel`) DnD-agnostic by accepting `dragListeners` and `dragAttributes` as optional props. The sortable wrapper (`SortableGroupPanel`) calls `useSortable`, applies `setNodeRef` and `style` to a container `<div>`, and passes only the listeners/attributes down. This keeps `GroupPanel` independently testable and reusable.
+2. **Optimistic update with rollback**: Capture the pre-drag `sortedGroups` array in the `handleDragEnd` closure before mutating. After calling `reorderGroups(orderedIds)`, pass `sortedGroups.map(g => g.id)` to `reorderGroups` inside the catch block to restore the previous visual order on API failure.
+3. **`sortedGroups` must be computed in render scope, not inside `handleDragEnd`**: `handleDragEnd` is memoised with `useCallback`; passing `sortedGroups` as a dependency ensures the closure always uses the current order when computing `oldIndex`/`newIndex`.
+4. **`DndContext` and `SortableContext` live in the canvas, not the page**: Scoping these to `SurveyCanvas` keeps drag-and-drop state local and avoids prop-drilling the event handlers up to `SurveyBuilderPage`.
+5. **Collapsible panels use shadcn/ui `Collapsible`**: Collapse toggle must call `e.stopPropagation()` inside `CollapsibleTrigger` to prevent the parent header's `onSelect` from firing. The `asChild` pattern on `CollapsibleTrigger` lets a `<button>` own the toggle without adding a redundant wrapper element.
 
 ## Reusable Patterns
-- Click-to-edit inline title: `isEditing` local state, conditional render of `<input>` vs `<span>`, save on Enter/blur, cancel on Escape — reuse for question titles in the Question Editor panel.
-- Delete confirmation dialog with cascade warning: extract to a generic `<ConfirmDeleteDialog title entity cascadeDescription />` component to reuse across groups, questions, and surveys.
-- MSW handler pattern for PATCH endpoints: return the request body merged with existing fixture data so tests can assert the saved value without a real DB.
-- Collapsible group panel with header row (drag handle + toggle + actions): this layout pattern will repeat for question items; extract the header row layout to a shared primitive.
+- **Props-based DnD handle**: any sortable list item component can accept `dragListeners?: DraggableSyntheticListeners` and `dragAttributes?: React.HTMLAttributes<HTMLElement>` and spread them onto a handle `<span>`. The parent sortable wrapper calls `useSortable` and passes down `listeners` and `attributes`.
+- **Optimistic reorder with revert**: `const prev = [...list]; optimisticUpdate(newOrder); try { await api.reorder(newOrder) } catch { revert(prev) }` — works for any ordered list backed by a store.
+- **Inline title editing pattern**: `isEditingTitle` boolean state gates between a static `<span>` (with `onDoubleClick` and explicit rename button) and an `<input>` that saves on `Enter`/blur and cancels on `Escape`. Always guard against empty string and unchanged value before making the API call.
+- **Testing DnD without simulating pointer events**: test the store action (`reorderGroups`) and the API call (`surveyService.reorderGroups`) in isolation; test that drag handle props are correctly spread to the DOM element using `fireEvent.pointerDown` and attribute assertions.
+- **Add item flow test pattern**: register an MSW `http.post` override that captures request bodies, click the trigger button inside `act()`, then `waitFor` both the captured request assertion and the new DOM element's presence.
 
 ## Files to Review for Similar Tasks
-- `src/components/survey-builder/GroupPanel.tsx` — canonical example of collapsible panel with inline editing and delete dialog in this codebase
-- `src/store/builderStore.ts` — reference for how optimistic UI updates are structured before the API call resolves
-- `src/services/surveyService.ts` — reference for group CRUD method signatures (createGroup, updateGroup, deleteGroup, reorderGroups)
-- `src/components/survey-builder/__tests__/GroupPanel.test.tsx` — MSW + Vitest patterns for testing collapsible UI, inline edits, and confirmation dialogs
+- `frontend/src/pages/SurveyBuilderPage.tsx` — `SortableGroupPanel` and `SurveyCanvas` components show the canonical way to wire `@dnd-kit/sortable` to a list of panels with optimistic reorder.
+- `frontend/src/components/survey-builder/GroupPanel.tsx` — reference implementation for inline title editing, delete confirmation dialog with cascade warning, and props-based drag handle integration.
+- `frontend/src/components/survey-builder/__tests__/GroupPanel.test.tsx` — shows how to test drag handle prop spreading, collapsible toggle, inline edit (Enter/blur/Escape), and delete confirm/cancel without rendering the full page.
+- `frontend/src/pages/__tests__/SurveyBuilderPage.test.tsx` — shows integration-level Add Group and reorder tests; note the strategy of calling `surveyService.reorderGroups` directly to test the API contract without simulating DnD events.
 
 ## Gotchas and Pitfalls
-- Do not use Radix Accordion as a drop-in for Collapsible when multiple groups must be independently expanded — Accordion enforces single-open-at-a-time by default; use Collapsible per group instead.
-- `onBlur` on the title input fires when focus moves to the delete button inside the same panel; guard against treating that as a "cancel" or premature "save" by checking `relatedTarget` or deferring blur handling with `setTimeout(0)`.
-- MSW handlers for DELETE endpoints must return a 204 (no body) — returning 200 with `{}` causes some fetch wrappers to attempt JSON parsing and throw unexpectedly.
-- When testing drag-handle reorder, avoid asserting on DOM order directly; instead assert on the sort_order values passed to the reorderGroups store action, since DOM order depends on the parent component's sort logic.
-- Cascade delete warning text must be present in the confirmation dialog for the acceptance criterion to pass — a generic "Are you sure?" is insufficient; include explicit mention of questions being deleted.
+- **Do not call `useSortable` inside a component that is re-created on every render** (e.g. a component defined inline inside another component's render function). React will remount the hook on every parent render, causing flickering and lost drag state. Always define sortable wrapper components at module scope.
+- **`sortedGroups` in `handleDragEnd`**: if `sortedGroups` is not in the `useCallback` dependency array, the closure will capture a stale snapshot and compute wrong indices after any reorder. Include it in deps even though it makes the callback recreate on every render — the correctness trade-off is worth it.
+- **`e.stopPropagation()` is mandatory on every interactive element inside the group header** (collapse toggle, title input, rename button, delete button). Without it, clicking any child element also fires the header's `onSelect`, toggling the selection unintentionally.
+- **Empty-title guard in `saveTitle`**: trimming the edited value and comparing to the current title before issuing a PATCH prevents unnecessary API calls when the user presses Enter without changing anything, or types only whitespace.
+- **`@dnd-kit/core` `PointerSensor` requires a drag distance threshold** — without it, a simple click on a draggable element can trigger `onDragEnd`. If click-to-select and drag-to-reorder coexist on the same element, configure `PointerSensor` with `activationConstraint: { distance: 8 }` to distinguish taps from drags.
+- **Test MSW override scoping**: use `server.use(...)` with one-time handlers inside individual `it` blocks rather than overriding in `beforeEach` unless every test in the suite needs the same handler, to avoid cross-test pollution.
 ```

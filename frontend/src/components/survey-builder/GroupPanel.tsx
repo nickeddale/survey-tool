@@ -12,6 +12,7 @@
  */
 
 import React, { useState, useRef, useCallback } from 'react'
+import type { DraggableSyntheticListeners } from '@dnd-kit/core'
 import { GripVertical, ChevronDown, ChevronRight, Trash2, Pencil } from 'lucide-react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible'
 import { Button } from '../ui/button'
@@ -42,6 +43,12 @@ export interface GroupPanelProps {
   isSelected?: boolean
   /** Called when a question item is clicked */
   onSelectQuestion?: (questionId: string) => void
+  /** @dnd-kit sortable drag handle listeners — passed from SurveyCanvas */
+  dragListeners?: DraggableSyntheticListeners
+  /** @dnd-kit sortable drag handle attributes — passed from SurveyCanvas */
+  dragAttributes?: React.HTMLAttributes<HTMLElement>
+  /** Whether this group is currently being dragged */
+  isDragging?: boolean
 }
 
 // ---------------------------------------------------------------------------
@@ -55,6 +62,9 @@ export function GroupPanel({
   onSelect,
   isSelected = false,
   onSelectQuestion,
+  dragListeners,
+  dragAttributes,
+  isDragging = false,
 }: GroupPanelProps) {
   const { updateGroup, removeGroup } = useBuilderStore()
 
@@ -135,7 +145,8 @@ export function GroupPanel({
         <div
           className={`flex items-center gap-2 px-3 py-2 rounded-t-lg border border-border bg-muted/40
             ${isSelected ? 'ring-2 ring-primary ring-offset-1' : ''}
-            ${!isOpen ? 'rounded-b-lg' : ''}`}
+            ${!isOpen ? 'rounded-b-lg' : ''}
+            ${isDragging ? 'opacity-50' : ''}`}
           onClick={() => onSelect?.(group.id)}
           role="button"
           tabIndex={0}
@@ -151,6 +162,8 @@ export function GroupPanel({
               className="text-muted-foreground cursor-grab shrink-0"
               aria-hidden="true"
               data-testid={`group-drag-handle-${group.id}`}
+              {...(dragListeners ?? {})}
+              {...(dragAttributes ?? {})}
             >
               <GripVertical size={16} />
             </span>

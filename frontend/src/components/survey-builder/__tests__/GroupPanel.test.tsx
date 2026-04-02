@@ -92,6 +92,9 @@ interface RenderGroupPanelOptions {
   readOnly?: boolean
   onSelect?: ReturnType<typeof vi.fn>
   isSelected?: boolean
+  isDragging?: boolean
+  dragListeners?: Record<string, unknown>
+  dragAttributes?: Record<string, unknown>
 }
 
 function renderGroupPanel({
@@ -99,6 +102,9 @@ function renderGroupPanel({
   readOnly = false,
   onSelect = vi.fn(),
   isSelected = false,
+  isDragging = false,
+  dragListeners,
+  dragAttributes,
 }: RenderGroupPanelOptions = {}) {
   return render(
     <GroupPanel
@@ -107,6 +113,9 @@ function renderGroupPanel({
       readOnly={readOnly}
       onSelect={onSelect}
       isSelected={isSelected}
+      isDragging={isDragging}
+      dragListeners={dragListeners as never}
+      dragAttributes={dragAttributes as never}
     />,
   )
 }
@@ -201,6 +210,26 @@ describe('rendering', () => {
     const header = screen.getByTestId(`group-panel-header-${BASE_GROUP.id}`)
     expect(header.className).toContain('ring-2')
     expect(header.className).toContain('ring-primary')
+  })
+
+  it('applies opacity when isDragging is true', () => {
+    renderGroupPanel({ isDragging: true })
+    const header = screen.getByTestId(`group-panel-header-${BASE_GROUP.id}`)
+    expect(header.className).toContain('opacity-50')
+  })
+
+  it('spreads dragListeners onto drag handle element', () => {
+    const onPointerDown = vi.fn()
+    renderGroupPanel({ dragListeners: { onPointerDown } })
+    const handle = screen.getByTestId(`group-drag-handle-${BASE_GROUP.id}`)
+    fireEvent.pointerDown(handle)
+    expect(onPointerDown).toHaveBeenCalled()
+  })
+
+  it('spreads dragAttributes onto drag handle element', () => {
+    renderGroupPanel({ dragAttributes: { 'aria-roledescription': 'sortable' } })
+    const handle = screen.getByTestId(`group-drag-handle-${BASE_GROUP.id}`)
+    expect(handle).toHaveAttribute('aria-roledescription', 'sortable')
   })
 })
 
