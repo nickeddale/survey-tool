@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { render, screen, waitFor, act } from '@testing-library/react'
+import { render, screen, waitFor, act, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { http, HttpResponse } from 'msw'
@@ -195,16 +195,13 @@ describe('property editor — item selection', () => {
   })
 
   it('shows group properties when a group is clicked', async () => {
-    const user = userEvent.setup()
     renderBuilder()
 
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
-    const groupCard = screen.getByTestId('canvas-group-g1')
-    // Click the card header — the CardHeader element within the group card
-    const header = groupCard.querySelector('[class*="CardHeader"], [class*="card-header"], .pb-2')
+    // Click the group panel header to select it
     await act(async () => {
-      await user.click(header ?? groupCard)
+      fireEvent.click(screen.getByTestId('group-panel-header-g1'))
     })
 
     await waitFor(() => expect(screen.getByTestId('group-properties')).toBeInTheDocument())
@@ -214,15 +211,11 @@ describe('property editor — item selection', () => {
   })
 
   it('shows question properties when a question is clicked', async () => {
-    const user = userEvent.setup()
     renderBuilder()
 
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
-    const questionEl = screen.getByTestId('canvas-question-q1')
-    await act(async () => {
-      await user.click(questionEl)
-    })
+    fireEvent.click(screen.getByTestId('canvas-question-q1'))
 
     await waitFor(() => expect(screen.getByTestId('question-properties')).toBeInTheDocument())
 
@@ -231,15 +224,11 @@ describe('property editor — item selection', () => {
   })
 
   it('updates builderStore selectedItem when question is clicked', async () => {
-    const user = userEvent.setup()
     renderBuilder()
 
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
-    const questionEl = screen.getByTestId('canvas-question-q2')
-    await act(async () => {
-      await user.click(questionEl)
-    })
+    fireEvent.click(screen.getByTestId('canvas-question-q2'))
 
     await waitFor(() => {
       const { selectedItem } = useBuilderStore.getState()
@@ -248,16 +237,12 @@ describe('property editor — item selection', () => {
   })
 
   it('shows answer options editor for radio question', async () => {
-    const user = userEvent.setup()
     renderBuilder()
 
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
     // q2 is the radio question with 2 answer options
-    const questionEl = screen.getByTestId('canvas-question-q2')
-    await act(async () => {
-      await user.click(questionEl)
-    })
+    fireEvent.click(screen.getByTestId('canvas-question-q2'))
 
     await waitFor(() => expect(screen.getByTestId('question-properties')).toBeInTheDocument())
 
@@ -265,6 +250,174 @@ describe('property editor — item selection', () => {
     expect(screen.getByTestId('answer-options-editor')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Very Satisfied')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Satisfied')).toBeInTheDocument()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// QuestionEditor integration
+// ---------------------------------------------------------------------------
+
+describe('QuestionEditor integration', () => {
+  it('renders QuestionEditor inside property editor when question is selected', async () => {
+    renderBuilder()
+
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    fireEvent.click(screen.getByTestId('canvas-question-q1'))
+
+    await waitFor(() => expect(screen.getByTestId('property-editor')).toBeInTheDocument())
+    expect(screen.getByTestId('question-properties')).toBeInTheDocument()
+  })
+
+  it('title field in QuestionEditor is a textarea (multi-line)', async () => {
+    renderBuilder()
+
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    fireEvent.click(screen.getByTestId('canvas-question-q1'))
+
+    await waitFor(() => expect(screen.getByTestId('property-question-title')).toBeInTheDocument())
+    expect(screen.getByTestId('property-question-title').tagName).toBe('TEXTAREA')
+  })
+
+  it('QuestionEditor title updates builder store when changed', async () => {
+    const user = userEvent.setup()
+    renderBuilder()
+
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    fireEvent.click(screen.getByTestId('canvas-question-q1'))
+
+    await waitFor(() => expect(screen.getByTestId('property-question-title')).toBeInTheDocument())
+
+    const titleEl = screen.getByTestId('property-question-title')
+    await act(async () => {
+      await user.clear(titleEl)
+      await user.type(titleEl, 'Updated Name Question')
+    })
+
+    await waitFor(() => {
+      const { groups } = useBuilderStore.getState()
+      const q = groups.flatMap((g) => g.questions).find((q) => q.id === 'q1')
+      expect(q?.title).toBe('Updated Name Question')
+    })
+  })
+
+  it('shows empty state in property editor when no question selected', async () => {
+    renderBuilder()
+
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    expect(screen.getByTestId('property-editor')).toHaveTextContent(
+      /select a group or question/i,
+    )
+    expect(screen.queryByTestId('question-properties')).not.toBeInTheDocument()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Add Group flow
+// ---------------------------------------------------------------------------
+
+describe('Add Group flow', () => {
+  it('renders Add Group button in canvas when survey has groups', async () => {
+    renderBuilder()
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+    expect(screen.getByTestId('add-group-button')).toBeInTheDocument()
+  })
+
+  it('calls POST /groups and adds group to store when Add Group clicked', async () => {
+    const capturedRequests: Array<{ body: Record<string, unknown> }> = []
+    server.use(
+      http.post(`/api/v1/surveys/${DRAFT_SURVEY_ID}/groups`, async ({ request }) => {
+        const body = (await request.json()) as Record<string, unknown>
+        capturedRequests.push({ body })
+        return HttpResponse.json(
+          {
+            id: 'g-new',
+            survey_id: DRAFT_SURVEY_ID,
+            title: body.title as string,
+            description: null,
+            sort_order: 2,
+            relevance: null,
+            created_at: '2024-01-10T10:00:00Z',
+          },
+          { status: 201 },
+        )
+      }),
+    )
+
+    renderBuilder()
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('add-group-button'))
+    })
+
+    await waitFor(() => {
+      expect(capturedRequests).toHaveLength(1)
+      expect(capturedRequests[0].body).toMatchObject({ title: 'Group 2' })
+    })
+
+    await waitFor(() => expect(screen.getByTestId('canvas-group-g-new')).toBeInTheDocument())
+    expect(useBuilderStore.getState().groups.find((g) => g.id === 'g-new')).toBeDefined()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Group reorder flow
+// ---------------------------------------------------------------------------
+
+describe('Group reorder — store action', () => {
+  it('reorderGroups store action changes group order', async () => {
+    renderBuilder()
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    // Load a second group into the store to test reordering
+    const { addGroup, reorderGroups } = useBuilderStore.getState()
+    addGroup({
+      id: 'g2',
+      survey_id: DRAFT_SURVEY_ID,
+      title: 'Second Group',
+      description: null,
+      sort_order: 2,
+      relevance: null,
+      created_at: '2024-01-08T12:00:00Z',
+      questions: [],
+    })
+
+    await waitFor(() => expect(screen.getByTestId('canvas-group-g2')).toBeInTheDocument())
+
+    // Reorder: move g2 before g1
+    reorderGroups(['g2', 'g1'])
+
+    await waitFor(() => {
+      const groups = useBuilderStore.getState().groups
+      expect(groups[0].id).toBe('g2')
+      expect(groups[1].id).toBe('g1')
+    })
+  })
+
+  it('calls PATCH /groups/reorder when reorderGroups API is called', async () => {
+    const capturedRequests: Array<{ body: Record<string, unknown> }> = []
+    server.use(
+      http.patch(`/api/v1/surveys/${DRAFT_SURVEY_ID}/groups/reorder`, async ({ request }) => {
+        const body = (await request.json()) as Record<string, unknown>
+        capturedRequests.push({ body })
+        return HttpResponse.json([], { status: 200 })
+      }),
+    )
+
+    await act(async () => {
+      await import('../../services/surveyService').then(({ default: svc }) =>
+        svc.reorderGroups(DRAFT_SURVEY_ID, { group_ids: ['g1', 'g2'] }),
+      )
+    })
+
+    await waitFor(() => {
+      expect(capturedRequests).toHaveLength(1)
+      expect(capturedRequests[0].body).toMatchObject({ group_ids: ['g1', 'g2'] })
+    })
   })
 })
 
