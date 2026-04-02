@@ -81,6 +81,94 @@ export const mockSurveys = [
   },
 ]
 
+// Full survey response with groups/questions/options (matches SurveyFullResponse)
+export const mockSurveyFull = {
+  ...(() => {
+    const base = {
+      id: '10000000-0000-0000-0000-000000000002',
+      user_id: '00000000-0000-0000-0000-000000000001',
+      title: 'Employee Feedback Form',
+      description: 'Gather employee feedback',
+      status: 'draft',
+      welcome_message: 'Welcome to our survey!',
+      end_message: 'Thank you for your feedback.',
+      default_language: 'en',
+      settings: null,
+      created_at: '2024-01-08T10:00:00Z',
+      updated_at: '2024-01-14T08:00:00Z',
+    }
+    return base
+  })(),
+  groups: [
+    {
+      id: 'g1',
+      survey_id: '10000000-0000-0000-0000-000000000002',
+      title: 'General Questions',
+      description: null,
+      sort_order: 1,
+      relevance: null,
+      created_at: '2024-01-08T10:00:00Z',
+      questions: [
+        {
+          id: 'q1',
+          group_id: 'g1',
+          parent_id: null,
+          question_type: 'text',
+          code: 'Q1',
+          title: 'What is your name?',
+          description: null,
+          is_required: true,
+          sort_order: 1,
+          relevance: null,
+          validation: null,
+          settings: null,
+          created_at: '2024-01-08T10:00:00Z',
+          subquestions: [],
+          answer_options: [],
+        },
+        {
+          id: 'q2',
+          group_id: 'g1',
+          parent_id: null,
+          question_type: 'radio',
+          code: 'Q2',
+          title: 'How satisfied are you?',
+          description: 'Rate your satisfaction',
+          is_required: false,
+          sort_order: 2,
+          relevance: null,
+          validation: null,
+          settings: null,
+          created_at: '2024-01-08T10:00:00Z',
+          subquestions: [],
+          answer_options: [
+            {
+              id: 'o1',
+              question_id: 'q2',
+              code: 'A1',
+              title: 'Very Satisfied',
+              sort_order: 1,
+              assessment_value: 5,
+              created_at: '2024-01-08T10:00:00Z',
+            },
+            {
+              id: 'o2',
+              question_id: 'q2',
+              code: 'A2',
+              title: 'Satisfied',
+              sort_order: 2,
+              assessment_value: 4,
+              created_at: '2024-01-08T10:00:00Z',
+            },
+          ],
+        },
+      ],
+    },
+  ],
+  questions: [],
+  options: [],
+}
+
 export const mockUser = {
   id: '00000000-0000-0000-0000-000000000001',
   email: 'test@example.com',
@@ -214,6 +302,10 @@ export const handlers = [
         { status: 401 },
       )
     }
+    // Return mockSurveyFull if id matches, otherwise build full response from mockSurveys
+    if (params.id === mockSurveyFull.id) {
+      return HttpResponse.json(mockSurveyFull, { status: 200 })
+    }
     const survey = mockSurveys.find((s) => s.id === params.id)
     if (!survey) {
       return HttpResponse.json(
@@ -221,7 +313,119 @@ export const handlers = [
         { status: 404 },
       )
     }
-    return HttpResponse.json(survey, { status: 200 })
+    return HttpResponse.json({ ...survey, groups: [], questions: [], options: [] }, { status: 200 })
+  }),
+
+  // POST /api/v1/surveys/:id/activate
+  http.post(`${BASE}/surveys/:id/activate`, ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const survey = mockSurveys.find((s) => s.id === params.id) ??
+      (params.id === mockSurveyFull.id ? mockSurveyFull : null)
+    if (!survey) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
+        { status: 404 },
+      )
+    }
+    return HttpResponse.json({ ...survey, status: 'active', updated_at: new Date().toISOString() }, { status: 200 })
+  }),
+
+  // POST /api/v1/surveys/:id/close
+  http.post(`${BASE}/surveys/:id/close`, ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const survey = mockSurveys.find((s) => s.id === params.id) ??
+      (params.id === mockSurveyFull.id ? mockSurveyFull : null)
+    if (!survey) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
+        { status: 404 },
+      )
+    }
+    return HttpResponse.json({ ...survey, status: 'closed', updated_at: new Date().toISOString() }, { status: 200 })
+  }),
+
+  // POST /api/v1/surveys/:id/archive
+  http.post(`${BASE}/surveys/:id/archive`, ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const survey = mockSurveys.find((s) => s.id === params.id) ??
+      (params.id === mockSurveyFull.id ? mockSurveyFull : null)
+    if (!survey) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
+        { status: 404 },
+      )
+    }
+    return HttpResponse.json({ ...survey, status: 'archived', updated_at: new Date().toISOString() }, { status: 200 })
+  }),
+
+  // POST /api/v1/surveys/:id/clone
+  http.post(`${BASE}/surveys/:id/clone`, ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const survey = mockSurveys.find((s) => s.id === params.id) ??
+      (params.id === mockSurveyFull.id ? mockSurveyFull : null)
+    if (!survey) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
+        { status: 404 },
+      )
+    }
+    const cloned = {
+      ...survey,
+      id: '30000000-0000-0000-0000-000000000001',
+      title: `Copy of ${survey.title}`,
+      status: 'draft',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+    return HttpResponse.json(cloned, { status: 201 })
+  }),
+
+  // GET /api/v1/surveys/:id/export
+  http.get(`${BASE}/surveys/:id/export`, ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const survey = mockSurveys.find((s) => s.id === params.id) ??
+      (params.id === mockSurveyFull.id ? mockSurveyFull : null)
+    if (!survey) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
+        { status: 404 },
+      )
+    }
+    const json = JSON.stringify(survey, null, 2)
+    return new HttpResponse(json, {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }),
 
   // POST /api/v1/surveys
