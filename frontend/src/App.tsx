@@ -9,6 +9,7 @@ import DashboardPage from './pages/DashboardPage'
 import SurveysPage from './pages/SurveysPage'
 import SurveyDetailPage from './pages/SurveyDetailPage'
 import SurveyFormPage from './pages/SurveyFormPage'
+import SurveyBuilderPage from './pages/SurveyBuilderPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/surveys/new" element={<SurveyFormPage />} />
               <Route path="/surveys/:id/edit" element={<SurveyFormPage />} />
+              <Route path="/surveys/:id/builder" element={<SurveyBuilderPage />} />
               <Route path="/surveys/:id" element={<SurveyDetailPage />} />
               <Route path="/surveys" element={<SurveysPage />} />
             </Route>
