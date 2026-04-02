@@ -15,7 +15,7 @@ import { mockTokens } from '../../mocks/handlers'
 
 function LocationDisplay() {
   const location = useLocation()
-  return <div data-testid="location">{location.pathname}</div>
+  return <div data-testid="location">{location.pathname + location.search}</div>
 }
 
 // ---------------------------------------------------------------------------
@@ -29,6 +29,7 @@ function renderProtectedRoute(initialPath: string) {
         <Routes>
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<div>Dashboard Content</div>} />
+            <Route path="/surveys/:id" element={<div>Survey Content</div>} />
           </Route>
           <Route path="/login" element={<LocationDisplay />} />
           <Route path="*" element={<LocationDisplay />} />
@@ -63,11 +64,19 @@ describe('ProtectedRoute', () => {
     })
   })
 
-  it('redirects unauthenticated users to /login', async () => {
+  it('redirects unauthenticated users to /login with returnTo param', async () => {
     renderProtectedRoute('/dashboard')
 
     await waitFor(() => {
-      expect(screen.getByTestId('location').textContent).toBe('/login')
+      expect(screen.getByTestId('location').textContent).toBe('/login?returnTo=%2Fdashboard')
+    })
+  })
+
+  it('preserves nested path in returnTo when redirecting to /login', async () => {
+    renderProtectedRoute('/surveys/123')
+
+    await waitFor(() => {
+      expect(screen.getByTestId('location').textContent).toBe('/login?returnTo=%2Fsurveys%2F123')
     })
   })
 

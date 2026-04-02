@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { ApiError } from '../types/api'
 
@@ -26,6 +26,7 @@ function validate(email: string, password: string): FieldErrors {
 function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
@@ -46,7 +47,8 @@ function LoginPage() {
     setIsSubmitting(true)
     try {
       await login({ email, password })
-      navigate('/dashboard')
+      const returnTo = searchParams.get('returnTo')
+      navigate(returnTo ? decodeURIComponent(returnTo) : '/dashboard')
     } catch (err) {
       if (err instanceof ApiError) {
         setError(err.message)

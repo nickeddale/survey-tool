@@ -19,14 +19,15 @@ function LocationDisplay() {
   return <div data-testid="location">{location.pathname}</div>
 }
 
-function renderLoginPage() {
+function renderLoginPage(initialEntry = '/login') {
   return render(
-    <MemoryRouter initialEntries={['/login']}>
+    <MemoryRouter initialEntries={[initialEntry]}>
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/dashboard" element={<LocationDisplay />} />
           <Route path="/register" element={<LocationDisplay />} />
+          <Route path="/surveys/:id" element={<LocationDisplay />} />
         </Routes>
       </AuthProvider>
     </MemoryRouter>,
@@ -121,7 +122,7 @@ describe('LoginPage', () => {
   })
 
   describe('successful login', () => {
-    it('redirects to /dashboard on successful login', async () => {
+    it('redirects to /dashboard on successful login when no returnTo param', async () => {
       renderLoginPage()
       await userEvent.type(screen.getByLabelText(/email/i), 'test@example.com')
       await userEvent.type(screen.getByLabelText(/password/i), 'password123')
@@ -129,6 +130,17 @@ describe('LoginPage', () => {
 
       await waitFor(() => {
         expect(screen.getByTestId('location').textContent).toBe('/dashboard')
+      })
+    })
+
+    it('redirects to returnTo path after login when returnTo param is present', async () => {
+      renderLoginPage('/login?returnTo=%2Fsurveys%2F123')
+      await userEvent.type(screen.getByLabelText(/email/i), 'test@example.com')
+      await userEvent.type(screen.getByLabelText(/password/i), 'password123')
+      await userEvent.click(screen.getByRole('button', { name: /sign in/i }))
+
+      await waitFor(() => {
+        expect(screen.getByTestId('location').textContent).toBe('/surveys/123')
       })
     })
   })
