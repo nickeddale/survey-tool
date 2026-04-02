@@ -173,15 +173,48 @@ export const handlers = [
         { status: 401 },
       )
     }
+    const url = new URL(request.url)
+    const page = Math.max(1, parseInt(url.searchParams.get('page') ?? '1', 10) || 1)
+    const perPage = Math.max(1, parseInt(url.searchParams.get('per_page') ?? '10', 10) || 10)
+    const statusFilter = url.searchParams.get('status') ?? ''
+    const search = (url.searchParams.get('search') ?? '').toLowerCase()
+
+    let filtered = [...mockSurveys]
+    if (statusFilter && statusFilter !== 'all') {
+      filtered = filtered.filter((s) => s.status === statusFilter)
+    }
+    if (search) {
+      filtered = filtered.filter((s) => s.title.toLowerCase().includes(search))
+    }
+
+    const total = filtered.length
+    const totalPages = Math.max(1, Math.ceil(total / perPage))
+    const safePage = Math.min(page, totalPages)
+    const start = (safePage - 1) * perPage
+    const items = filtered.slice(start, start + perPage)
+
     return HttpResponse.json(
       {
-        items: mockSurveys,
-        total: mockSurveys.length,
-        page: 1,
-        per_page: 100,
+        items,
+        total,
+        page: safePage,
+        per_page: perPage,
+        total_pages: totalPages,
       },
       { status: 200 },
     )
+  }),
+
+  // DELETE /api/v1/surveys/:id
+  http.delete(`${BASE}/surveys/:id`, ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    return new HttpResponse(null, { status: 204 })
   }),
 
   // PATCH /api/v1/auth/me
