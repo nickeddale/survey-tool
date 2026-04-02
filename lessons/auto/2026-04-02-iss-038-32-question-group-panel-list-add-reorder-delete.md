@@ -2,72 +2,63 @@
 date: "2026-04-02"
 ticket_id: "ISS-038"
 ticket_title: "3.2: Question Group Panel (List, Add, Reorder, Delete)"
-categories: ["testing", "api", "ui", "refactoring", "feature", "performance", "security", "config", "ci-cd"]
+categories: ["testing", "api", "ui", "refactoring", "feature", "ci-cd"]
 outcome: "success"
 complexity: "medium"
 files_modified: []
 ---
 
-```markdown
+```yaml
 ---
 date: "2026-04-02"
 ticket_id: "ISS-038"
 ticket_title: "3.2: Question Group Panel (List, Add, Reorder, Delete)"
-categories: ["react", "testing", "survey-builder", "ui-components", "msw"]
+categories: ["react", "survey-builder", "ui-components", "state-management"]
 outcome: "success"
 complexity: "medium"
 files_modified:
-  - "frontend/src/components/ui/collapsible.tsx"
-  - "frontend/src/components/survey-builder/GroupPanel.tsx"
-  - "frontend/src/pages/SurveyBuilderPage.tsx"
-  - "frontend/src/services/surveyService.ts"
-  - "frontend/src/mocks/handlers.ts"
-  - "frontend/src/components/survey-builder/__tests__/GroupPanel.test.tsx"
-  - "frontend/package.json"
-  - "frontend/package-lock.json"
+  - "src/components/survey-builder/GroupPanel.tsx"
+  - "src/components/survey-builder/__tests__/GroupPanel.test.tsx"
+  - "src/pages/SurveyBuilderPage.tsx"
+  - "src/store/builderStore.ts"
+  - "src/services/surveyService.ts"
+  - "src/types/survey.ts"
 ---
 
 # Lessons Learned: 3.2: Question Group Panel (List, Add, Reorder, Delete)
 
 ## What Worked Well
-- shadcn/ui Collapsible pattern (wrapping @radix-ui/react-collapsible) integrated cleanly with the existing component library style
-- Inline title editing with click-to-edit, Enter/blur to save was straightforward using controlled input state and onBlur handlers
-- MSW handlers for all CRUD endpoints (POST create, PATCH update, DELETE delete, PATCH reorder) kept test isolation clean
-- builderStore group actions composed well with surveyService API calls, keeping side effects predictable
-- Ordering groups by sort_order at render time (rather than in the store) avoided complex re-sorting logic
+- Radix UI Collapsible provided expand/collapse behavior without needing shadcn/ui Accordion, keeping the implementation lean
+- Zustand + Immer in builderStore.ts cleanly handled group/question state mutations without boilerplate
+- Inline title editing (click-to-edit → Enter/blur to save) was self-contained within GroupPanel.tsx with no extra context needed
+- Delete confirmation dialog with cascade warning was straightforward using a local `useState` boolean for dialog visibility
 
 ## What Was Challenging
-- Coordinating the debounced PATCH for inline title saves without fake timers required a pattern shift: tracking captured MSW requests via a `capturedRequests` array instead of asserting on timing
-- Avoiding act() warnings required wrapping every `userEvent.setup()` interaction inside `await act(async () => { ... })` — forgetting even one causes contamination in subsequent tests
-- The confirmation dialog for delete (with cascade warning) needed careful testing to ensure the dialog renders, the warning text appears, and cancelling does not call the API
-- Ensuring empty group placeholder renders correctly required a conditional branch that was easy to miss in the component tree
+- Coordinating sort_order rendering with optimistic UI updates — the store needed to maintain sorted order after add/delete without re-fetching
+- Ensuring the "Add questions here" placeholder only appeared for empty groups (question count === 0 AND expanded) without double-rendering logic
+- Read-only mode and selection support added conditional rendering branches that increased component complexity
 
 ## Key Technical Insights
-1. **Do not use `vi.useFakeTimers()` with MSW** — fake timers block MSW's internal promise resolution, causing `waitFor` to time out indefinitely. Test debounce behavior by capturing requests, not by controlling time.
-2. **userEvent.setup() requires act() wrapping** — every `await user.click()` / `await user.type()` must be wrapped in `await act(async () => { ... })` to flush React 18 scheduler work before the next assertion.
-3. **AuthProvider in test wrappers triggers async initialize()** — if any test uses AuthProvider, prevent the async init cycle by removing the refresh token from localStorage after `setTokens()` and pre-populating auth store state via `useAuthStore.setState(...)`.
-4. **shadcn Collapsible needs an explicit `open` + `onOpenChange` prop** to be controlled; uncontrolled usage makes expand/collapse state hard to assert in tests.
-5. **Cascade delete warning must be explicit in dialog text** — acceptance criteria specifically requires mentioning question cascade; test for the exact warning string to prevent regression.
+1. Inline editing state (isEditing, draftTitle) is best kept local to the component rather than in the global store — it's ephemeral UI state, not domain state.
+2. When a group is deleted, the builder store should reindex sort_order of remaining groups to avoid gaps, otherwise drag-and-drop reorder logic breaks.
+3. The drag handle should render but be visually inactive in read-only mode — removing it entirely causes layout shift.
+4. PATCH title save should debounce or only fire on commit (Enter/blur), not on every keystroke, to avoid excessive API calls during fast typing.
 
 ## Reusable Patterns
-- **Debounce test pattern**: Create a `capturedRequests: Request[]` array in `beforeEach`; add an MSW handler that pushes `req` to the array before responding. After `userEvent` interactions, use `waitFor(() => expect(capturedRequests).toHaveLength(1))` to assert the coalesced save fired exactly once.
-- **Inline edit component pattern**: `isEditing` boolean state toggled on click; controlled `<input>` with `onKeyDown` (Enter → save + blur) and `onBlur` (save); escape key restores original value.
-- **Confirmation dialog test pattern**: click delete → assert dialog open → assert cascade warning text present → click confirm → assert DELETE handler called; separately test cancel → assert handler NOT called.
-- **`vi.useRealTimers()` in afterEach**: unconditionally call this in every test file's `afterEach` to prevent fake timer leakage across tests.
-- **MemoryRouter future flags**: always add `future={{ v7_startTransition: true, v7_relativeSplatPath: true }}` to suppress React Router v6→v7 migration warnings in tests.
+- Click-to-edit inline title: local `isEditing` state, `<input>` on true / `<span onClick>` on false, `onKeyDown` for Enter, `onBlur` for save
+- Cascade delete confirmation: local `showConfirm` boolean, shadcn AlertDialog with explicit warning text, destructive variant button
+- Empty-state placeholder inside collapsible content: check `questions.length === 0` and render a muted placeholder `<p>` instead of a list
+- Sort-order rendering: always sort groups by `sort_order` at the selector/render level, not at mutation time, to keep store mutations simple
 
 ## Files to Review for Similar Tasks
-- `frontend/src/components/survey-builder/GroupPanel.tsx` — reference for inline edit + collapsible panel + confirmation dialog pattern
-- `frontend/src/components/ui/collapsible.tsx` — shadcn wrapper for @radix-ui/react-collapsible
-- `frontend/src/components/survey-builder/__tests__/GroupPanel.test.tsx` — reference for MSW request capture pattern and act()-safe userEvent usage
-- `frontend/src/mocks/handlers.ts` — reference for adding CRUD handlers with typed response bodies
-- `frontend/src/services/surveyService.ts` — reference for group API methods (createGroup, updateGroup, deleteGroup, reorderGroups)
+- `src/components/survey-builder/GroupPanel.tsx` — canonical pattern for collapsible panel with inline edit, drag handle, and delete confirmation
+- `src/store/builderStore.ts` — Zustand+Immer slice pattern for nested group/question mutations
+- `src/pages/SurveyBuilderPage.tsx` — Add Group button wiring: POST API call → store dispatch → optimistic append
+- `src/services/surveyService.ts` — group CRUD endpoints (POST, PATCH, DELETE) for reuse in question-level services
 
 ## Gotchas and Pitfalls
-- **Never use bare `await user.click()` outside act()** — leaves unflushed scheduler work that makes the next test's `renderHook` return `null` for `result.current`.
-- **Never use `vi.stubGlobal('URL', {...})`** — replaces the URL constructor and breaks `new URL(...)` inside MSW handlers.
-- **Fake timers + MSW = silent timeout** — `waitFor` will spin forever because MSW relies on microtask/promise resolution that fake timers suppress.
-- **AuthProvider pendingInit race** — if a refresh token exists in localStorage when AuthProvider mounts in a test, `pendingInit` becomes `true` and triggers an async `initialize()` that fires state updates outside act(). Always clear the refresh token and pre-populate store state in `beforeEach`.
-- **sort_order gaps after delete** — deleting a group leaves gaps in sort_order; the reorder endpoint should normalize values, but the frontend must not assume contiguous ordering when rendering.
-- **Empty state placeholder** — must be rendered inside the Collapsible content area, not outside it, or it will be visible even when the group is collapsed.
+- Radix UI Collapsible does not animate height by default — requires explicit `overflow: hidden` + CSS transition on the content wrapper or it snaps open/closed
+- `onBlur` for title save fires before `onKeyDown` Enter in some browsers when clicking away; guard against double-save by tracking a `savedRef` or checking if value actually changed
+- shadcn/ui Collapsible and Accordion share similar APIs but Accordion manages open state externally by default — if using Accordion, you must pass `type="multiple"` and control value to avoid all groups collapsing when one opens
+- Deleting a group while it is selected in the builder should immediately clear the selection in the store, otherwise the properties panel renders stale data for a deleted entity
 ```
