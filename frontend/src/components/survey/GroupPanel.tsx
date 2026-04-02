@@ -66,6 +66,7 @@ export function GroupPanel({
     >
       <CardHeader
         className="pb-2 select-none"
+        data-testid={`group-panel-header-${group.id}`}
         onClick={() =>
           onSelectItem(isGroupSelected ? null : { type: 'group', id: group.id })
         }

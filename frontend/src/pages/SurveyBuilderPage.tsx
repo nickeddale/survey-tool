@@ -48,7 +48,7 @@ import { Card, CardContent } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Skeleton } from '../components/ui/skeleton'
 import { QuestionEditor } from '../components/survey-builder/QuestionEditor'
-import { GroupPanel as BuilderGroupPanel } from '../components/survey-builder/GroupPanel'
+import { GroupPanel as BuilderGroupPanel } from '../components/survey/GroupPanel'
 import { QuestionCard } from '../components/survey/QuestionCard'
 
 // ---------------------------------------------------------------------------
@@ -197,7 +197,6 @@ function GroupDragPreview({ group }: { group: BuilderGroup }) {
 // ---------------------------------------------------------------------------
 
 interface SortableGroupPanelProps {
-  surveyId: string
   group: BuilderGroup
   readOnly: boolean
   selectedItem: SelectedItem
@@ -205,7 +204,6 @@ interface SortableGroupPanelProps {
 }
 
 function SortableGroupPanel({
-  surveyId,
   group,
   readOnly,
   selectedItem,
@@ -226,26 +224,15 @@ function SortableGroupPanel({
     opacity: isDragging ? 0.4 : 1,
   }
 
-  const isGroupSelected = selectedItem?.type === 'group' && selectedItem.id === group.id
-
   return (
     <div ref={setNodeRef} style={style}>
       <BuilderGroupPanel
-        surveyId={surveyId}
         group={group}
+        selectedItem={selectedItem}
+        onSelectItem={onSelectItem}
         readOnly={readOnly}
-        isSelected={isGroupSelected}
-        isDragging={isDragging}
         dragListeners={listeners}
         dragAttributes={attributes}
-        onSelect={(groupId) =>
-          onSelectItem(isGroupSelected ? null : { type: 'group', id: groupId })
-        }
-        onSelectQuestion={(questionId) => {
-          const isQuestionSelected =
-            selectedItem?.type === 'question' && selectedItem.id === questionId
-          onSelectItem(isQuestionSelected ? null : { type: 'question', id: questionId })
-        }}
       />
     </div>
   )
@@ -496,7 +483,6 @@ function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem }: Survey
             {sortedGroups.map((group) => (
               <SortableGroupPanel
                 key={group.id}
-                surveyId={surveyId}
                 group={group}
                 readOnly={readOnly}
                 selectedItem={selectedItem}
