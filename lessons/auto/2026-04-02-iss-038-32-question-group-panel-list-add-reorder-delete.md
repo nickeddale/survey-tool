@@ -2,65 +2,93 @@
 date: "2026-04-02"
 ticket_id: "ISS-038"
 ticket_title: "3.2: Question Group Panel (List, Add, Reorder, Delete)"
-categories: ["testing", "api", "ui", "refactoring", "feature", "ci-cd"]
+categories: ["testing", "api", "ui", "refactoring", "bug-fix", "feature", "performance", "security", "config", "ci-cd"]
 outcome: "success"
 complexity: "medium"
 files_modified: []
 ---
 
-```yaml
+```markdown
 ---
 date: "2026-04-02"
 ticket_id: "ISS-038"
 ticket_title: "3.2: Question Group Panel (List, Add, Reorder, Delete)"
-categories: ["react", "survey-builder", "ui-components", "state-management"]
+categories: ["react", "testing", "zustand", "msw", "survey-builder"]
 outcome: "success"
 complexity: "medium"
 files_modified:
   - "frontend/src/components/survey-builder/GroupPanel.tsx"
+  - "frontend/src/components/survey-builder/__tests__/GroupPanel.test.tsx"
   - "frontend/src/pages/SurveyBuilderPage.tsx"
   - "frontend/src/store/builderStore.ts"
   - "frontend/src/services/surveyService.ts"
-  - "frontend/src/components/survey-builder/__tests__/GroupPanel.test.tsx"
-  - "frontend/src/mocks/handlers.ts"
+  - "frontend/src/types/survey.ts"
 ---
 
 # Lessons Learned: 3.2: Question Group Panel (List, Add, Reorder, Delete)
 
 ## What Worked Well
-- Implementation was largely pre-existing at 1,332 lines — the ticket was effectively a verification and completion pass rather than a greenfield build
-- MSW handlers covered all CRUD operations (POST, PATCH, DELETE) cleanly, enabling isolated component tests without real API calls
-- shadcn/ui Collapsible provided the expand/collapse behavior with minimal custom logic
-- builderStore actions (addGroup, removeGroup, updateGroup, reorderGroups) kept API side effects cleanly separated from UI state
+- Shadcn/ui Collapsible provided expand/collapse behavior with minimal boilerplate, fitting cleanly into the group panel structure.
+- Zustand builderStore actions (addGroup/removeGroup/updateGroup/reorderGroups) gave the component a clean, predictable state interface with no prop drilling.
+- surveyService abstraction kept API calls out of the component and made MSW mocking straightforward.
+- Inline title editing pattern (click → input focused → Enter/blur → PATCH) was self-contained and required no external state management beyond local component state.
+- Pre-populating auth state via `useAuthStore.setState()` instead of relying on AuthProvider initialization eliminated act() warning noise across all tests.
 
 ## What Was Challenging
-- Large component file (1,332 lines) makes navigation and targeted modifications slow — risk of unintended side effects when editing
-- Inline title editing (click-to-edit, Enter/blur to save) requires careful focus management and edge case handling (empty title, concurrent blur+Enter events)
-- Delete confirmation dialog needed to clearly communicate cascading question deletion without alarming users unnecessarily
-- sort_order rendering depends on consistent store state — if reorderGroups is called optimistically before the API confirms, a failed request can leave UI out of sync with backend
+- Ensuring act() compliance with userEvent.setup() required wrapping every `user.click/type` call — easy to miss one and introduce subtle test contamination that only manifests in later tests.
+- Delete confirmation dialog cascade warning text is an acceptance criterion, not just UX copy — asserting on it explicitly required discipline to treat dialog content as a testable contract.
+- MSW error handler shape divergence (simplified `{message}` vs real backend `{detail: {code, message}}`) is a silent failure mode: tests pass but the component would mishandle real API errors.
+- Sort order correctness required confirming groups are sorted in the store selector rather than inside GroupPanel render — sorting inside the component re-sorts on every render and interferes with optimistic drag-reorder state.
 
 ## Key Technical Insights
-1. Inline editing with dual-save triggers (Enter keydown + blur) requires a guard (e.g., a `saving` ref) to prevent double PATCH requests when the user presses Enter and focus simultaneously moves away
-2. Collapsible panels from shadcn/ui need controlled `open` state wired to store if expand/collapse state must survive re-renders or be driven externally (e.g., auto-expand newly added groups)
-3. Empty group placeholder ('Add questions here') should be rendered inside CollapsibleContent so it only appears when the group is expanded — rendering it outside causes it to show even when collapsed
-4. Delete with cascade warning: the confirmation dialog message should be static (not dynamically listing question titles) to avoid an extra API fetch just for the dialog
+1. **Sort in the selector, not the component.** Sorting groups by sort_order inside the Zustand store selector (or before passing as props) rather than inside GroupPanel's render function prevents re-sort conflicts with optimistic drag-reorder state updates.
+2. **Delete dialog text is a tested contract.** The cascade warning in the confirmation dialog is an explicit acceptance criterion — assert on it in tests so copy changes are caught as regressions, not silent UX degradation.
+3. **MSW error envelopes must match the real backend shape.** The backend returns `{detail: {code: string, message: string}}`. Using `{message: '...'}` in test handlers produces false-positive tests that diverge from real API behavior.
+4. **AuthProvider initialization must be suppressed in unit tests.** When setTokens() is called in beforeEach, AuthProvider mounts with pendingInit=true and fires initialize() asynchronously, producing act() warnings. Fix: remove the refresh token from localStorage and pre-populate auth store state directly after setTokens().
+5. **Every userEvent interaction needs an act() wrapper.** userEvent.setup() dispatches events outside React's act() boundary. Bare `await user.click()` leaves the React 18 scheduler with unflushed work that contaminates subsequent tests. Wrap universally: `await act(async () => { await user.click(...) })`.
+6. **vi.useRealTimers() in afterEach is non-negotiable.** Leaked fake timers silently block MSW promise resolution, causing all downstream tests to time out with no clear error pointing to the leak source.
 
 ## Reusable Patterns
-- Click-to-edit inline title pattern: input hidden by default, shown on click with `autoFocus`, saved on Enter/blur, reverted on Escape — reusable for any entity title in the builder
-- Optimistic store update + rollback on API error: update store immediately, call API, catch error and revert with previous state snapshot
-- MSW handler structure for CRUD: define handlers for the resource in `handlers.ts` and import into test setup; keeps test files free of `http.post(...)` boilerplate
-- Confirmation dialog with cascade warning: accept a `warningMessage` prop so the same ConfirmDialog component can be reused for groups, questions, and surveys
+- **Auth pre-population in beforeEach:**
+  ```ts
+  setTokens(accessToken, refreshToken);
+  localStorage.removeItem('devtracker_refresh_token');
+  useAuthStore.setState({ user: mockUser, isAuthenticated: true, isLoading: false });
+  ```
+- **act() wrapper for every userEvent call:**
+  ```ts
+  await act(async () => { await user.click(element) });
+  await act(async () => { await user.type(input, 'text') });
+  ```
+- **Timer cleanup in afterEach:**
+  ```ts
+  afterEach(() => { vi.useRealTimers(); });
+  ```
+- **MSW error handler with correct backend envelope:**
+  ```ts
+  http.delete('/api/v1/surveys/:id/groups/:gid', () =>
+    HttpResponse.json({ detail: { code: 'NOT_FOUND', message: 'Group not found' } }, { status: 404 })
+  )
+  ```
+- **MemoryRouter future flags to suppress warnings:**
+  ```tsx
+  <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+  ```
+- **Inline edit pattern:** local `isEditing` + `editValue` state; on blur or Enter, call PATCH API then update store; on Escape, reset without saving.
+- **Delete confirmation with cascade warning:** assert `screen.getByText(/questions.*deleted|deleted.*questions/i)` or the exact warning string to lock in the acceptance criterion.
 
 ## Files to Review for Similar Tasks
-- `frontend/src/components/survey-builder/GroupPanel.tsx` — reference for collapsible panel, inline editing, delete confirmation patterns
-- `frontend/src/store/builderStore.ts` — reference for optimistic CRUD actions with rollback
-- `frontend/src/components/survey-builder/__tests__/GroupPanel.test.tsx` — reference for MSW-based component tests covering full CRUD lifecycle
-- `frontend/src/mocks/handlers.ts` — reference for registering MSW handlers for survey builder endpoints
+- `frontend/src/components/survey-builder/GroupPanel.tsx` — collapsible panel with inline edit, delete dialog, empty-state placeholder, drag handle
+- `frontend/src/components/survey-builder/__tests__/GroupPanel.test.tsx` — MSW + userEvent + act() patterns for interactive component tests
+- `frontend/src/pages/SurveyBuilderPage.tsx` — Add Group integration: POST API call + builderStore.addGroup()
+- `frontend/src/store/builderStore.ts` — addGroup/removeGroup/updateGroup/reorderGroups actions; sort_order selector pattern
+- `frontend/src/services/surveyService.ts` — createGroup/updateGroup/deleteGroup/reorderGroups API methods
 
 ## Gotchas and Pitfalls
-- Double-save on inline edit: blur fires after Enter in some browsers; always debounce or gate with a ref to avoid duplicate PATCH calls
-- sort_order gaps: after deletion, sort_order values may have gaps — backend should renumber on delete, or frontend must tolerate non-contiguous ordering
-- Drag handle and click events conflict: ensure drag handle has `onMouseDown` with `e.stopPropagation()` so dragging doesn't trigger the title-edit click handler
-- act() warnings in tests when testing inline edit: state updates from blur events fired via `userEvent` should be wrapped in `await act(async () => { ... })` per project memory guidelines
-- Collapsible animation and test assertions: `CollapsibleContent` may use CSS `display:none` or height animation — query by visibility or role rather than presence in DOM to avoid false positives
+- **Bare userEvent calls contaminate subsequent tests.** A single `await user.click()` without act() wrapping can cause `result.current` to be null in the next renderHook call. Wrap every call, every time.
+- **Refresh token in localStorage triggers AuthProvider init.** Even in unit tests, if a refresh token is present in localStorage when AuthProvider mounts, it fires initialize() and causes act() warnings throughout the test. Always clear it after setTokens().
+- **Fake timer leaks are silent.** A test that calls vi.useFakeTimers() without a corresponding vi.useRealTimers() in afterEach will cause all subsequent MSW-dependent tests to hang with timeout errors that appear unrelated to the leak.
+- **Sorting inside the component breaks drag-reorder.** GroupPanel must receive pre-sorted groups; sorting internally means optimistic drag state (reorder before API confirm) is immediately overwritten by the re-render sort.
+- **Dialog cascade text must be asserted, not assumed.** If the warning string is refactored without updating the test, the dialog continues to open but the acceptance criterion silently breaks. Test the text explicitly.
+- **Simplified MSW error shapes produce false positives.** `{message: 'error'}` passes component error-handling tests but the real component code path (which reads `error.detail.message`) is never exercised. Always mirror the exact backend error envelope.
 ```
