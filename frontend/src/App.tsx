@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
 import SurveysPage from './pages/SurveysPage'
+import SurveyFormPage from './pages/SurveyFormPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 function App() {
@@ -27,7 +28,9 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/surveys/*" element={<SurveysPage />} />
+              <Route path="/surveys/new" element={<SurveyFormPage />} />
+              <Route path="/surveys/:id/edit" element={<SurveyFormPage />} />
+              <Route path="/surveys" element={<SurveysPage />} />
             </Route>
           </Route>
 

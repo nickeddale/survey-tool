@@ -94,3 +94,21 @@ export interface ApiKeyCreate {
   scopes?: string[] | null
   expires_at?: string | null
 }
+
+export type SurveyStatus = 'draft' | 'active' | 'closed' | 'archived'
+
+export interface SurveyCreatePayload {
+  title: string
+  description?: string | null
+  welcome_message?: string | null
+  end_message?: string | null
+  default_language?: string
+}
+
+export interface SurveyUpdatePayload {
+  title?: string
+  description?: string | null
+  welcome_message?: string | null
+  end_message?: string | null
+  default_language?: string
+}
