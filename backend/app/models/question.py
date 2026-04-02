@@ -32,6 +32,10 @@ VALID_QUESTION_TYPES = (
     "url",
     "yes_no",
     "boolean",
+    "ranking",
+    "image_picker",
+    "expression",
+    "html",
 )
 
 

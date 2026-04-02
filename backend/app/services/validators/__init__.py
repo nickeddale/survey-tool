@@ -51,6 +51,15 @@ from app.services.validators.misc_validators import (
     validate_file_upload_answer,
     validate_number_answer,
 )
+from app.services.validators.special_validators import (
+    validate_ranking_settings,
+    validate_ranking_answer,
+    validate_image_picker_settings,
+    validate_image_picker_answer,
+    validate_file_upload_settings,
+    validate_expression_settings,
+    validate_html_settings,
+)
 from app.services.validators.validation_rules import validate_validation_rules
 
 
@@ -77,6 +86,8 @@ _MATRIX_TYPES = frozenset({"matrix", "matrix_dropdown", "matrix_dynamic"})
 _SCALAR_TYPES = frozenset({"numeric", "rating", "boolean", "date"})
 _TEXT_TYPES = frozenset({"short_text", "long_text", "email", "phone", "url"})
 _MISC_TYPES = frozenset({"scale", "yes_no", "time", "datetime", "file_upload", "number"})
+# Special types that require answer_options in their config/answer validators
+_SPECIAL_CHOICE_TYPES = frozenset({"ranking", "image_picker"})
 
 # Config validators: keyed by type, value is the settings-validator callable.
 # Choice: (settings, answer_options) -> None
@@ -97,6 +108,13 @@ _CONFIG_VALIDATORS: dict[str, Callable] = {
     "rating": validate_rating_settings,
     "boolean": validate_boolean_settings,
     "date": validate_date_settings,
+    # special (choice-like: require answer_options)
+    "ranking": validate_ranking_settings,
+    "image_picker": validate_image_picker_settings,
+    # special (scalar-like: no answer_options needed)
+    "file_upload": validate_file_upload_settings,
+    "expression": validate_expression_settings,
+    "html": validate_html_settings,
 }
 
 # Answer validators: keyed by type, value is the answer-validator callable.
@@ -128,6 +146,10 @@ _ANSWER_VALIDATORS: dict[str, Callable] = {
     "datetime": validate_datetime_answer,
     "file_upload": validate_file_upload_answer,
     "number": validate_number_answer,
+    # special choice-like (signature: answer, question, answer_options)
+    "ranking": validate_ranking_answer,
+    "image_picker": validate_image_picker_answer,
+    # expression and html: no answer validator (computed/static — no user input)
 }
 
 
@@ -159,12 +181,12 @@ def validate_question_config(
     config_fn = _CONFIG_VALIDATORS.get(question_type)
     if config_fn is not None and settings is not None:
         try:
-            if question_type in _CHOICE_TYPES:
+            if question_type in _CHOICE_TYPES or question_type in _SPECIAL_CHOICE_TYPES:
                 config_fn(settings, answer_options)
             elif question_type in _MATRIX_TYPES:
                 config_fn(settings, answer_options, subquestions)
             else:
-                # scalar — no answer_options/subquestions needed
+                # scalar / special scalar — no answer_options/subquestions needed
                 config_fn(settings)
         except Exception as exc:
             errors.append(QuestionValidationError(field="settings", message=str(exc)))
@@ -197,7 +219,7 @@ def validate_answer(
         return errors
 
     try:
-        if question_type in _CHOICE_TYPES:
+        if question_type in _CHOICE_TYPES or question_type in _SPECIAL_CHOICE_TYPES:
             answer_fn(answer, question, answer_options)
         elif question_type in _MATRIX_TYPES:
             answer_fn(answer, question, answer_options, subquestions)
