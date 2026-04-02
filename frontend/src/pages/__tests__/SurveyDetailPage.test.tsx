@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { http, HttpResponse } from 'msw'
@@ -7,7 +7,7 @@ import { server } from '../../test/setup'
 import { AuthProvider } from '../../contexts/AuthContext'
 import { useAuthStore } from '../../store/authStore'
 import { clearTokens, setTokens } from '../../services/tokenService'
-import { mockTokens, mockSurveyFull } from '../../mocks/handlers'
+import { mockTokens, mockUser, mockSurveyFull } from '../../mocks/handlers'
 import SurveyDetailPage from '../SurveyDetailPage'
 
 // ---------------------------------------------------------------------------
@@ -23,7 +23,7 @@ const SURVEY_ID = mockSurveyFull.id // '10000000-0000-0000-0000-000000000002'
 
 function renderDetail(id = SURVEY_ID) {
   return render(
-    <MemoryRouter initialEntries={[`/surveys/${id}`]}>
+    <MemoryRouter initialEntries={[`/surveys/${id}`]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AuthProvider>
         <Routes>
           <Route path="/surveys/:id" element={<SurveyDetailPage />} />
@@ -52,7 +52,14 @@ describe('SurveyDetailPage', () => {
     clearTokens()
     localStorage.clear()
     resetAuthStore()
+    // Set only the access token (in memory) without storing the refresh token in
+    // localStorage. This prevents AuthProvider from calling initialize() on mount,
+    // which would trigger async state updates (setPendingInit, set user) outside act().
+    // The mock JWT has exp=9999999999, so no proactive refresh occurs either.
     setTokens(mockTokens.access_token, mockTokens.refresh_token)
+    localStorage.removeItem('devtracker_refresh_token')
+    // Pre-populate the auth store so components that check isAuthenticated work correctly
+    useAuthStore.setState({ user: mockUser, isAuthenticated: true, isLoading: false })
   })
 
   afterEach(() => {
@@ -102,7 +109,9 @@ describe('SurveyDetailPage', () => {
         expect(screen.getByTestId('survey-not-found')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByRole('button', { name: /back to surveys/i }))
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /back to surveys/i }))
+      })
 
       await waitFor(() => {
         expect(screen.getByTestId('location').textContent).toBe('/surveys')
@@ -276,9 +285,11 @@ describe('SurveyDetailPage', () => {
         expect(screen.getByTestId('activate-button')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByTestId('activate-button'))
+      await act(async () => {
+        await user.click(screen.getByTestId('activate-button'))
+      })
 
-      expect(screen.getByTestId('confirm-modal')).toBeInTheDocument()
+      await screen.findByTestId('confirm-modal')
       expect(screen.getByText(/activate survey/i)).toBeInTheDocument()
     })
 
@@ -298,10 +309,14 @@ describe('SurveyDetailPage', () => {
         expect(screen.getByTestId('activate-button')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByTestId('activate-button'))
-      expect(screen.getByTestId('confirm-modal')).toBeInTheDocument()
+      await act(async () => {
+        await user.click(screen.getByTestId('activate-button'))
+      })
+      await screen.findByTestId('confirm-modal')
 
-      await user.click(screen.getByRole('button', { name: /cancel/i }))
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /cancel/i }))
+      })
 
       expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument()
       expect(activateCalled).toBe(false)
@@ -315,8 +330,12 @@ describe('SurveyDetailPage', () => {
         expect(screen.getByTestId('activate-button')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByTestId('activate-button'))
-      await user.click(screen.getByTestId('confirm-button'))
+      await act(async () => {
+        await user.click(screen.getByTestId('activate-button'))
+      })
+      await act(async () => {
+        await user.click(screen.getByTestId('confirm-button'))
+      })
 
       await waitFor(() => {
         expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument()
@@ -345,8 +364,12 @@ describe('SurveyDetailPage', () => {
         expect(screen.getByTestId('activate-button')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByTestId('activate-button'))
-      await user.click(screen.getByTestId('confirm-button'))
+      await act(async () => {
+        await user.click(screen.getByTestId('activate-button'))
+      })
+      await act(async () => {
+        await user.click(screen.getByTestId('confirm-button'))
+      })
 
       await waitFor(() => {
         // Modal stays open with error message
@@ -381,9 +404,11 @@ describe('SurveyDetailPage', () => {
         expect(screen.getByTestId('close-button')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByTestId('close-button'))
+      await act(async () => {
+        await user.click(screen.getByTestId('close-button'))
+      })
 
-      expect(screen.getByTestId('confirm-modal')).toBeInTheDocument()
+      await screen.findByTestId('confirm-modal')
       expect(screen.getByRole('heading', { name: /close survey/i })).toBeInTheDocument()
     })
 
@@ -395,8 +420,12 @@ describe('SurveyDetailPage', () => {
         expect(screen.getByTestId('close-button')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByTestId('close-button'))
-      await user.click(screen.getByTestId('confirm-button'))
+      await act(async () => {
+        await user.click(screen.getByTestId('close-button'))
+      })
+      await act(async () => {
+        await user.click(screen.getByTestId('confirm-button'))
+      })
 
       await waitFor(() => {
         expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument()
@@ -432,9 +461,11 @@ describe('SurveyDetailPage', () => {
         expect(screen.getByTestId('archive-button')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByTestId('archive-button'))
+      await act(async () => {
+        await user.click(screen.getByTestId('archive-button'))
+      })
 
-      expect(screen.getByTestId('confirm-modal')).toBeInTheDocument()
+      await screen.findByTestId('confirm-modal')
       expect(screen.getByText(/archive survey/i)).toBeInTheDocument()
     })
 
@@ -446,8 +477,12 @@ describe('SurveyDetailPage', () => {
         expect(screen.getByTestId('archive-button')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByTestId('archive-button'))
-      await user.click(screen.getByTestId('confirm-button'))
+      await act(async () => {
+        await user.click(screen.getByTestId('archive-button'))
+      })
+      await act(async () => {
+        await user.click(screen.getByTestId('confirm-button'))
+      })
 
       await waitFor(() => {
         expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument()
@@ -499,7 +534,9 @@ describe('SurveyDetailPage', () => {
         expect(screen.getByTestId('edit-button')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByTestId('edit-button'))
+      await act(async () => {
+        await user.click(screen.getByTestId('edit-button'))
+      })
 
       await waitFor(() => {
         expect(screen.getByTestId('location').textContent).toBe(`/surveys/${SURVEY_ID}/edit`)
@@ -528,9 +565,11 @@ describe('SurveyDetailPage', () => {
         expect(screen.getByTestId('clone-button')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByTestId('clone-button'))
+      await act(async () => {
+        await user.click(screen.getByTestId('clone-button'))
+      })
 
-      expect(screen.getByTestId('confirm-modal')).toBeInTheDocument()
+      await screen.findByTestId('confirm-modal')
       expect(screen.getByText(/clone survey/i)).toBeInTheDocument()
     })
 
@@ -542,8 +581,12 @@ describe('SurveyDetailPage', () => {
         expect(screen.getByTestId('clone-button')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByTestId('clone-button'))
-      await user.click(screen.getByTestId('confirm-button'))
+      await act(async () => {
+        await user.click(screen.getByTestId('clone-button'))
+      })
+      await act(async () => {
+        await user.click(screen.getByTestId('confirm-button'))
+      })
 
       await waitFor(() => {
         expect(screen.getByTestId('location').textContent).toBe(
@@ -593,7 +636,9 @@ describe('SurveyDetailPage', () => {
         expect(screen.getByTestId('export-button')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByTestId('export-button'))
+      await act(async () => {
+        await user.click(screen.getByTestId('export-button'))
+      })
 
       await waitFor(() => {
         expect(createObjectURL).toHaveBeenCalled()
@@ -622,9 +667,11 @@ describe('SurveyDetailPage', () => {
         expect(screen.getByTestId('delete-button')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByTestId('delete-button'))
+      await act(async () => {
+        await user.click(screen.getByTestId('delete-button'))
+      })
 
-      expect(screen.getByTestId('confirm-modal')).toBeInTheDocument()
+      await screen.findByTestId('confirm-modal')
       expect(screen.getByText(/delete survey/i)).toBeInTheDocument()
     })
 
@@ -636,8 +683,12 @@ describe('SurveyDetailPage', () => {
         expect(screen.getByTestId('delete-button')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByTestId('delete-button'))
-      await user.click(screen.getByTestId('confirm-button'))
+      await act(async () => {
+        await user.click(screen.getByTestId('delete-button'))
+      })
+      await act(async () => {
+        await user.click(screen.getByTestId('confirm-button'))
+      })
 
       await waitFor(() => {
         expect(screen.getByTestId('location').textContent).toBe('/surveys')
@@ -660,8 +711,12 @@ describe('SurveyDetailPage', () => {
         expect(screen.getByTestId('delete-button')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByTestId('delete-button'))
-      await user.click(screen.getByRole('button', { name: /cancel/i }))
+      await act(async () => {
+        await user.click(screen.getByTestId('delete-button'))
+      })
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /cancel/i }))
+      })
 
       await new Promise((r) => setTimeout(r, 50))
       expect(deleteCalled).toBe(false)
@@ -681,7 +736,9 @@ describe('SurveyDetailPage', () => {
         expect(screen.getByTestId('survey-detail-page')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByLabelText('Back to surveys'))
+      await act(async () => {
+        await user.click(screen.getByLabelText('Back to surveys'))
+      })
 
       await waitFor(() => {
         expect(screen.getByTestId('location').textContent).toBe('/surveys')
