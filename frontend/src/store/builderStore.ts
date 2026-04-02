@@ -68,6 +68,9 @@ interface BuilderActions {
   // Load full survey from API response
   loadSurvey: (survey: SurveyFullResponse) => void
 
+  // Metadata actions
+  setTitle: (title: string) => void
+
   // Group actions
   addGroup: (group: BuilderGroup) => void
   removeGroup: (groupId: string) => void
@@ -178,6 +181,15 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
         state.saveStatus = 'idle'
         state.lastSavedAt = null
         state.saveError = null
+      }),
+
+    // -----------------------------------------------------------------------
+    // Metadata actions
+    // -----------------------------------------------------------------------
+
+    setTitle: (title: string) =>
+      set((state) => {
+        state.title = title
       }),
 
     // -----------------------------------------------------------------------

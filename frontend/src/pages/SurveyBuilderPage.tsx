@@ -38,17 +38,16 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { ArrowLeft, Eye, EyeOff, Lock, Plus, Type, List, AlignLeft, CheckSquare, ToggleLeft, Hash, Undo2, Redo2 } from 'lucide-react'
+import { Plus, Type, List, AlignLeft, CheckSquare, ToggleLeft, Hash } from 'lucide-react'
 import surveyService from '../services/surveyService'
 import { useBuilderStore } from '../store/builderStore'
 import type { BuilderGroup, BuilderQuestion, SelectedItem } from '../store/builderStore'
 import { ApiError } from '../types/api'
 import { Button } from '../components/ui/button'
 import { Card, CardContent } from '../components/ui/card'
-import { Badge } from '../components/ui/badge'
 import { Skeleton } from '../components/ui/skeleton'
 import { QuestionEditor } from '../components/survey-builder/QuestionEditor'
-import { SaveIndicator } from '../components/survey-builder/SaveIndicator'
+import { BuilderToolbar } from '../components/survey-builder/BuilderToolbar'
 import { GroupPanel as BuilderGroupPanel } from '../components/survey/GroupPanel'
 import { QuestionCard } from '../components/survey/QuestionCard'
 import { QuestionPreview } from '../components/survey-builder/QuestionPreview'
@@ -56,13 +55,6 @@ import { QuestionPreview } from '../components/survey-builder/QuestionPreview'
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-
-const STATUS_STYLES: Record<string, string> = {
-  draft: 'bg-muted text-muted-foreground',
-  active: 'bg-green-100 text-green-800',
-  closed: 'bg-yellow-100 text-yellow-800',
-  archived: 'bg-red-100 text-red-800',
-}
 
 const QUESTION_TYPES = [
   { type: 'text', label: 'Short Text', icon: Type },
@@ -102,22 +94,6 @@ function BuilderSkeleton() {
         <Skeleton className="w-72 h-full" />
       </div>
     </div>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// Sub-components: Status badge
-// ---------------------------------------------------------------------------
-
-function StatusBadge({ status }: { status: string }) {
-  const cls = STATUS_STYLES[status] ?? 'bg-muted text-muted-foreground'
-  return (
-    <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded text-sm font-medium capitalize ${cls}`}
-      data-testid="status-badge"
-    >
-      {status}
-    </span>
   )
 }
 
@@ -659,7 +635,6 @@ function SurveyBuilderPage() {
 
   const {
     surveyId,
-    title,
     status,
     selectedItem,
     isLoading,
@@ -824,102 +799,14 @@ function SurveyBuilderPage() {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden" data-testid="survey-builder-page">
-      {/* Top bar */}
-      <header
-        className="flex items-center gap-3 px-4 py-3 border-b border-border bg-background shrink-0"
-        data-testid="builder-top-bar"
-      >
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-muted-foreground hover:text-foreground"
-          onClick={() => navigate(`/surveys/${id}`)}
-          aria-label="Back to survey"
-        >
-          <ArrowLeft size={18} />
-        </Button>
-
-        <h1 className="text-lg font-semibold text-foreground truncate flex-1" data-testid="builder-title">
-          {title}
-        </h1>
-
-        <StatusBadge status={status} />
-
-        {!readOnly && (
-          <SaveIndicator
-            onRetry={saveStatus === 'error' ? () => setSaveStatus('idle') : undefined}
-          />
-        )}
-
-        {!readOnly && (
-          <>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => {
-                undoRedoPendingRef.current = true
-                undo()
-              }}
-              disabled={undoStack.length === 0}
-              aria-label="Undo (Ctrl+Z)"
-              title="Undo (Ctrl+Z)"
-              data-testid="undo-button"
-            >
-              <Undo2 size={16} />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => {
-                undoRedoPendingRef.current = true
-                redo()
-              }}
-              disabled={redoStack.length === 0}
-              aria-label="Redo (Ctrl+Shift+Z)"
-              title="Redo (Ctrl+Shift+Z)"
-              data-testid="redo-button"
-            >
-              <Redo2 size={16} />
-            </Button>
-          </>
-        )}
-
-        <Button
-          variant={isPreviewMode ? 'default' : 'outline'}
-          size="sm"
-          className="h-8 gap-1"
-          onClick={() => setIsPreviewMode((prev) => !prev)}
-          aria-pressed={isPreviewMode}
-          data-testid="preview-mode-toggle"
-        >
-          {isPreviewMode ? <EyeOff size={14} /> : <Eye size={14} />}
-          {isPreviewMode ? 'Exit Preview' : 'Preview'}
-        </Button>
-
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-8 gap-1"
-          onClick={() => navigate(`/surveys/${id}/preview`)}
-          data-testid="full-preview-button"
-        >
-          <Eye size={14} />
-          Full Preview
-        </Button>
-
-        {readOnly && (
-          <Badge
-            variant="outline"
-            className="gap-1 border-amber-400 text-amber-700 bg-amber-50"
-            data-testid="read-only-badge"
-          >
-            <Lock size={12} />
-            Read-only
-          </Badge>
-        )}
-      </header>
+      {/* Toolbar */}
+      <BuilderToolbar
+        surveyId={surveyId ?? ''}
+        isPreviewMode={isPreviewMode}
+        onTogglePreview={() => setIsPreviewMode((prev) => !prev)}
+        readOnly={readOnly}
+        undoRedoPendingRef={undoRedoPendingRef}
+      />
 
       {/* Three-panel layout */}
       <div className="flex flex-1 overflow-hidden">

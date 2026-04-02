@@ -134,6 +134,15 @@ export interface QuestionGroupUpdatePayload {
   description?: string | null
 }
 
+export interface QuestionCreatePayload {
+  question_type: string
+  title: string
+  code?: string
+  description?: string | null
+  is_required?: boolean
+  sort_order?: number
+}
+
 export interface GroupReorderPayload {
   group_ids: string[]
 }
