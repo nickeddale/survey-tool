@@ -22,6 +22,21 @@ import { isTokenExpiringSoon } from '../utils/jwt'
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? '/api/v1'
 
+// ---------------------------------------------------------------------------
+// Redirect function — abstracted so tests can swap it out
+// ---------------------------------------------------------------------------
+
+let redirectToLogin: () => void = () => {
+  if (typeof window !== 'undefined') {
+    window.location.href = '/login'
+  }
+}
+
+/** Override the redirect-to-login function (useful in tests). */
+export function setRedirectFn(fn: () => void): void {
+  redirectToLogin = fn
+}
+
 export const apiClient = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -103,9 +118,7 @@ apiClient.interceptors.request.use(async (config: InternalAxiosRequestConfig) =>
           isRefreshing = false
           rejectQueue(err)
           clearTokens()
-          if (typeof window !== 'undefined') {
-            window.location.href = '/login'
-          }
+          redirectToLogin()
           return Promise.reject(err)
         }
       } else {
@@ -172,9 +185,7 @@ apiClient.interceptors.response.use(
         isRefreshing = false
         rejectQueue(refreshErr)
         clearTokens()
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login'
-        }
+        redirectToLogin()
         return Promise.reject(refreshErr)
       }
     }
