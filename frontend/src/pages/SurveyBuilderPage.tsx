@@ -732,6 +732,17 @@ function SurveyBuilderPage() {
           {isPreviewMode ? 'Exit Preview' : 'Preview'}
         </Button>
 
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 gap-1"
+          onClick={() => navigate(`/surveys/${id}/preview`)}
+          data-testid="full-preview-button"
+        >
+          <Eye size={14} />
+          Full Preview
+        </Button>
+
         {readOnly && (
           <Badge
             variant="outline"
