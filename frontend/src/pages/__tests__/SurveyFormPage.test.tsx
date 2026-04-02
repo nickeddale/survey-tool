@@ -7,7 +7,7 @@ import { server } from '../../test/setup'
 import { AuthProvider } from '../../contexts/AuthContext'
 import { useAuthStore } from '../../store/authStore'
 import { clearTokens, setTokens } from '../../services/tokenService'
-import { mockTokens, mockSurveys } from '../../mocks/handlers'
+import { mockTokens, mockUser, mockSurveys } from '../../mocks/handlers'
 import SurveyFormPage from '../SurveyFormPage'
 
 // ---------------------------------------------------------------------------
@@ -21,7 +21,7 @@ function LocationDisplay() {
 
 function renderForm(initialUrl: string) {
   return render(
-    <MemoryRouter initialEntries={[initialUrl]}>
+    <MemoryRouter initialEntries={[initialUrl]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AuthProvider>
         <Routes>
           <Route path="/surveys/new" element={<SurveyFormPage />} />
@@ -52,7 +52,13 @@ describe('SurveyFormPage', () => {
     clearTokens()
     localStorage.clear()
     resetAuthStore()
+    // Set access token (in memory) without storing refresh token in localStorage.
+    // This prevents AuthProvider from calling initialize() on mount, which would
+    // trigger async state updates (setPendingInit, setUser) outside act().
     setTokens(mockTokens.access_token, mockTokens.refresh_token)
+    localStorage.removeItem('devtracker_refresh_token')
+    // Pre-populate auth store so authenticated API calls work correctly.
+    useAuthStore.setState({ user: mockUser, isAuthenticated: true, isLoading: false })
   })
 
   afterEach(() => {
@@ -82,12 +88,11 @@ describe('SurveyFormPage', () => {
 
       renderForm('/surveys/new')
 
-      await user.click(screen.getByRole('button', { name: /create survey/i }))
-
-      await waitFor(() => {
-        expect(screen.getByRole('alert')).toBeInTheDocument()
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /create survey/i }))
       })
 
+      expect(await screen.findByRole('alert')).toBeInTheDocument()
       expect(screen.getByRole('alert').textContent).toMatch(/title is required/i)
     })
 
@@ -96,14 +101,16 @@ describe('SurveyFormPage', () => {
 
       renderForm('/surveys/new')
 
-      await user.type(screen.getByLabelText(/title/i), 'My New Survey')
-      await user.click(screen.getByRole('button', { name: /create survey/i }))
-
-      await waitFor(() => {
-        expect(screen.getByTestId('location-display').textContent).toBe(
-          '/surveys/20000000-0000-0000-0000-000000000001',
-        )
+      await act(async () => {
+        await user.type(screen.getByLabelText(/title/i), 'My New Survey')
       })
+
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /create survey/i }))
+      })
+
+      const location = await screen.findByTestId('location-display')
+      expect(location.textContent).toBe('/surveys/20000000-0000-0000-0000-000000000001')
     })
 
     it('displays backend validation error on 422 response', async () => {
@@ -120,13 +127,15 @@ describe('SurveyFormPage', () => {
 
       renderForm('/surveys/new')
 
-      await user.type(screen.getByLabelText(/title/i), 'Duplicate Title')
-      await user.click(screen.getByRole('button', { name: /create survey/i }))
-
-      await waitFor(() => {
-        expect(screen.getByRole('alert')).toBeInTheDocument()
+      await act(async () => {
+        await user.type(screen.getByLabelText(/title/i), 'Duplicate Title')
       })
 
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /create survey/i }))
+      })
+
+      expect(await screen.findByRole('alert')).toBeInTheDocument()
       expect(screen.getByRole('alert').textContent).toMatch(/title must be unique/i)
     })
 
@@ -139,9 +148,12 @@ describe('SurveyFormPage', () => {
 
       renderForm('/surveys/new')
 
-      await user.type(screen.getByLabelText(/title/i), 'Loading Test')
+      await act(async () => {
+        await user.type(screen.getByLabelText(/title/i), 'Loading Test')
+      })
 
-      // Fire submit and immediately check button state without awaiting
+      // userEvent already wraps in act internally; outer act ensures all
+      // pending React state updates (setIsSubmitting) are flushed before assertion
       await act(async () => {
         await user.click(screen.getByRole('button', { name: /create survey/i }))
       })
@@ -154,11 +166,12 @@ describe('SurveyFormPage', () => {
 
       renderForm('/surveys/new')
 
-      await user.click(screen.getByRole('button', { name: /cancel/i }))
-
-      await waitFor(() => {
-        expect(screen.getByTestId('location-display').textContent).toBe('/surveys')
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /cancel/i }))
       })
+
+      const location = await screen.findByTestId('location-display')
+      expect(location.textContent).toBe('/surveys')
     })
   })
 
@@ -223,16 +236,17 @@ describe('SurveyFormPage', () => {
 
       // Clear and type a new title
       const titleInput = screen.getByLabelText(/title/i)
-      await user.clear(titleInput)
-      await user.type(titleInput, 'Updated Survey Title')
-
-      await user.click(screen.getByRole('button', { name: /save changes/i }))
-
-      await waitFor(() => {
-        expect(screen.getByTestId('location-display').textContent).toBe(
-          `/surveys/${draftSurvey.id}`,
-        )
+      await act(async () => {
+        await user.clear(titleInput)
+        await user.type(titleInput, 'Updated Survey Title')
       })
+
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /save changes/i }))
+      })
+
+      const location = await screen.findByTestId('location-display')
+      expect(location.textContent).toBe(`/surveys/${draftSurvey.id}`)
     })
 
     it('shows 404 view when survey is not found', async () => {
@@ -306,11 +320,12 @@ describe('SurveyFormPage', () => {
         expect(screen.getByRole('button', { name: /back to surveys/i })).toBeInTheDocument()
       })
 
-      await user.click(screen.getByRole('button', { name: /back to surveys/i }))
-
-      await waitFor(() => {
-        expect(screen.getByTestId('location-display').textContent).toBe('/surveys')
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /back to surveys/i }))
       })
+
+      const location = await screen.findByTestId('location-display')
+      expect(location.textContent).toBe('/surveys')
     })
 
     it('shows error alert if API returns a non-404 error when loading survey', async () => {
@@ -347,13 +362,12 @@ describe('SurveyFormPage', () => {
         expect(screen.getByDisplayValue(draftSurvey.title)).toBeInTheDocument()
       })
 
-      await user.clear(screen.getByLabelText(/title/i))
-      await user.click(screen.getByRole('button', { name: /save changes/i }))
-
-      await waitFor(() => {
-        expect(screen.getByRole('alert')).toBeInTheDocument()
+      await act(async () => {
+        await user.clear(screen.getByLabelText(/title/i))
+        await user.click(screen.getByRole('button', { name: /save changes/i }))
       })
 
+      expect(await screen.findByRole('alert')).toBeInTheDocument()
       expect(screen.getByRole('alert').textContent).toMatch(/title is required/i)
     })
 
@@ -372,11 +386,12 @@ describe('SurveyFormPage', () => {
         expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument()
       })
 
-      await user.click(screen.getByRole('button', { name: /cancel/i }))
-
-      await waitFor(() => {
-        expect(screen.getByTestId('location-display').textContent).toBe('/surveys')
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /cancel/i }))
       })
+
+      const location = await screen.findByTestId('location-display')
+      expect(location.textContent).toBe('/surveys')
     })
   })
 })

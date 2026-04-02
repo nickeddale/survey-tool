@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { render, screen, waitFor, fireEvent } from '@testing-library/react'
+import { render, screen, waitFor, act, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { http, HttpResponse } from 'msw'
@@ -20,7 +20,7 @@ function LocationDisplay() {
 
 function renderRegisterPage() {
   return render(
-    <MemoryRouter initialEntries={['/register']}>
+    <MemoryRouter initialEntries={['/register']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AuthProvider>
         <Routes>
           <Route path="/register" element={<RegisterPage />} />
@@ -36,11 +36,11 @@ function resetAuthStore() {
   useAuthStore.setState({ user: null, isAuthenticated: false, isLoading: false })
 }
 
-async function fillForm(name: string, email: string, password: string, confirmPassword: string) {
-  await userEvent.type(screen.getByLabelText('Name'), name)
-  await userEvent.type(screen.getByLabelText('Email'), email)
-  await userEvent.type(screen.getByLabelText('Password'), password)
-  await userEvent.type(screen.getByLabelText('Confirm Password'), confirmPassword)
+async function fillForm(user: ReturnType<typeof userEvent.setup>, name: string, email: string, password: string, confirmPassword: string) {
+  await user.type(screen.getByLabelText('Name'), name)
+  await user.type(screen.getByLabelText('Email'), email)
+  await user.type(screen.getByLabelText('Password'), password)
+  await user.type(screen.getByLabelText('Confirm Password'), confirmPassword)
 }
 
 // ---------------------------------------------------------------------------
@@ -74,15 +74,23 @@ describe('RegisterPage', () => {
 
   describe('client-side validation', () => {
     it('shows error when name is empty on submit', async () => {
+      const user = userEvent.setup()
       renderRegisterPage()
-      await userEvent.click(screen.getByRole('button', { name: /create account/i }))
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /create account/i }))
+      })
       expect(await screen.findByText('Name is required')).toBeInTheDocument()
     })
 
     it('shows error when email is empty on submit', async () => {
+      const user = userEvent.setup()
       renderRegisterPage()
-      await userEvent.type(screen.getByLabelText('Name'), 'Test User')
-      await userEvent.click(screen.getByRole('button', { name: /create account/i }))
+      await act(async () => {
+        await user.type(screen.getByLabelText('Name'), 'Test User')
+      })
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /create account/i }))
+      })
       expect(await screen.findByText('Email is required')).toBeInTheDocument()
     })
 
@@ -98,44 +106,67 @@ describe('RegisterPage', () => {
     })
 
     it('shows error when password is empty on submit', async () => {
+      const user = userEvent.setup()
       renderRegisterPage()
-      await userEvent.type(screen.getByLabelText('Name'), 'Test User')
-      await userEvent.type(screen.getByLabelText('Email'), 'new@example.com')
-      await userEvent.click(screen.getByRole('button', { name: /create account/i }))
+      await act(async () => {
+        await user.type(screen.getByLabelText('Name'), 'Test User')
+        await user.type(screen.getByLabelText('Email'), 'new@example.com')
+      })
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /create account/i }))
+      })
       expect(await screen.findByText('Password is required')).toBeInTheDocument()
     })
 
     it('shows error when password is less than 8 characters', async () => {
+      const user = userEvent.setup()
       renderRegisterPage()
-      await userEvent.type(screen.getByLabelText('Name'), 'Test User')
-      await userEvent.type(screen.getByLabelText('Email'), 'new@example.com')
-      await userEvent.type(screen.getByLabelText('Password'), 'short')
-      await userEvent.click(screen.getByRole('button', { name: /create account/i }))
+      await act(async () => {
+        await user.type(screen.getByLabelText('Name'), 'Test User')
+        await user.type(screen.getByLabelText('Email'), 'new@example.com')
+        await user.type(screen.getByLabelText('Password'), 'short')
+      })
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /create account/i }))
+      })
       expect(await screen.findByText('Password must be at least 8 characters')).toBeInTheDocument()
     })
 
     it('shows error when confirm password is empty', async () => {
+      const user = userEvent.setup()
       renderRegisterPage()
-      await userEvent.type(screen.getByLabelText('Name'), 'Test User')
-      await userEvent.type(screen.getByLabelText('Email'), 'new@example.com')
-      await userEvent.type(screen.getByLabelText('Password'), 'password123')
-      await userEvent.click(screen.getByRole('button', { name: /create account/i }))
+      await act(async () => {
+        await user.type(screen.getByLabelText('Name'), 'Test User')
+        await user.type(screen.getByLabelText('Email'), 'new@example.com')
+        await user.type(screen.getByLabelText('Password'), 'password123')
+      })
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /create account/i }))
+      })
       expect(await screen.findByText('Please confirm your password')).toBeInTheDocument()
     })
 
     it('shows error when passwords do not match', async () => {
+      const user = userEvent.setup()
       renderRegisterPage()
-      await userEvent.type(screen.getByLabelText('Name'), 'Test User')
-      await userEvent.type(screen.getByLabelText('Email'), 'new@example.com')
-      await userEvent.type(screen.getByLabelText('Password'), 'password123')
-      await userEvent.type(screen.getByLabelText('Confirm Password'), 'different123')
-      await userEvent.click(screen.getByRole('button', { name: /create account/i }))
+      await act(async () => {
+        await user.type(screen.getByLabelText('Name'), 'Test User')
+        await user.type(screen.getByLabelText('Email'), 'new@example.com')
+        await user.type(screen.getByLabelText('Password'), 'password123')
+        await user.type(screen.getByLabelText('Confirm Password'), 'different123')
+      })
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /create account/i }))
+      })
       expect(await screen.findByText('Passwords do not match')).toBeInTheDocument()
     })
 
     it('does not call register when validation fails', async () => {
+      const user = userEvent.setup()
       renderRegisterPage()
-      await userEvent.click(screen.getByRole('button', { name: /create account/i }))
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /create account/i }))
+      })
       expect(screen.getByRole('button', { name: /create account/i })).not.toBeDisabled()
     })
   })
@@ -146,9 +177,14 @@ describe('RegisterPage', () => {
         http.post('/api/v1/auth/register', () => new Promise<never>(() => {})),
       )
 
+      const user = userEvent.setup()
       renderRegisterPage()
-      await fillForm('Test User', 'new@example.com', 'password123', 'password123')
-      await userEvent.click(screen.getByRole('button', { name: /create account/i }))
+      await act(async () => {
+        await fillForm(user, 'Test User', 'new@example.com', 'password123', 'password123')
+      })
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /create account/i }))
+      })
 
       await waitFor(() => {
         expect(screen.getByRole('button', { name: /creating account/i })).toBeDisabled()
@@ -158,22 +194,31 @@ describe('RegisterPage', () => {
 
   describe('successful registration', () => {
     it('auto-logs in and redirects to /dashboard after successful registration', async () => {
+      const user = userEvent.setup()
       renderRegisterPage()
       // Use credentials the MSW login handler accepts (test@example.com / password123)
-      await fillForm('Test User', 'test@example.com', 'password123', 'password123')
-      await userEvent.click(screen.getByRole('button', { name: /create account/i }))
-
-      await waitFor(() => {
-        expect(screen.getByTestId('location').textContent).toBe('/dashboard')
+      await act(async () => {
+        await fillForm(user, 'Test User', 'test@example.com', 'password123', 'password123')
       })
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /create account/i }))
+      })
+
+      const location = await screen.findByTestId('location')
+      expect(location.textContent).toBe('/dashboard')
     })
   })
 
   describe('backend error display', () => {
     it('shows email already registered error from backend', async () => {
+      const user = userEvent.setup()
       renderRegisterPage()
-      await fillForm('Test User', 'existing@example.com', 'password123', 'password123')
-      await userEvent.click(screen.getByRole('button', { name: /create account/i }))
+      await act(async () => {
+        await fillForm(user, 'Test User', 'existing@example.com', 'password123', 'password123')
+      })
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /create account/i }))
+      })
 
       await waitFor(() => {
         expect(screen.getByRole('alert')).toHaveTextContent('A user with this email already exists')
@@ -181,9 +226,14 @@ describe('RegisterPage', () => {
     })
 
     it('re-enables the button after a failed registration', async () => {
+      const user = userEvent.setup()
       renderRegisterPage()
-      await fillForm('Test User', 'existing@example.com', 'password123', 'password123')
-      await userEvent.click(screen.getByRole('button', { name: /create account/i }))
+      await act(async () => {
+        await fillForm(user, 'Test User', 'existing@example.com', 'password123', 'password123')
+      })
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /create account/i }))
+      })
 
       await waitFor(() => {
         expect(screen.getByRole('button', { name: /create account/i })).not.toBeDisabled()
@@ -195,9 +245,14 @@ describe('RegisterPage', () => {
         http.post('/api/v1/auth/register', () => HttpResponse.error()),
       )
 
+      const user = userEvent.setup()
       renderRegisterPage()
-      await fillForm('Test User', 'new@example.com', 'password123', 'password123')
-      await userEvent.click(screen.getByRole('button', { name: /create account/i }))
+      await act(async () => {
+        await fillForm(user, 'Test User', 'new@example.com', 'password123', 'password123')
+      })
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /create account/i }))
+      })
 
       await waitFor(() => {
         expect(screen.getByRole('alert')).toHaveTextContent('Registration failed. Please try again.')
