@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-02T07:50:33.617Z",
+  "lastUpdated": "2026-04-02T08:18:40.830Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -744,6 +744,25 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md",
+      "ticketId": "ISS-050",
+      "title": "2.7-fix: Add returnTo URL preservation to ProtectedRoute",
+      "date": "2026-04-02",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "config"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -783,7 +802,8 @@
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
       "2026-04-02-iss-034-28-survey-createedit-form.md",
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
-      "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md"
+      "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
+      "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -820,7 +840,8 @@
       "2026-04-02-iss-032-26-dashboard-page.md",
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
       "2026-04-02-iss-034-28-survey-createedit-form.md",
-      "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md"
+      "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
+      "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -854,7 +875,8 @@
       "2026-04-02-iss-029-23-auth-context-and-protected-routes.md",
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
       "2026-04-02-iss-034-28-survey-createedit-form.md",
-      "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md"
+      "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
+      "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -891,7 +913,8 @@
       "2026-04-02-iss-032-26-dashboard-page.md",
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
       "2026-04-02-iss-034-28-survey-createedit-form.md",
-      "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md"
+      "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
+      "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -939,7 +962,8 @@
       "2026-04-02-iss-032-26-dashboard-page.md",
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
       "2026-04-02-iss-034-28-survey-createedit-form.md",
-      "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md"
+      "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
+      "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -976,7 +1000,8 @@
       "2026-04-02-iss-032-26-dashboard-page.md",
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
       "2026-04-02-iss-034-28-survey-createedit-form.md",
-      "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md"
+      "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
+      "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1042,7 +1067,8 @@
       "2026-04-02-iss-027-21-frontend-project-scaffolding-vite-react-typescr.md",
       "2026-04-02-iss-028-22-api-client-and-auth-service-layer.md",
       "2026-04-02-iss-031-25-app-layout-and-navigation-shell.md",
-      "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md"
+      "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
+      "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1112,7 +1138,8 @@
       "2026-04-02-iss-032-26-dashboard-page.md",
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
       "2026-04-02-iss-034-28-survey-createedit-form.md",
-      "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md"
+      "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
+      "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md"
