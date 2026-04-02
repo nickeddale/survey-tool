@@ -2,68 +2,65 @@
 date: "2026-04-02"
 ticket_id: "ISS-038"
 ticket_title: "3.2: Question Group Panel (List, Add, Reorder, Delete)"
-categories: ["testing", "api", "database", "ui", "refactoring", "bug-fix", "feature", "performance", "documentation", "config", "ci-cd"]
+categories: ["testing", "api", "ui", "refactoring", "bug-fix", "feature", "ci-cd"]
 outcome: "success"
 complexity: "medium"
 files_modified: []
 ---
 
-```markdown
+```yaml
 ---
 date: "2026-04-02"
 ticket_id: "ISS-038"
 ticket_title: "3.2: Question Group Panel (List, Add, Reorder, Delete)"
-categories: ["frontend", "react", "dnd-kit", "merge-conflicts", "testing", "survey-builder"]
+categories: ["react", "survey-builder", "ui-components", "drag-and-drop", "zustand"]
 outcome: "success"
 complexity: "medium"
 files_modified:
-  - "frontend/src/components/survey/GroupPanel.tsx"
-  - "frontend/src/components/survey/__tests__/dnd.test.tsx"
-  - "frontend/src/pages/SurveyBuilderPage.tsx"
-  - "frontend/src/services/surveyService.ts"
-  - "frontend/package.json"
-  - "frontend/package-lock.json"
-  - "lessons/auto/index.json"
-  - "frontend/src/components/survey-builder/GroupPanel.tsx"
+  - "src/components/survey-builder/GroupPanel.tsx"
+  - "src/pages/SurveyBuilderPage.tsx"
+  - "src/store/builderStore.ts"
+  - "src/services/surveyService.ts"
+  - "src/components/survey-builder/__tests__/GroupPanel.test.tsx"
 ---
 
 # Lessons Learned: 3.2: Question Group Panel (List, Add, Reorder, Delete)
 
 ## What Worked Well
-- The advanced `survey-builder/GroupPanel.tsx` was already largely complete before merge conflict resolution, providing collapsible panels, inline title editing, drag handles, delete confirmation dialogs, and empty group placeholders out of the box.
-- The implementation plan warnings about AA-conflicted files accurately predicted the resolution strategy: picking the more complete HEAD version rather than attempting to merge two independently-developed implementations of the same component.
-- DnD provider nesting (outermost `DnDContext` wrapping all `SortableContext` instances in `SurveyBuilderPage.tsx`) worked correctly when the correct provider order from past lessons was followed.
+- Pre-existing GroupPanel.tsx scaffold (354 lines) meant the implementation was largely complete before active work began, reducing implementation effort significantly.
+- @radix-ui/react-collapsible provided reliable expand/collapse behavior without needing to manage open/closed state manually for each panel.
+- Zustand builderStore cleanly centralized group state (addGroup, removeGroup, updateGroup) and made the GroupPanel component purely reactive.
+- shadcn/ui Dialog component handled the delete confirmation pattern with cascade warning without custom modal plumbing.
+- Separating the SortableGroupPanel wrapper (dnd-kit) from GroupPanel kept drag-and-drop concerns out of the panel's rendering logic.
 
 ## What Was Challenging
-- Resolving AA-conflicted files (`GroupPanel.tsx`, `dnd.test.tsx`) where both branches independently added the same file required careful judgment about which version was more complete rather than a standard merge.
-- `package-lock.json` conflicts in large lock files are inherently error-prone to merge manually — the correct resolution was to accept one side and re-run `npm install` to regenerate a consistent dependency tree.
-- Ensuring all userEvent interactions in DnD-related tests were wrapped in `await act(async () => {...})` to prevent act() warnings from contaminating subsequent test renders required disciplined application of the pattern.
+- The ticket's implementation was substantially complete at the start, making it difficult to distinguish what work actually remained versus what had already been done in prior commits.
+- Coordinating inline title editing (click-to-edit, Enter/blur to save) with collapsible toggle required careful event handling to prevent collapse toggling when the title input is focused.
+- Ensuring sort_order is respected on render required the store to maintain a sorted list or the component to sort on display — a subtle ordering concern that can silently regress.
 
 ## Key Technical Insights
-1. **AA conflict resolution strategy**: When both branches independently add the same file (AA state in `git status`), the correct resolution is always to pick the more complete implementation. Attempting to merge two parallel implementations risks duplicate test names, overlapping logic, and inconsistent behavior.
-2. **Lock file conflict resolution**: Never manually merge `package-lock.json`. Accept one side entirely (`git checkout --theirs` or `--ours`) then run `npm install` to regenerate. Manual lock file merges produce inconsistent dependency trees that cause silent runtime failures.
-3. **DnD context nesting order**: The outermost `DnDContext` must wrap all `SortableContext` instances. Getting this wrong causes silent DnD failures with no error messages — the drag events simply don't fire. The `onDragEnd` handler must be registered at the `DnDContext` level, not inside a `SortableContext`.
-4. **TypeScript smoke-test after merge conflict resolution**: Running `tsc --noEmit` immediately after resolving conflicts catches type errors in merged files before running the full test suite. This is the frontend equivalent of a Python import smoke-test and saves significant debugging time.
-5. **Inline title editing state isolation**: When implementing click-to-edit inline fields, the editing state (`isEditing`, `draftTitle`) must be local to the component instance — not hoisted to a shared store — to avoid one group's editing state affecting others when multiple groups are rendered.
+1. Inline title editing on a collapsible panel header requires stopping click event propagation on the input/edit trigger to prevent unintended collapse/expand toggling.
+2. The cascade delete warning in the confirmation dialog must be present in the UI copy — not just as a backend concern — to satisfy the acceptance criteria and user expectations.
+3. @dnd-kit's sortable wrapper pattern (SortableGroupPanel wrapping GroupPanel) is the correct separation: the sortable context owns drag state, the panel owns display state.
+4. Empty group placeholder ("Add questions here") is a display concern tied to `group.questions.length === 0`, not to collapsed state — both states should show it appropriately.
+5. POST /api/v1/surveys/{survey_id}/groups should optimistically add the returned group to the store rather than refetching the full group list to keep the UI responsive.
 
 ## Reusable Patterns
-- **userEvent wrapped in act()**: Every `await user.click/type/selectOptions(...)` call in tests involving async state updates must be wrapped: `await act(async () => { await user.click(...) })`. Bare `await user.click()` dispatches state updates outside React's act() boundary.
-- **vi.useRealTimers() in afterEach**: Add to every test file that touches DnD, GroupPanel, or any async survey state. Leaked fake timers block MSW promise resolution and cause all subsequent tests to time out.
-- **Delete confirmation with cascade warning**: Assert both that the dialog appears AND that the specific cascade warning text is visible before simulating confirmation. This verifies UX correctness, not just that *a* dialog showed.
-- **MemoryRouter future flags**: Add `future={{ v7_startTransition: true, v7_relativeSplatPath: true }}` to all `MemoryRouter` instances in tests to suppress React Router v7 future flag warnings.
-- **Preventing AuthProvider.initialize() warnings**: After `setTokens(...)` in `beforeEach`, call `localStorage.removeItem('devtracker_refresh_token')` and directly set `useAuthStore.setState(...)` to prevent `pendingInit=true` from triggering async initialization during the test.
+- **Sortable wrapper pattern**: Wrap display components in a thin SortableItem shell that injects drag handle props and sort attributes, keeping the display component unaware of DnD.
+- **Inline edit pattern**: Toggle between `<span onClick={startEdit}>` and `<input onBlur={save} onKeyDown={handleEnter}>` with a shared `isEditing` boolean state.
+- **Optimistic store dispatch**: After a successful API create call, dispatch `addGroup(response.data)` to the Zustand store rather than re-fetching — avoids flicker and extra network round trips.
+- **Cascade delete dialog**: Reuse shadcn/ui AlertDialog with a standardized warning message pattern for any delete that cascades to child records.
 
 ## Files to Review for Similar Tasks
-- `frontend/src/components/survey-builder/GroupPanel.tsx` — canonical collapsible group panel with inline editing, drag handle, delete dialog, and empty placeholder
-- `frontend/src/pages/SurveyBuilderPage.tsx` — correct DnDContext/SortableContext provider nesting and onDragEnd handler registration
-- `frontend/src/services/surveyService.ts` — createGroup, updateGroup, deleteGroup, reorderGroups API methods pattern
-- `frontend/src/components/survey/__tests__/dnd.test.tsx` — DnD interaction test patterns with act()-wrapped userEvent calls
-- `frontend/src/components/survey-builder/__tests__/GroupPanel.test.tsx` — GroupPanel unit test patterns including inline edit and delete dialog assertions
+- `src/components/survey-builder/GroupPanel.tsx` — canonical example of collapsible panel with inline editing and delete confirmation.
+- `src/pages/SurveyBuilderPage.tsx` — shows how SortableGroupPanel wraps GroupPanel within a DndContext for reorderable lists.
+- `src/store/builderStore.ts` — reference for the addGroup/removeGroup/updateGroup action pattern to replicate for questions within groups.
+- `src/components/survey-builder/__tests__/GroupPanel.test.tsx` — 13-suite test file covering all acceptance criteria; use as template for similar panel component tests.
 
 ## Gotchas and Pitfalls
-- **Silent DnD failures**: Incorrect provider nesting (`SortableContext` outside `DnDContext`, or `onDragEnd` at the wrong level) produces zero errors — drag events simply do nothing. Always verify the nesting order visually in the component tree.
-- **AA-conflicted test files with duplicate test descriptions**: If two independently-added test files are naively merged, duplicate `describe`/`it` block names cause Vitest to silently skip one suite. Always pick one file as canonical.
-- **Collapsible component import path**: Shadcn/ui `Collapsible` is from `@radix-ui/react-collapsible` and must be listed in `package.json` dependencies. If the conflict resolution drops this dependency, the component will fail to import with a cryptic module resolution error rather than a missing-package error.
-- **sort_order vs array index**: Groups must always be rendered ordered by `sort_order` from the API response, not by insertion order in the local store. After an optimistic reorder update, re-sort the local array by the updated `sort_order` values before re-rendering to avoid visual flicker.
-- **Inline editing Enter key handler**: The `onKeyDown` handler for inline title input must call `event.stopPropagation()` to prevent Enter from bubbling to parent collapsible/accordion components that might toggle expand/collapse state simultaneously.
+- Collapsible toggle and inline title edit share the same click target area — without `e.stopPropagation()` on the input, clicking to edit will also collapse the panel.
+- sort_order from the API is the source of truth; never rely on array insertion order from the store for display ordering.
+- The "Add Group" button must be outside the collapsible/scrollable groups list area (at the bottom of the canvas) to remain always visible regardless of how many groups exist.
+- Delete confirmation dialog must explicitly mention that questions inside the group will also be deleted — omitting this fails the acceptance criterion even if the backend cascade works correctly.
+- When the ticket branch already contains a full implementation, verify test coverage before marking done; green tests are the only reliable signal that all acceptance criteria are actually met.
 ```
