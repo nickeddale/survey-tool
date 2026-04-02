@@ -8,59 +8,59 @@ complexity: "medium"
 files_modified: []
 ---
 
-```markdown
+```yaml
 ---
 date: "2026-04-02"
 ticket_id: "ISS-039"
 ticket_title: "3.3: Drag-and-Drop for Group Reordering"
-categories: ["drag-and-drop", "dnd-kit", "react", "accessibility", "testing"]
+categories: ["drag-and-drop", "dnd-kit", "zustand", "optimistic-updates", "accessibility"]
 outcome: "success"
 complexity: "medium"
 files_modified:
   - "frontend/src/pages/SurveyBuilderPage.tsx"
-  - "frontend/src/components/survey-builder/GroupPanel.tsx"
-  - "frontend/src/store/builderStore.ts"
-  - "frontend/src/services/surveyService.ts"
-  - "frontend/src/components/survey/__tests__/dnd.test.tsx"
+  - "frontend/src/components/survey/GroupPanel.tsx"
 ---
 
 # Lessons Learned: 3.3: Drag-and-Drop for Group Reordering
 
 ## What Worked Well
-- @dnd-kit/core + @dnd-kit/sortable proved to be a clean abstraction: `useSortable` encapsulates transform, transition, isDragging, listeners, and attributes in a single hook call, keeping GroupPanel concerns localized.
-- Separating drag-handle rendering from the sortable wrapper kept the GroupPanel markup clear — passing `listeners` and `attributes` only to the handle element (not the whole panel) prevented accidental drags on interactive children.
-- The `arrayMove` utility from @dnd-kit/sortable made the reorder logic in `handleDragEnd` trivial to implement correctly.
-- Optimistic updates in the builder store (reorder immediately, undo on API failure) gave a snappy UX without waiting for the network round-trip.
+- Prefixing draggable IDs with a namespace (`group:`) cleanly disambiguates groups from questions inside a single shared `DndContext`, avoiding id collisions and simplifying the `handleDragEnd` routing logic.
+- Wrapping `GroupPanel` in a thin `SortableGroupPanel` component kept `useSortable` logic out of `GroupPanel` itself — `GroupPanel` remains a pure presentational component that simply accepts `dragListeners` and `dragAttributes` props.
+- Optimistic updates via `reorderGroups()` followed by `undo()` on API failure gave instant visual feedback with safe rollback, requiring no extra loading state.
+- Using a stable `groupsRef` (updated each render) inside `useCallback` handlers eliminated stale closure issues without widening dependency arrays.
+- `CSS.Transform.toString(transform)` combined with the `transition` value from `useSortable` produced smooth animations with zero custom CSS.
+- Including `KeyboardSensor` with `sortableKeyboardCoordinates` satisfied keyboard accessibility without extra work.
 
 ## What Was Challenging
-- JSDOM does not implement Pointer Events, so testing actual drag sequences (pointerdown → pointermove → pointerup) is not feasible. This forced a mocking strategy at the @dnd-kit boundary rather than simulating real gestures.
-- DragOverlay requires the dragged item to be rendered outside the SortableContext portal, which means maintaining an `activeGroup` state derived from `activeId` and re-rendering a simplified (or full) GroupPanel inside `DragOverlay` — easy to forget that the overlay clone is not connected to any sortable context.
-- KeyboardSensor requires a `coordinateGetter` (usually `sortableKeyboardCoordinates` from @dnd-kit/sortable) to function correctly; omitting it silently disables keyboard reordering.
-- The `activationConstraint` on PointerSensor (distance: 8) is important to prevent accidental drags when users click buttons inside the group panel.
+- The single `DndContext` must handle three distinct drag scenarios (group reorder, same-group question reorder, cross-group question move). Branching logic in `handleDragEnd` grows quickly and requires careful ordering of checks.
+- Cross-group question movement required two sequential API calls (`moveQuestion` then `reorderQuestions`) and a post-move snapshot of store state via `groupsRef.current` to build the correct final order.
+- `SortableContext` items must use the same prefixed IDs (`group:${id}`) that `useSortable` receives, or sorting detection silently breaks.
+- The `PointerSensor` `activationConstraint: { distance: 5 }` is essential — without it, every click on a draggable element triggers a drag start and suppresses click events on buttons inside the card.
 
 ## Key Technical Insights
-1. `DragOverlay` renders into a portal at the document body — any styles (shadows, opacity, width) must be self-contained or passed via inline style, since the overlay is outside the normal component tree and may not inherit scoped CSS.
-2. `useSortable` returns `isDragging` which should be used to apply a placeholder/ghost style to the original item's position while the overlay is active; failing to do so causes a visual "double" of the item.
-3. Both `PointerSensor` and `KeyboardSensor` should be registered in `useSensors`; using only `PointerSensor` fails WCAG keyboard accessibility requirements for drag-and-drop interactions.
-4. The PATCH `/surveys/{id}/groups/reorder` endpoint should receive the full ordered array of `group_id`s (not just the two swapped items), so `arrayMove` must be applied to the full groups array before extracting IDs for the API payload.
-5. When the `handleDragEnd` fires with `over === null` (dropped outside any droppable), the reorder should be aborted — always guard against a null `over` before calling `arrayMove`.
+1. **ID namespacing is mandatory in shared DndContext.** When groups and questions coexist under one `DndContext`, prefix group IDs (e.g., `group:<uuid>`) so `onDragStart`/`onDragEnd` can branch correctly without querying the DOM.
+2. **Stable refs prevent stale closures in async drag handlers.** Because `handleDragEnd` is async and `useCallback`-memoized, `groups` state read directly would be stale. A `groupsRef` updated each render solves this cleanly.
+3. **`useSortable` transform + transition = free animation.** Applying `CSS.Transform.toString(transform)` and `transition` from `useSortable` to the wrapper element's `style` prop gives dnd-kit's built-in spring animation at no extra cost.
+4. **`DragOverlay` needs its own data source, not the live DOM.** `activeGroup` state is set in `onDragStart` so the overlay renders a frozen snapshot of the group, independent of any DOM mutations during the drag.
+5. **`useDroppable` on `GroupPanel` enables cross-group drops.** Making each group card a droppable zone (id = `group.id`, without prefix) allows questions to be dragged into empty groups or onto the group header without a question target underneath.
 
 ## Reusable Patterns
-- **Optimistic reorder with undo**: call `reorderGroups(newOrder)` in the store immediately on drop, capture the previous order before mutation, and restore it if the API call rejects.
-- **Drag handle pattern**: pass `{...listeners, ...attributes}` only to a dedicated `<button aria-label="Drag to reorder">` child rather than the container, so clicks elsewhere are not intercepted.
-- **Mock @dnd-kit in Vitest**: mock the module at the test file level to expose a `simulateDragEnd(activeId, overId)` helper that directly invokes the `onDragEnd` callback registered on `DndContext`, bypassing JSDOM pointer event limitations.
-- **sortableKeyboardCoordinates**: always import and pass this as `coordinateGetter` to `KeyboardSensor` for correct keyboard-driven reordering in sorted lists.
+- **Namespace-prefixed sortable IDs:** `'group:' + id` / `'question:' + id` — use whenever multiple entity types share a `DndContext`.
+- **SortableWrapper + presentational component split:** thin wrapper owns `useSortable` and passes `listeners`/`attributes`/`isDragging` as props; inner component stays unaware of dnd-kit.
+- **Optimistic update + `undo()` on failure:** call store action immediately, await API, catch and call `undo()` — works for any reordering action backed by a Zustand history slice.
+- **`groupsRef` stable ref pattern:** `const ref = useRef(state); ref.current = state;` inside the component body keeps async callbacks current without adding state to `useCallback` deps.
+- **`distance: 5` activation constraint on PointerSensor:** standard guard to prevent drag activation on click; apply to every sortable list with interactive child elements.
 
 ## Files to Review for Similar Tasks
-- `frontend/src/pages/SurveyBuilderPage.tsx` — DndContext setup, sensors, handleDragEnd, DragOverlay, activeId state management
-- `frontend/src/components/survey-builder/GroupPanel.tsx` — useSortable integration, drag handle markup, isDragging ghost style, keyboard attributes
-- `frontend/src/store/builderStore.ts` — reorderGroups() action, optimistic update + rollback pattern
-- `frontend/src/components/survey/__tests__/dnd.test.tsx` — @dnd-kit mock strategy, reorderGroups store test, API call assertion
+- `frontend/src/pages/SurveyBuilderPage.tsx` — full DndContext setup, SortableGroupPanel wrapper, GroupDragPreview overlay, and handleDragEnd branching logic.
+- `frontend/src/components/survey/GroupPanel.tsx` — pattern for a component that is both a `useDroppable` target (for cross-group drops) and a drag-handle consumer via props.
+- `frontend/src/store/builderStore.ts` — `reorderGroups` action and `undo` mechanism for optimistic update rollback.
+- `frontend/src/services/surveyService.ts` — `reorderGroups` (PATCH) and `moveQuestion` service methods.
 
 ## Gotchas and Pitfalls
-- Forgetting `transition` from `useSortable` on the panel's style causes other items to snap rather than animate when a group is dragged past them.
-- Rendering the full `GroupPanel` inside `DragOverlay` without stripping its own `useSortable` context causes a React error — the overlay clone must be a plain presentational render, not another sortable item.
-- `KeyboardSensor` with no `coordinateGetter` will silently fail to move items; always pair it with `sortableKeyboardCoordinates`.
-- `sort_order` values in the backend should be derived from the array index sent in the PATCH payload, not from client-computed integers — avoid sending explicit `sort_order` numbers and let the backend assign them from the ordered ID list.
-- Tests that skip the DragOverlay render assertion will pass locally but miss the visual regression; explicitly assert `DragOverlay` content renders when `activeId` is set.
+- **Forgetting to sort by `sort_order` before `arrayMove`.** `arrayMove` requires a stable, sorted array as input; unsorted groups produce incorrect new orders silently.
+- **`SortableContext` items array must match `useSortable` IDs exactly.** A mismatch (e.g., passing raw IDs to `SortableContext` but `group:<id>` to `useSortable`) causes the sorting strategy to malfunction with no error.
+- **`tabIndex={-1}` on the drag handle button.** The drag handle gets keyboard focus through `useSortable` attributes already; an additional `tabIndex={0}` would double-expose it in the tab order.
+- **DragOverlay renders outside the normal React tree.** Styles from parent `overflow: hidden` containers do not clip the overlay — this is intentional but can surprise if the overlay unexpectedly bleeds over fixed headers or sidebars.
+- **Two API calls for cross-group moves must be sequential.** Calling `reorderQuestions` before `moveQuestion` completes will operate on stale server state; always await `moveQuestion` first.
 ```

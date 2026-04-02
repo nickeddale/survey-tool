@@ -143,9 +143,9 @@ describe('draft survey', () => {
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
     // mockSurveyFull has one group 'g1' with 2 questions
-    expect(screen.getByTestId('group-panel-g1')).toBeInTheDocument()
-    expect(screen.getByTestId('group-question-item-q1')).toBeInTheDocument()
-    expect(screen.getByTestId('group-question-item-q2')).toBeInTheDocument()
+    expect(screen.getByTestId('canvas-group-g1')).toBeInTheDocument()
+    expect(screen.getByTestId('canvas-question-q1')).toBeInTheDocument()
+    expect(screen.getByTestId('canvas-question-q2')).toBeInTheDocument()
   })
 })
 
@@ -200,7 +200,9 @@ describe('property editor — item selection', () => {
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
     // Click the group panel header to select it
-    fireEvent.click(screen.getByTestId('group-panel-header-g1'))
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('group-panel-header-g1'))
+    })
 
     await waitFor(() => expect(screen.getByTestId('group-properties')).toBeInTheDocument())
 
@@ -213,7 +215,7 @@ describe('property editor — item selection', () => {
 
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
-    fireEvent.click(screen.getByTestId('group-question-item-q1'))
+    fireEvent.click(screen.getByTestId('canvas-question-q1'))
 
     await waitFor(() => expect(screen.getByTestId('question-properties')).toBeInTheDocument())
 
@@ -226,7 +228,7 @@ describe('property editor — item selection', () => {
 
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
-    fireEvent.click(screen.getByTestId('group-question-item-q2'))
+    fireEvent.click(screen.getByTestId('canvas-question-q2'))
 
     await waitFor(() => {
       const { selectedItem } = useBuilderStore.getState()
@@ -240,7 +242,7 @@ describe('property editor — item selection', () => {
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
     // q2 is the radio question with 2 answer options
-    fireEvent.click(screen.getByTestId('group-question-item-q2'))
+    fireEvent.click(screen.getByTestId('canvas-question-q2'))
 
     await waitFor(() => expect(screen.getByTestId('question-properties')).toBeInTheDocument())
 
@@ -259,7 +261,7 @@ describe('QuestionEditor integration', () => {
 
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
-    fireEvent.click(screen.getByTestId('group-question-item-q1'))
+    fireEvent.click(screen.getByTestId('canvas-question-q1'))
 
     await waitFor(() => expect(screen.getByTestId('property-editor')).toBeInTheDocument())
     expect(screen.getByTestId('question-properties')).toBeInTheDocument()
@@ -270,7 +272,7 @@ describe('QuestionEditor integration', () => {
 
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
-    fireEvent.click(screen.getByTestId('group-question-item-q1'))
+    fireEvent.click(screen.getByTestId('canvas-question-q1'))
 
     await waitFor(() => expect(screen.getByTestId('property-question-title')).toBeInTheDocument())
     expect(screen.getByTestId('property-question-title').tagName).toBe('TEXTAREA')
@@ -282,7 +284,7 @@ describe('QuestionEditor integration', () => {
 
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
-    fireEvent.click(screen.getByTestId('group-question-item-q1'))
+    fireEvent.click(screen.getByTestId('canvas-question-q1'))
 
     await waitFor(() => expect(screen.getByTestId('property-question-title')).toBeInTheDocument())
 
@@ -355,7 +357,7 @@ describe('Add Group flow', () => {
       expect(capturedRequests[0].body).toMatchObject({ title: 'Group 2' })
     })
 
-    await waitFor(() => expect(screen.getByTestId('group-panel-g-new')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByTestId('canvas-group-g-new')).toBeInTheDocument())
     expect(useBuilderStore.getState().groups.find((g) => g.id === 'g-new')).toBeDefined()
   })
 })
@@ -382,7 +384,7 @@ describe('Group reorder — store action', () => {
       questions: [],
     })
 
-    await waitFor(() => expect(screen.getByTestId('group-panel-g2')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByTestId('canvas-group-g2')).toBeInTheDocument())
 
     // Reorder: move g2 before g1
     reorderGroups(['g2', 'g1'])
