@@ -38,7 +38,7 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { ArrowLeft, Lock, Plus, Type, List, AlignLeft, CheckSquare, ToggleLeft, Hash } from 'lucide-react'
+import { ArrowLeft, Eye, EyeOff, Lock, Plus, Type, List, AlignLeft, CheckSquare, ToggleLeft, Hash } from 'lucide-react'
 import surveyService from '../services/surveyService'
 import { useBuilderStore } from '../store/builderStore'
 import type { BuilderGroup, BuilderQuestion, SelectedItem } from '../store/builderStore'
@@ -50,6 +50,7 @@ import { Skeleton } from '../components/ui/skeleton'
 import { QuestionEditor } from '../components/survey-builder/QuestionEditor'
 import { GroupPanel as BuilderGroupPanel } from '../components/survey/GroupPanel'
 import { QuestionCard } from '../components/survey/QuestionCard'
+import { QuestionPreview } from '../components/survey-builder/QuestionPreview'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -201,6 +202,7 @@ interface SortableGroupPanelProps {
   readOnly: boolean
   selectedItem: SelectedItem
   onSelectItem: (item: SelectedItem) => void
+  isPreviewMode: boolean
 }
 
 function SortableGroupPanel({
@@ -208,6 +210,7 @@ function SortableGroupPanel({
   readOnly,
   selectedItem,
   onSelectItem,
+  isPreviewMode,
 }: SortableGroupPanelProps) {
   const {
     attributes,
@@ -233,6 +236,7 @@ function SortableGroupPanel({
         readOnly={readOnly}
         dragListeners={listeners}
         dragAttributes={attributes}
+        isPreviewMode={isPreviewMode}
       />
     </div>
   )
@@ -247,9 +251,10 @@ interface SurveyCanvasProps {
   readOnly: boolean
   selectedItem: SelectedItem
   onSelectItem: (item: SelectedItem) => void
+  isPreviewMode: boolean
 }
 
-function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem }: SurveyCanvasProps) {
+function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem, isPreviewMode }: SurveyCanvasProps) {
   const groups = useBuilderStore((s) => s.groups)
   const addGroup = useBuilderStore((s) => s.addGroup)
   const reorderGroups = useBuilderStore((s) => s.reorderGroups)
@@ -488,6 +493,7 @@ function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem }: Survey
                 readOnly={readOnly}
                 selectedItem={selectedItem}
                 onSelectItem={onSelectItem}
+                isPreviewMode={isPreviewMode}
               />
             ))}
           </SortableContext>
@@ -497,13 +503,17 @@ function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem }: Survey
             {activeGroup ? (
               <GroupDragPreview group={activeGroup} />
             ) : activeQuestion ? (
-              <QuestionCard
-                question={activeQuestion}
-                selectedItem={null}
-                onSelectItem={() => {}}
-                readOnly={readOnly}
-                isOverlay
-              />
+              isPreviewMode ? (
+                <QuestionPreview question={activeQuestion} />
+              ) : (
+                <QuestionCard
+                  question={activeQuestion}
+                  selectedItem={null}
+                  onSelectItem={() => {}}
+                  readOnly={readOnly}
+                  isOverlay
+                />
+              )
             ) : null}
           </DragOverlay>
         </DndContext>
@@ -621,6 +631,7 @@ function SurveyBuilderPage() {
   } = useBuilderStore()
 
   const readOnly = status !== '' && status !== 'draft'
+  const [isPreviewMode, setIsPreviewMode] = useState(false)
 
   // -------------------------------------------------------------------------
   // Fetch survey on mount
@@ -709,6 +720,18 @@ function SurveyBuilderPage() {
 
         <StatusBadge status={status} />
 
+        <Button
+          variant={isPreviewMode ? 'default' : 'outline'}
+          size="sm"
+          className="h-8 gap-1"
+          onClick={() => setIsPreviewMode((prev) => !prev)}
+          aria-pressed={isPreviewMode}
+          data-testid="preview-mode-toggle"
+        >
+          {isPreviewMode ? <EyeOff size={14} /> : <Eye size={14} />}
+          {isPreviewMode ? 'Exit Preview' : 'Preview'}
+        </Button>
+
         {readOnly && (
           <Badge
             variant="outline"
@@ -729,6 +752,7 @@ function SurveyBuilderPage() {
           readOnly={readOnly}
           selectedItem={selectedItem}
           onSelectItem={setSelectedItem}
+          isPreviewMode={isPreviewMode}
         />
         <PropertyEditor surveyId={surveyId ?? ''} readOnly={readOnly} selectedItem={selectedItem} />
       </div>

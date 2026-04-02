@@ -221,11 +221,6 @@ export function AnswerOptionsEditor({
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
 
-  // Only show for choice-type questions
-  if (!CHOICE_TYPES.has(questionType)) {
-    return null
-  }
-
   // ---------------------------------------------------------------------------
   // Auto-generate next option code (A1, A2, ...)
   // ---------------------------------------------------------------------------
@@ -242,7 +237,7 @@ export function AnswerOptionsEditor({
   }
 
   // ---------------------------------------------------------------------------
-  // Handlers
+  // Handlers (all hooks must be declared before any conditional return)
   // ---------------------------------------------------------------------------
 
   const handleAddOption = useCallback(async () => {
@@ -367,6 +362,11 @@ export function AnswerOptionsEditor({
     },
     [surveyId, groupId, questionId, reorderOptions, undo],
   )
+
+  // Only show for choice-type questions (after all hooks to comply with Rules of Hooks)
+  if (!CHOICE_TYPES.has(questionType)) {
+    return null
+  }
 
   // ---------------------------------------------------------------------------
   // Render
