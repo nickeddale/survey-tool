@@ -8,20 +8,48 @@
  *
  * On mount: fetches the full survey via GET /api/v1/surveys/:id and loads it
  * into the builder Zustand store. Non-draft surveys are rendered read-only.
+ *
+ * Drag-and-drop:
+ *   Groups are sortable by dragging the group drag handle.
+ *   Questions are sortable within their group AND draggable between groups.
+ *   Uses @dnd-kit/core (DndContext) with closestCorners collision detection.
+ *   onDragEnd handles group reorder, same-group question reorder, and
+ *   cross-group question move.
  */
 
-import { useEffect } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import {
+  DndContext,
+  DragOverlay,
+  closestCorners,
+  PointerSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  type DragStartEvent,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { ArrowLeft, Lock, Plus, Type, List, AlignLeft, CheckSquare, ToggleLeft, Hash } from 'lucide-react'
 import surveyService from '../services/surveyService'
 import { useBuilderStore } from '../store/builderStore'
-import type { SelectedItem } from '../store/builderStore'
+import type { BuilderGroup, BuilderQuestion, SelectedItem } from '../store/builderStore'
 import { ApiError } from '../types/api'
 import { Button } from '../components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
+import { Card, CardContent } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Skeleton } from '../components/ui/skeleton'
 import { QuestionEditor } from '../components/survey-builder/QuestionEditor'
+import { GroupPanel as BuilderGroupPanel } from '../components/survey/GroupPanel'
+import { QuestionCard } from '../components/survey/QuestionCard'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -127,17 +155,293 @@ function QuestionPalette({ readOnly }: { readOnly: boolean }) {
 }
 
 // ---------------------------------------------------------------------------
-// Sub-components: Center panel — survey canvas
+// Sub-components: Group drag overlay preview (miniature group card)
 // ---------------------------------------------------------------------------
 
-interface SurveyCanvasProps {
+function GroupDragPreview({ group }: { group: BuilderGroup }) {
+  return (
+    <div
+      className="opacity-90 shadow-xl rounded-lg border border-border bg-background overflow-hidden"
+      data-testid="group-drag-overlay"
+    >
+      <div className="flex items-center gap-2 px-3 py-2 bg-muted/40 border-b border-border">
+        <span className="text-sm font-medium truncate flex-1">{group.title}</span>
+        <span className="text-xs text-muted-foreground shrink-0">
+          {group.questions.length} {group.questions.length === 1 ? 'question' : 'questions'}
+        </span>
+      </div>
+      {group.questions.length > 0 && (
+        <div className="px-3 py-2 space-y-1 max-h-40 overflow-hidden">
+          {group.questions.slice(0, 3).map((q) => (
+            <div
+              key={q.id}
+              className="flex items-center gap-1.5 text-xs text-muted-foreground"
+            >
+              <span className="font-mono bg-muted px-1 py-0.5 rounded">{q.code}</span>
+              <span className="truncate">{q.title}</span>
+            </div>
+          ))}
+          {group.questions.length > 3 && (
+            <p className="text-xs text-muted-foreground italic">
+              +{group.questions.length - 3} more…
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Sub-components: Sortable group panel wrapper
+// ---------------------------------------------------------------------------
+
+interface SortableGroupPanelProps {
+  group: BuilderGroup
   readOnly: boolean
   selectedItem: SelectedItem
   onSelectItem: (item: SelectedItem) => void
 }
 
-function SurveyCanvas({ readOnly, selectedItem, onSelectItem }: SurveyCanvasProps) {
+function SortableGroupPanel({
+  group,
+  readOnly,
+  selectedItem,
+  onSelectItem,
+}: SortableGroupPanelProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: `group:${group.id}` })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  }
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <BuilderGroupPanel
+        group={group}
+        selectedItem={selectedItem}
+        onSelectItem={onSelectItem}
+        readOnly={readOnly}
+        dragListeners={listeners}
+        dragAttributes={attributes}
+      />
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Sub-components: Center panel — survey canvas with DnD
+// ---------------------------------------------------------------------------
+
+interface SurveyCanvasProps {
+  surveyId: string
+  readOnly: boolean
+  selectedItem: SelectedItem
+  onSelectItem: (item: SelectedItem) => void
+}
+
+function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem }: SurveyCanvasProps) {
   const groups = useBuilderStore((s) => s.groups)
+  const addGroup = useBuilderStore((s) => s.addGroup)
+  const reorderGroups = useBuilderStore((s) => s.reorderGroups)
+  const reorderQuestions = useBuilderStore((s) => s.reorderQuestions)
+  const moveQuestion = useBuilderStore((s) => s.moveQuestion)
+  const undo = useBuilderStore((s) => s.undo)
+  const [isAddingGroup, setIsAddingGroup] = useState(false)
+
+  // Track which question or group is actively being dragged (for DragOverlay)
+  const [activeQuestion, setActiveQuestion] = useState<BuilderQuestion | null>(null)
+  const [activeGroup, setActiveGroup] = useState<BuilderGroup | null>(null)
+
+  // Stable ref to groups for use inside callbacks without stale closures
+  const groupsRef = useRef(groups)
+  groupsRef.current = groups
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        // Require 5px movement before starting drag to allow clicks
+        distance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  )
+
+  const handleAddGroup = useCallback(async () => {
+    if (readOnly || isAddingGroup) return
+    setIsAddingGroup(true)
+    try {
+      const newGroup = await surveyService.createGroup(surveyId, {
+        title: `Group ${groups.length + 1}`,
+      })
+      addGroup({
+        ...newGroup,
+        questions: [],
+      })
+    } finally {
+      setIsAddingGroup(false)
+    }
+  }, [readOnly, isAddingGroup, surveyId, groups.length, addGroup])
+
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    const { active } = event
+    const activeId = active.id.toString()
+
+    if (activeId.startsWith('group:')) {
+      // Dragging a group — set activeGroup for DragOverlay
+      const groupId = activeId.slice('group:'.length)
+      const group = groupsRef.current.find((g) => g.id === groupId)
+      setActiveGroup(group ?? null)
+    } else {
+      // Dragging a question — set activeQuestion for DragOverlay
+      const question = groupsRef.current
+        .flatMap((g) => g.questions)
+        .find((q) => q.id === activeId)
+      setActiveQuestion(question ?? null)
+    }
+  }, [])
+
+  const handleDragEnd = useCallback(
+    async (event: DragEndEvent) => {
+      const { active, over } = event
+      setActiveQuestion(null)
+      setActiveGroup(null)
+
+      if (!over) return
+      if (active.id === over.id) return
+
+      const activeId = active.id.toString()
+      const overId = over.id.toString()
+      const currentGroups = groupsRef.current
+
+      // --- Group reorder ---
+      if (activeId.startsWith('group:')) {
+        const activeGroupId = activeId.slice('group:'.length)
+        const overGroupId = overId.startsWith('group:') ? overId.slice('group:'.length) : null
+        if (!overGroupId) return
+
+        const sortedGroups = [...currentGroups].sort((a, b) => a.sort_order - b.sort_order)
+        const oldIndex = sortedGroups.findIndex((g) => g.id === activeGroupId)
+        const newIndex = sortedGroups.findIndex((g) => g.id === overGroupId)
+        if (oldIndex === -1 || newIndex === -1) return
+
+        const newOrder = arrayMove(
+          sortedGroups.map((g) => g.id),
+          oldIndex,
+          newIndex,
+        )
+
+        // Optimistic update
+        reorderGroups(newOrder)
+
+        // Persist to API
+        try {
+          await surveyService.reorderGroups(surveyId, { group_ids: newOrder })
+        } catch {
+          // Revert to previous order on failure
+          undo()
+        }
+        return
+      }
+
+      // --- Question reorder / move ---
+
+      // Find the group that contains the dragged question
+      const fromGroup = currentGroups.find((g) =>
+        g.questions.some((q) => q.id === activeId),
+      )
+      if (!fromGroup) return
+
+      // Determine if we dropped onto a question or a group
+      const isOverQuestion = currentGroups.some((g) =>
+        g.questions.some((q) => q.id === overId),
+      )
+      const isOverGroup = currentGroups.some((g) => `group:${g.id}` === overId || g.id === overId)
+
+      // Find the target group
+      const toGroup = isOverQuestion
+        ? currentGroups.find((g) => g.questions.some((q) => q.id === overId))
+        : isOverGroup
+          ? currentGroups.find((g) => `group:${g.id}` === overId || g.id === overId)
+          : null
+
+      if (!toGroup) return
+
+      const isSameGroup = fromGroup.id === toGroup.id
+
+      if (isSameGroup) {
+        // Reorder within same group
+        const oldIndex = fromGroup.questions.findIndex((q) => q.id === activeId)
+        const newIndex = fromGroup.questions.findIndex((q) => q.id === overId)
+        if (oldIndex === newIndex) return
+
+        const newOrder = arrayMove(
+          fromGroup.questions.map((q) => q.id),
+          oldIndex,
+          newIndex,
+        )
+
+        // Optimistic update
+        reorderQuestions(fromGroup.id, newOrder)
+
+        try {
+          await surveyService.reorderQuestions(surveyId, fromGroup.id, newOrder)
+        } catch {
+          undo()
+        }
+      } else {
+        // Move question to a different group
+        const targetQuestionIndex = isOverQuestion
+          ? toGroup.questions.findIndex((q) => q.id === overId)
+          : -1
+
+        // Optimistic update: move the question
+        moveQuestion(fromGroup.id, toGroup.id, activeId)
+
+        // Build new order for target group with the moved question inserted
+        const targetGroupAfterMove = groupsRef.current.find((g) => g.id === toGroup.id)
+        const newTargetOrder = targetGroupAfterMove?.questions.map((q) => q.id) ?? []
+
+        // If we dropped onto a specific question, reorder so the moved item is at that position
+        if (targetQuestionIndex !== -1) {
+          const movedIdx = newTargetOrder.indexOf(activeId)
+          if (movedIdx !== -1) {
+            const reordered = arrayMove(newTargetOrder, movedIdx, targetQuestionIndex)
+            reorderQuestions(toGroup.id, reordered)
+          }
+        }
+
+        try {
+          await surveyService.moveQuestion(surveyId, activeId, toGroup.id)
+          // Reorder target group after move
+          const finalTargetGroup = groupsRef.current.find((g) => g.id === toGroup.id)
+          if (finalTargetGroup) {
+            await surveyService.reorderQuestions(
+              surveyId,
+              toGroup.id,
+              finalTargetGroup.questions.map((q) => q.id),
+            )
+          }
+        } catch {
+          undo()
+        }
+      }
+    },
+    [surveyId, reorderGroups, reorderQuestions, moveQuestion, undo],
+  )
+
+  const sortedGroups = [...groups].sort((a, b) => a.sort_order - b.sort_order)
 
   return (
     <main
@@ -155,7 +459,8 @@ function SurveyCanvas({ readOnly, selectedItem, onSelectItem }: SurveyCanvasProp
               {!readOnly && (
                 <Button
                   size="sm"
-                  disabled={readOnly}
+                  disabled={readOnly || isAddingGroup}
+                  onClick={handleAddGroup}
                   data-testid="add-group-button"
                 >
                   <Plus size={14} />
@@ -166,109 +471,53 @@ function SurveyCanvas({ readOnly, selectedItem, onSelectItem }: SurveyCanvasProp
           </Card>
         )}
 
-        {groups.map((group) => {
-          const isGroupSelected = selectedItem?.type === 'group' && selectedItem.id === group.id
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={sortedGroups.map((g) => `group:${g.id}`)}
+            strategy={verticalListSortingStrategy}
+          >
+            {sortedGroups.map((group) => (
+              <SortableGroupPanel
+                key={group.id}
+                group={group}
+                readOnly={readOnly}
+                selectedItem={selectedItem}
+                onSelectItem={onSelectItem}
+              />
+            ))}
+          </SortableContext>
 
-          return (
-            <Card
-              key={group.id}
-              className={`transition-shadow ${isGroupSelected ? 'ring-2 ring-primary' : ''}`}
-              data-testid={`canvas-group-${group.id}`}
-            >
-              <CardHeader
-                className="pb-2 cursor-pointer select-none"
-                onClick={() =>
-                  onSelectItem(isGroupSelected ? null : { type: 'group', id: group.id })
-                }
-              >
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">{group.title}</CardTitle>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">
-                      {group.questions.length} question{group.questions.length !== 1 ? 's' : ''}
-                    </span>
-                    {!readOnly && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-6 px-2 text-xs"
-                        disabled={readOnly}
-                        data-testid={`add-question-button-${group.id}`}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                        }}
-                      >
-                        <Plus size={12} />
-                        Question
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </CardHeader>
-
-              <CardContent className="pt-0">
-                {group.questions.length === 0 ? (
-                  <p className="text-xs text-muted-foreground italic py-2">No questions in this group.</p>
-                ) : (
-                  <div className="space-y-2">
-                    {group.questions.map((question) => {
-                      const isQuestionSelected =
-                        selectedItem?.type === 'question' && selectedItem.id === question.id
-                      return (
-                        <div
-                          key={question.id}
-                          className={`flex items-start gap-2 p-2 rounded-md border border-border cursor-pointer
-                            transition-colors hover:bg-muted/50
-                            ${isQuestionSelected ? 'bg-primary/5 border-primary/50 ring-1 ring-primary/30' : ''}`}
-                          onClick={() =>
-                            onSelectItem(
-                              isQuestionSelected ? null : { type: 'question', id: question.id },
-                            )
-                          }
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              onSelectItem(
-                                isQuestionSelected ? null : { type: 'question', id: question.id },
-                              )
-                            }
-                          }}
-                          data-testid={`canvas-question-${question.id}`}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="text-xs font-mono text-muted-foreground bg-muted px-1 py-0.5 rounded">
-                                {question.code}
-                              </span>
-                              <span className="text-sm font-medium truncate">{question.title}</span>
-                              <span className="text-xs text-muted-foreground bg-muted/60 px-1 py-0.5 rounded">
-                                {question.question_type}
-                              </span>
-                              {question.is_required && (
-                                <span className="text-xs text-destructive">*</span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )
-        })}
+          {/* Floating drag overlay — shows preview card while dragging a question or group */}
+          <DragOverlay>
+            {activeGroup ? (
+              <GroupDragPreview group={activeGroup} />
+            ) : activeQuestion ? (
+              <QuestionCard
+                question={activeQuestion}
+                selectedItem={null}
+                onSelectItem={() => {}}
+                readOnly={readOnly}
+                isOverlay
+              />
+            ) : null}
+          </DragOverlay>
+        </DndContext>
 
         {groups.length > 0 && !readOnly && (
           <Button
             variant="outline"
             className="w-full"
-            disabled={readOnly}
+            disabled={readOnly || isAddingGroup}
+            onClick={handleAddGroup}
             data-testid="add-group-button"
           >
             <Plus size={14} />
-            Add Group
+            {isAddingGroup ? 'Adding…' : 'Add Group'}
           </Button>
         )}
       </div>
@@ -476,6 +725,7 @@ function SurveyBuilderPage() {
       <div className="flex flex-1 overflow-hidden">
         <QuestionPalette readOnly={readOnly} />
         <SurveyCanvas
+          surveyId={surveyId ?? ''}
           readOnly={readOnly}
           selectedItem={selectedItem}
           onSelectItem={setSelectedItem}

@@ -123,3 +123,17 @@ export interface QuestionUpdatePayload {
   validation?: Record<string, unknown> | null
   settings?: Record<string, unknown> | null
 }
+
+export interface QuestionGroupCreatePayload {
+  title: string
+  description?: string | null
+}
+
+export interface QuestionGroupUpdatePayload {
+  title?: string
+  description?: string | null
+}
+
+export interface GroupReorderPayload {
+  group_ids: string[]
+}

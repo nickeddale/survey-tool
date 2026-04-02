@@ -235,26 +235,6 @@
       "complexity": "medium"
     },
     {
-      "file": "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
-      "ticketId": "ISS-013",
-      "title": "Task 1.13: Backend Test Infrastructure and Initial Test Suite",
-      "date": "2026-04-01",
-      "categories": [
-        "testing",
-        "api",
-        "database",
-        "ui",
-        "bug-fix",
-        "feature",
-        "security",
-        "config",
-        "ci-cd"
-      ],
-      "filesModified": [],
-      "outcome": "success",
-      "complexity": "medium"
-    },
-    {
       "file": "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
       "ticketId": "ISS-012",
       "title": "Task 1.12: API Error Handling, Pagination, and Middleware",
@@ -268,6 +248,26 @@
         "bug-fix",
         "feature",
         "performance",
+        "security",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
+      "ticketId": "ISS-013",
+      "title": "Task 1.13: Backend Test Infrastructure and Initial Test Suite",
+      "date": "2026-04-01",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
         "security",
         "config",
         "ci-cd"
@@ -709,6 +709,27 @@
       "complexity": "medium"
     },
     {
+      "file": "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
+      "ticketId": "ISS-035",
+      "title": "2.9: Survey Detail Page with Status Actions",
+      "date": "2026-04-02",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
       "file": "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
       "ticketId": "ISS-036",
       "title": "2.10: Frontend Test Infrastructure and Initial Tests",
@@ -725,15 +746,93 @@
       "complexity": "high"
     },
     {
-      "file": "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
-      "ticketId": "ISS-035",
-      "title": "2.9: Survey Detail Page with Status Actions",
+      "file": "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md",
+      "ticketId": "ISS-037",
+      "title": "3.1: Survey Builder Page Layout and State Management",
       "date": "2026-04-02",
       "categories": [
         "testing",
         "api",
         "database",
         "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md",
+      "ticketId": "ISS-038",
+      "title": "3.2: Question Group Panel (List, Add, Reorder, Delete)",
+      "date": "2026-04-02",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "refactoring",
+        "feature",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-02-iss-039-33-drag-and-drop-for-group-reordering.md",
+      "ticketId": "ISS-039",
+      "title": "3.3: Drag-and-Drop for Group Reordering",
+      "date": "2026-04-02",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-02-iss-041-35-drag-and-drop-for-question-reordering-within-an.md",
+      "ticketId": "ISS-041",
+      "title": "3.5: Drag-and-Drop for Question Reordering (Within and Between Groups)",
+      "date": "2026-04-02",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "refactoring",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md",
+      "ticketId": "ISS-042",
+      "title": "3.6: Question Editor Panel (Properties Editor)",
+      "date": "2026-04-02",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "refactoring",
         "bug-fix",
         "feature",
         "performance",
@@ -823,45 +922,6 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
-    },
-    {
-      "file": "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md",
-      "ticketId": "ISS-037",
-      "title": "3.1: Survey Builder Page Layout and State Management",
-      "date": "2026-04-02",
-      "categories": [
-        "testing",
-        "api",
-        "database",
-        "ui",
-        "bug-fix",
-        "feature",
-        "performance",
-        "security",
-        "config",
-        "ci-cd"
-      ],
-      "filesModified": [],
-      "outcome": "success",
-      "complexity": "medium"
-    },
-    {
-      "file": "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md",
-      "ticketId": "ISS-042",
-      "title": "3.6: Question Editor Panel (Properties Editor)",
-      "date": "2026-04-02",
-      "categories": [
-        "testing",
-        "api",
-        "ui",
-        "bug-fix",
-        "feature",
-        "config",
-        "ci-cd"
-      ],
-      "filesModified": [],
-      "outcome": "success",
-      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -877,8 +937,8 @@
       "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md",
       "2026-04-01-iss-010-task-110-survey-status-transitions.md",
       "2026-04-01-iss-011-task-111-survey-clone-and-exportimport.md",
-      "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
+      "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
       "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
       "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md",
@@ -900,14 +960,17 @@
       "2026-04-02-iss-032-26-dashboard-page.md",
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
       "2026-04-02-iss-034-28-survey-createedit-form.md",
-      "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
       "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
+      "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
+      "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md",
+      "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md",
+      "2026-04-02-iss-039-33-drag-and-drop-for-group-reordering.md",
+      "2026-04-02-iss-041-35-drag-and-drop-for-question-reordering-within-an.md",
+      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md",
       "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md",
       "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
       "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md",
-      "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
-      "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md",
-      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md"
+      "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -921,8 +984,8 @@
       "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md",
       "2026-04-01-iss-010-task-110-survey-status-transitions.md",
       "2026-04-01-iss-011-task-111-survey-clone-and-exportimport.md",
-      "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
+      "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
       "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
       "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md",
@@ -945,12 +1008,15 @@
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
       "2026-04-02-iss-034-28-survey-createedit-form.md",
       "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
+      "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md",
+      "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md",
+      "2026-04-02-iss-039-33-drag-and-drop-for-group-reordering.md",
+      "2026-04-02-iss-041-35-drag-and-drop-for-question-reordering-within-an.md",
+      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md",
       "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md",
       "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
       "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md",
-      "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
-      "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md",
-      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md"
+      "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -964,8 +1030,8 @@
       "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md",
       "2026-04-01-iss-010-task-110-survey-status-transitions.md",
       "2026-04-01-iss-011-task-111-survey-clone-and-exportimport.md",
-      "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
+      "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
       "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
       "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md",
@@ -985,10 +1051,13 @@
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
       "2026-04-02-iss-034-28-survey-createedit-form.md",
       "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
+      "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md",
+      "2026-04-02-iss-039-33-drag-and-drop-for-group-reordering.md",
+      "2026-04-02-iss-041-35-drag-and-drop-for-question-reordering-within-an.md",
       "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md",
       "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
       "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
-      "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md"
+      "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1002,8 +1071,8 @@
       "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md",
       "2026-04-01-iss-010-task-110-survey-status-transitions.md",
       "2026-04-01-iss-011-task-111-survey-clone-and-exportimport.md",
-      "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
+      "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
       "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
       "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md",
@@ -1026,12 +1095,15 @@
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
       "2026-04-02-iss-034-28-survey-createedit-form.md",
       "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
+      "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md",
+      "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md",
+      "2026-04-02-iss-039-33-drag-and-drop-for-group-reordering.md",
+      "2026-04-02-iss-041-35-drag-and-drop-for-question-reordering-within-an.md",
+      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md",
       "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md",
       "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
       "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md",
-      "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
-      "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md",
-      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md"
+      "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1043,9 +1115,12 @@
       "2026-04-02-iss-029-23-auth-context-and-protected-routes.md",
       "2026-04-02-iss-031-25-app-layout-and-navigation-shell.md",
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
+      "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md",
+      "2026-04-02-iss-041-35-drag-and-drop-for-question-reordering-within-an.md",
+      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md",
       "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
       "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
-      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md"
+      "2026-04-02-iss-041-35-drag-and-drop-for-question-reordering-within-an.md"
     ],
     "bug-fix": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1059,8 +1134,8 @@
       "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md",
       "2026-04-01-iss-010-task-110-survey-status-transitions.md",
       "2026-04-01-iss-011-task-111-survey-clone-and-exportimport.md",
-      "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
+      "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
       "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
       "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md",
@@ -1083,12 +1158,15 @@
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
       "2026-04-02-iss-034-28-survey-createedit-form.md",
       "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
+      "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md",
+      "2026-04-02-iss-039-33-drag-and-drop-for-group-reordering.md",
+      "2026-04-02-iss-041-35-drag-and-drop-for-question-reordering-within-an.md",
+      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md",
       "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md",
       "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
       "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md",
       "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
-      "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md",
-      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md"
+      "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1102,8 +1180,8 @@
       "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md",
       "2026-04-01-iss-010-task-110-survey-status-transitions.md",
       "2026-04-01-iss-011-task-111-survey-clone-and-exportimport.md",
-      "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
+      "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
       "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
       "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md",
@@ -1126,12 +1204,15 @@
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
       "2026-04-02-iss-034-28-survey-createedit-form.md",
       "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
+      "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md",
+      "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md",
+      "2026-04-02-iss-039-33-drag-and-drop-for-group-reordering.md",
+      "2026-04-02-iss-041-35-drag-and-drop-for-question-reordering-within-an.md",
+      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md",
       "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md",
       "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
       "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md",
-      "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
-      "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md",
-      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md"
+      "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1155,9 +1236,11 @@
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
       "2026-04-02-iss-034-28-survey-createedit-form.md",
       "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
-      "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
       "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md",
-      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md"
+      "2026-04-02-iss-041-35-drag-and-drop-for-question-reordering-within-an.md",
+      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md",
+      "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
+      "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1169,7 +1252,8 @@
       "2026-04-02-iss-027-21-frontend-project-scaffolding-vite-react-typescr.md",
       "2026-04-02-iss-028-22-api-client-and-auth-service-layer.md",
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
-      "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md"
+      "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
+      "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1183,8 +1267,8 @@
       "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md",
       "2026-04-01-iss-010-task-110-survey-status-transitions.md",
       "2026-04-01-iss-011-task-111-survey-clone-and-exportimport.md",
-      "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
+      "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
       "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
       "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md",
@@ -1202,11 +1286,13 @@
       "2026-04-02-iss-028-22-api-client-and-auth-service-layer.md",
       "2026-04-02-iss-031-25-app-layout-and-navigation-shell.md",
       "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
+      "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md",
+      "2026-04-02-iss-041-35-drag-and-drop-for-question-reordering-within-an.md",
+      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md",
       "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md",
       "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
       "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md",
-      "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md",
-      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md"
+      "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1220,8 +1306,8 @@
       "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md",
       "2026-04-01-iss-010-task-110-survey-status-transitions.md",
       "2026-04-01-iss-011-task-111-survey-clone-and-exportimport.md",
-      "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
+      "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-014-11-project-scaffolding-and-docker-setup.md",
       "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
       "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md",
@@ -1244,11 +1330,14 @@
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
       "2026-04-02-iss-034-28-survey-createedit-form.md",
       "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
+      "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md",
+      "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md",
+      "2026-04-02-iss-039-33-drag-and-drop-for-group-reordering.md",
+      "2026-04-02-iss-041-35-drag-and-drop-for-question-reordering-within-an.md",
+      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md",
       "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
       "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md",
-      "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
-      "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md",
-      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md"
+      "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -1260,8 +1349,8 @@
       "2026-04-01-iss-009-task-19-answer-option-model-and-crud-endpoints.md",
       "2026-04-01-iss-010-task-110-survey-status-transitions.md",
       "2026-04-01-iss-011-task-111-survey-clone-and-exportimport.md",
-      "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-012-task-112-api-error-handling-pagination-and-middlew.md",
+      "2026-04-01-iss-013-task-113-backend-test-infrastructure-and-initial-t.md",
       "2026-04-01-iss-015-12-database-engine-and-alembic-setup.md",
       "2026-04-01-iss-016-13-user-model-and-registration-endpoint.md",
       "2026-04-01-iss-017-14-jwt-authentication-login-refresh-middleware.md",
@@ -1282,10 +1371,11 @@
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
       "2026-04-02-iss-034-28-survey-createedit-form.md",
       "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
-      "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md",
-      "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
       "2026-04-02-iss-037-31-survey-builder-page-layout-and-state-management.md",
-      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md"
+      "2026-04-02-iss-041-35-drag-and-drop-for-question-reordering-within-an.md",
+      "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md",
+      "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md",
+      "2026-04-02-iss-051-22-fix-install-shadcnui-components.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md"

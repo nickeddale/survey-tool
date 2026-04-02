@@ -1,5 +1,5 @@
 import apiClient from './apiClient'
-import type { SurveyResponse, SurveyFullResponse, SurveyListResponse, SurveyCreatePayload, SurveyUpdatePayload, QuestionResponse, QuestionUpdatePayload } from '../types/survey'
+import type { SurveyResponse, SurveyFullResponse, SurveyListResponse, SurveyCreatePayload, SurveyUpdatePayload, QuestionResponse, QuestionUpdatePayload, QuestionGroupResponse, QuestionGroupCreatePayload, QuestionGroupUpdatePayload, GroupReorderPayload } from '../types/survey'
 
 export interface SurveyFetchParams {
   page?: number
@@ -79,6 +79,50 @@ class SurveyService {
       data,
     )
     return response.data
+  }
+
+  async createGroup(surveyId: string, data: QuestionGroupCreatePayload): Promise<QuestionGroupResponse> {
+    const response = await apiClient.post<QuestionGroupResponse>(
+      `/surveys/${surveyId}/groups`,
+      data,
+    )
+    return response.data
+  }
+
+  async updateGroup(
+    surveyId: string,
+    groupId: string,
+    data: QuestionGroupUpdatePayload,
+  ): Promise<QuestionGroupResponse> {
+    const response = await apiClient.patch<QuestionGroupResponse>(
+      `/surveys/${surveyId}/groups/${groupId}`,
+      data,
+    )
+    return response.data
+  }
+
+  async deleteGroup(surveyId: string, groupId: string): Promise<void> {
+    await apiClient.delete(`/surveys/${surveyId}/groups/${groupId}`)
+  }
+
+  async reorderGroups(surveyId: string, data: GroupReorderPayload): Promise<QuestionGroupResponse[]> {
+    const response = await apiClient.patch<QuestionGroupResponse[]>(
+      `/surveys/${surveyId}/groups/reorder`,
+      data,
+    )
+    return response.data
+  }
+
+  async reorderQuestions(surveyId: string, groupId: string, orderedIds: string[]): Promise<void> {
+    await apiClient.patch(`/surveys/${surveyId}/groups/${groupId}/questions/reorder`, {
+      ordered_ids: orderedIds,
+    })
+  }
+
+  async moveQuestion(surveyId: string, questionId: string, newGroupId: string): Promise<void> {
+    await apiClient.patch(`/surveys/${surveyId}/questions/${questionId}`, {
+      group_id: newGroupId,
+    })
   }
 
   async getDashboardStats(): Promise<{ stats: DashboardStats; recentSurveys: SurveyResponse[] }> {
