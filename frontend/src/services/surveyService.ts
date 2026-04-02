@@ -1,5 +1,5 @@
 import apiClient from './apiClient'
-import type { SurveyResponse, SurveyFullResponse, SurveyListResponse, SurveyCreatePayload, SurveyUpdatePayload, AnswerOptionResponse, QuestionResponse, QuestionUpdatePayload, QuestionGroupResponse, QuestionGroupCreatePayload, QuestionGroupUpdatePayload, GroupReorderPayload } from '../types/survey'
+import type { SurveyResponse, SurveyFullResponse, SurveyListResponse, SurveyCreatePayload, SurveyUpdatePayload, AnswerOptionResponse, QuestionResponse, QuestionUpdatePayload, QuestionCreatePayload, QuestionGroupResponse, QuestionGroupCreatePayload, QuestionGroupUpdatePayload, GroupReorderPayload } from '../types/survey'
 
 export interface AnswerOptionCreatePayload {
   code: string
@@ -82,6 +82,18 @@ class SurveyService {
 
   async deleteSurvey(id: string): Promise<void> {
     await apiClient.delete(`/surveys/${id}`)
+  }
+
+  async createQuestion(
+    surveyId: string,
+    groupId: string,
+    data: QuestionCreatePayload,
+  ): Promise<QuestionResponse> {
+    const response = await apiClient.post<QuestionResponse>(
+      `/surveys/${surveyId}/groups/${groupId}/questions`,
+      data,
+    )
+    return response.data
   }
 
   async updateQuestion(
