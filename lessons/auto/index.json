@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-02T17:41:04.625Z",
+  "lastUpdated": "2026-04-02T20:23:57.841Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1083,6 +1083,27 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-02-iss-058-42-backend-choice-question-types-radio-dropdown-ch.md",
+      "ticketId": "ISS-058",
+      "title": "4.2: Backend — Choice Question Types (radio, dropdown, checkbox)",
+      "date": "2026-04-02",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -1140,7 +1161,8 @@
       "2026-04-02-iss-048-312-undoredo-support.md",
       "2026-04-02-iss-049-313-builder-toolbar.md",
       "2026-04-02-iss-055-bug-act-warnings-still-present-in-authprovider-and.md",
-      "2026-04-02-iss-056-chore-address-react-router-v7-future-flag-warnings.md"
+      "2026-04-02-iss-056-chore-address-react-router-v7-future-flag-warnings.md",
+      "2026-04-02-iss-058-42-backend-choice-question-types-radio-dropdown-ch.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1193,7 +1215,8 @@
       "2026-04-02-iss-047-311-autosave-and-save-indicator.md",
       "2026-04-02-iss-048-312-undoredo-support.md",
       "2026-04-02-iss-049-313-builder-toolbar.md",
-      "2026-04-02-iss-056-chore-address-react-router-v7-future-flag-warnings.md"
+      "2026-04-02-iss-056-chore-address-react-router-v7-future-flag-warnings.md",
+      "2026-04-02-iss-058-42-backend-choice-question-types-radio-dropdown-ch.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1235,7 +1258,8 @@
       "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
       "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
       "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md",
-      "2026-04-02-iss-055-bug-act-warnings-still-present-in-authprovider-and.md"
+      "2026-04-02-iss-055-bug-act-warnings-still-present-in-authprovider-and.md",
+      "2026-04-02-iss-058-42-backend-choice-question-types-radio-dropdown-ch.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1290,7 +1314,8 @@
       "2026-04-02-iss-048-312-undoredo-support.md",
       "2026-04-02-iss-049-313-builder-toolbar.md",
       "2026-04-02-iss-055-bug-act-warnings-still-present-in-authprovider-and.md",
-      "2026-04-02-iss-056-chore-address-react-router-v7-future-flag-warnings.md"
+      "2026-04-02-iss-056-chore-address-react-router-v7-future-flag-warnings.md",
+      "2026-04-02-iss-058-42-backend-choice-question-types-radio-dropdown-ch.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1361,7 +1386,8 @@
       "2026-04-02-iss-047-311-autosave-and-save-indicator.md",
       "2026-04-02-iss-048-312-undoredo-support.md",
       "2026-04-02-iss-055-bug-act-warnings-still-present-in-authprovider-and.md",
-      "2026-04-02-iss-056-chore-address-react-router-v7-future-flag-warnings.md"
+      "2026-04-02-iss-056-chore-address-react-router-v7-future-flag-warnings.md",
+      "2026-04-02-iss-058-42-backend-choice-question-types-radio-dropdown-ch.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1415,7 +1441,8 @@
       "2026-04-02-iss-047-311-autosave-and-save-indicator.md",
       "2026-04-02-iss-048-312-undoredo-support.md",
       "2026-04-02-iss-049-313-builder-toolbar.md",
-      "2026-04-02-iss-056-chore-address-react-router-v7-future-flag-warnings.md"
+      "2026-04-02-iss-056-chore-address-react-router-v7-future-flag-warnings.md",
+      "2026-04-02-iss-058-42-backend-choice-question-types-radio-dropdown-ch.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1460,7 +1487,8 @@
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
       "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
       "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md",
-      "2026-04-02-iss-044-38-question-type-specific-settings-forms.md"
+      "2026-04-02-iss-044-38-question-type-specific-settings-forms.md",
+      "2026-04-02-iss-058-42-backend-choice-question-types-radio-dropdown-ch.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1505,7 +1533,8 @@
       "2026-04-02-iss-045-39-question-preview-component.md",
       "2026-04-02-iss-046-310-survey-preview-mode.md",
       "2026-04-02-iss-047-311-autosave-and-save-indicator.md",
-      "2026-04-02-iss-056-chore-address-react-router-v7-future-flag-warnings.md"
+      "2026-04-02-iss-056-chore-address-react-router-v7-future-flag-warnings.md",
+      "2026-04-02-iss-058-42-backend-choice-question-types-radio-dropdown-ch.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1558,7 +1587,8 @@
       "2026-04-02-iss-047-311-autosave-and-save-indicator.md",
       "2026-04-02-iss-048-312-undoredo-support.md",
       "2026-04-02-iss-049-313-builder-toolbar.md",
-      "2026-04-02-iss-055-bug-act-warnings-still-present-in-authprovider-and.md"
+      "2026-04-02-iss-055-bug-act-warnings-still-present-in-authprovider-and.md",
+      "2026-04-02-iss-058-42-backend-choice-question-types-radio-dropdown-ch.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -1598,7 +1628,8 @@
       "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md",
       "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
       "2026-04-02-iss-044-38-question-type-specific-settings-forms.md",
-      "2026-04-02-iss-055-bug-act-warnings-still-present-in-authprovider-and.md"
+      "2026-04-02-iss-055-bug-act-warnings-still-present-in-authprovider-and.md",
+      "2026-04-02-iss-058-42-backend-choice-question-types-radio-dropdown-ch.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md"
