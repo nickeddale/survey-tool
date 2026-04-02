@@ -11,6 +11,7 @@ import { useBuilderStore } from '../../store/builderStore'
 import surveyService from '../../services/surveyService'
 import type { BuilderQuestion } from '../../store/builderStore'
 import { QuestionSettingsForm } from './settings/QuestionSettingsForm'
+import { AnswerOptionsEditor } from './AnswerOptionsEditor'
 import {
   getDefaultSettings,
   getCompatibleSettings,
@@ -545,25 +546,15 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
         )}
       </div>
 
-      {/* Answer options (read-only display) */}
-      {selectedQuestion.answer_options.length > 0 && (
-        <div>
-          <p className="text-xs font-medium text-muted-foreground mb-1">
-            Answer Options ({selectedQuestion.answer_options.length})
-          </p>
-          <div className="space-y-1">
-            {selectedQuestion.answer_options.map((opt) => (
-              <div
-                key={opt.id}
-                className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-2 py-1 rounded"
-              >
-                <span className="font-mono">{opt.code}</span>
-                <span className="flex-1 truncate">{opt.title}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Answer options editor */}
+      <AnswerOptionsEditor
+        surveyId={surveyId}
+        groupId={selectedGroup.id}
+        questionId={selectedQuestion.id}
+        questionType={questionType}
+        options={selectedQuestion.answer_options}
+        readOnly={readOnly}
+      />
     </div>
   )
 }

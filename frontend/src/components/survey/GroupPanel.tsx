@@ -16,6 +16,7 @@ import { GripVertical, Plus } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
 import { QuestionCard } from './QuestionCard'
+import { QuestionPreview } from '../survey-builder/QuestionPreview'
 import type { BuilderGroup } from '../../store/builderStore'
 import type { SelectedItem } from '../../store/builderStore'
 
@@ -34,6 +35,8 @@ export interface GroupPanelProps {
   dragListeners?: DraggableSyntheticListeners
   /** @dnd-kit drag handle attributes for group-level reordering */
   dragAttributes?: React.HTMLAttributes<HTMLElement>
+  /** When true, renders QuestionPreview instead of QuestionCard for each question */
+  isPreviewMode?: boolean
 }
 
 // ---------------------------------------------------------------------------
@@ -48,6 +51,7 @@ export function GroupPanel({
   isOver = false,
   dragListeners,
   dragAttributes,
+  isPreviewMode = false,
 }: GroupPanelProps) {
   const isGroupSelected = selectedItem?.type === 'group' && selectedItem.id === group.id
 
@@ -131,13 +135,20 @@ export function GroupPanel({
           ) : (
             <div className="space-y-2">
               {group.questions.map((question) => (
-                <QuestionCard
-                  key={question.id}
-                  question={question}
-                  selectedItem={selectedItem}
-                  onSelectItem={onSelectItem}
-                  readOnly={readOnly}
-                />
+                isPreviewMode ? (
+                  <QuestionPreview
+                    key={question.id}
+                    question={question}
+                  />
+                ) : (
+                  <QuestionCard
+                    key={question.id}
+                    question={question}
+                    selectedItem={selectedItem}
+                    onSelectItem={onSelectItem}
+                    readOnly={readOnly}
+                  />
+                )
               ))}
             </div>
           )}

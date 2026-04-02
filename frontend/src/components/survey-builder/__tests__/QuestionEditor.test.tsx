@@ -138,8 +138,9 @@ describe('question selection populates fields', () => {
   it('shows answer options for radio question', () => {
     useBuilderStore.getState().setSelectedItem({ type: 'question', id: Q2.id })
     renderEditor()
-    expect(screen.getByText('Very Satisfied')).toBeInTheDocument()
-    expect(screen.getByText('Satisfied')).toBeInTheDocument()
+    // AnswerOptionsEditor renders options as input values (defaultValue)
+    expect(screen.getByDisplayValue('Very Satisfied')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Satisfied')).toBeInTheDocument()
   })
 
   it('updates fields when selected question changes', async () => {
