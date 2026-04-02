@@ -7,7 +7,7 @@ import { server } from '../../test/setup'
 import { AuthProvider } from '../../contexts/AuthContext'
 import { useAuthStore } from '../../store/authStore'
 import { clearTokens, setTokens } from '../../services/tokenService'
-import { mockTokens, mockSurveys } from '../../mocks/handlers'
+import { mockTokens, mockUser, mockSurveys } from '../../mocks/handlers'
 import SurveysPage from '../SurveysPage'
 
 // ---------------------------------------------------------------------------
@@ -21,7 +21,7 @@ function LocationDisplay() {
 
 function renderSurveys(initialUrl = '/surveys') {
   return render(
-    <MemoryRouter initialEntries={[initialUrl]}>
+    <MemoryRouter initialEntries={[initialUrl]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AuthProvider>
         <Routes>
           <Route path="/surveys" element={<SurveysPage />} />
@@ -47,7 +47,14 @@ describe('SurveysPage', () => {
     clearTokens()
     localStorage.clear()
     resetAuthStore()
+    // Set only the access token (in memory) without storing the refresh token in
+    // localStorage. This prevents AuthProvider from calling initialize() on mount,
+    // which would trigger async state updates (setPendingInit, set user) outside act().
+    // The mock JWT has exp=9999999999, so no proactive refresh occurs either.
     setTokens(mockTokens.access_token, mockTokens.refresh_token)
+    localStorage.removeItem('devtracker_refresh_token')
+    // Pre-populate the auth store so components that check isAuthenticated work correctly
+    useAuthStore.setState({ user: mockUser, isAuthenticated: true, isLoading: false })
   })
 
   afterEach(() => {
@@ -234,12 +241,12 @@ describe('SurveysPage', () => {
       })
 
       const select = screen.getByLabelText('Filter by status')
-      await user.selectOptions(select, 'draft')
-
-      await waitFor(() => {
-        expect(screen.queryByText('Customer Satisfaction Survey')).not.toBeInTheDocument()
-        expect(screen.getByText('Employee Feedback Form')).toBeInTheDocument()
+      await act(async () => {
+        await user.selectOptions(select, 'draft')
       })
+
+      await screen.findByText('Employee Feedback Form')
+      expect(screen.queryByText('Customer Satisfaction Survey')).not.toBeInTheDocument()
     })
   })
 
@@ -285,7 +292,9 @@ describe('SurveysPage', () => {
 
       // Type quickly — debounce should coalesce these into a single fetch
       const searchInput = screen.getByLabelText('Search surveys')
-      await user.type(searchInput, 'NPS')
+      await act(async () => {
+        await user.type(searchInput, 'NPS')
+      })
 
       // After debounce settles, only one additional fetch should have fired
       await waitFor(() => {
@@ -358,16 +367,19 @@ describe('SurveysPage', () => {
 
       renderSurveys()
 
-      await waitFor(() => {
-        expect(screen.getByText('Survey 1')).toBeInTheDocument()
-      })
+      // Wait for initial data to load
+      await screen.findByText('Survey 1')
 
-      // Allow debounce timer (300ms) to settle before navigating pages
+      // Allow the debounce timer (300ms) to settle before changing page.
+      // The debounce useEffect schedules setPage(1) at 300ms after mount;
+      // if we navigate to page 2 before that timer fires, it will reset us back.
       await act(async () => {
         await new Promise((r) => setTimeout(r, 400))
       })
 
-      await user.click(screen.getByLabelText('Next page'))
+      await act(async () => {
+        await user.click(screen.getByLabelText('Next page'))
+      })
 
       await waitFor(() => {
         expect(screen.getByText('Survey 11')).toBeInTheDocument()
@@ -456,7 +468,9 @@ describe('SurveysPage', () => {
         expect(screen.getByLabelText('Delete Customer Satisfaction Survey')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByLabelText('Delete Customer Satisfaction Survey'))
+      await act(async () => {
+        await user.click(screen.getByLabelText('Delete Customer Satisfaction Survey'))
+      })
 
       await waitFor(() => {
         expect(deleteCalledFor).toBe('10000000-0000-0000-0000-000000000001')
@@ -481,7 +495,9 @@ describe('SurveysPage', () => {
         expect(screen.getByLabelText('Delete Customer Satisfaction Survey')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByLabelText('Delete Customer Satisfaction Survey'))
+      await act(async () => {
+        await user.click(screen.getByLabelText('Delete Customer Satisfaction Survey'))
+      })
 
       // Give time for any async work
       await new Promise((r) => setTimeout(r, 50))
@@ -503,11 +519,13 @@ describe('SurveysPage', () => {
         expect(screen.getByRole('button', { name: /create new survey/i })).toBeInTheDocument()
       })
 
-      await user.click(screen.getByRole('button', { name: /create new survey/i }))
-
-      await waitFor(() => {
-        expect(screen.getByTestId('location').textContent).toBe('/surveys/new')
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /create new survey/i }))
       })
+
+      // findByTestId internally uses waitFor, allowing all pending state updates to settle
+      const location = await screen.findByTestId('location')
+      expect(location.textContent).toBe('/surveys/new')
     })
 
     it('navigates to /surveys/:id when View is clicked', async () => {
@@ -519,13 +537,12 @@ describe('SurveysPage', () => {
         expect(screen.getByLabelText('View Customer Satisfaction Survey')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByLabelText('View Customer Satisfaction Survey'))
-
-      await waitFor(() => {
-        expect(screen.getByTestId('location').textContent).toBe(
-          '/surveys/10000000-0000-0000-0000-000000000001',
-        )
+      await act(async () => {
+        await user.click(screen.getByLabelText('View Customer Satisfaction Survey'))
       })
+
+      const location = await screen.findByTestId('location')
+      expect(location.textContent).toBe('/surveys/10000000-0000-0000-0000-000000000001')
     })
 
     it('navigates to /surveys/:id/edit when Edit is clicked on a draft survey', async () => {
@@ -537,13 +554,12 @@ describe('SurveysPage', () => {
         expect(screen.getByLabelText('Edit Employee Feedback Form')).toBeInTheDocument()
       })
 
-      await user.click(screen.getByLabelText('Edit Employee Feedback Form'))
-
-      await waitFor(() => {
-        expect(screen.getByTestId('location').textContent).toBe(
-          '/surveys/10000000-0000-0000-0000-000000000002/edit',
-        )
+      await act(async () => {
+        await user.click(screen.getByLabelText('Edit Employee Feedback Form'))
       })
+
+      const location = await screen.findByTestId('location')
+      expect(location.textContent).toBe('/surveys/10000000-0000-0000-0000-000000000002/edit')
     })
   })
 
