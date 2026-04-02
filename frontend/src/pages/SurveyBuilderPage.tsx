@@ -21,6 +21,7 @@ import { Button } from '../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Skeleton } from '../components/ui/skeleton'
+import { QuestionEditor } from '../components/survey-builder/QuestionEditor'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -280,20 +281,18 @@ function SurveyCanvas({ readOnly, selectedItem, onSelectItem }: SurveyCanvasProp
 // ---------------------------------------------------------------------------
 
 interface PropertyEditorProps {
+  surveyId: string
   readOnly: boolean
   selectedItem: SelectedItem
 }
 
-function PropertyEditor({ readOnly, selectedItem }: PropertyEditorProps) {
+function PropertyEditor({ surveyId, readOnly, selectedItem }: PropertyEditorProps) {
   const groups = useBuilderStore((s) => s.groups)
 
   const selectedGroup =
     selectedItem?.type === 'group' ? groups.find((g) => g.id === selectedItem.id) ?? null : null
 
-  const selectedQuestion =
-    selectedItem?.type === 'question'
-      ? groups.flatMap((g) => g.questions).find((q) => q.id === selectedItem.id) ?? null
-      : null
+  const isQuestionSelected = selectedItem?.type === 'question'
 
   return (
     <aside
@@ -304,7 +303,7 @@ function PropertyEditor({ readOnly, selectedItem }: PropertyEditorProps) {
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Properties</p>
       </div>
 
-      {!selectedGroup && !selectedQuestion && (
+      {!selectedGroup && !isQuestionSelected && (
         <div className="flex-1 flex items-center justify-center p-4">
           <p className="text-xs text-muted-foreground text-center">
             Select a group or question to edit its properties.
@@ -344,65 +343,8 @@ function PropertyEditor({ readOnly, selectedItem }: PropertyEditorProps) {
         </div>
       )}
 
-      {selectedQuestion && (
-        <div className="p-3 space-y-3" data-testid="question-properties">
-          <div>
-            <p className="text-xs font-medium text-muted-foreground mb-1">Question Title</p>
-            <input
-              type="text"
-              className="w-full rounded-md border border-input bg-background px-2 py-1.5 text-sm
-                focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
-              defaultValue={selectedQuestion.title}
-              disabled={readOnly}
-              aria-label="Question title"
-              data-testid="property-question-title"
-            />
-          </div>
-          <div>
-            <p className="text-xs font-medium text-muted-foreground mb-1">Code</p>
-            <input
-              type="text"
-              className="w-full rounded-md border border-input bg-background px-2 py-1.5 text-sm font-mono
-                focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
-              defaultValue={selectedQuestion.code}
-              disabled={readOnly}
-              aria-label="Question code"
-              data-testid="property-question-code"
-            />
-          </div>
-          <div>
-            <p className="text-xs font-medium text-muted-foreground mb-1">Type</p>
-            <p className="text-sm text-foreground capitalize">{selectedQuestion.question_type}</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="prop-required"
-              defaultChecked={selectedQuestion.is_required}
-              disabled={readOnly}
-              data-testid="property-question-required"
-            />
-            <label htmlFor="prop-required" className="text-sm">Required</label>
-          </div>
-          {selectedQuestion.answer_options.length > 0 && (
-            <div>
-              <p className="text-xs font-medium text-muted-foreground mb-1">
-                Answer Options ({selectedQuestion.answer_options.length})
-              </p>
-              <div className="space-y-1">
-                {selectedQuestion.answer_options.map((opt) => (
-                  <div
-                    key={opt.id}
-                    className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-2 py-1 rounded"
-                  >
-                    <span className="font-mono">{opt.code}</span>
-                    <span className="flex-1 truncate">{opt.title}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+      {isQuestionSelected && (
+        <QuestionEditor surveyId={surveyId} readOnly={readOnly} />
       )}
     </aside>
   )
@@ -538,7 +480,7 @@ function SurveyBuilderPage() {
           selectedItem={selectedItem}
           onSelectItem={setSelectedItem}
         />
-        <PropertyEditor readOnly={readOnly} selectedItem={selectedItem} />
+        <PropertyEditor surveyId={surveyId ?? ''} readOnly={readOnly} selectedItem={selectedItem} />
       </div>
     </div>
   )

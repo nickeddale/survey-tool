@@ -267,6 +267,79 @@ describe('property editor — item selection', () => {
 })
 
 // ---------------------------------------------------------------------------
+// QuestionEditor integration
+// ---------------------------------------------------------------------------
+
+describe('QuestionEditor integration', () => {
+  it('renders QuestionEditor inside property editor when question is selected', async () => {
+    const user = userEvent.setup()
+    renderBuilder()
+
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    const questionEl = screen.getByTestId('canvas-question-q1')
+    await act(async () => {
+      await user.click(questionEl)
+    })
+
+    await waitFor(() => expect(screen.getByTestId('property-editor')).toBeInTheDocument())
+    expect(screen.getByTestId('question-properties')).toBeInTheDocument()
+  })
+
+  it('title field in QuestionEditor is a textarea (multi-line)', async () => {
+    const user = userEvent.setup()
+    renderBuilder()
+
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    const questionEl = screen.getByTestId('canvas-question-q1')
+    await act(async () => {
+      await user.click(questionEl)
+    })
+
+    await waitFor(() => expect(screen.getByTestId('property-question-title')).toBeInTheDocument())
+    expect(screen.getByTestId('property-question-title').tagName).toBe('TEXTAREA')
+  })
+
+  it('QuestionEditor title updates builder store when changed', async () => {
+    const user = userEvent.setup()
+    renderBuilder()
+
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    const questionEl = screen.getByTestId('canvas-question-q1')
+    await act(async () => {
+      await user.click(questionEl)
+    })
+
+    await waitFor(() => expect(screen.getByTestId('property-question-title')).toBeInTheDocument())
+
+    const titleEl = screen.getByTestId('property-question-title')
+    await act(async () => {
+      await user.clear(titleEl)
+      await user.type(titleEl, 'Updated Name Question')
+    })
+
+    await waitFor(() => {
+      const { groups } = useBuilderStore.getState()
+      const q = groups.flatMap((g) => g.questions).find((q) => q.id === 'q1')
+      expect(q?.title).toBe('Updated Name Question')
+    })
+  })
+
+  it('shows empty state in property editor when no question selected', async () => {
+    renderBuilder()
+
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    expect(screen.getByTestId('property-editor')).toHaveTextContent(
+      /select a group or question/i,
+    )
+    expect(screen.queryByTestId('question-properties')).not.toBeInTheDocument()
+  })
+})
+
+// ---------------------------------------------------------------------------
 // Navigation
 // ---------------------------------------------------------------------------
 

@@ -493,6 +493,35 @@ export const handlers = [
     return new HttpResponse(null, { status: 204 })
   }),
 
+  // PATCH /api/v1/surveys/:surveyId/groups/:groupId/questions/:questionId
+  http.patch(`${BASE}/surveys/:surveyId/groups/:groupId/questions/:questionId`, async ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    // Find the question in mockSurveyFull
+    let foundQuestion = null
+    for (const group of mockSurveyFull.groups) {
+      const q = group.questions.find((q) => q.id === params.questionId)
+      if (q) {
+        foundQuestion = q
+        break
+      }
+    }
+    if (!foundQuestion) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Question not found' } },
+        { status: 404 },
+      )
+    }
+    const body = (await request.json()) as Record<string, unknown>
+    const updated = { ...foundQuestion, ...body, updated_at: new Date().toISOString() }
+    return HttpResponse.json(updated, { status: 200 })
+  }),
+
   // PATCH /api/v1/auth/me
   http.patch(`${BASE}/auth/me`, async ({ request }) => {
     const authHeader = request.headers.get('Authorization')

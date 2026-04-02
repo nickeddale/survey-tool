@@ -1,5 +1,5 @@
 import apiClient from './apiClient'
-import type { SurveyResponse, SurveyFullResponse, SurveyListResponse, SurveyCreatePayload, SurveyUpdatePayload } from '../types/survey'
+import type { SurveyResponse, SurveyFullResponse, SurveyListResponse, SurveyCreatePayload, SurveyUpdatePayload, QuestionResponse, QuestionUpdatePayload } from '../types/survey'
 
 export interface SurveyFetchParams {
   page?: number
@@ -66,6 +66,19 @@ class SurveyService {
 
   async deleteSurvey(id: string): Promise<void> {
     await apiClient.delete(`/surveys/${id}`)
+  }
+
+  async updateQuestion(
+    surveyId: string,
+    groupId: string,
+    questionId: string,
+    data: QuestionUpdatePayload,
+  ): Promise<QuestionResponse> {
+    const response = await apiClient.patch<QuestionResponse>(
+      `/surveys/${surveyId}/groups/${groupId}/questions/${questionId}`,
+      data,
+    )
+    return response.data
   }
 
   async getDashboardStats(): Promise<{ stats: DashboardStats; recentSurveys: SurveyResponse[] }> {
