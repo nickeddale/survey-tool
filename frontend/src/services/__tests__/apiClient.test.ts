@@ -1,16 +1,29 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { http, HttpResponse } from 'msw'
 import { server } from '../../test/setup'
-import apiClient from '../apiClient'
+import apiClient, { setRedirectFn } from '../apiClient'
 import { setTokens, clearTokens, getAccessToken, getRefreshToken } from '../tokenService'
 import { mockTokens, mockNewTokens } from '../../mocks/handlers'
 
 const BASE = '/api/v1'
 
 describe('apiClient interceptors', () => {
+  const mockRedirect = vi.fn()
+
   beforeEach(() => {
     clearTokens()
     localStorage.clear()
+    mockRedirect.mockClear()
+    setRedirectFn(mockRedirect)
+  })
+
+  afterEach(() => {
+    // Restore default redirect behaviour
+    setRedirectFn(() => {
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login'
+      }
+    })
   })
 
   describe('request interceptor', () => {
@@ -112,8 +125,9 @@ describe('apiClient interceptors', () => {
         await apiClient.get('/protected')
         expect.fail('should have thrown')
       } catch {
-        // Should have cleared tokens
+        // Should have cleared tokens and called the redirect function
         expect(getAccessToken()).toBeNull()
+        expect(mockRedirect).toHaveBeenCalledOnce()
       }
     })
 

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-02T08:35:02.404Z",
+  "lastUpdated": "2026-04-02T08:38:12.517Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -784,6 +784,24 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md",
+      "ticketId": "ISS-052",
+      "title": "Bug: jsdom navigation warnings in apiClient tests",
+      "date": "2026-04-02",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -825,7 +843,8 @@
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
       "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
       "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md",
-      "2026-04-02-iss-051-22-fix-install-shadcnui-components.md"
+      "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
+      "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -864,7 +883,8 @@
       "2026-04-02-iss-034-28-survey-createedit-form.md",
       "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
       "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md",
-      "2026-04-02-iss-051-22-fix-install-shadcnui-components.md"
+      "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
+      "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -939,7 +959,8 @@
       "2026-04-02-iss-034-28-survey-createedit-form.md",
       "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
       "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md",
-      "2026-04-02-iss-051-22-fix-install-shadcnui-components.md"
+      "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
+      "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -990,7 +1011,8 @@
       "2026-04-02-iss-034-28-survey-createedit-form.md",
       "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
       "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md",
-      "2026-04-02-iss-051-22-fix-install-shadcnui-components.md"
+      "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
+      "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1029,7 +1051,8 @@
       "2026-04-02-iss-034-28-survey-createedit-form.md",
       "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
       "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md",
-      "2026-04-02-iss-051-22-fix-install-shadcnui-components.md"
+      "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
+      "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1097,7 +1120,8 @@
       "2026-04-02-iss-031-25-app-layout-and-navigation-shell.md",
       "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
       "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md",
-      "2026-04-02-iss-051-22-fix-install-shadcnui-components.md"
+      "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
+      "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1135,7 +1159,8 @@
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
       "2026-04-02-iss-034-28-survey-createedit-form.md",
       "2026-04-02-iss-035-29-survey-detail-page-with-status-actions.md",
-      "2026-04-02-iss-051-22-fix-install-shadcnui-components.md"
+      "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
+      "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
