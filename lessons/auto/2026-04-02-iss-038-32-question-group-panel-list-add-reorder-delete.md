@@ -13,52 +13,58 @@ files_modified: []
 date: "2026-04-02"
 ticket_id: "ISS-038"
 ticket_title: "3.2: Question Group Panel (List, Add, Reorder, Delete)"
-categories: ["react", "survey-builder", "ui-components", "shadcn-ui"]
+categories: ["frontend", "react", "survey-builder", "ui-components", "testing"]
 outcome: "success"
 complexity: "medium"
 files_modified:
   - "src/components/survey-builder/GroupPanel.tsx"
-  - "src/components/survey-builder/__tests__/GroupPanel.test.tsx"
+  - "src/pages/SurveyBuilderPage.tsx"
   - "src/store/builderStore.ts"
   - "src/services/surveyService.ts"
-  - "src/types/survey.ts"
+  - "src/components/survey-builder/__tests__/GroupPanel.test.tsx"
 ---
 
 # Lessons Learned: 3.2: Question Group Panel (List, Add, Reorder, Delete)
 
 ## What Worked Well
-- GroupPanel.tsx was already fully implemented at 346 lines before the ticket work began, indicating strong carry-over from adjacent ticket work
-- shadcn/ui Collapsible and Dialog components mapped cleanly onto the required expand/collapse and delete-confirmation UX patterns
-- Centralizing state in useBuilderStore kept GroupPanel.tsx stateless enough to test in isolation
-- Inline title editing (click-to-edit, Enter/blur-to-save) was handled entirely within the component without needing a separate modal
+- GroupPanel.tsx was already fully implemented prior to the ticket being actioned, meaning the implementation plan served primarily as a verification and test-coverage exercise
+- shadcn/ui Collapsible component integrated cleanly with the existing design system
+- Zustand+Immer store pattern (builderStore) handled optimistic UI updates for add/rename/delete group operations without requiring manual immutability management
+- @dnd-kit drag handle integration coexisted naturally with the collapsible panel interaction model — drag handle captured pointer events independently from expand/collapse trigger
+- MSW handlers provided reliable API mocking for PATCH/DELETE endpoints in unit tests
 
 ## What Was Challenging
-- Verifying the Add Group button placement — it lives in the parent canvas component rather than GroupPanel itself, so acceptance criteria tracing required checking multiple files
-- Ensuring delete confirmation copy explicitly mentioned cascading question deletion to satisfy the acceptance criterion (easy to write a generic "are you sure?" and miss the cascade warning requirement)
-- Sort order rendering depends on data arriving pre-sorted or the component sorting by `sort_order`; subtle bugs can appear if the store doesn't preserve order after optimistic updates
+- Distinguishing between click-to-edit (inline title) and click-to-expand (collapsible) required careful event handling — both targets lived in the group header area
+- Delete confirmation dialog needed to surface cascade warning text clearly; verifying the exact warning copy in tests required knowing the precise string rendered
+- Ensuring the Add Group button appeared at the bottom of the canvas (outside the group list scroll area) required attention to layout structure in SurveyBuilderPage.tsx
+- act() boundary warnings when testing async store actions (addGroup, removeGroup) that triggered re-renders needed the established pattern of wrapping userEvent interactions
 
 ## Key Technical Insights
-1. shadcn/ui `Collapsible` is the right primitive for single-panel expand/collapse; `Accordion` is better when only one panel should be open at a time — for survey groups, independent expand/collapse per panel means `Collapsible` is the correct choice.
-2. Inline title editing requires careful blur/Enter handling: save on both, but cancel (Escape) should revert to the last saved value, not an empty string.
-3. Drag handles should be visually distinct but not interfere with the click target for expand/collapse — separate the handle element from the header click zone.
-4. Optimistic UI for delete (remove from store immediately, revert on API error) prevents the lag that makes delete feel broken on slow connections.
-5. Empty group placeholder ("Add questions here") must be inside the Collapsible content so it appears/disappears correctly with expand/collapse state.
+1. Inline title editing pattern: render a `<span>` in display mode and swap to `<input>` on click; save on Enter keydown or onBlur, cancel on Escape — prevents accidental saves while keeping UX natural
+2. Collapsible expand/collapse state should live in local component state (not the store) unless cross-component synchronization is needed — avoids polluting global state with transient UI state
+3. Delete confirmation dialogs that warn about cascading deletes must render the warning text unconditionally inside the dialog (not conditionally based on question count) so tests can assert its presence reliably
+4. sort_order rendering: always derive display order from `[...groups].sort((a, b) => a.sort_order - b.sort_order)` at render time rather than relying on store insertion order
+5. Empty group placeholder (`Add questions here`) should be rendered inside the Collapsible content area so it is only visible when the group is expanded, matching user expectations
 
 ## Reusable Patterns
-- `click-to-edit` inline text: render `<span onClick={() => setEditing(true)}>` that swaps to `<input autoFocus onBlur={save} onKeyDown={handleKey}>` — reusable for any inline rename pattern in the survey builder.
-- Confirmation dialog with cascade warning: wrap shadcn/ui `Dialog` with a `isDangerous` prop pattern that renders red-tinted body text when the action has irreversible side effects.
-- useBuilderStore action pairing: every mutation (createGroup, renameGroup, deleteGroup) should have a matching optimistic store update + async API call + rollback on failure.
+- Inline edit pattern: `isEditing` local state + controlled input + onKeyDown for Enter/Escape + onBlur for save — reusable for any inline rename interaction
+- Confirmation dialog with cascade warning: shadcn/ui AlertDialog with destructive variant button; warning text as a separate paragraph styled with `text-destructive` or muted tone
+- Group header layout: flex row with drag handle (cursor-grab, stops propagation), expand/collapse trigger (flex-1), badge (question count), action buttons (icon-only, stops propagation)
+- MSW handler pattern for PATCH: `http.patch('/api/v1/surveys/:surveyId/groups/:groupId', ...)` returning the updated resource — reuse for any entity rename endpoint
+- builderStore action pattern: call surveyService, then update Immer draft directly on success, catch and surface error without rolling back (let the next fetch reconcile state)
 
 ## Files to Review for Similar Tasks
-- `src/components/survey-builder/GroupPanel.tsx` — reference for collapsible panel + inline edit + delete confirm pattern
-- `src/store/builderStore.ts` — how group CRUD actions are structured for reuse when implementing question-level CRUD
-- `src/services/surveyService.ts` — REST call patterns for survey sub-resources (groups, questions)
-- `src/components/survey-builder/__tests__/GroupPanel.test.tsx` — test patterns for inline editing and dialog interactions
+- `src/components/survey-builder/GroupPanel.tsx` — reference for collapsible panel with inline edit, drag handle, and delete confirmation pattern
+- `src/store/builderStore.ts` — reference for Zustand+Immer async action pattern (add/update/remove entity)
+- `src/components/survey-builder/__tests__/GroupPanel.test.tsx` — reference for testing collapsible, inline edit, and delete dialog with MSW
+- `src/pages/SurveyBuilderPage.tsx` — reference for canvas layout with sticky Add button at canvas bottom
+- `src/services/surveyService.ts` — reference for PATCH/DELETE group API call signatures
 
 ## Gotchas and Pitfalls
-- Do not attach the drag-handle `onMouseDown` to the entire panel header — it will conflict with the expand/collapse click and the inline title edit click target.
-- shadcn/ui Dialog's `onOpenChange` fires on both open and close; guard the close path to avoid triggering a delete API call when the user cancels.
-- `sort_order` gaps are normal (e.g., 1, 3, 5) after deletions — render in order, never assume contiguous values or use index as a proxy for sort_order.
-- When the panel title input is empty on blur/Enter, either restore the previous title or block the save — saving an empty string produces a broken UI state.
-- Test the empty-group placeholder carefully: it must not appear when the collapsible is collapsed (hidden inside content), and it must appear when expanded with zero questions.
+- Event propagation: clicks on action buttons (rename, delete) inside the group header must call `e.stopPropagation()` to prevent triggering the collapsible toggle
+- Drag handle events must also stop propagation to prevent the Collapsible from toggling when the user initiates a drag
+- `useRealTimers()` in afterEach is mandatory — any fake timer leak will cause subsequent async tests to hang indefinitely
+- When asserting the cascade warning text in delete dialog tests, the dialog must be opened first (click delete button) before querying for the warning — shadcn AlertDialog is not pre-rendered in the DOM
+- Avoid storing `isExpanded` in the builder store — it is transient UI state; storing it causes unnecessary re-renders of unrelated components on every expand/collapse
+- PATCH title save should debounce or only fire on commit (Enter/blur), not on every keystroke, to avoid flooding the API during typing
 ```
