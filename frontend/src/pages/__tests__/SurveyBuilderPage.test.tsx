@@ -462,3 +462,247 @@ describe('error state', () => {
     expect(screen.getByRole('alert')).toBeInTheDocument()
   })
 })
+
+// ---------------------------------------------------------------------------
+// Undo/redo toolbar buttons
+// ---------------------------------------------------------------------------
+
+describe('undo/redo toolbar buttons', () => {
+  it('renders undo and redo buttons in toolbar for draft survey', async () => {
+    renderBuilder()
+
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    expect(screen.getByTestId('undo-button')).toBeInTheDocument()
+    expect(screen.getByTestId('redo-button')).toBeInTheDocument()
+  })
+
+  it('undo button is disabled when undoStack is empty', async () => {
+    renderBuilder()
+
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    // Initially, undoStack is empty (no actions taken yet)
+    expect(screen.getByTestId('undo-button')).toBeDisabled()
+  })
+
+  it('redo button is disabled when redoStack is empty', async () => {
+    renderBuilder()
+
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    // Initially, redoStack is empty
+    expect(screen.getByTestId('redo-button')).toBeDisabled()
+  })
+
+  it('undo button becomes enabled after a builder action', async () => {
+    renderBuilder()
+
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    // Push a state onto the undo stack by performing a builder action
+    act(() => {
+      useBuilderStore.getState().addGroup({
+        id: 'g-test',
+        survey_id: DRAFT_SURVEY_ID,
+        title: 'Test Group',
+        description: null,
+        sort_order: 2,
+        relevance: null,
+        created_at: '2024-01-01T00:00:00Z',
+        questions: [],
+      })
+    })
+
+    await waitFor(() => expect(screen.getByTestId('undo-button')).not.toBeDisabled())
+  })
+
+  it('undo button calls store undo when clicked', async () => {
+    renderBuilder()
+
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    // Push a state to enable the undo button
+    act(() => {
+      useBuilderStore.getState().addGroup({
+        id: 'g-test',
+        survey_id: DRAFT_SURVEY_ID,
+        title: 'Test Group',
+        description: null,
+        sort_order: 2,
+        relevance: null,
+        created_at: '2024-01-01T00:00:00Z',
+        questions: [],
+      })
+    })
+
+    await waitFor(() => expect(screen.getByTestId('undo-button')).not.toBeDisabled())
+
+    const groupCountBefore = useBuilderStore.getState().groups.length
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('undo-button'))
+    })
+
+    await waitFor(() => {
+      expect(useBuilderStore.getState().groups.length).toBeLessThan(groupCountBefore)
+    })
+  })
+
+  it('redo button becomes enabled after an undo', async () => {
+    renderBuilder()
+
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    act(() => {
+      useBuilderStore.getState().addGroup({
+        id: 'g-test',
+        survey_id: DRAFT_SURVEY_ID,
+        title: 'Test Group',
+        description: null,
+        sort_order: 2,
+        relevance: null,
+        created_at: '2024-01-01T00:00:00Z',
+        questions: [],
+      })
+    })
+
+    await waitFor(() => expect(screen.getByTestId('undo-button')).not.toBeDisabled())
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('undo-button'))
+    })
+
+    await waitFor(() => expect(screen.getByTestId('redo-button')).not.toBeDisabled())
+  })
+
+  it('does not render undo/redo buttons for read-only (non-draft) survey', async () => {
+    renderBuilder(ACTIVE_SURVEY_ID)
+
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    expect(screen.queryByTestId('undo-button')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('redo-button')).not.toBeInTheDocument()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Undo/redo keyboard shortcuts
+// ---------------------------------------------------------------------------
+
+describe('undo/redo keyboard shortcuts', () => {
+  it('Ctrl+Z triggers undo when undoStack is not empty', async () => {
+    renderBuilder()
+
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    // Add a group to populate the undo stack
+    act(() => {
+      useBuilderStore.getState().addGroup({
+        id: 'g-ks',
+        survey_id: DRAFT_SURVEY_ID,
+        title: 'Keyboard Shortcut Test Group',
+        description: null,
+        sort_order: 2,
+        relevance: null,
+        created_at: '2024-01-01T00:00:00Z',
+        questions: [],
+      })
+    })
+
+    const groupCountBefore = useBuilderStore.getState().groups.length
+
+    await act(async () => {
+      fireEvent.keyDown(window, { key: 'z', ctrlKey: true })
+    })
+
+    await waitFor(() => {
+      expect(useBuilderStore.getState().groups.length).toBeLessThan(groupCountBefore)
+    })
+  })
+
+  it('Ctrl+Shift+Z triggers redo when redoStack is not empty', async () => {
+    renderBuilder()
+
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    act(() => {
+      useBuilderStore.getState().addGroup({
+        id: 'g-ks2',
+        survey_id: DRAFT_SURVEY_ID,
+        title: 'Keyboard Shortcut Test Group 2',
+        description: null,
+        sort_order: 2,
+        relevance: null,
+        created_at: '2024-01-01T00:00:00Z',
+        questions: [],
+      })
+    })
+
+    // Undo first to populate the redo stack
+    await act(async () => {
+      fireEvent.keyDown(window, { key: 'z', ctrlKey: true })
+    })
+
+    const groupCountAfterUndo = useBuilderStore.getState().groups.length
+
+    await act(async () => {
+      fireEvent.keyDown(window, { key: 'z', ctrlKey: true, shiftKey: true })
+    })
+
+    await waitFor(() => {
+      expect(useBuilderStore.getState().groups.length).toBeGreaterThan(groupCountAfterUndo)
+    })
+  })
+
+  it('Ctrl+Z does nothing when undoStack is empty', async () => {
+    renderBuilder()
+
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    const groupCountBefore = useBuilderStore.getState().groups.length
+
+    await act(async () => {
+      fireEvent.keyDown(window, { key: 'z', ctrlKey: true })
+    })
+
+    // Groups count should remain the same
+    expect(useBuilderStore.getState().groups.length).toBe(groupCountBefore)
+  })
+
+  it('keyboard shortcuts are ignored when typing in an input', async () => {
+    renderBuilder()
+
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+
+    act(() => {
+      useBuilderStore.getState().addGroup({
+        id: 'g-input',
+        survey_id: DRAFT_SURVEY_ID,
+        title: 'Input Test Group',
+        description: null,
+        sort_order: 2,
+        relevance: null,
+        created_at: '2024-01-01T00:00:00Z',
+        questions: [],
+      })
+    })
+
+    const groupCountBefore = useBuilderStore.getState().groups.length
+
+    // Click on a group to show the group title input
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('group-panel-header-g1'))
+    })
+
+    const titleInput = await screen.findByTestId('property-group-title')
+
+    // Fire Ctrl+Z from within the input element
+    await act(async () => {
+      fireEvent.keyDown(titleInput, { key: 'z', ctrlKey: true })
+    })
+
+    // Group count should remain unchanged (undo was not triggered)
+    expect(useBuilderStore.getState().groups.length).toBe(groupCountBefore)
+  })
+})

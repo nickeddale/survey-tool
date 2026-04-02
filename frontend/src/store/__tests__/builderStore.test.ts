@@ -408,6 +408,48 @@ describe('undo / redo', () => {
     useBuilderStore.getState().redo()
     expect(useBuilderStore.getState().groups).toHaveLength(3)
   })
+
+  it('undo sets saveStatus to saving to trigger auto-save', () => {
+    useBuilderStore.getState().addGroup(mockGroup('g1'))
+    useBuilderStore.getState().addGroup(mockGroup('g2'))
+    // Clear saving status set by addGroup actions
+    useBuilderStore.getState().setSaveStatus('idle')
+
+    useBuilderStore.getState().undo()
+    expect(useBuilderStore.getState().saveStatus).toBe('saving')
+  })
+
+  it('redo sets saveStatus to saving to trigger auto-save', () => {
+    useBuilderStore.getState().addGroup(mockGroup('g1'))
+    useBuilderStore.getState().addGroup(mockGroup('g2'))
+    useBuilderStore.getState().undo()
+    // Clear saving status set by undo
+    useBuilderStore.getState().setSaveStatus('idle')
+
+    useBuilderStore.getState().redo()
+    expect(useBuilderStore.getState().saveStatus).toBe('saving')
+  })
+
+  it('undo does not set saveStatus when stack is empty', () => {
+    useBuilderStore.getState().setSaveStatus('idle')
+    useBuilderStore.getState().undo() // nothing to undo
+    expect(useBuilderStore.getState().saveStatus).toBe('idle')
+  })
+
+  it('redo does not set saveStatus when stack is empty', () => {
+    useBuilderStore.getState().addGroup(mockGroup('g1'))
+    useBuilderStore.getState().setSaveStatus('idle')
+    useBuilderStore.getState().redo() // nothing to redo
+    expect(useBuilderStore.getState().saveStatus).toBe('idle')
+  })
+
+  it('caps undo stack at 50 entries', () => {
+    // Add 55 groups — undo stack should never exceed 50
+    for (let i = 0; i < 55; i++) {
+      useBuilderStore.getState().addGroup(mockGroup(`g${i}`))
+    }
+    expect(useBuilderStore.getState().undoStack.length).toBeLessThanOrEqual(50)
+  })
 })
 
 // ---------------------------------------------------------------------------

@@ -394,6 +394,9 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
         if (!prev) return
         state.redoStack.push(snapshot(state.groups))
         state.groups = prev.groups
+        // Signal that the restored state needs to be auto-saved
+        state.saveStatus = 'saving'
+        state.saveError = null
       }),
 
     redo: () =>
@@ -402,6 +405,9 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
         if (!next) return
         state.undoStack.push(snapshot(state.groups))
         state.groups = next.groups
+        // Signal that the restored state needs to be auto-saved
+        state.saveStatus = 'saving'
+        state.saveError = null
       }),
 
     // -----------------------------------------------------------------------
