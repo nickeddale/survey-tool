@@ -17,8 +17,8 @@
  *   cross-group question move.
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { useParams, useNavigate, useBlocker, UNSAFE_DataRouterContext } from 'react-router-dom'
 import {
   DndContext,
   DragOverlay,
@@ -48,6 +48,7 @@ import { Card, CardContent } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Skeleton } from '../components/ui/skeleton'
 import { QuestionEditor } from '../components/survey-builder/QuestionEditor'
+import { SaveIndicator } from '../components/survey-builder/SaveIndicator'
 import { GroupPanel as BuilderGroupPanel } from '../components/survey/GroupPanel'
 import { QuestionCard } from '../components/survey/QuestionCard'
 import { QuestionPreview } from '../components/survey-builder/QuestionPreview'
@@ -261,6 +262,7 @@ function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem, isPrevie
   const reorderQuestions = useBuilderStore((s) => s.reorderQuestions)
   const moveQuestion = useBuilderStore((s) => s.moveQuestion)
   const undo = useBuilderStore((s) => s.undo)
+  const setSaveStatus = useBuilderStore((s) => s.setSaveStatus)
   const [isAddingGroup, setIsAddingGroup] = useState(false)
 
   // Track which question or group is actively being dragged (for DragOverlay)
@@ -351,11 +353,14 @@ function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem, isPrevie
         reorderGroups(newOrder)
 
         // Persist to API
+        setSaveStatus('saving')
         try {
           await surveyService.reorderGroups(surveyId, { group_ids: newOrder })
+          setSaveStatus('saved')
         } catch {
           // Revert to previous order on failure
           undo()
+          setSaveStatus('error', 'Failed to save group order. Please try again.')
         }
         return
       }
@@ -400,10 +405,13 @@ function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem, isPrevie
         // Optimistic update
         reorderQuestions(fromGroup.id, newOrder)
 
+        setSaveStatus('saving')
         try {
           await surveyService.reorderQuestions(surveyId, fromGroup.id, newOrder)
+          setSaveStatus('saved')
         } catch {
           undo()
+          setSaveStatus('error', 'Failed to save question order. Please try again.')
         }
       } else {
         // Move question to a different group
@@ -427,6 +435,7 @@ function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem, isPrevie
           }
         }
 
+        setSaveStatus('saving')
         try {
           await surveyService.moveQuestion(surveyId, activeId, toGroup.id)
           // Reorder target group after move
@@ -438,12 +447,14 @@ function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem, isPrevie
               finalTargetGroup.questions.map((q) => q.id),
             )
           }
+          setSaveStatus('saved')
         } catch {
           undo()
+          setSaveStatus('error', 'Failed to move question. Please try again.')
         }
       }
     },
-    [surveyId, reorderGroups, reorderQuestions, moveQuestion, undo],
+    [surveyId, reorderGroups, reorderQuestions, moveQuestion, undo, setSaveStatus],
   )
 
   const sortedGroups = [...groups].sort((a, b) => a.sort_order - b.sort_order)
@@ -610,6 +621,35 @@ function PropertyEditor({ readOnly, selectedItem, surveyId }: PropertyEditorProp
 }
 
 // ---------------------------------------------------------------------------
+// Navigation blocker component (only renders in data router context)
+// ---------------------------------------------------------------------------
+
+/**
+ * NavigationBlocker renders inside SurveyBuilderPage when `shouldBlock` is
+ * true. It is rendered only when a data router context is available (i.e. the
+ * app is wrapped in createBrowserRouter / RouterProvider) so that it doesn't
+ * break test environments using the legacy MemoryRouter/Routes API.
+ */
+function NavigationBlocker({ shouldBlock }: { shouldBlock: boolean }) {
+  const blocker = useBlocker(shouldBlock)
+
+  useEffect(() => {
+    if (blocker.state === 'blocked') {
+      const confirmed = window.confirm(
+        'You have unsaved changes. Are you sure you want to leave?',
+      )
+      if (confirmed) {
+        blocker.proceed()
+      } else {
+        blocker.reset()
+      }
+    }
+  }, [blocker])
+
+  return null
+}
+
+// ---------------------------------------------------------------------------
 // Main page
 // ---------------------------------------------------------------------------
 
@@ -624,6 +664,8 @@ function SurveyBuilderPage() {
     selectedItem,
     isLoading,
     error,
+    saveStatus,
+    setSaveStatus,
     loadSurvey,
     setLoading,
     setError,
@@ -632,6 +674,31 @@ function SurveyBuilderPage() {
 
   const readOnly = status !== '' && status !== 'draft'
   const [isPreviewMode, setIsPreviewMode] = useState(false)
+
+  // -------------------------------------------------------------------------
+  // Navigation guard: warn when there are unsaved changes
+  // -------------------------------------------------------------------------
+
+  const hasUnsavedChanges = saveStatus === 'saving' || saveStatus === 'error'
+
+  // Detect data router context to conditionally enable useBlocker
+  const dataRouterContext = useContext(UNSAFE_DataRouterContext)
+
+  // Block browser close / tab refresh when there are unsaved changes
+  useEffect(() => {
+    function handleBeforeUnload(e: BeforeUnloadEvent) {
+      if (hasUnsavedChanges) {
+        e.preventDefault()
+        // Modern browsers show a generic message, ignoring returnValue
+        e.returnValue = ''
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [hasUnsavedChanges])
 
   // -------------------------------------------------------------------------
   // Fetch survey on mount
@@ -720,6 +787,12 @@ function SurveyBuilderPage() {
 
         <StatusBadge status={status} />
 
+        {!readOnly && (
+          <SaveIndicator
+            onRetry={saveStatus === 'error' ? () => setSaveStatus('idle') : undefined}
+          />
+        )}
+
         <Button
           variant={isPreviewMode ? 'default' : 'outline'}
           size="sm"
@@ -767,6 +840,11 @@ function SurveyBuilderPage() {
         />
         <PropertyEditor surveyId={surveyId ?? ''} readOnly={readOnly} selectedItem={selectedItem} />
       </div>
+
+      {/* In-app navigation blocker — only available in data router context */}
+      {dataRouterContext && !readOnly && (
+        <NavigationBlocker shouldBlock={hasUnsavedChanges} />
+      )}
     </div>
   )
 }

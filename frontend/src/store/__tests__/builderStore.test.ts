@@ -427,3 +427,106 @@ describe('reset', () => {
     expect(state.redoStack).toHaveLength(0)
   })
 })
+
+// ---------------------------------------------------------------------------
+// Save status actions
+// ---------------------------------------------------------------------------
+
+describe('setSaveStatus', () => {
+  it('sets saveStatus to saving', () => {
+    useBuilderStore.getState().setSaveStatus('saving')
+    expect(useBuilderStore.getState().saveStatus).toBe('saving')
+  })
+
+  it('sets saveStatus to saved and updates lastSavedAt', () => {
+    const before = new Date()
+    useBuilderStore.getState().setSaveStatus('saved')
+    const state = useBuilderStore.getState()
+    expect(state.saveStatus).toBe('saved')
+    expect(state.lastSavedAt).not.toBeNull()
+    expect(state.lastSavedAt!.getTime()).toBeGreaterThanOrEqual(before.getTime())
+  })
+
+  it('sets saveStatus to error with error message', () => {
+    useBuilderStore.getState().setSaveStatus('error', 'Network timeout')
+    const state = useBuilderStore.getState()
+    expect(state.saveStatus).toBe('error')
+    expect(state.saveError).toBe('Network timeout')
+  })
+
+  it('sets saveStatus to error with null error when not provided', () => {
+    useBuilderStore.getState().setSaveStatus('error')
+    const state = useBuilderStore.getState()
+    expect(state.saveStatus).toBe('error')
+    expect(state.saveError).toBeNull()
+  })
+
+  it('sets saveStatus to idle', () => {
+    useBuilderStore.getState().setSaveStatus('saving')
+    useBuilderStore.getState().setSaveStatus('idle')
+    expect(useBuilderStore.getState().saveStatus).toBe('idle')
+  })
+
+  it('clears saveError when transitioning to saving', () => {
+    useBuilderStore.getState().setSaveStatus('error', 'Something went wrong')
+    useBuilderStore.getState().setSaveStatus('saving')
+    expect(useBuilderStore.getState().saveError).toBeNull()
+  })
+
+  it('does not update lastSavedAt when status is not saved', () => {
+    useBuilderStore.getState().setSaveStatus('saving')
+    expect(useBuilderStore.getState().lastSavedAt).toBeNull()
+  })
+})
+
+describe('setLastSavedAt', () => {
+  it('updates lastSavedAt with given date', () => {
+    const date = new Date('2024-01-01T12:00:00Z')
+    useBuilderStore.getState().setLastSavedAt(date)
+    expect(useBuilderStore.getState().lastSavedAt).toEqual(date)
+  })
+
+  it('clears lastSavedAt when set to null', () => {
+    useBuilderStore.getState().setLastSavedAt(new Date())
+    useBuilderStore.getState().setLastSavedAt(null)
+    expect(useBuilderStore.getState().lastSavedAt).toBeNull()
+  })
+})
+
+describe('save status reset on loadSurvey', () => {
+  it('resets save status fields when loading a new survey', () => {
+    useBuilderStore.getState().setSaveStatus('error', 'Previous error')
+    const survey = {
+      id: 'survey-1',
+      user_id: 'user-1',
+      title: 'Test Survey',
+      description: null,
+      status: 'draft',
+      welcome_message: null,
+      end_message: null,
+      default_language: 'en',
+      settings: null,
+      created_at: '2024-01-01T00:00:00Z',
+      updated_at: '2024-01-01T00:00:00Z',
+      groups: [],
+      questions: [],
+      options: [],
+    }
+    useBuilderStore.getState().loadSurvey(survey)
+    const state = useBuilderStore.getState()
+    expect(state.saveStatus).toBe('idle')
+    expect(state.saveError).toBeNull()
+    expect(state.lastSavedAt).toBeNull()
+  })
+})
+
+describe('save status reset on reset()', () => {
+  it('resets save status fields on reset', () => {
+    useBuilderStore.getState().setSaveStatus('error', 'Previous error')
+    useBuilderStore.getState().reset()
+    const state = useBuilderStore.getState()
+    expect(state.saveStatus).toBe('idle')
+    expect(state.saveError).toBeNull()
+    expect(state.lastSavedAt).toBeNull()
+  })
+})

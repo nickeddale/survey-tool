@@ -208,6 +208,7 @@ export function AnswerOptionsEditor({
   const updateOption = useBuilderStore((s) => s.updateOption)
   const reorderOptions = useBuilderStore((s) => s.reorderOptions)
   const undo = useBuilderStore((s) => s.undo)
+  const setSaveStatus = useBuilderStore((s) => s.setSaveStatus)
 
   const [deleteError, setDeleteError] = useState<string | null>(null)
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
@@ -255,6 +256,7 @@ export function AnswerOptionsEditor({
 
     addOption(groupId, questionId, optimisticOption)
 
+    setSaveStatus('saving')
     try {
       const created = await surveyService.createOption(surveyId, questionId, {
         code,
@@ -265,47 +267,58 @@ export function AnswerOptionsEditor({
       // Replace optimistic option with real one
       removeOption(groupId, questionId, optimisticOption.id)
       addOption(groupId, questionId, created)
+      setSaveStatus('saved')
     } catch {
       undo()
+      setSaveStatus('error', 'Failed to add option. Please try again.')
     }
-  }, [surveyId, groupId, questionId, options, addOption, removeOption, undo])
+  }, [surveyId, groupId, questionId, options, addOption, removeOption, undo, setSaveStatus])
 
   const handleTitleChange = useCallback(
     async (optionId: string, title: string) => {
       updateOption(groupId, questionId, optionId, { title })
+      setSaveStatus('saving')
       try {
         await surveyService.updateOption(surveyId, questionId, optionId, { title })
+        setSaveStatus('saved')
       } catch {
         undo()
+        setSaveStatus('error', 'Failed to save option. Please try again.')
       }
     },
-    [surveyId, groupId, questionId, updateOption, undo],
+    [surveyId, groupId, questionId, updateOption, undo, setSaveStatus],
   )
 
   const handleAssessmentChange = useCallback(
     async (optionId: string, assessment_value: number) => {
       updateOption(groupId, questionId, optionId, { assessment_value })
+      setSaveStatus('saving')
       try {
         await surveyService.updateOption(surveyId, questionId, optionId, { assessment_value })
+        setSaveStatus('saved')
       } catch {
         undo()
+        setSaveStatus('error', 'Failed to save option. Please try again.')
       }
     },
-    [surveyId, groupId, questionId, updateOption, undo],
+    [surveyId, groupId, questionId, updateOption, undo, setSaveStatus],
   )
 
   const handleImageUrlChange = useCallback(
     async (optionId: string, image_url: string) => {
       updateOption(groupId, questionId, optionId, {})
+      setSaveStatus('saving')
       try {
         await surveyService.updateOption(surveyId, questionId, optionId, {
           image_url: image_url || null,
         })
+        setSaveStatus('saved')
       } catch {
         undo()
+        setSaveStatus('error', 'Failed to save option. Please try again.')
       }
     },
-    [surveyId, groupId, questionId, updateOption, undo],
+    [surveyId, groupId, questionId, updateOption, undo, setSaveStatus],
   )
 
   const handleDeleteRequest = useCallback((optionId: string) => {
@@ -319,19 +332,23 @@ export function AnswerOptionsEditor({
     setConfirmDeleteId(null)
 
     removeOption(groupId, questionId, optionId)
+    setSaveStatus('saving')
     try {
       await surveyService.deleteOption(surveyId, questionId, optionId)
+      setSaveStatus('saved')
     } catch (err: unknown) {
       undo()
       // Show error if responses exist (409 Conflict)
       const status = (err as { status?: number })?.status
       if (status === 409) {
         setDeleteError('Cannot delete: responses already exist for this option.')
+        setSaveStatus('idle')
       } else {
         setDeleteError('Failed to delete option. Please try again.')
+        setSaveStatus('error', 'Failed to delete option. Please try again.')
       }
     }
-  }, [confirmDeleteId, surveyId, groupId, questionId, removeOption, undo])
+  }, [confirmDeleteId, surveyId, groupId, questionId, removeOption, undo, setSaveStatus])
 
   const handleDeleteCancel = useCallback(() => {
     setConfirmDeleteId(null)
@@ -354,13 +371,16 @@ export function AnswerOptionsEditor({
       )
 
       reorderOptions(groupId, questionId, newOrder)
+      setSaveStatus('saving')
       try {
         await surveyService.reorderOptions(surveyId, questionId, newOrder)
+        setSaveStatus('saved')
       } catch {
         undo()
+        setSaveStatus('error', 'Failed to save option order. Please try again.')
       }
     },
-    [surveyId, groupId, questionId, reorderOptions, undo],
+    [surveyId, groupId, questionId, reorderOptions, undo, setSaveStatus],
   )
 
   // Only show for choice-type questions (after all hooks to comply with Rules of Hooks)

@@ -20,6 +20,8 @@ import type {
 // Types
 // ---------------------------------------------------------------------------
 
+export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
+
 export type SelectedItem =
   | { type: 'group'; id: string }
   | { type: 'question'; id: string }
@@ -51,6 +53,11 @@ interface BuilderState {
   selectedItem: SelectedItem
   isLoading: boolean
   error: string | null
+
+  // Save state
+  saveStatus: SaveStatus
+  lastSavedAt: Date | null
+  saveError: string | null
 
   // Undo/redo stacks
   undoStack: BuilderSnapshot[]
@@ -94,6 +101,10 @@ interface BuilderActions {
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
 
+  // Save status actions
+  setSaveStatus: (status: SaveStatus, error?: string | null) => void
+  setLastSavedAt: (date: Date | null) => void
+
   // Undo/redo
   undo: () => void
   redo: () => void
@@ -131,6 +142,9 @@ const initialState: BuilderState = {
   selectedItem: null,
   isLoading: false,
   error: null,
+  saveStatus: 'idle',
+  lastSavedAt: null,
+  saveError: null,
   undoStack: [],
   redoStack: [],
 }
@@ -161,6 +175,9 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
         state.redoStack = []
         state.selectedItem = null
         state.error = null
+        state.saveStatus = 'idle'
+        state.lastSavedAt = null
+        state.saveError = null
       }),
 
     // -----------------------------------------------------------------------
@@ -351,6 +368,20 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
     setError: (error: string | null) =>
       set((state) => {
         state.error = error
+      }),
+
+    setSaveStatus: (status: SaveStatus, error: string | null = null) =>
+      set((state) => {
+        state.saveStatus = status
+        state.saveError = error
+        if (status === 'saved') {
+          state.lastSavedAt = new Date()
+        }
+      }),
+
+    setLastSavedAt: (date: Date | null) =>
+      set((state) => {
+        state.lastSavedAt = date
       }),
 
     // -----------------------------------------------------------------------
