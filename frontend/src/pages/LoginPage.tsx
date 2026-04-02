@@ -1,19 +1,48 @@
 import { useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { ApiError } from '../types/api'
+
+interface FieldErrors {
+  email?: string
+  password?: string
+}
+
+function validate(email: string, password: string): FieldErrors {
+  const errors: FieldErrors = {}
+  if (!email.trim()) {
+    errors.email = 'Email is required'
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errors.email = 'Please enter a valid email address'
+  }
+  if (!password) {
+    errors.password = 'Password is required'
+  } else if (password.length < 8) {
+    errors.password = 'Password must be at least 8 characters'
+  }
+  return errors
+}
 
 function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
+
+    const errors = validate(email, password)
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      return
+    }
+    setFieldErrors({})
+
     setIsSubmitting(true)
     try {
       await login({ email, password })
@@ -51,10 +80,14 @@ function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
               className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="you@example.com"
             />
+            {fieldErrors.email && (
+              <p className="mt-1 text-sm text-destructive" role="alert">
+                {fieldErrors.email}
+              </p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium text-foreground mb-1" htmlFor="password">
@@ -65,10 +98,14 @@ function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
               className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="••••••••"
             />
+            {fieldErrors.password && (
+              <p className="mt-1 text-sm text-destructive" role="alert">
+                {fieldErrors.password}
+              </p>
+            )}
           </div>
           <button
             type="submit"
@@ -80,9 +117,9 @@ function LoginPage() {
         </form>
         <p className="text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{' '}
-          <a href="/register" className="text-primary hover:underline font-medium">
+          <Link to="/register" className="text-primary hover:underline font-medium">
             Register
-          </a>
+          </Link>
         </p>
       </div>
     </div>
