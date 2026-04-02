@@ -75,6 +75,14 @@ class QuestionResponse(BaseModel):
 QuestionResponse.model_rebuild()
 
 
+class SubquestionCreate(BaseModel):
+    title: str
+    code: str | None = None
+    description: str | None = None
+    is_required: bool = False
+    sort_order: int | None = None
+
+
 class QuestionReorderItem(BaseModel):
     id: uuid.UUID
     sort_order: int

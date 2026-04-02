@@ -13,19 +13,26 @@ from app.schemas.question import (
     QuestionReorderRequest,
     QuestionResponse,
     QuestionUpdate,
+    SubquestionCreate,
 )
 from app.services.question_service import (
     create_question,
+    create_subquestion,
     delete_question,
     get_question_by_id,
     list_questions,
     reorder_questions,
     update_question,
 )
-from app.utils.errors import ConflictError, NotFoundError
+from app.utils.errors import ConflictError, NotFoundError, UnprocessableError
 
 router = APIRouter(
     prefix="/surveys/{survey_id}/groups/{group_id}/questions",
+    tags=["questions"],
+)
+
+subquestions_router = APIRouter(
+    prefix="/surveys/{survey_id}/questions/{question_id}/subquestions",
     tags=["questions"],
 )
 
@@ -219,3 +226,42 @@ async def delete(
     if question is None:
         raise NotFoundError("Question not found")
     await delete_question(session, question)
+
+
+@subquestions_router.post(
+    "",
+    response_model=QuestionResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_subquestion_endpoint(
+    survey_id: str,
+    question_id: str,
+    payload: SubquestionCreate,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> QuestionResponse:
+    """Create a subquestion (row) for a matrix parent question.
+
+    Returns the parent question with the new subquestion included in the subquestions array.
+    """
+    parsed_survey_id = _parse_uuid(survey_id, "Survey")
+    parsed_question_id = _parse_uuid(question_id, "Question")
+
+    try:
+        parent = await create_subquestion(
+            session,
+            survey_id=parsed_survey_id,
+            question_id=parsed_question_id,
+            user_id=current_user.id,
+            title=payload.title,
+            code=payload.code,
+            description=payload.description,
+            is_required=payload.is_required,
+            sort_order=payload.sort_order,
+        )
+    except IntegrityError:
+        raise ConflictError("A subquestion with that code already exists")
+
+    if parent is None:
+        raise NotFoundError("Question not found")
+    return QuestionResponse.model_validate(parent)
