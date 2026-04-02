@@ -205,6 +205,78 @@ export const handlers = [
     )
   }),
 
+  // GET /api/v1/surveys/:id
+  http.get(`${BASE}/surveys/:id`, ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const survey = mockSurveys.find((s) => s.id === params.id)
+    if (!survey) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
+        { status: 404 },
+      )
+    }
+    return HttpResponse.json(survey, { status: 200 })
+  }),
+
+  // POST /api/v1/surveys
+  http.post(`${BASE}/surveys`, async ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const body = (await request.json()) as Record<string, unknown>
+    if (!body.title) {
+      return HttpResponse.json(
+        { detail: { code: 'VALIDATION_ERROR', message: 'Title is required' } },
+        { status: 422 },
+      )
+    }
+    const newSurvey = {
+      id: '20000000-0000-0000-0000-000000000001',
+      user_id: '00000000-0000-0000-0000-000000000001',
+      title: body.title as string,
+      description: (body.description as string | null) ?? null,
+      status: 'draft',
+      welcome_message: (body.welcome_message as string | null) ?? null,
+      end_message: (body.end_message as string | null) ?? null,
+      default_language: (body.default_language as string) ?? 'en',
+      settings: null,
+      created_at: '2024-01-20T10:00:00Z',
+      updated_at: '2024-01-20T10:00:00Z',
+    }
+    return HttpResponse.json(newSurvey, { status: 201 })
+  }),
+
+  // PATCH /api/v1/surveys/:id
+  http.patch(`${BASE}/surveys/:id`, async ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const survey = mockSurveys.find((s) => s.id === params.id)
+    if (!survey) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
+        { status: 404 },
+      )
+    }
+    const body = (await request.json()) as Record<string, unknown>
+    const updated = { ...survey, ...body, updated_at: '2024-01-20T12:00:00Z' }
+    return HttpResponse.json(updated, { status: 200 })
+  }),
+
   // DELETE /api/v1/surveys/:id
   http.delete(`${BASE}/surveys/:id`, ({ request }) => {
     const authHeader = request.headers.get('Authorization')

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-02T07:17:44.661Z",
+  "lastUpdated": "2026-04-02T07:24:37.409Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -687,6 +687,26 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-02-iss-034-28-survey-createedit-form.md",
+      "ticketId": "ISS-034",
+      "title": "2.8: Survey Create/Edit Form",
+      "date": "2026-04-02",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -723,7 +743,8 @@
       "2026-04-02-iss-030-24-registration-and-login-pages.md",
       "2026-04-02-iss-031-25-app-layout-and-navigation-shell.md",
       "2026-04-02-iss-032-26-dashboard-page.md",
-      "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md"
+      "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
+      "2026-04-02-iss-034-28-survey-createedit-form.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -758,7 +779,8 @@
       "2026-04-02-iss-030-24-registration-and-login-pages.md",
       "2026-04-02-iss-031-25-app-layout-and-navigation-shell.md",
       "2026-04-02-iss-032-26-dashboard-page.md",
-      "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md"
+      "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
+      "2026-04-02-iss-034-28-survey-createedit-form.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -790,7 +812,8 @@
       "2026-04-02-iss-027-21-frontend-project-scaffolding-vite-react-typescr.md",
       "2026-04-02-iss-028-22-api-client-and-auth-service-layer.md",
       "2026-04-02-iss-029-23-auth-context-and-protected-routes.md",
-      "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md"
+      "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
+      "2026-04-02-iss-034-28-survey-createedit-form.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -825,7 +848,8 @@
       "2026-04-02-iss-030-24-registration-and-login-pages.md",
       "2026-04-02-iss-031-25-app-layout-and-navigation-shell.md",
       "2026-04-02-iss-032-26-dashboard-page.md",
-      "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md"
+      "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
+      "2026-04-02-iss-034-28-survey-createedit-form.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -871,7 +895,8 @@
       "2026-04-02-iss-030-24-registration-and-login-pages.md",
       "2026-04-02-iss-031-25-app-layout-and-navigation-shell.md",
       "2026-04-02-iss-032-26-dashboard-page.md",
-      "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md"
+      "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
+      "2026-04-02-iss-034-28-survey-createedit-form.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -906,7 +931,8 @@
       "2026-04-02-iss-030-24-registration-and-login-pages.md",
       "2026-04-02-iss-031-25-app-layout-and-navigation-shell.md",
       "2026-04-02-iss-032-26-dashboard-page.md",
-      "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md"
+      "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
+      "2026-04-02-iss-034-28-survey-createedit-form.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -927,7 +953,8 @@
       "2026-04-02-iss-030-24-registration-and-login-pages.md",
       "2026-04-02-iss-031-25-app-layout-and-navigation-shell.md",
       "2026-04-02-iss-032-26-dashboard-page.md",
-      "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md"
+      "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
+      "2026-04-02-iss-034-28-survey-createedit-form.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1004,7 +1031,8 @@
       "2026-04-02-iss-030-24-registration-and-login-pages.md",
       "2026-04-02-iss-031-25-app-layout-and-navigation-shell.md",
       "2026-04-02-iss-032-26-dashboard-page.md",
-      "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md"
+      "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
+      "2026-04-02-iss-034-28-survey-createedit-form.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -1035,7 +1063,8 @@
       "2026-04-02-iss-030-24-registration-and-login-pages.md",
       "2026-04-02-iss-031-25-app-layout-and-navigation-shell.md",
       "2026-04-02-iss-032-26-dashboard-page.md",
-      "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md"
+      "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
+      "2026-04-02-iss-034-28-survey-createedit-form.md"
     ]
   },
   "fileIndex": {}

@@ -1,5 +1,5 @@
 import apiClient from './apiClient'
-import type { SurveyResponse, SurveyListResponse } from '../types/survey'
+import type { SurveyResponse, SurveyListResponse, SurveyCreatePayload, SurveyUpdatePayload } from '../types/survey'
 
 export interface SurveyFetchParams {
   page?: number
@@ -21,6 +21,21 @@ export interface DashboardStats {
 class SurveyService {
   async fetchSurveys(params: SurveyFetchParams = {}): Promise<SurveyListResponse> {
     const response = await apiClient.get<SurveyListResponse>('/surveys', { params })
+    return response.data
+  }
+
+  async getSurvey(id: string): Promise<SurveyResponse> {
+    const response = await apiClient.get<SurveyResponse>(`/surveys/${id}`)
+    return response.data
+  }
+
+  async createSurvey(data: SurveyCreatePayload): Promise<SurveyResponse> {
+    const response = await apiClient.post<SurveyResponse>('/surveys', data)
+    return response.data
+  }
+
+  async updateSurvey(id: string, data: SurveyUpdatePayload): Promise<SurveyResponse> {
+    const response = await apiClient.patch<SurveyResponse>(`/surveys/${id}`, data)
     return response.data
   }
 
