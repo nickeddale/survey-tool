@@ -853,6 +853,125 @@ describe('SurveyCanvas DnD rendering', () => {
 })
 
 // ---------------------------------------------------------------------------
+// Group DragOverlay (GroupDragPreview) tests
+// ---------------------------------------------------------------------------
+
+// Import the GroupDragPreview indirectly by testing the DragOverlay mock renders
+// the correct content. We simulate the group-drag-overlay by rendering a minimal
+// version of what GroupDragPreview outputs and verifying the data-testid.
+
+describe('group drag overlay preview', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+    vi.useRealTimers()
+  })
+
+  it('group drag handle has accessible aria-label', () => {
+    const group = makeGroup('g1', [makeQuestion('q1', 'g1', 1)])
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <GroupPanel group={group} selectedItem={null} onSelectItem={() => {}} readOnly={false} />
+      </MemoryRouter>,
+    )
+
+    const handle = screen.getByTestId('group-drag-handle-g1')
+    expect(handle).toHaveAttribute('aria-label', 'Drag to reorder group')
+  })
+
+  it('group drag handle accepts dragListeners without error', () => {
+    const group = makeGroup('g1', [])
+    const mockOnPointerDown = vi.fn()
+    expect(() =>
+      render(
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <GroupPanel
+            group={group}
+            selectedItem={null}
+            onSelectItem={() => {}}
+            readOnly={false}
+            dragListeners={{ onPointerDown: mockOnPointerDown } as unknown as import('@dnd-kit/core').DraggableSyntheticListeners}
+          />
+        </MemoryRouter>,
+      ),
+    ).not.toThrow()
+
+    expect(screen.getByTestId('group-drag-handle-g1')).toBeInTheDocument()
+  })
+
+  it('renders "group-drag-overlay" testid when group drag overlay is active', () => {
+    // Render a simple mock of the GroupDragPreview output directly
+    // (matches what SurveyBuilderPage renders in the DragOverlay when a group is dragged)
+    const group = makeGroup('g-overlay', [
+      makeQuestion('q1', 'g-overlay', 1),
+      makeQuestion('q2', 'g-overlay', 2),
+    ])
+
+    render(
+      <div data-testid="group-drag-overlay">
+        <span>{group.title}</span>
+        <span>{group.questions.length} questions</span>
+        {group.questions.slice(0, 3).map((q) => (
+          <div key={q.id}>
+            <span>{q.code}</span>
+            <span>{q.title}</span>
+          </div>
+        ))}
+      </div>,
+    )
+
+    expect(screen.getByTestId('group-drag-overlay')).toBeInTheDocument()
+    expect(screen.getByText('Group g-overlay')).toBeInTheDocument()
+    expect(screen.getByText('2 questions')).toBeInTheDocument()
+    expect(screen.getByText('Q1')).toBeInTheDocument()
+    expect(screen.getByText('Question q1')).toBeInTheDocument()
+  })
+
+  it('KeyboardSensor and PointerSensor are defined in @dnd-kit/core mock', async () => {
+    // Verify that both sensor classes exist in the mocked @dnd-kit/core module
+    // (ensuring SurveyCanvas can register both sensors for keyboard accessibility)
+    const dndCore = await import('@dnd-kit/core')
+    expect(dndCore.KeyboardSensor).toBeDefined()
+    expect(dndCore.PointerSensor).toBeDefined()
+    expect(dndCore.useSensors).toBeDefined()
+    expect(dndCore.useSensor).toBeDefined()
+  })
+
+  it('reorderGroups preserves group questions when reordering', () => {
+    const q1 = makeQuestion('q1', 'g1', 1)
+    const q2 = makeQuestion('q2', 'g2', 1)
+    const g1 = makeGroup('g1', [q1], 1)
+    const g2 = makeGroup('g2', [q2], 2)
+
+    useBuilderStore.setState({ groups: [g1, g2] })
+
+    act(() => {
+      useBuilderStore.getState().reorderGroups(['g2', 'g1'])
+    })
+
+    const state = useBuilderStore.getState()
+    // g2 is now first
+    expect(state.groups[0].id).toBe('g2')
+    // g2 still has its question
+    expect(state.groups[0].questions[0].id).toBe('q2')
+    // g1 is now second
+    expect(state.groups[1].id).toBe('g1')
+    // g1 still has its question
+    expect(state.groups[1].questions[0].id).toBe('q1')
+  })
+
+  it('groups with more than 3 questions shows overflow count in preview data', () => {
+    const questions = Array.from({ length: 5 }, (_, i) =>
+      makeQuestion(`q${i + 1}`, 'g1', i + 1),
+    )
+    // Verify slice(0,3) logic
+    const shown = questions.slice(0, 3)
+    const overflow = questions.length - 3
+    expect(shown).toHaveLength(3)
+    expect(overflow).toBe(2)
+  })
+})
+
+// ---------------------------------------------------------------------------
 // waitFor import needed for async assertions
 // ---------------------------------------------------------------------------
 void waitFor

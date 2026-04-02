@@ -48,7 +48,7 @@ import { Card, CardContent } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Skeleton } from '../components/ui/skeleton'
 import { QuestionEditor } from '../components/survey-builder/QuestionEditor'
-import { GroupPanel } from '../components/survey-builder/GroupPanel'
+import { GroupPanel as BuilderGroupPanel } from '../components/survey-builder/GroupPanel'
 import { QuestionCard } from '../components/survey/QuestionCard'
 
 // ---------------------------------------------------------------------------
@@ -155,6 +155,44 @@ function QuestionPalette({ readOnly }: { readOnly: boolean }) {
 }
 
 // ---------------------------------------------------------------------------
+// Sub-components: Group drag overlay preview (miniature group card)
+// ---------------------------------------------------------------------------
+
+function GroupDragPreview({ group }: { group: BuilderGroup }) {
+  return (
+    <div
+      className="opacity-90 shadow-xl rounded-lg border border-border bg-background overflow-hidden"
+      data-testid="group-drag-overlay"
+    >
+      <div className="flex items-center gap-2 px-3 py-2 bg-muted/40 border-b border-border">
+        <span className="text-sm font-medium truncate flex-1">{group.title}</span>
+        <span className="text-xs text-muted-foreground shrink-0">
+          {group.questions.length} {group.questions.length === 1 ? 'question' : 'questions'}
+        </span>
+      </div>
+      {group.questions.length > 0 && (
+        <div className="px-3 py-2 space-y-1 max-h-40 overflow-hidden">
+          {group.questions.slice(0, 3).map((q) => (
+            <div
+              key={q.id}
+              className="flex items-center gap-1.5 text-xs text-muted-foreground"
+            >
+              <span className="font-mono bg-muted px-1 py-0.5 rounded">{q.code}</span>
+              <span className="truncate">{q.title}</span>
+            </div>
+          ))}
+          {group.questions.length > 3 && (
+            <p className="text-xs text-muted-foreground italic">
+              +{group.questions.length - 3} more…
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Sub-components: Sortable group panel wrapper
 // ---------------------------------------------------------------------------
 
@@ -192,7 +230,7 @@ function SortableGroupPanel({
 
   return (
     <div ref={setNodeRef} style={style}>
-      <GroupPanel
+      <BuilderGroupPanel
         surveyId={surveyId}
         group={group}
         readOnly={readOnly}
@@ -233,8 +271,9 @@ function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem }: Survey
   const undo = useBuilderStore((s) => s.undo)
   const [isAddingGroup, setIsAddingGroup] = useState(false)
 
-  // Track which question is actively being dragged (for DragOverlay)
+  // Track which question or group is actively being dragged (for DragOverlay)
   const [activeQuestion, setActiveQuestion] = useState<BuilderQuestion | null>(null)
+  const [activeGroup, setActiveGroup] = useState<BuilderGroup | null>(null)
 
   // Stable ref to groups for use inside callbacks without stale closures
   const groupsRef = useRef(groups)
@@ -272,8 +311,13 @@ function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem }: Survey
     const { active } = event
     const activeId = active.id.toString()
 
-    // If dragging a question (not a group), set activeQuestion for DragOverlay
-    if (!activeId.startsWith('group:')) {
+    if (activeId.startsWith('group:')) {
+      // Dragging a group — set activeGroup for DragOverlay
+      const groupId = activeId.slice('group:'.length)
+      const group = groupsRef.current.find((g) => g.id === groupId)
+      setActiveGroup(group ?? null)
+    } else {
+      // Dragging a question — set activeQuestion for DragOverlay
       const question = groupsRef.current
         .flatMap((g) => g.questions)
         .find((q) => q.id === activeId)
@@ -285,6 +329,7 @@ function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem }: Survey
     async (event: DragEndEvent) => {
       const { active, over } = event
       setActiveQuestion(null)
+      setActiveGroup(null)
 
       if (!over) return
       if (active.id === over.id) return
@@ -460,9 +505,11 @@ function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem }: Survey
             ))}
           </SortableContext>
 
-          {/* Floating drag overlay — shows preview card while dragging a question */}
+          {/* Floating drag overlay — shows preview card while dragging a question or group */}
           <DragOverlay>
-            {activeQuestion ? (
+            {activeGroup ? (
+              <GroupDragPreview group={activeGroup} />
+            ) : activeQuestion ? (
               <QuestionCard
                 question={activeQuestion}
                 selectedItem={null}
