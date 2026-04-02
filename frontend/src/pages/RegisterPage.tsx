@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { ApiError } from '../types/api'
 
-function LoginPage() {
-  const { login } = useAuth()
+function RegisterPage() {
+  const { register } = useAuth()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -16,13 +17,13 @@ function LoginPage() {
     setError(null)
     setIsSubmitting(true)
     try {
-      await login({ email, password })
-      navigate('/dashboard')
+      await register({ email, password, name: name || null })
+      navigate('/login')
     } catch (err) {
       if (err instanceof ApiError) {
         setError(err.message)
       } else {
-        setError('Login failed. Please try again.')
+        setError('Registration failed. Please try again.')
       }
     } finally {
       setIsSubmitting(false)
@@ -32,16 +33,27 @@ function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="w-full max-w-md p-8 space-y-6 bg-card rounded-lg border border-border shadow-sm">
-        <h1 className="text-2xl font-bold text-center text-foreground">Sign in to DevTracker</h1>
-        <p className="text-center text-muted-foreground">
-          Enter your credentials to access your account
-        </p>
+        <h1 className="text-2xl font-bold text-center text-foreground">Create an account</h1>
+        <p className="text-center text-muted-foreground">Join DevTracker today</p>
         {error && (
           <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
             {error}
           </div>
         )}
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1" htmlFor="name">
+              Name (optional)
+            </label>
+            <input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              placeholder="Your name"
+            />
+          </div>
           <div>
             <label className="block text-sm font-medium text-foreground mb-1" htmlFor="email">
               Email
@@ -75,13 +87,13 @@ function LoginPage() {
             disabled={isSubmitting}
             className="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
           >
-            {isSubmitting ? 'Signing in...' : 'Sign In'}
+            {isSubmitting ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
         <p className="text-center text-sm text-muted-foreground">
-          Don&apos;t have an account?{' '}
-          <a href="/register" className="text-primary hover:underline font-medium">
-            Register
+          Already have an account?{' '}
+          <a href="/login" className="text-primary hover:underline font-medium">
+            Sign in
           </a>
         </p>
       </div>
@@ -89,4 +101,4 @@ function LoginPage() {
   )
 }
 
-export default LoginPage
+export default RegisterPage
