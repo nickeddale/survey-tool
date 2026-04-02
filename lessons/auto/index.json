@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-02T12:11:18.462Z",
+  "lastUpdated": "2026-04-02T12:17:37.936Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -776,7 +776,6 @@
         "api",
         "ui",
         "refactoring",
-        "bug-fix",
         "feature",
         "ci-cd"
       ],

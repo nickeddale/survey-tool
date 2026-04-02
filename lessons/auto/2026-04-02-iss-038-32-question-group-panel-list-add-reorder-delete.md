@@ -2,7 +2,7 @@
 date: "2026-04-02"
 ticket_id: "ISS-038"
 ticket_title: "3.2: Question Group Panel (List, Add, Reorder, Delete)"
-categories: ["testing", "api", "ui", "refactoring", "bug-fix", "feature", "ci-cd"]
+categories: ["testing", "api", "ui", "refactoring", "feature", "ci-cd"]
 outcome: "success"
 complexity: "medium"
 files_modified: []
@@ -13,54 +13,52 @@ files_modified: []
 date: "2026-04-02"
 ticket_id: "ISS-038"
 ticket_title: "3.2: Question Group Panel (List, Add, Reorder, Delete)"
-categories: ["react", "survey-builder", "ui-components", "drag-and-drop", "zustand"]
+categories: ["react", "survey-builder", "ui-components", "shadcn-ui"]
 outcome: "success"
 complexity: "medium"
 files_modified:
   - "src/components/survey-builder/GroupPanel.tsx"
-  - "src/pages/SurveyBuilderPage.tsx"
+  - "src/components/survey-builder/__tests__/GroupPanel.test.tsx"
   - "src/store/builderStore.ts"
   - "src/services/surveyService.ts"
-  - "src/components/survey-builder/__tests__/GroupPanel.test.tsx"
+  - "src/types/survey.ts"
 ---
 
 # Lessons Learned: 3.2: Question Group Panel (List, Add, Reorder, Delete)
 
 ## What Worked Well
-- Pre-existing GroupPanel.tsx scaffold (354 lines) meant the implementation was largely complete before active work began, reducing implementation effort significantly.
-- @radix-ui/react-collapsible provided reliable expand/collapse behavior without needing to manage open/closed state manually for each panel.
-- Zustand builderStore cleanly centralized group state (addGroup, removeGroup, updateGroup) and made the GroupPanel component purely reactive.
-- shadcn/ui Dialog component handled the delete confirmation pattern with cascade warning without custom modal plumbing.
-- Separating the SortableGroupPanel wrapper (dnd-kit) from GroupPanel kept drag-and-drop concerns out of the panel's rendering logic.
+- GroupPanel.tsx was already fully implemented at 346 lines before the ticket work began, indicating strong carry-over from adjacent ticket work
+- shadcn/ui Collapsible and Dialog components mapped cleanly onto the required expand/collapse and delete-confirmation UX patterns
+- Centralizing state in useBuilderStore kept GroupPanel.tsx stateless enough to test in isolation
+- Inline title editing (click-to-edit, Enter/blur-to-save) was handled entirely within the component without needing a separate modal
 
 ## What Was Challenging
-- The ticket's implementation was substantially complete at the start, making it difficult to distinguish what work actually remained versus what had already been done in prior commits.
-- Coordinating inline title editing (click-to-edit, Enter/blur to save) with collapsible toggle required careful event handling to prevent collapse toggling when the title input is focused.
-- Ensuring sort_order is respected on render required the store to maintain a sorted list or the component to sort on display — a subtle ordering concern that can silently regress.
+- Verifying the Add Group button placement — it lives in the parent canvas component rather than GroupPanel itself, so acceptance criteria tracing required checking multiple files
+- Ensuring delete confirmation copy explicitly mentioned cascading question deletion to satisfy the acceptance criterion (easy to write a generic "are you sure?" and miss the cascade warning requirement)
+- Sort order rendering depends on data arriving pre-sorted or the component sorting by `sort_order`; subtle bugs can appear if the store doesn't preserve order after optimistic updates
 
 ## Key Technical Insights
-1. Inline title editing on a collapsible panel header requires stopping click event propagation on the input/edit trigger to prevent unintended collapse/expand toggling.
-2. The cascade delete warning in the confirmation dialog must be present in the UI copy — not just as a backend concern — to satisfy the acceptance criteria and user expectations.
-3. @dnd-kit's sortable wrapper pattern (SortableGroupPanel wrapping GroupPanel) is the correct separation: the sortable context owns drag state, the panel owns display state.
-4. Empty group placeholder ("Add questions here") is a display concern tied to `group.questions.length === 0`, not to collapsed state — both states should show it appropriately.
-5. POST /api/v1/surveys/{survey_id}/groups should optimistically add the returned group to the store rather than refetching the full group list to keep the UI responsive.
+1. shadcn/ui `Collapsible` is the right primitive for single-panel expand/collapse; `Accordion` is better when only one panel should be open at a time — for survey groups, independent expand/collapse per panel means `Collapsible` is the correct choice.
+2. Inline title editing requires careful blur/Enter handling: save on both, but cancel (Escape) should revert to the last saved value, not an empty string.
+3. Drag handles should be visually distinct but not interfere with the click target for expand/collapse — separate the handle element from the header click zone.
+4. Optimistic UI for delete (remove from store immediately, revert on API error) prevents the lag that makes delete feel broken on slow connections.
+5. Empty group placeholder ("Add questions here") must be inside the Collapsible content so it appears/disappears correctly with expand/collapse state.
 
 ## Reusable Patterns
-- **Sortable wrapper pattern**: Wrap display components in a thin SortableItem shell that injects drag handle props and sort attributes, keeping the display component unaware of DnD.
-- **Inline edit pattern**: Toggle between `<span onClick={startEdit}>` and `<input onBlur={save} onKeyDown={handleEnter}>` with a shared `isEditing` boolean state.
-- **Optimistic store dispatch**: After a successful API create call, dispatch `addGroup(response.data)` to the Zustand store rather than re-fetching — avoids flicker and extra network round trips.
-- **Cascade delete dialog**: Reuse shadcn/ui AlertDialog with a standardized warning message pattern for any delete that cascades to child records.
+- `click-to-edit` inline text: render `<span onClick={() => setEditing(true)}>` that swaps to `<input autoFocus onBlur={save} onKeyDown={handleKey}>` — reusable for any inline rename pattern in the survey builder.
+- Confirmation dialog with cascade warning: wrap shadcn/ui `Dialog` with a `isDangerous` prop pattern that renders red-tinted body text when the action has irreversible side effects.
+- useBuilderStore action pairing: every mutation (createGroup, renameGroup, deleteGroup) should have a matching optimistic store update + async API call + rollback on failure.
 
 ## Files to Review for Similar Tasks
-- `src/components/survey-builder/GroupPanel.tsx` — canonical example of collapsible panel with inline editing and delete confirmation.
-- `src/pages/SurveyBuilderPage.tsx` — shows how SortableGroupPanel wraps GroupPanel within a DndContext for reorderable lists.
-- `src/store/builderStore.ts` — reference for the addGroup/removeGroup/updateGroup action pattern to replicate for questions within groups.
-- `src/components/survey-builder/__tests__/GroupPanel.test.tsx` — 13-suite test file covering all acceptance criteria; use as template for similar panel component tests.
+- `src/components/survey-builder/GroupPanel.tsx` — reference for collapsible panel + inline edit + delete confirm pattern
+- `src/store/builderStore.ts` — how group CRUD actions are structured for reuse when implementing question-level CRUD
+- `src/services/surveyService.ts` — REST call patterns for survey sub-resources (groups, questions)
+- `src/components/survey-builder/__tests__/GroupPanel.test.tsx` — test patterns for inline editing and dialog interactions
 
 ## Gotchas and Pitfalls
-- Collapsible toggle and inline title edit share the same click target area — without `e.stopPropagation()` on the input, clicking to edit will also collapse the panel.
-- sort_order from the API is the source of truth; never rely on array insertion order from the store for display ordering.
-- The "Add Group" button must be outside the collapsible/scrollable groups list area (at the bottom of the canvas) to remain always visible regardless of how many groups exist.
-- Delete confirmation dialog must explicitly mention that questions inside the group will also be deleted — omitting this fails the acceptance criterion even if the backend cascade works correctly.
-- When the ticket branch already contains a full implementation, verify test coverage before marking done; green tests are the only reliable signal that all acceptance criteria are actually met.
+- Do not attach the drag-handle `onMouseDown` to the entire panel header — it will conflict with the expand/collapse click and the inline title edit click target.
+- shadcn/ui Dialog's `onOpenChange` fires on both open and close; guard the close path to avoid triggering a delete API call when the user cancels.
+- `sort_order` gaps are normal (e.g., 1, 3, 5) after deletions — render in order, never assume contiguous values or use index as a proxy for sort_order.
+- When the panel title input is empty on blur/Enter, either restore the previous title or block the save — saving an empty string produces a broken UI state.
+- Test the empty-group placeholder carefully: it must not appear when the collapsible is collapsed (hidden inside content), and it must appear when expanded with zero questions.
 ```
