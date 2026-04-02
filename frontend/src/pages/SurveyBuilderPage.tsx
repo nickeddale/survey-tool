@@ -38,7 +38,7 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { ArrowLeft, Eye, EyeOff, Lock, Plus, Type, List, AlignLeft, CheckSquare, ToggleLeft, Hash } from 'lucide-react'
+import { ArrowLeft, Eye, EyeOff, Lock, Plus, Type, List, AlignLeft, CheckSquare, ToggleLeft, Hash, Undo2, Redo2 } from 'lucide-react'
 import surveyService from '../services/surveyService'
 import { useBuilderStore } from '../store/builderStore'
 import type { BuilderGroup, BuilderQuestion, SelectedItem } from '../store/builderStore'
@@ -670,16 +670,74 @@ function SurveyBuilderPage() {
     setLoading,
     setError,
     setSelectedItem,
+    undo,
+    redo,
+    undoStack,
+    redoStack,
   } = useBuilderStore()
 
   const readOnly = status !== '' && status !== 'draft'
   const [isPreviewMode, setIsPreviewMode] = useState(false)
+
+  // Tracks whether the current 'saving' status was triggered by an undo/redo action
+  const undoRedoPendingRef = useRef(false)
 
   // -------------------------------------------------------------------------
   // Navigation guard: warn when there are unsaved changes
   // -------------------------------------------------------------------------
 
   const hasUnsavedChanges = saveStatus === 'saving' || saveStatus === 'error'
+
+  // -------------------------------------------------------------------------
+  // Undo/redo keyboard shortcuts: Ctrl+Z / Cmd+Z and Ctrl+Shift+Z / Cmd+Shift+Z
+  // -------------------------------------------------------------------------
+
+  useEffect(() => {
+    if (readOnly) return
+
+    function handleKeyDown(e: KeyboardEvent) {
+      // Ignore shortcuts when user is typing in an input, textarea, or contenteditable
+      const target = e.target as HTMLElement
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      ) {
+        return
+      }
+
+      const isMeta = e.metaKey || e.ctrlKey
+
+      if (isMeta && e.shiftKey && e.key === 'z') {
+        e.preventDefault()
+        if (redoStack.length > 0) {
+          undoRedoPendingRef.current = true
+          redo()
+        }
+      } else if (isMeta && !e.shiftKey && e.key === 'z') {
+        e.preventDefault()
+        if (undoStack.length > 0) {
+          undoRedoPendingRef.current = true
+          undo()
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [readOnly, undo, redo, undoStack.length, redoStack.length])
+
+  // -------------------------------------------------------------------------
+  // Auto-save after undo/redo: resolve 'saving' status set by store actions
+  // -------------------------------------------------------------------------
+
+  useEffect(() => {
+    if (saveStatus === 'saving' && undoRedoPendingRef.current) {
+      undoRedoPendingRef.current = false
+      // The restored state was previously saved — mark as saved to complete the autosave cycle
+      setSaveStatus('saved')
+    }
+  }, [saveStatus, setSaveStatus])
 
   // Detect data router context to conditionally enable useBlocker
   const dataRouterContext = useContext(UNSAFE_DataRouterContext)
@@ -791,6 +849,41 @@ function SurveyBuilderPage() {
           <SaveIndicator
             onRetry={saveStatus === 'error' ? () => setSaveStatus('idle') : undefined}
           />
+        )}
+
+        {!readOnly && (
+          <>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => {
+                undoRedoPendingRef.current = true
+                undo()
+              }}
+              disabled={undoStack.length === 0}
+              aria-label="Undo (Ctrl+Z)"
+              title="Undo (Ctrl+Z)"
+              data-testid="undo-button"
+            >
+              <Undo2 size={16} />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => {
+                undoRedoPendingRef.current = true
+                redo()
+              }}
+              disabled={redoStack.length === 0}
+              aria-label="Redo (Ctrl+Shift+Z)"
+              title="Redo (Ctrl+Shift+Z)"
+              data-testid="redo-button"
+            >
+              <Redo2 size={16} />
+            </Button>
+          </>
         )}
 
         <Button
