@@ -1,5 +1,5 @@
 import apiClient from './apiClient'
-import type { SurveyResponse, SurveyListResponse, SurveyCreatePayload, SurveyUpdatePayload } from '../types/survey'
+import type { SurveyResponse, SurveyFullResponse, SurveyListResponse, SurveyCreatePayload, SurveyUpdatePayload } from '../types/survey'
 
 export interface SurveyFetchParams {
   page?: number
@@ -24,8 +24,33 @@ class SurveyService {
     return response.data
   }
 
-  async getSurvey(id: string): Promise<SurveyResponse> {
-    const response = await apiClient.get<SurveyResponse>(`/surveys/${id}`)
+  async getSurvey(id: string): Promise<SurveyFullResponse> {
+    const response = await apiClient.get<SurveyFullResponse>(`/surveys/${id}`)
+    return response.data
+  }
+
+  async activateSurvey(id: string): Promise<SurveyResponse> {
+    const response = await apiClient.post<SurveyResponse>(`/surveys/${id}/activate`)
+    return response.data
+  }
+
+  async closeSurvey(id: string): Promise<SurveyResponse> {
+    const response = await apiClient.post<SurveyResponse>(`/surveys/${id}/close`)
+    return response.data
+  }
+
+  async archiveSurvey(id: string): Promise<SurveyResponse> {
+    const response = await apiClient.post<SurveyResponse>(`/surveys/${id}/archive`)
+    return response.data
+  }
+
+  async cloneSurvey(id: string, title?: string): Promise<SurveyResponse> {
+    const response = await apiClient.post<SurveyResponse>(`/surveys/${id}/clone`, title ? { title } : {})
+    return response.data
+  }
+
+  async exportSurvey(id: string): Promise<Blob> {
+    const response = await apiClient.get<Blob>(`/surveys/${id}/export`, { responseType: 'blob' })
     return response.data
   }
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { Plus, Eye, Pencil, Trash2 } from 'lucide-react'
 import surveyService from '../services/surveyService'
 import type { SurveyResponse } from '../types/survey'
@@ -277,7 +277,14 @@ function SurveysPage() {
               <tbody className="divide-y divide-border">
                 {surveys.map((survey) => (
                   <tr key={survey.id} className="bg-card hover:bg-muted/30 transition-colors">
-                    <td className="px-4 py-3 font-medium text-foreground">{survey.title}</td>
+                    <td className="px-4 py-3 font-medium text-foreground">
+                      <Link
+                        to={`/surveys/${survey.id}`}
+                        className="hover:text-primary hover:underline transition-colors"
+                      >
+                        {survey.title}
+                      </Link>
+                    </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={survey.status} />
                     </td>
