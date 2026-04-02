@@ -4,11 +4,15 @@
  * Each group uses a SortableContext for its questions so they can be reordered
  * within the group. The group card itself is also a droppable zone to support
  * cross-group question movement (via useDroppable).
+ *
+ * Supports group-level drag-and-drop reordering via dragListeners/dragAttributes
+ * passed from the parent SortableGroupPanel wrapper.
  */
 
+import type { DraggableSyntheticListeners } from '@dnd-kit/core'
 import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { Plus } from 'lucide-react'
+import { GripVertical, Plus } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
 import { QuestionCard } from './QuestionCard'
@@ -26,6 +30,10 @@ export interface GroupPanelProps {
   readOnly: boolean
   /** True while a question is being dragged over this group */
   isOver?: boolean
+  /** @dnd-kit drag handle listeners for group-level reordering */
+  dragListeners?: DraggableSyntheticListeners
+  /** @dnd-kit drag handle attributes for group-level reordering */
+  dragAttributes?: React.HTMLAttributes<HTMLElement>
 }
 
 // ---------------------------------------------------------------------------
@@ -38,6 +46,8 @@ export function GroupPanel({
   onSelectItem,
   readOnly,
   isOver = false,
+  dragListeners,
+  dragAttributes,
 }: GroupPanelProps) {
   const isGroupSelected = selectedItem?.type === 'group' && selectedItem.id === group.id
 
@@ -55,32 +65,49 @@ export function GroupPanel({
       data-testid={`canvas-group-${group.id}`}
     >
       <CardHeader
-        className="pb-2 cursor-pointer select-none"
+        className="pb-2 select-none"
         onClick={() =>
           onSelectItem(isGroupSelected ? null : { type: 'group', id: group.id })
         }
       >
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base">{group.title}</CardTitle>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">
-              {group.questions.length} question{group.questions.length !== 1 ? 's' : ''}
-            </span>
-            {!readOnly && (
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-6 px-2 text-xs"
-                disabled={readOnly}
-                data-testid={`add-question-button-${group.id}`}
-                onClick={(e) => {
-                  e.stopPropagation()
-                }}
-              >
-                <Plus size={12} />
-                Question
-              </Button>
-            )}
+        <div className="flex items-center gap-2">
+          {/* Group drag handle */}
+          {!readOnly && (
+            <button
+              {...(dragListeners ?? {})}
+              {...(dragAttributes ?? {})}
+              className="shrink-0 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground
+                p-0.5 rounded focus:outline-none focus:ring-1 focus:ring-ring"
+              aria-label="Drag to reorder group"
+              data-testid={`group-drag-handle-${group.id}`}
+              onClick={(e) => e.stopPropagation()}
+              tabIndex={-1}
+            >
+              <GripVertical size={16} />
+            </button>
+          )}
+          <div className="flex items-center justify-between flex-1 cursor-pointer">
+            <CardTitle className="text-base">{group.title}</CardTitle>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">
+                {group.questions.length} question{group.questions.length !== 1 ? 's' : ''}
+              </span>
+              {!readOnly && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-6 px-2 text-xs"
+                  disabled={readOnly}
+                  data-testid={`add-question-button-${group.id}`}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                  }}
+                >
+                  <Plus size={12} />
+                  Question
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </CardHeader>

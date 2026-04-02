@@ -112,3 +112,28 @@ export interface SurveyUpdatePayload {
   end_message?: string | null
   default_language?: string
 }
+
+export interface QuestionUpdatePayload {
+  title?: string
+  code?: string
+  question_type?: string
+  description?: string | null
+  is_required?: boolean
+  relevance?: string | null
+  validation?: Record<string, unknown> | null
+  settings?: Record<string, unknown> | null
+}
+
+export interface QuestionGroupCreatePayload {
+  title: string
+  description?: string | null
+}
+
+export interface QuestionGroupUpdatePayload {
+  title?: string
+  description?: string | null
+}
+
+export interface GroupReorderPayload {
+  group_ids: string[]
+}

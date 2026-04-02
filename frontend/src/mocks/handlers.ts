@@ -517,6 +517,109 @@ export const handlers = [
     return new HttpResponse(null, { status: 204 })
   }),
 
+  // POST /api/v1/surveys/:surveyId/groups
+  http.post(`${BASE}/surveys/:surveyId/groups`, async ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const body = (await request.json()) as Record<string, unknown>
+    const newGroup = {
+      id: `g-new-${Date.now()}`,
+      survey_id: params.surveyId as string,
+      title: (body.title as string) ?? 'New Group',
+      description: (body.description as string | null) ?? null,
+      sort_order: mockSurveyFull.groups.length + 1,
+      relevance: null,
+      created_at: new Date().toISOString(),
+      questions: [],
+    }
+    return HttpResponse.json(newGroup, { status: 201 })
+  }),
+
+  // PATCH /api/v1/surveys/:surveyId/groups/reorder
+  http.patch(`${BASE}/surveys/:surveyId/groups/reorder`, async ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const body = (await request.json()) as { group_ids?: string[] }
+    const groupIds = body.group_ids ?? []
+    const reordered = groupIds.map((id, index) => {
+      const existing = mockSurveyFull.groups.find((g) => g.id === id)
+      return existing ? { ...existing, sort_order: index + 1 } : null
+    }).filter(Boolean)
+    return HttpResponse.json(reordered, { status: 200 })
+  }),
+
+  // PATCH /api/v1/surveys/:surveyId/groups/:groupId
+  http.patch(`${BASE}/surveys/:surveyId/groups/:groupId`, async ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const group = mockSurveyFull.groups.find((g) => g.id === params.groupId)
+    if (!group) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Group not found' } },
+        { status: 404 },
+      )
+    }
+    const body = (await request.json()) as Record<string, unknown>
+    const updated = { ...group, ...body, updated_at: new Date().toISOString() }
+    return HttpResponse.json(updated, { status: 200 })
+  }),
+
+  // DELETE /api/v1/surveys/:surveyId/groups/:groupId
+  http.delete(`${BASE}/surveys/:surveyId/groups/:groupId`, ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  // PATCH /api/v1/surveys/:surveyId/groups/:groupId/questions/:questionId
+  http.patch(`${BASE}/surveys/:surveyId/groups/:groupId/questions/:questionId`, async ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    // Find the question in mockSurveyFull
+    let foundQuestion = null
+    for (const group of mockSurveyFull.groups) {
+      const q = group.questions.find((q) => q.id === params.questionId)
+      if (q) {
+        foundQuestion = q
+        break
+      }
+    }
+    if (!foundQuestion) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Question not found' } },
+        { status: 404 },
+      )
+    }
+    const body = (await request.json()) as Record<string, unknown>
+    const updated = { ...foundQuestion, ...body, updated_at: new Date().toISOString() }
+    return HttpResponse.json(updated, { status: 200 })
+  }),
+
   // PATCH /api/v1/auth/me
   http.patch(`${BASE}/auth/me`, async ({ request }) => {
     const authHeader = request.headers.get('Authorization')
