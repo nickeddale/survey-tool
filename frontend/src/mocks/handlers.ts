@@ -481,6 +481,75 @@ export const handlers = [
     return HttpResponse.json(updated, { status: 200 })
   }),
 
+  // POST /api/v1/surveys/:surveyId/questions/:questionId/options
+  http.post(`${BASE}/surveys/:surveyId/questions/:questionId/options`, async ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const body = (await request.json()) as Record<string, unknown>
+    const newOption = {
+      id: `opt-${Date.now()}`,
+      question_id: params.questionId as string,
+      code: body.code as string,
+      title: body.title as string,
+      sort_order: (body.sort_order as number) ?? 1,
+      assessment_value: (body.assessment_value as number) ?? 0,
+      created_at: new Date().toISOString(),
+    }
+    return HttpResponse.json(newOption, { status: 201 })
+  }),
+
+  // PATCH /api/v1/surveys/:surveyId/questions/:questionId/options/reorder
+  http.patch(`${BASE}/surveys/:surveyId/questions/:questionId/options/reorder`, ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  // PATCH /api/v1/surveys/:surveyId/questions/:questionId/options/:optionId
+  http.patch(`${BASE}/surveys/:surveyId/questions/:questionId/options/:optionId`, async ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const body = (await request.json()) as Record<string, unknown>
+    const updatedOption = {
+      id: params.optionId as string,
+      question_id: params.questionId as string,
+      code: 'A1',
+      title: 'Updated',
+      sort_order: 1,
+      assessment_value: 0,
+      created_at: '2024-01-08T10:00:00Z',
+      ...body,
+    }
+    return HttpResponse.json(updatedOption, { status: 200 })
+  }),
+
+  // DELETE /api/v1/surveys/:surveyId/questions/:questionId/options/:optionId
+  http.delete(`${BASE}/surveys/:surveyId/questions/:questionId/options/:optionId`, ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    return new HttpResponse(null, { status: 204 })
+  }),
+
   // PATCH /api/v1/surveys/:id/groups/:groupId/questions/reorder
   http.patch(`${BASE}/surveys/:surveyId/groups/:groupId/questions/reorder`, ({ request }) => {
     const authHeader = request.headers.get('Authorization')

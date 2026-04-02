@@ -42,6 +42,7 @@ import { Badge } from '../components/ui/badge'
 import { Skeleton } from '../components/ui/skeleton'
 import { GroupPanel } from '../components/survey/GroupPanel'
 import { QuestionCard } from '../components/survey/QuestionCard'
+import { AnswerOptionsEditor } from '../components/survey-builder/AnswerOptionsEditor'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -387,9 +388,10 @@ function SurveyCanvas({ readOnly, selectedItem, onSelectItem, surveyId }: Survey
 interface PropertyEditorProps {
   readOnly: boolean
   selectedItem: SelectedItem
+  surveyId: string
 }
 
-function PropertyEditor({ readOnly, selectedItem }: PropertyEditorProps) {
+function PropertyEditor({ readOnly, selectedItem, surveyId }: PropertyEditorProps) {
   const groups = useBuilderStore((s) => s.groups)
 
   const selectedGroup =
@@ -489,24 +491,14 @@ function PropertyEditor({ readOnly, selectedItem }: PropertyEditorProps) {
             />
             <label htmlFor="prop-required" className="text-sm">Required</label>
           </div>
-          {selectedQuestion.answer_options.length > 0 && (
-            <div>
-              <p className="text-xs font-medium text-muted-foreground mb-1">
-                Answer Options ({selectedQuestion.answer_options.length})
-              </p>
-              <div className="space-y-1">
-                {selectedQuestion.answer_options.map((opt) => (
-                  <div
-                    key={opt.id}
-                    className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-2 py-1 rounded"
-                  >
-                    <span className="font-mono">{opt.code}</span>
-                    <span className="flex-1 truncate">{opt.title}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <AnswerOptionsEditor
+            surveyId={surveyId}
+            groupId={selectedQuestion.group_id}
+            questionId={selectedQuestion.id}
+            questionType={selectedQuestion.question_type}
+            options={selectedQuestion.answer_options}
+            readOnly={readOnly}
+          />
         </div>
       )}
     </aside>
@@ -644,7 +636,7 @@ function SurveyBuilderPage() {
           onSelectItem={setSelectedItem}
           surveyId={surveyId}
         />
-        <PropertyEditor readOnly={readOnly} selectedItem={selectedItem} />
+        <PropertyEditor readOnly={readOnly} selectedItem={selectedItem} surveyId={surveyId} />
       </div>
     </div>
   )

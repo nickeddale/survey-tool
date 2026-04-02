@@ -1,5 +1,21 @@
 import apiClient from './apiClient'
-import type { SurveyResponse, SurveyFullResponse, SurveyListResponse, SurveyCreatePayload, SurveyUpdatePayload } from '../types/survey'
+import type { SurveyResponse, SurveyFullResponse, SurveyListResponse, SurveyCreatePayload, SurveyUpdatePayload, AnswerOptionResponse } from '../types/survey'
+
+export interface AnswerOptionCreatePayload {
+  code: string
+  title: string
+  sort_order?: number
+  assessment_value?: number
+  image_url?: string | null
+}
+
+export interface AnswerOptionUpdatePayload {
+  title?: string
+  code?: string
+  sort_order?: number
+  assessment_value?: number
+  image_url?: string | null
+}
 
 export interface SurveyFetchParams {
   page?: number
@@ -77,6 +93,41 @@ class SurveyService {
   async moveQuestion(surveyId: string, questionId: string, newGroupId: string): Promise<void> {
     await apiClient.patch(`/surveys/${surveyId}/questions/${questionId}`, {
       group_id: newGroupId,
+    })
+  }
+
+  async createOption(
+    surveyId: string,
+    questionId: string,
+    data: AnswerOptionCreatePayload,
+  ): Promise<AnswerOptionResponse> {
+    const response = await apiClient.post<AnswerOptionResponse>(
+      `/surveys/${surveyId}/questions/${questionId}/options`,
+      data,
+    )
+    return response.data
+  }
+
+  async updateOption(
+    surveyId: string,
+    questionId: string,
+    optionId: string,
+    data: AnswerOptionUpdatePayload,
+  ): Promise<AnswerOptionResponse> {
+    const response = await apiClient.patch<AnswerOptionResponse>(
+      `/surveys/${surveyId}/questions/${questionId}/options/${optionId}`,
+      data,
+    )
+    return response.data
+  }
+
+  async deleteOption(surveyId: string, questionId: string, optionId: string): Promise<void> {
+    await apiClient.delete(`/surveys/${surveyId}/questions/${questionId}/options/${optionId}`)
+  }
+
+  async reorderOptions(surveyId: string, questionId: string, orderedIds: string[]): Promise<void> {
+    await apiClient.patch(`/surveys/${surveyId}/questions/${questionId}/options/reorder`, {
+      ordered_ids: orderedIds,
     })
   }
 
