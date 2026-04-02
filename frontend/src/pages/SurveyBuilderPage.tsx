@@ -535,7 +535,7 @@ interface PropertyEditorProps {
   selectedItem: SelectedItem
 }
 
-function PropertyEditor({ surveyId, readOnly, selectedItem }: PropertyEditorProps) {
+function PropertyEditor({ readOnly, selectedItem, surveyId }: PropertyEditorProps) {
   const groups = useBuilderStore((s) => s.groups)
 
   const selectedGroup =

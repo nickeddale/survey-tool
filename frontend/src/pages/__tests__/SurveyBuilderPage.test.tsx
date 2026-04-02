@@ -236,7 +236,7 @@ describe('property editor — item selection', () => {
     })
   })
 
-  it('shows answer options in property editor for radio question', async () => {
+  it('shows answer options editor for radio question', async () => {
     renderBuilder()
 
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
@@ -246,8 +246,10 @@ describe('property editor — item selection', () => {
 
     await waitFor(() => expect(screen.getByTestId('question-properties')).toBeInTheDocument())
 
-    expect(screen.getByText('Very Satisfied')).toBeInTheDocument()
-    expect(screen.getByText('Satisfied')).toBeInTheDocument()
+    // Options are now rendered as inputs in AnswerOptionsEditor
+    expect(screen.getByTestId('answer-options-editor')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Very Satisfied')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Satisfied')).toBeInTheDocument()
   })
 })
 
