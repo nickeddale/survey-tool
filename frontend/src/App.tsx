@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import PublicRoute from './components/PublicRoute'
+import AppLayout from './components/AppLayout'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
@@ -22,10 +23,12 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
           </Route>
 
-          {/* Protected routes — redirect to /login if not authenticated */}
+          {/* Protected routes — wrapped in AppLayout which renders Outlet */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/surveys/*" element={<SurveysPage />} />
+            <Route element={<AppLayout />}>
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/surveys/*" element={<SurveysPage />} />
+            </Route>
           </Route>
 
           <Route path="*" element={<NotFoundPage />} />
