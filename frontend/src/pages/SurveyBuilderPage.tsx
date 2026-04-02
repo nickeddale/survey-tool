@@ -10,7 +10,7 @@
  * into the builder Zustand store. Non-draft surveys are rendered read-only.
  */
 
-import { useEffect } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Lock, Plus, Type, List, AlignLeft, CheckSquare, ToggleLeft, Hash } from 'lucide-react'
 import surveyService from '../services/surveyService'
@@ -18,10 +18,11 @@ import { useBuilderStore } from '../store/builderStore'
 import type { SelectedItem } from '../store/builderStore'
 import { ApiError } from '../types/api'
 import { Button } from '../components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
+import { Card, CardContent } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Skeleton } from '../components/ui/skeleton'
 import { QuestionEditor } from '../components/survey-builder/QuestionEditor'
+import { GroupPanel } from '../components/survey-builder/GroupPanel'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -131,13 +132,34 @@ function QuestionPalette({ readOnly }: { readOnly: boolean }) {
 // ---------------------------------------------------------------------------
 
 interface SurveyCanvasProps {
+  surveyId: string
   readOnly: boolean
   selectedItem: SelectedItem
   onSelectItem: (item: SelectedItem) => void
 }
 
-function SurveyCanvas({ readOnly, selectedItem, onSelectItem }: SurveyCanvasProps) {
+function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem }: SurveyCanvasProps) {
   const groups = useBuilderStore((s) => s.groups)
+  const addGroup = useBuilderStore((s) => s.addGroup)
+  const [isAddingGroup, setIsAddingGroup] = useState(false)
+
+  const handleAddGroup = useCallback(async () => {
+    if (readOnly || isAddingGroup) return
+    setIsAddingGroup(true)
+    try {
+      const newGroup = await surveyService.createGroup(surveyId, {
+        title: `Group ${groups.length + 1}`,
+      })
+      addGroup({
+        ...newGroup,
+        questions: [],
+      })
+    } finally {
+      setIsAddingGroup(false)
+    }
+  }, [readOnly, isAddingGroup, surveyId, groups.length, addGroup])
+
+  const sortedGroups = [...groups].sort((a, b) => a.sort_order - b.sort_order)
 
   return (
     <main
@@ -155,7 +177,8 @@ function SurveyCanvas({ readOnly, selectedItem, onSelectItem }: SurveyCanvasProp
               {!readOnly && (
                 <Button
                   size="sm"
-                  disabled={readOnly}
+                  disabled={readOnly || isAddingGroup}
+                  onClick={handleAddGroup}
                   data-testid="add-group-button"
                 >
                   <Plus size={14} />
@@ -166,97 +189,24 @@ function SurveyCanvas({ readOnly, selectedItem, onSelectItem }: SurveyCanvasProp
           </Card>
         )}
 
-        {groups.map((group) => {
+        {sortedGroups.map((group) => {
           const isGroupSelected = selectedItem?.type === 'group' && selectedItem.id === group.id
-
           return (
-            <Card
+            <GroupPanel
               key={group.id}
-              className={`transition-shadow ${isGroupSelected ? 'ring-2 ring-primary' : ''}`}
-              data-testid={`canvas-group-${group.id}`}
-            >
-              <CardHeader
-                className="pb-2 cursor-pointer select-none"
-                onClick={() =>
-                  onSelectItem(isGroupSelected ? null : { type: 'group', id: group.id })
-                }
-              >
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">{group.title}</CardTitle>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">
-                      {group.questions.length} question{group.questions.length !== 1 ? 's' : ''}
-                    </span>
-                    {!readOnly && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-6 px-2 text-xs"
-                        disabled={readOnly}
-                        data-testid={`add-question-button-${group.id}`}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                        }}
-                      >
-                        <Plus size={12} />
-                        Question
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </CardHeader>
-
-              <CardContent className="pt-0">
-                {group.questions.length === 0 ? (
-                  <p className="text-xs text-muted-foreground italic py-2">No questions in this group.</p>
-                ) : (
-                  <div className="space-y-2">
-                    {group.questions.map((question) => {
-                      const isQuestionSelected =
-                        selectedItem?.type === 'question' && selectedItem.id === question.id
-                      return (
-                        <div
-                          key={question.id}
-                          className={`flex items-start gap-2 p-2 rounded-md border border-border cursor-pointer
-                            transition-colors hover:bg-muted/50
-                            ${isQuestionSelected ? 'bg-primary/5 border-primary/50 ring-1 ring-primary/30' : ''}`}
-                          onClick={() =>
-                            onSelectItem(
-                              isQuestionSelected ? null : { type: 'question', id: question.id },
-                            )
-                          }
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              onSelectItem(
-                                isQuestionSelected ? null : { type: 'question', id: question.id },
-                              )
-                            }
-                          }}
-                          data-testid={`canvas-question-${question.id}`}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="text-xs font-mono text-muted-foreground bg-muted px-1 py-0.5 rounded">
-                                {question.code}
-                              </span>
-                              <span className="text-sm font-medium truncate">{question.title}</span>
-                              <span className="text-xs text-muted-foreground bg-muted/60 px-1 py-0.5 rounded">
-                                {question.question_type}
-                              </span>
-                              {question.is_required && (
-                                <span className="text-xs text-destructive">*</span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+              surveyId={surveyId}
+              group={group}
+              readOnly={readOnly}
+              isSelected={isGroupSelected}
+              onSelect={(groupId) =>
+                onSelectItem(isGroupSelected ? null : { type: 'group', id: groupId })
+              }
+              onSelectQuestion={(questionId) => {
+                const isQuestionSelected =
+                  selectedItem?.type === 'question' && selectedItem.id === questionId
+                onSelectItem(isQuestionSelected ? null : { type: 'question', id: questionId })
+              }}
+            />
           )
         })}
 
@@ -264,11 +214,12 @@ function SurveyCanvas({ readOnly, selectedItem, onSelectItem }: SurveyCanvasProp
           <Button
             variant="outline"
             className="w-full"
-            disabled={readOnly}
+            disabled={readOnly || isAddingGroup}
+            onClick={handleAddGroup}
             data-testid="add-group-button"
           >
             <Plus size={14} />
-            Add Group
+            {isAddingGroup ? 'Adding…' : 'Add Group'}
           </Button>
         )}
       </div>
@@ -476,6 +427,7 @@ function SurveyBuilderPage() {
       <div className="flex flex-1 overflow-hidden">
         <QuestionPalette readOnly={readOnly} />
         <SurveyCanvas
+          surveyId={surveyId ?? ''}
           readOnly={readOnly}
           selectedItem={selectedItem}
           onSelectItem={setSelectedItem}

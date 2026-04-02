@@ -142,19 +142,21 @@ describe('question selection populates fields', () => {
     expect(screen.getByText('Satisfied')).toBeInTheDocument()
   })
 
-  it('updates fields when selected question changes', () => {
+  it('updates fields when selected question changes', async () => {
     useBuilderStore.getState().setSelectedItem({ type: 'question', id: Q1.id })
     const { rerender } = renderEditor()
     expect(screen.getByTestId('property-question-title')).toHaveValue(Q1.title)
 
-    useBuilderStore.getState().setSelectedItem({ type: 'question', id: Q2.id })
-    rerender(
-      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <AuthProvider>
-          <QuestionEditor surveyId={SURVEY_ID} readOnly={false} />
-        </AuthProvider>
-      </MemoryRouter>,
-    )
+    await act(async () => {
+      useBuilderStore.getState().setSelectedItem({ type: 'question', id: Q2.id })
+      rerender(
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <AuthProvider>
+            <QuestionEditor surveyId={SURVEY_ID} readOnly={false} />
+          </AuthProvider>
+        </MemoryRouter>,
+      )
+    })
     expect(screen.getByTestId('property-question-title')).toHaveValue(Q2.title)
   })
 })

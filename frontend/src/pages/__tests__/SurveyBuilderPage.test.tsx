@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { render, screen, waitFor, act } from '@testing-library/react'
+import { render, screen, waitFor, act, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { http, HttpResponse } from 'msw'
@@ -143,9 +143,9 @@ describe('draft survey', () => {
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
     // mockSurveyFull has one group 'g1' with 2 questions
-    expect(screen.getByTestId('canvas-group-g1')).toBeInTheDocument()
-    expect(screen.getByTestId('canvas-question-q1')).toBeInTheDocument()
-    expect(screen.getByTestId('canvas-question-q2')).toBeInTheDocument()
+    expect(screen.getByTestId('group-panel-g1')).toBeInTheDocument()
+    expect(screen.getByTestId('group-question-item-q1')).toBeInTheDocument()
+    expect(screen.getByTestId('group-question-item-q2')).toBeInTheDocument()
   })
 })
 
@@ -195,17 +195,12 @@ describe('property editor — item selection', () => {
   })
 
   it('shows group properties when a group is clicked', async () => {
-    const user = userEvent.setup()
     renderBuilder()
 
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
-    const groupCard = screen.getByTestId('canvas-group-g1')
-    // Click the card header — the CardHeader element within the group card
-    const header = groupCard.querySelector('[class*="CardHeader"], [class*="card-header"], .pb-2')
-    await act(async () => {
-      await user.click(header ?? groupCard)
-    })
+    // Click the group panel header to select it
+    fireEvent.click(screen.getByTestId('group-panel-header-g1'))
 
     await waitFor(() => expect(screen.getByTestId('group-properties')).toBeInTheDocument())
 
@@ -214,15 +209,11 @@ describe('property editor — item selection', () => {
   })
 
   it('shows question properties when a question is clicked', async () => {
-    const user = userEvent.setup()
     renderBuilder()
 
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
-    const questionEl = screen.getByTestId('canvas-question-q1')
-    await act(async () => {
-      await user.click(questionEl)
-    })
+    fireEvent.click(screen.getByTestId('group-question-item-q1'))
 
     await waitFor(() => expect(screen.getByTestId('question-properties')).toBeInTheDocument())
 
@@ -231,15 +222,11 @@ describe('property editor — item selection', () => {
   })
 
   it('updates builderStore selectedItem when question is clicked', async () => {
-    const user = userEvent.setup()
     renderBuilder()
 
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
-    const questionEl = screen.getByTestId('canvas-question-q2')
-    await act(async () => {
-      await user.click(questionEl)
-    })
+    fireEvent.click(screen.getByTestId('group-question-item-q2'))
 
     await waitFor(() => {
       const { selectedItem } = useBuilderStore.getState()
@@ -248,16 +235,12 @@ describe('property editor — item selection', () => {
   })
 
   it('shows answer options in property editor for radio question', async () => {
-    const user = userEvent.setup()
     renderBuilder()
 
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
     // q2 is the radio question with 2 answer options
-    const questionEl = screen.getByTestId('canvas-question-q2')
-    await act(async () => {
-      await user.click(questionEl)
-    })
+    fireEvent.click(screen.getByTestId('group-question-item-q2'))
 
     await waitFor(() => expect(screen.getByTestId('question-properties')).toBeInTheDocument())
 
@@ -272,30 +255,22 @@ describe('property editor — item selection', () => {
 
 describe('QuestionEditor integration', () => {
   it('renders QuestionEditor inside property editor when question is selected', async () => {
-    const user = userEvent.setup()
     renderBuilder()
 
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
-    const questionEl = screen.getByTestId('canvas-question-q1')
-    await act(async () => {
-      await user.click(questionEl)
-    })
+    fireEvent.click(screen.getByTestId('group-question-item-q1'))
 
     await waitFor(() => expect(screen.getByTestId('property-editor')).toBeInTheDocument())
     expect(screen.getByTestId('question-properties')).toBeInTheDocument()
   })
 
   it('title field in QuestionEditor is a textarea (multi-line)', async () => {
-    const user = userEvent.setup()
     renderBuilder()
 
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
-    const questionEl = screen.getByTestId('canvas-question-q1')
-    await act(async () => {
-      await user.click(questionEl)
-    })
+    fireEvent.click(screen.getByTestId('group-question-item-q1'))
 
     await waitFor(() => expect(screen.getByTestId('property-question-title')).toBeInTheDocument())
     expect(screen.getByTestId('property-question-title').tagName).toBe('TEXTAREA')
@@ -307,10 +282,7 @@ describe('QuestionEditor integration', () => {
 
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
-    const questionEl = screen.getByTestId('canvas-question-q1')
-    await act(async () => {
-      await user.click(questionEl)
-    })
+    fireEvent.click(screen.getByTestId('group-question-item-q1'))
 
     await waitFor(() => expect(screen.getByTestId('property-question-title')).toBeInTheDocument())
 
