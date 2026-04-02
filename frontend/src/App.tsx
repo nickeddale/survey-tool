@@ -15,7 +15,7 @@ import NotFoundPage from './pages/NotFoundPage'
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AuthProvider>
         <Routes>
           {/* Redirect root to dashboard (ProtectedRoute will redirect to /login if needed) */}

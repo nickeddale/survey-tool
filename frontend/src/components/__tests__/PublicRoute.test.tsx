@@ -24,7 +24,7 @@ function LocationDisplay() {
 
 function renderPublicRoute(initialPath: string) {
   return render(
-    <MemoryRouter initialEntries={[initialPath]}>
+    <MemoryRouter initialEntries={[initialPath]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AuthProvider>
         <Routes>
           <Route element={<PublicRoute />}>
