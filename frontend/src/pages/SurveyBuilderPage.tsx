@@ -8,30 +8,40 @@
  *
  * On mount: fetches the full survey via GET /api/v1/surveys/:id and loads it
  * into the builder Zustand store. Non-draft surveys are rendered read-only.
+ *
+ * Drag-and-drop:
+ *   Groups are sortable by dragging the group drag handle.
+ *   Questions are sortable within their group AND draggable between groups.
+ *   Uses @dnd-kit/core (DndContext) with closestCorners collision detection.
+ *   onDragEnd handles group reorder, same-group question reorder, and
+ *   cross-group question move.
  */
 
-import { useEffect, useState, useCallback } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Lock, Plus, Type, List, AlignLeft, CheckSquare, ToggleLeft, Hash } from 'lucide-react'
 import {
   DndContext,
-  closestCenter,
+  DragOverlay,
+  closestCorners,
   PointerSensor,
   KeyboardSensor,
   useSensor,
   useSensors,
+  type DragStartEvent,
+  type DragEndEvent,
 } from '@dnd-kit/core'
-import type { DragEndEvent } from '@dnd-kit/core'
 import {
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
+  arrayMove,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { ArrowLeft, Lock, Plus, Type, List, AlignLeft, CheckSquare, ToggleLeft, Hash } from 'lucide-react'
 import surveyService from '../services/surveyService'
 import { useBuilderStore } from '../store/builderStore'
-import type { SelectedItem, BuilderGroup } from '../store/builderStore'
+import type { BuilderGroup, BuilderQuestion, SelectedItem } from '../store/builderStore'
 import { ApiError } from '../types/api'
 import { Button } from '../components/ui/button'
 import { Card, CardContent } from '../components/ui/card'
@@ -39,6 +49,7 @@ import { Badge } from '../components/ui/badge'
 import { Skeleton } from '../components/ui/skeleton'
 import { QuestionEditor } from '../components/survey-builder/QuestionEditor'
 import { GroupPanel } from '../components/survey-builder/GroupPanel'
+import { QuestionCard } from '../components/survey/QuestionCard'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -169,11 +180,12 @@ function SortableGroupPanel({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: group.id })
+  } = useSortable({ id: `group:${group.id}` })
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    opacity: isDragging ? 0.4 : 1,
   }
 
   const isGroupSelected = selectedItem?.type === 'group' && selectedItem.id === group.id
@@ -202,7 +214,7 @@ function SortableGroupPanel({
 }
 
 // ---------------------------------------------------------------------------
-// Sub-components: Center panel — survey canvas
+// Sub-components: Center panel — survey canvas with DnD
 // ---------------------------------------------------------------------------
 
 interface SurveyCanvasProps {
@@ -216,10 +228,25 @@ function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem }: Survey
   const groups = useBuilderStore((s) => s.groups)
   const addGroup = useBuilderStore((s) => s.addGroup)
   const reorderGroups = useBuilderStore((s) => s.reorderGroups)
+  const reorderQuestions = useBuilderStore((s) => s.reorderQuestions)
+  const moveQuestion = useBuilderStore((s) => s.moveQuestion)
+  const undo = useBuilderStore((s) => s.undo)
   const [isAddingGroup, setIsAddingGroup] = useState(false)
 
+  // Track which question is actively being dragged (for DragOverlay)
+  const [activeQuestion, setActiveQuestion] = useState<BuilderQuestion | null>(null)
+
+  // Stable ref to groups for use inside callbacks without stale closures
+  const groupsRef = useRef(groups)
+  groupsRef.current = groups
+
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        // Require 5px movement before starting drag to allow clicks
+        distance: 5,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
@@ -241,36 +268,147 @@ function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem }: Survey
     }
   }, [readOnly, isAddingGroup, surveyId, groups.length, addGroup])
 
-  const sortedGroups = [...groups].sort((a, b) => a.sort_order - b.sort_order)
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    const { active } = event
+    const activeId = active.id.toString()
+
+    // If dragging a question (not a group), set activeQuestion for DragOverlay
+    if (!activeId.startsWith('group:')) {
+      const question = groupsRef.current
+        .flatMap((g) => g.questions)
+        .find((q) => q.id === activeId)
+      setActiveQuestion(question ?? null)
+    }
+  }, [])
 
   const handleDragEnd = useCallback(
     async (event: DragEndEvent) => {
       const { active, over } = event
-      if (!over || active.id === over.id) return
+      setActiveQuestion(null)
 
-      const oldIndex = sortedGroups.findIndex((g) => g.id === active.id)
-      const newIndex = sortedGroups.findIndex((g) => g.id === over.id)
-      if (oldIndex === -1 || newIndex === -1) return
+      if (!over) return
+      if (active.id === over.id) return
 
-      // Build new ordered id list
-      const newOrder = [...sortedGroups]
-      const [moved] = newOrder.splice(oldIndex, 1)
-      newOrder.splice(newIndex, 0, moved)
-      const orderedIds = newOrder.map((g) => g.id)
+      const activeId = active.id.toString()
+      const overId = over.id.toString()
+      const currentGroups = groupsRef.current
 
-      // Optimistic update
-      reorderGroups(orderedIds)
+      // --- Group reorder ---
+      if (activeId.startsWith('group:')) {
+        const activeGroupId = activeId.slice('group:'.length)
+        const overGroupId = overId.startsWith('group:') ? overId.slice('group:'.length) : null
+        if (!overGroupId) return
 
-      // Persist to API
-      try {
-        await surveyService.reorderGroups(surveyId, { group_ids: orderedIds })
-      } catch {
-        // Revert to previous order on failure
-        reorderGroups(sortedGroups.map((g) => g.id))
+        const sortedGroups = [...currentGroups].sort((a, b) => a.sort_order - b.sort_order)
+        const oldIndex = sortedGroups.findIndex((g) => g.id === activeGroupId)
+        const newIndex = sortedGroups.findIndex((g) => g.id === overGroupId)
+        if (oldIndex === -1 || newIndex === -1) return
+
+        const newOrder = arrayMove(
+          sortedGroups.map((g) => g.id),
+          oldIndex,
+          newIndex,
+        )
+
+        // Optimistic update
+        reorderGroups(newOrder)
+
+        // Persist to API
+        try {
+          await surveyService.reorderGroups(surveyId, { group_ids: newOrder })
+        } catch {
+          // Revert to previous order on failure
+          undo()
+        }
+        return
+      }
+
+      // --- Question reorder / move ---
+      // Find the group that contains the dragged question
+      const fromGroup = currentGroups.find((g) =>
+        g.questions.some((q) => q.id === activeId),
+      )
+      if (!fromGroup) return
+
+      // Determine if we dropped onto a question or a group
+      const isOverQuestion = currentGroups.some((g) =>
+        g.questions.some((q) => q.id === overId),
+      )
+      const isOverGroup = currentGroups.some((g) => `group:${g.id}` === overId || g.id === overId)
+
+      // Find the target group
+      const toGroup = isOverQuestion
+        ? currentGroups.find((g) => g.questions.some((q) => q.id === overId))
+        : isOverGroup
+          ? currentGroups.find((g) => `group:${g.id}` === overId || g.id === overId)
+          : null
+
+      if (!toGroup) return
+
+      const isSameGroup = fromGroup.id === toGroup.id
+
+      if (isSameGroup) {
+        // Reorder within same group
+        const oldIndex = fromGroup.questions.findIndex((q) => q.id === activeId)
+        const newIndex = fromGroup.questions.findIndex((q) => q.id === overId)
+        if (oldIndex === newIndex) return
+
+        const newOrder = arrayMove(
+          fromGroup.questions.map((q) => q.id),
+          oldIndex,
+          newIndex,
+        )
+
+        // Optimistic update
+        reorderQuestions(fromGroup.id, newOrder)
+
+        try {
+          await surveyService.reorderQuestions(surveyId, fromGroup.id, newOrder)
+        } catch {
+          undo()
+        }
+      } else {
+        // Move question to a different group
+        const targetQuestionIndex = isOverQuestion
+          ? toGroup.questions.findIndex((q) => q.id === overId)
+          : -1
+
+        // Optimistic update: move the question
+        moveQuestion(fromGroup.id, toGroup.id, activeId)
+
+        // Build new order for target group with the moved question inserted
+        const targetGroupAfterMove = groupsRef.current.find((g) => g.id === toGroup.id)
+        const newTargetOrder = targetGroupAfterMove?.questions.map((q) => q.id) ?? []
+
+        // If we dropped onto a specific question, reorder so the moved item is at that position
+        if (targetQuestionIndex !== -1) {
+          const movedIdx = newTargetOrder.indexOf(activeId)
+          if (movedIdx !== -1) {
+            const reordered = arrayMove(newTargetOrder, movedIdx, targetQuestionIndex)
+            reorderQuestions(toGroup.id, reordered)
+          }
+        }
+
+        try {
+          await surveyService.moveQuestion(surveyId, activeId, toGroup.id)
+          // Reorder target group after move
+          const finalTargetGroup = groupsRef.current.find((g) => g.id === toGroup.id)
+          if (finalTargetGroup) {
+            await surveyService.reorderQuestions(
+              surveyId,
+              toGroup.id,
+              finalTargetGroup.questions.map((q) => q.id),
+            )
+          }
+        } catch {
+          undo()
+        }
       }
     },
-    [sortedGroups, reorderGroups, surveyId],
+    [surveyId, reorderGroups, reorderQuestions, moveQuestion, undo],
   )
+
+  const sortedGroups = [...groups].sort((a, b) => a.sort_order - b.sort_order)
 
   return (
     <main
@@ -302,11 +440,12 @@ function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem }: Survey
 
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCenter}
+          collisionDetection={closestCorners}
+          onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={sortedGroups.map((g) => g.id)}
+            items={sortedGroups.map((g) => `group:${g.id}`)}
             strategy={verticalListSortingStrategy}
           >
             {sortedGroups.map((group) => (
@@ -320,6 +459,19 @@ function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem }: Survey
               />
             ))}
           </SortableContext>
+
+          {/* Floating drag overlay — shows preview card while dragging a question */}
+          <DragOverlay>
+            {activeQuestion ? (
+              <QuestionCard
+                question={activeQuestion}
+                selectedItem={null}
+                onSelectItem={() => {}}
+                readOnly={readOnly}
+                isOverlay
+              />
+            ) : null}
+          </DragOverlay>
         </DndContext>
 
         {groups.length > 0 && !readOnly && (

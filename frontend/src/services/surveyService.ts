@@ -113,6 +113,18 @@ class SurveyService {
     return response.data
   }
 
+  async reorderQuestions(surveyId: string, groupId: string, orderedIds: string[]): Promise<void> {
+    await apiClient.patch(`/surveys/${surveyId}/groups/${groupId}/questions/reorder`, {
+      ordered_ids: orderedIds,
+    })
+  }
+
+  async moveQuestion(surveyId: string, questionId: string, newGroupId: string): Promise<void> {
+    await apiClient.patch(`/surveys/${surveyId}/questions/${questionId}`, {
+      group_id: newGroupId,
+    })
+  }
+
   async getDashboardStats(): Promise<{ stats: DashboardStats; recentSurveys: SurveyResponse[] }> {
     const response = await this.fetchSurveys({ per_page: 100, page: 1 })
     const surveys = response.items
