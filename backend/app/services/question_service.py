@@ -19,6 +19,12 @@ from app.services.validators.matrix_validators import (
     validate_matrix_dropdown_settings,
     validate_matrix_dynamic_settings,
 )
+from app.services.validators.scalar_validators import (
+    validate_numeric_settings,
+    validate_rating_settings,
+    validate_boolean_settings,
+    validate_date_settings,
+)
 
 _CHOICE_TYPE_VALIDATORS = {
     "single_choice": validate_radio_settings,
@@ -31,6 +37,14 @@ _MATRIX_TYPE_VALIDATORS = {
     "matrix": validate_matrix_settings,
     "matrix_dropdown": validate_matrix_dropdown_settings,
     "matrix_dynamic": validate_matrix_dynamic_settings,
+}
+
+# Scalar validators accept only (settings) — no answer_options or subquestions.
+_SCALAR_TYPE_VALIDATORS = {
+    "numeric": validate_numeric_settings,
+    "rating": validate_rating_settings,
+    "boolean": validate_boolean_settings,
+    "date": validate_date_settings,
 }
 
 
@@ -192,6 +206,10 @@ async def create_question(
     if settings is not None and question_type in _MATRIX_TYPE_VALIDATORS:
         _MATRIX_TYPE_VALIDATORS[question_type](settings, [], [])
 
+    # Validate settings for scalar question types (no answer_options needed).
+    if settings is not None and question_type in _SCALAR_TYPE_VALIDATORS:
+        _SCALAR_TYPE_VALIDATORS[question_type](settings)
+
     question = Question(
         group_id=group_id,
         parent_id=parent_id,
@@ -294,6 +312,10 @@ async def update_question(
             list(question.answer_options),
             list(question.subquestions),
         )
+
+    # Validate settings for scalar question types (no answer_options needed).
+    if new_settings is not None and effective_type in _SCALAR_TYPE_VALIDATORS:
+        _SCALAR_TYPE_VALIDATORS[effective_type](new_settings)
 
     for field, value in kwargs.items():
         setattr(question, field, value)
