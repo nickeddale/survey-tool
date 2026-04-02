@@ -2,6 +2,10 @@ import { useState, type FormEvent } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { ApiError } from '../types/api'
+import { Button } from '../components/ui/button'
+import { Input } from '../components/ui/input'
+import { Label } from '../components/ui/label'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card'
 
 interface FieldErrors {
   name?: string
@@ -73,102 +77,90 @@ function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md p-8 space-y-6 bg-card rounded-lg border border-border shadow-sm">
-        <h1 className="text-2xl font-bold text-center text-foreground">Create an account</h1>
-        <p className="text-center text-muted-foreground">Join DevTracker today</p>
-        {error && (
-          <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
-            {error}
-          </div>
-        )}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1" htmlFor="name">
-              Name
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              placeholder="Your name"
-            />
-            {fieldErrors.name && (
-              <p className="mt-1 text-sm text-destructive" role="alert">
-                {fieldErrors.name}
-              </p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1" htmlFor="email">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              placeholder="you@example.com"
-            />
-            {fieldErrors.email && (
-              <p className="mt-1 text-sm text-destructive" role="alert">
-                {fieldErrors.email}
-              </p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1" htmlFor="password">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              placeholder="••••••••"
-            />
-            {fieldErrors.password && (
-              <p className="mt-1 text-sm text-destructive" role="alert">
-                {fieldErrors.password}
-              </p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1" htmlFor="confirmPassword">
-              Confirm Password
-            </label>
-            <input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              placeholder="••••••••"
-            />
-            {fieldErrors.confirmPassword && (
-              <p className="mt-1 text-sm text-destructive" role="alert">
-                {fieldErrors.confirmPassword}
-              </p>
-            )}
-          </div>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
-          >
-            {isSubmitting ? 'Creating account...' : 'Create Account'}
-          </button>
-        </form>
-        <p className="text-center text-sm text-muted-foreground">
-          Already have an account?{' '}
-          <Link to="/login" className="text-primary hover:underline font-medium">
-            Sign in
-          </Link>
-        </p>
-      </div>
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl text-center">Create an account</CardTitle>
+          <CardDescription className="text-center">Join DevTracker today</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {error && (
+            <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+              {error}
+            </div>
+          )}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your name"
+              />
+              {fieldErrors.name && (
+                <p className="text-sm text-destructive" role="alert">
+                  {fieldErrors.name}
+                </p>
+              )}
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+              />
+              {fieldErrors.email && (
+                <p className="text-sm text-destructive" role="alert">
+                  {fieldErrors.email}
+                </p>
+              )}
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+              />
+              {fieldErrors.password && (
+                <p className="text-sm text-destructive" role="alert">
+                  {fieldErrors.password}
+                </p>
+              )}
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+              />
+              {fieldErrors.confirmPassword && (
+                <p className="text-sm text-destructive" role="alert">
+                  {fieldErrors.confirmPassword}
+                </p>
+              )}
+            </div>
+            <Button type="submit" disabled={isSubmitting} className="w-full">
+              {isSubmitting ? 'Creating account...' : 'Create Account'}
+            </Button>
+          </form>
+          <p className="mt-4 text-center text-sm text-muted-foreground">
+            Already have an account?{' '}
+            <Link to="/login" className="text-primary hover:underline font-medium">
+              Sign in
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
     </div>
   )
 }
