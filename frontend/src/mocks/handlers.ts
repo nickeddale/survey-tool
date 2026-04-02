@@ -13,6 +13,74 @@ const BASE = '/api/v1'
 // Mock data
 // ---------------------------------------------------------------------------
 
+export const mockSurveys = [
+  {
+    id: '10000000-0000-0000-0000-000000000001',
+    user_id: '00000000-0000-0000-0000-000000000001',
+    title: 'Customer Satisfaction Survey',
+    description: 'Measure customer satisfaction',
+    status: 'active',
+    welcome_message: null,
+    end_message: null,
+    default_language: 'en',
+    settings: null,
+    created_at: '2024-01-10T10:00:00Z',
+    updated_at: '2024-01-15T12:00:00Z',
+  },
+  {
+    id: '10000000-0000-0000-0000-000000000002',
+    user_id: '00000000-0000-0000-0000-000000000001',
+    title: 'Employee Feedback Form',
+    description: null,
+    status: 'draft',
+    welcome_message: null,
+    end_message: null,
+    default_language: 'en',
+    settings: null,
+    created_at: '2024-01-08T10:00:00Z',
+    updated_at: '2024-01-14T08:00:00Z',
+  },
+  {
+    id: '10000000-0000-0000-0000-000000000003',
+    user_id: '00000000-0000-0000-0000-000000000001',
+    title: 'Product NPS Survey',
+    description: 'Net Promoter Score',
+    status: 'closed',
+    welcome_message: null,
+    end_message: null,
+    default_language: 'en',
+    settings: null,
+    created_at: '2024-01-05T10:00:00Z',
+    updated_at: '2024-01-12T15:00:00Z',
+  },
+  {
+    id: '10000000-0000-0000-0000-000000000004',
+    user_id: '00000000-0000-0000-0000-000000000001',
+    title: 'Old Market Research',
+    description: null,
+    status: 'archived',
+    welcome_message: null,
+    end_message: null,
+    default_language: 'en',
+    settings: null,
+    created_at: '2024-01-01T10:00:00Z',
+    updated_at: '2024-01-11T09:00:00Z',
+  },
+  {
+    id: '10000000-0000-0000-0000-000000000005',
+    user_id: '00000000-0000-0000-0000-000000000001',
+    title: 'Annual Review Survey',
+    description: null,
+    status: 'draft',
+    welcome_message: null,
+    end_message: null,
+    default_language: 'en',
+    settings: null,
+    created_at: '2024-01-03T10:00:00Z',
+    updated_at: '2024-01-10T11:00:00Z',
+  },
+]
+
 export const mockUser = {
   id: '00000000-0000-0000-0000-000000000001',
   email: 'test@example.com',
@@ -94,6 +162,26 @@ export const handlers = [
       )
     }
     return HttpResponse.json(mockUser, { status: 200 })
+  }),
+
+  // GET /api/v1/surveys
+  http.get(`${BASE}/surveys`, ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    return HttpResponse.json(
+      {
+        items: mockSurveys,
+        total: mockSurveys.length,
+        page: 1,
+        per_page: 100,
+      },
+      { status: 200 },
+    )
   }),
 
   // PATCH /api/v1/auth/me
