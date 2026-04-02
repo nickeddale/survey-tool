@@ -82,6 +82,7 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
   const selectedItem = useBuilderStore((s) => s.selectedItem)
   const groups = useBuilderStore((s) => s.groups)
   const updateQuestion = useBuilderStore((s) => s.updateQuestion)
+  const setSaveStatus = useBuilderStore((s) => s.setSaveStatus)
 
   // Find selected question and its group
   const selectedGroup = selectedItem?.type === 'question'
@@ -105,7 +106,6 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
   const [relevance, setRelevance] = useState('')
   const [validationJson, setValidationJson] = useState('')
   const [validationError, setValidationError] = useState<string | null>(null)
-  const [patchError, setPatchError] = useState<string | null>(null)
 
   // Type-specific settings (JSONB)
   const [settingsJson, setSettingsJson] = useState<QuestionSettings>(() =>
@@ -154,7 +154,6 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
         selectedQuestion.validation ? JSON.stringify(selectedQuestion.validation, null, 2) : '',
       )
       setValidationError(null)
-      setPatchError(null)
       setPendingType(null)
 
       // Initialize settings from question, null-coalescing with defaults
@@ -179,17 +178,18 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
       if (debounceTimerRef.current !== null) {
         clearTimeout(debounceTimerRef.current)
       }
+      setSaveStatus('saving')
       debounceTimerRef.current = setTimeout(async () => {
         debounceTimerRef.current = null
         try {
           await surveyService.updateQuestion(surveyId, groupId, questionId, updates)
-          setPatchError(null)
+          setSaveStatus('saved')
         } catch {
-          setPatchError('Failed to save changes. Please try again.')
+          setSaveStatus('error', 'Failed to save changes. Please try again.')
         }
       }, 500)
     },
-    [surveyId],
+    [surveyId, setSaveStatus],
   )
 
   // -------------------------------------------------------------------------
@@ -337,17 +337,6 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
 
   return (
     <div className="p-3 space-y-3" data-testid="question-properties">
-      {/* Save error */}
-      {patchError && (
-        <div
-          className="p-2 text-xs text-destructive bg-destructive/10 rounded"
-          role="alert"
-          data-testid="question-editor-patch-error"
-        >
-          {patchError}
-        </div>
-      )}
-
       {/* Incompatible type change warning dialog */}
       {pendingType && (
         <div

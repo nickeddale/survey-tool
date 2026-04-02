@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-02T15:51:35.863Z",
+  "lastUpdated": "2026-04-02T16:04:01.914Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -995,6 +995,25 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-02-iss-047-311-autosave-and-save-indicator.md",
+      "ticketId": "ISS-047",
+      "title": "3.11: Autosave and Save Indicator",
+      "date": "2026-04-02",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -1047,7 +1066,8 @@
       "2026-04-02-iss-043-37-answer-option-editor.md",
       "2026-04-02-iss-044-38-question-type-specific-settings-forms.md",
       "2026-04-02-iss-045-39-question-preview-component.md",
-      "2026-04-02-iss-046-310-survey-preview-mode.md"
+      "2026-04-02-iss-046-310-survey-preview-mode.md",
+      "2026-04-02-iss-047-311-autosave-and-save-indicator.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1096,7 +1116,8 @@
       "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
       "2026-04-02-iss-043-37-answer-option-editor.md",
       "2026-04-02-iss-044-38-question-type-specific-settings-forms.md",
-      "2026-04-02-iss-046-310-survey-preview-mode.md"
+      "2026-04-02-iss-046-310-survey-preview-mode.md",
+      "2026-04-02-iss-047-311-autosave-and-save-indicator.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1187,7 +1208,8 @@
       "2026-04-02-iss-043-37-answer-option-editor.md",
       "2026-04-02-iss-044-38-question-type-specific-settings-forms.md",
       "2026-04-02-iss-045-39-question-preview-component.md",
-      "2026-04-02-iss-046-310-survey-preview-mode.md"
+      "2026-04-02-iss-046-310-survey-preview-mode.md",
+      "2026-04-02-iss-047-311-autosave-and-save-indicator.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1254,7 +1276,8 @@
       "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md",
       "2026-04-02-iss-043-37-answer-option-editor.md",
       "2026-04-02-iss-044-38-question-type-specific-settings-forms.md",
-      "2026-04-02-iss-045-39-question-preview-component.md"
+      "2026-04-02-iss-045-39-question-preview-component.md",
+      "2026-04-02-iss-047-311-autosave-and-save-indicator.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1304,7 +1327,8 @@
       "2026-04-02-iss-043-37-answer-option-editor.md",
       "2026-04-02-iss-044-38-question-type-specific-settings-forms.md",
       "2026-04-02-iss-045-39-question-preview-component.md",
-      "2026-04-02-iss-046-310-survey-preview-mode.md"
+      "2026-04-02-iss-046-310-survey-preview-mode.md",
+      "2026-04-02-iss-047-311-autosave-and-save-indicator.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1332,7 +1356,8 @@
       "2026-04-02-iss-041-35-drag-and-drop-for-question-reordering-within-an.md",
       "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md",
       "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
-      "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md"
+      "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md",
+      "2026-04-02-iss-047-311-autosave-and-save-indicator.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1389,7 +1414,8 @@
       "2026-04-02-iss-043-37-answer-option-editor.md",
       "2026-04-02-iss-044-38-question-type-specific-settings-forms.md",
       "2026-04-02-iss-045-39-question-preview-component.md",
-      "2026-04-02-iss-046-310-survey-preview-mode.md"
+      "2026-04-02-iss-046-310-survey-preview-mode.md",
+      "2026-04-02-iss-047-311-autosave-and-save-indicator.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1438,7 +1464,8 @@
       "2026-04-02-iss-043-37-answer-option-editor.md",
       "2026-04-02-iss-044-38-question-type-specific-settings-forms.md",
       "2026-04-02-iss-045-39-question-preview-component.md",
-      "2026-04-02-iss-046-310-survey-preview-mode.md"
+      "2026-04-02-iss-046-310-survey-preview-mode.md",
+      "2026-04-02-iss-047-311-autosave-and-save-indicator.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
