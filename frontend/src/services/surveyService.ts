@@ -6,6 +6,8 @@ export interface SurveyFetchParams {
   per_page?: number
   sort_by?: string
   sort_order?: 'asc' | 'desc'
+  status?: string
+  search?: string
 }
 
 export interface DashboardStats {
@@ -20,6 +22,10 @@ class SurveyService {
   async fetchSurveys(params: SurveyFetchParams = {}): Promise<SurveyListResponse> {
     const response = await apiClient.get<SurveyListResponse>('/surveys', { params })
     return response.data
+  }
+
+  async deleteSurvey(id: string): Promise<void> {
+    await apiClient.delete(`/surveys/${id}`)
   }
 
   async getDashboardStats(): Promise<{ stats: DashboardStats; recentSurveys: SurveyResponse[] }> {

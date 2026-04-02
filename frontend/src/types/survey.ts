@@ -64,6 +64,7 @@ export interface SurveyListResponse {
   total: number
   page: number
   per_page: number
+  total_pages?: number
 }
 
 export interface ApiKeyResponse {
