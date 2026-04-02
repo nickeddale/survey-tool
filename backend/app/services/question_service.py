@@ -9,6 +9,17 @@ from app.models.question import Question
 from app.models.question_group import QuestionGroup
 from app.models.survey import Survey
 from app.services.survey_service import check_survey_editable
+from app.services.validators.choice_validators import (
+    validate_checkbox_settings,
+    validate_dropdown_settings,
+    validate_radio_settings,
+)
+
+_CHOICE_TYPE_VALIDATORS = {
+    "single_choice": validate_radio_settings,
+    "dropdown": validate_dropdown_settings,
+    "multiple_choice": validate_checkbox_settings,
+}
 
 
 def _with_eager_loads():
@@ -157,6 +168,13 @@ async def create_question(
     if existing.scalar_one_or_none() is not None:
         raise ValueError(f"Question code '{code}' already exists in this survey")
 
+    # Validate settings for choice question types.
+    # At creation time there are no answer_options yet, so we validate with an
+    # empty list — meaning settings cannot be provided on a new question that
+    # has no options (the "at least one option" check fires immediately).
+    if settings is not None and question_type in _CHOICE_TYPE_VALIDATORS:
+        _CHOICE_TYPE_VALIDATORS[question_type](settings, [])
+
     question = Question(
         group_id=group_id,
         parent_id=parent_id,
@@ -245,6 +263,13 @@ async def update_question(
     survey = survey_result.scalar_one_or_none()
     if survey is not None:
         check_survey_editable(survey)
+
+    # Validate settings when question type is a choice type and settings are being updated.
+    new_settings = kwargs.get("settings", question.settings)
+    effective_type = kwargs.get("question_type", question.question_type)
+    if new_settings is not None and effective_type in _CHOICE_TYPE_VALIDATORS:
+        _CHOICE_TYPE_VALIDATORS[effective_type](new_settings, list(question.answer_options))
+
     for field, value in kwargs.items():
         setattr(question, field, value)
 
