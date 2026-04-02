@@ -113,7 +113,7 @@ export const mockSurveyFull = {
           id: 'q1',
           group_id: 'g1',
           parent_id: null,
-          question_type: 'text',
+          question_type: 'short_text',
           code: 'Q1',
           title: 'What is your name?',
           description: null,

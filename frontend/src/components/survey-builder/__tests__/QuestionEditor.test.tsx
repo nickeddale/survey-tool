@@ -260,13 +260,13 @@ describe('code field auto-generate toggle', () => {
 describe('question type dropdown', () => {
   it('shows warning when switching to incompatible type', async () => {
     const user = userEvent.setup()
-    // Q2 is 'radio' (choice type). Switching to 'text' (non-choice) is incompatible.
+    // Q2 is 'radio' (choice type). Switching to 'short_text' (non-choice) is incompatible.
     useBuilderStore.getState().setSelectedItem({ type: 'question', id: Q2.id })
     renderEditor()
 
     const typeSelect = screen.getByTestId('property-question-type')
     await act(async () => {
-      await user.selectOptions(typeSelect, 'text')
+      await user.selectOptions(typeSelect, 'short_text')
     })
 
     await waitFor(() => {
@@ -282,7 +282,7 @@ describe('question type dropdown', () => {
 
     const typeSelect = screen.getByTestId('property-question-type')
     await act(async () => {
-      await user.selectOptions(typeSelect, 'text')
+      await user.selectOptions(typeSelect, 'short_text')
     })
 
     await waitFor(() => expect(screen.getByTestId('type-change-warning')).toBeInTheDocument())
@@ -297,7 +297,7 @@ describe('question type dropdown', () => {
     await waitFor(() => {
       const { groups } = useBuilderStore.getState()
       const q = groups.flatMap((g) => g.questions).find((q) => q.id === Q2.id)
-      expect(q?.question_type).toBe('text')
+      expect(q?.question_type).toBe('short_text')
     })
   })
 
@@ -308,7 +308,7 @@ describe('question type dropdown', () => {
 
     const typeSelect = screen.getByTestId('property-question-type')
     await act(async () => {
-      await user.selectOptions(typeSelect, 'text')
+      await user.selectOptions(typeSelect, 'short_text')
     })
 
     await waitFor(() => expect(screen.getByTestId('type-change-warning')).toBeInTheDocument())

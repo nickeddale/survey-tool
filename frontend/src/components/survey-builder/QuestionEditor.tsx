@@ -10,22 +10,45 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { useBuilderStore } from '../../store/builderStore'
 import surveyService from '../../services/surveyService'
 import type { BuilderQuestion } from '../../store/builderStore'
+import { QuestionSettingsForm } from './settings/QuestionSettingsForm'
+import {
+  getDefaultSettings,
+  getCompatibleSettings,
+} from '../../types/questionSettings'
+import type { QuestionSettings } from '../../types/questionSettings'
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
 const QUESTION_TYPE_OPTIONS = [
-  { value: 'text', label: 'Short Text' },
-  { value: 'textarea', label: 'Long Text' },
-  { value: 'radio', label: 'Single Choice' },
-  { value: 'checkbox', label: 'Multiple Choice' },
-  { value: 'select', label: 'Dropdown' },
-  { value: 'number', label: 'Number' },
+  // Text types
+  { value: 'short_text', label: 'Short Text' },
+  { value: 'long_text', label: 'Long Text' },
+  { value: 'huge_text', label: 'Huge Text' },
+  // Choice types
+  { value: 'radio', label: 'Single Choice (Radio)' },
+  { value: 'dropdown', label: 'Dropdown' },
+  { value: 'checkbox', label: 'Multiple Choice (Checkbox)' },
+  { value: 'ranking', label: 'Ranking' },
+  { value: 'image_picker', label: 'Image Picker' },
+  // Matrix types
+  { value: 'matrix', label: 'Matrix' },
+  { value: 'matrix_dropdown', label: 'Matrix Dropdown' },
+  { value: 'matrix_dynamic', label: 'Matrix Dynamic' },
+  // Scalar types
+  { value: 'numeric', label: 'Numeric' },
+  { value: 'rating', label: 'Rating' },
+  { value: 'boolean', label: 'Yes/No (Boolean)' },
+  { value: 'date', label: 'Date' },
+  // Special types
+  { value: 'file_upload', label: 'File Upload' },
+  { value: 'expression', label: 'Expression' },
+  { value: 'html', label: 'HTML Content' },
 ]
 
 // Types that have answer options — changing away from these loses options data
-const CHOICE_TYPES = new Set(['radio', 'checkbox', 'select'])
+const CHOICE_TYPES = new Set(['radio', 'checkbox', 'dropdown', 'ranking', 'image_picker'])
 
 function isIncompatibleTypeChange(from: string, to: string): boolean {
   return CHOICE_TYPES.has(from) !== CHOICE_TYPES.has(to)
@@ -75,13 +98,21 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
   const [title, setTitle] = useState('')
   const [code, setCode] = useState('')
   const [codeIsCustom, setCodeIsCustom] = useState(false)
-  const [questionType, setQuestionType] = useState('text')
+  const [questionType, setQuestionType] = useState('short_text')
   const [description, setDescription] = useState('')
   const [isRequired, setIsRequired] = useState(false)
   const [relevance, setRelevance] = useState('')
   const [validationJson, setValidationJson] = useState('')
   const [validationError, setValidationError] = useState<string | null>(null)
   const [patchError, setPatchError] = useState<string | null>(null)
+
+  // Type-specific settings (JSONB)
+  const [settingsJson, setSettingsJson] = useState<QuestionSettings>(() =>
+    getDefaultSettings('short_text'),
+  )
+
+  // Settings section expand/collapse state (local UI only — not persisted)
+  const [settingsExpanded, setSettingsExpanded] = useState(true)
 
   // Incompatible type change warning
   const [pendingType, setPendingType] = useState<string | null>(null)
@@ -124,6 +155,11 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
       setValidationError(null)
       setPatchError(null)
       setPendingType(null)
+
+      // Initialize settings from question, null-coalescing with defaults
+      const initialSettings = (selectedQuestion.settings as QuestionSettings | null) ??
+        getDefaultSettings(selectedQuestion.question_type)
+      setSettingsJson(initialSettings)
 
       // Cancel any pending debounce from previous question
       if (debounceTimerRef.current !== null) {
@@ -209,10 +245,23 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
 
   function applyTypeChange(newType: string) {
     if (!selectedGroup || !selectedQuestion) return
+
+    // Snapshot current settings BEFORE state mutation (avoid stale closure)
+    const currentSettings = settingsJson as unknown as Record<string, unknown>
+    const compatibleSettings = getCompatibleSettings(questionType, newType, currentSettings)
+
     setQuestionType(newType)
     setPendingType(null)
-    updateQuestion(selectedGroup.id, selectedQuestion.id, { question_type: newType })
-    schedulePatch(selectedGroup.id, selectedQuestion.id, { question_type: newType })
+    setSettingsJson(compatibleSettings as unknown as QuestionSettings)
+
+    updateQuestion(selectedGroup.id, selectedQuestion.id, {
+      question_type: newType,
+      settings: compatibleSettings,
+    })
+    schedulePatch(selectedGroup.id, selectedQuestion.id, {
+      question_type: newType,
+      settings: compatibleSettings,
+    })
   }
 
   function handleDescriptionChange(value: string) {
@@ -253,6 +302,15 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
     } catch {
       setValidationError('Invalid JSON')
     }
+  }
+
+  function handleSettingsChange(updates: Partial<Record<string, unknown>>) {
+    if (!selectedGroup || !selectedQuestion) return
+
+    const newSettings = { ...(settingsJson as unknown as Record<string, unknown>), ...updates } as unknown as QuestionSettings
+    setSettingsJson(newSettings)
+    updateQuestion(selectedGroup.id, selectedQuestion.id, { settings: newSettings as unknown as Record<string, unknown> })
+    schedulePatch(selectedGroup.id, selectedQuestion.id, { settings: newSettings })
   }
 
   // -------------------------------------------------------------------------
@@ -457,6 +515,33 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
           >
             {validationError}
           </p>
+        )}
+      </div>
+
+      {/* Type Settings collapsible section */}
+      <div
+        className="rounded-md border border-border"
+        data-testid="type-settings-section"
+      >
+        <button
+          className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-muted-foreground
+            hover:bg-muted/50 rounded-md transition-colors"
+          onClick={() => setSettingsExpanded((prev) => !prev)}
+          aria-expanded={settingsExpanded}
+          data-testid="type-settings-toggle"
+        >
+          <span>Type Settings</span>
+          <span className="text-muted-foreground">{settingsExpanded ? '▲' : '▼'}</span>
+        </button>
+        {settingsExpanded && (
+          <div className="px-3 pb-3 pt-1">
+            <QuestionSettingsForm
+              type={questionType}
+              settings={settingsJson}
+              onChange={handleSettingsChange}
+              readOnly={readOnly}
+            />
+          </div>
         )}
       </div>
 

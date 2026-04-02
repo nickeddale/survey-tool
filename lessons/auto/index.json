@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-02T15:09:27.016Z",
+  "lastUpdated": "2026-04-02T15:28:14.459Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -940,6 +940,27 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-02-iss-044-38-question-type-specific-settings-forms.md",
+      "ticketId": "ISS-044",
+      "title": "3.8: Question Type-Specific Settings Forms",
+      "date": "2026-04-02",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "refactoring",
+        "bug-fix",
+        "feature",
+        "security",
+        "config",
+        "ci-cd",
+        "documentation"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -989,7 +1010,8 @@
       "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
       "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md",
       "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
-      "2026-04-02-iss-043-37-answer-option-editor.md"
+      "2026-04-02-iss-043-37-answer-option-editor.md",
+      "2026-04-02-iss-044-38-question-type-specific-settings-forms.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1036,7 +1058,8 @@
       "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
       "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md",
       "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
-      "2026-04-02-iss-043-37-answer-option-editor.md"
+      "2026-04-02-iss-043-37-answer-option-editor.md",
+      "2026-04-02-iss-044-38-question-type-specific-settings-forms.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1124,7 +1147,8 @@
       "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
       "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md",
       "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
-      "2026-04-02-iss-043-37-answer-option-editor.md"
+      "2026-04-02-iss-043-37-answer-option-editor.md",
+      "2026-04-02-iss-044-38-question-type-specific-settings-forms.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1141,7 +1165,8 @@
       "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md",
       "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
       "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
-      "2026-04-02-iss-041-35-drag-and-drop-for-question-reordering-within-an.md"
+      "2026-04-02-iss-041-35-drag-and-drop-for-question-reordering-within-an.md",
+      "2026-04-02-iss-044-38-question-type-specific-settings-forms.md"
     ],
     "bug-fix": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1188,7 +1213,8 @@
       "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md",
       "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
       "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md",
-      "2026-04-02-iss-043-37-answer-option-editor.md"
+      "2026-04-02-iss-043-37-answer-option-editor.md",
+      "2026-04-02-iss-044-38-question-type-specific-settings-forms.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1235,7 +1261,8 @@
       "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
       "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md",
       "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
-      "2026-04-02-iss-043-37-answer-option-editor.md"
+      "2026-04-02-iss-043-37-answer-option-editor.md",
+      "2026-04-02-iss-044-38-question-type-specific-settings-forms.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1276,7 +1303,8 @@
       "2026-04-02-iss-028-22-api-client-and-auth-service-layer.md",
       "2026-04-02-iss-033-27-survey-list-page-with-pagination-search-and-fil.md",
       "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
-      "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md"
+      "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md",
+      "2026-04-02-iss-044-38-question-type-specific-settings-forms.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1316,7 +1344,8 @@
       "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
       "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md",
       "2026-04-02-iss-038-32-question-group-panel-list-add-reorder-delete.md",
-      "2026-04-02-iss-043-37-answer-option-editor.md"
+      "2026-04-02-iss-043-37-answer-option-editor.md",
+      "2026-04-02-iss-044-38-question-type-specific-settings-forms.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1362,7 +1391,8 @@
       "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
       "2026-04-02-iss-052-bug-jsdom-navigation-warnings-in-apiclient-tests.md",
       "2026-04-02-iss-053-bug-act-warnings-in-surveyspage-and-surveydetailpa.md",
-      "2026-04-02-iss-043-37-answer-option-editor.md"
+      "2026-04-02-iss-043-37-answer-option-editor.md",
+      "2026-04-02-iss-044-38-question-type-specific-settings-forms.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -1400,7 +1430,8 @@
       "2026-04-02-iss-041-35-drag-and-drop-for-question-reordering-within-an.md",
       "2026-04-02-iss-042-36-question-editor-panel-properties-editor.md",
       "2026-04-02-iss-050-27-fix-add-returnto-url-preservation-to-protectedr.md",
-      "2026-04-02-iss-051-22-fix-install-shadcnui-components.md"
+      "2026-04-02-iss-051-22-fix-install-shadcnui-components.md",
+      "2026-04-02-iss-044-38-question-type-specific-settings-forms.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md"
