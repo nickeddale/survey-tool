@@ -369,6 +369,7 @@ function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem }: Survey
       }
 
       // --- Question reorder / move ---
+
       // Find the group that contains the dragged question
       const fromGroup = currentGroups.find((g) =>
         g.questions.some((q) => q.id === activeId),
