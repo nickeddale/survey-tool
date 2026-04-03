@@ -1,6 +1,7 @@
 """Expression language services package.
 
-Provides lexing (tokenization) and parsing of survey expression strings.
+Provides lexing (tokenization), parsing, and evaluation of survey expression
+strings.
 """
 
 from app.services.expressions.lexer import (
@@ -20,6 +21,11 @@ from app.services.expressions.ast_nodes import (
     ParserError,
 )
 from app.services.expressions.parser import parse
+from app.services.expressions.evaluator import (
+    evaluate,
+    Evaluator,
+    EvaluationError,
+)
 
 __all__ = [
     # Lexer
@@ -38,4 +44,8 @@ __all__ = [
     # Parser
     "parse",
     "ParserError",
+    # Evaluator
+    "evaluate",
+    "Evaluator",
+    "EvaluationError",
 ]
