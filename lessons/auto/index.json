@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-03T05:49:08.199Z",
+  "lastUpdated": "2026-04-03T06:08:51.139Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1268,6 +1268,25 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-03-iss-067-411-frontend-special-input-components.md",
+      "ticketId": "ISS-067",
+      "title": "4.11: Frontend — Special Input Components",
+      "date": "2026-04-03",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -1334,7 +1353,8 @@
       "2026-04-03-iss-063-47-frontend-text-input-components.md",
       "2026-04-03-iss-064-48-frontend-choice-input-components.md",
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
-      "2026-04-03-iss-066-410-frontend-scalar-input-components.md"
+      "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
+      "2026-04-03-iss-067-411-frontend-special-input-components.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1395,7 +1415,8 @@
       "2026-04-02-iss-061-45-backend-special-question-types-ranking-imagepic.md",
       "2026-04-03-iss-063-47-frontend-text-input-components.md",
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
-      "2026-04-03-iss-066-410-frontend-scalar-input-components.md"
+      "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
+      "2026-04-03-iss-067-411-frontend-special-input-components.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1446,7 +1467,8 @@
       "2026-04-03-iss-063-47-frontend-text-input-components.md",
       "2026-04-03-iss-064-48-frontend-choice-input-components.md",
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
-      "2026-04-03-iss-066-410-frontend-scalar-input-components.md"
+      "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
+      "2026-04-03-iss-067-411-frontend-special-input-components.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1510,7 +1532,8 @@
       "2026-04-03-iss-063-47-frontend-text-input-components.md",
       "2026-04-03-iss-064-48-frontend-choice-input-components.md",
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
-      "2026-04-03-iss-066-410-frontend-scalar-input-components.md"
+      "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
+      "2026-04-03-iss-067-411-frontend-special-input-components.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1592,7 +1615,8 @@
       "2026-04-03-iss-063-47-frontend-text-input-components.md",
       "2026-04-03-iss-064-48-frontend-choice-input-components.md",
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
-      "2026-04-03-iss-066-410-frontend-scalar-input-components.md"
+      "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
+      "2026-04-03-iss-067-411-frontend-special-input-components.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1655,7 +1679,8 @@
       "2026-04-03-iss-063-47-frontend-text-input-components.md",
       "2026-04-03-iss-064-48-frontend-choice-input-components.md",
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
-      "2026-04-03-iss-066-410-frontend-scalar-input-components.md"
+      "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
+      "2026-04-03-iss-067-411-frontend-special-input-components.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1760,7 +1785,8 @@
       "2026-04-03-iss-063-47-frontend-text-input-components.md",
       "2026-04-03-iss-064-48-frontend-choice-input-components.md",
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
-      "2026-04-03-iss-066-410-frontend-scalar-input-components.md"
+      "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
+      "2026-04-03-iss-067-411-frontend-special-input-components.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1822,7 +1848,8 @@
       "2026-04-03-iss-063-47-frontend-text-input-components.md",
       "2026-04-03-iss-064-48-frontend-choice-input-components.md",
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
-      "2026-04-03-iss-066-410-frontend-scalar-input-components.md"
+      "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
+      "2026-04-03-iss-067-411-frontend-special-input-components.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",

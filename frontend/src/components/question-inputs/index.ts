@@ -40,3 +40,18 @@ export type { BooleanInputProps } from './BooleanInput'
 
 export { DateInput } from './DateInput'
 export type { DateInputProps } from './DateInput'
+
+export { RankingInput } from './RankingInput'
+export type { RankingInputProps } from './RankingInput'
+
+export { ImagePickerInput } from './ImagePickerInput'
+export type { ImagePickerInputProps } from './ImagePickerInput'
+
+export { FileUploadInput } from './FileUploadInput'
+export type { FileUploadInputProps } from './FileUploadInput'
+
+export { ExpressionDisplay } from './ExpressionDisplay'
+export type { ExpressionDisplayProps } from './ExpressionDisplay'
+
+export { HtmlContent } from './HtmlContent'
+export type { HtmlContentProps } from './HtmlContent'
