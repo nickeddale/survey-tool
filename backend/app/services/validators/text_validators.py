@@ -1,9 +1,14 @@
-"""Answer validators for text-based question types.
+"""Settings and answer validators for text-based question types.
 
-Types covered: short_text, long_text, email, phone, url.
+Types covered: short_text, long_text, huge_text, email, phone, url.
 
-Each validator:
+Each settings validator:
+- Validates type-specific settings fields.
+- Raises UnprocessableError with a descriptive message on invalid settings.
+
+Each answer validator:
 - Enforces is_required.
+- Applies settings constraints (max_length, input_type format checks).
 - Applies validation JSONB rules (min_length, max_length, regex) where relevant.
 - Returns None on success; raises UnprocessableError on failure.
 """
@@ -68,8 +73,134 @@ def _apply_text_validation_rules(value: str, validation: dict | None) -> None:
             pass
 
 
+def _check_email_format(value: str) -> None:
+    """Raise UnprocessableError if value is not a valid email address."""
+    if "@" not in value or value.startswith("@") or value.endswith("@"):
+        raise UnprocessableError("Answer must be a valid email address")
+    local, _, domain = value.partition("@")
+    if not local or not domain or "." not in domain:
+        raise UnprocessableError("Answer must be a valid email address")
+
+
+def _check_url_format(value: str) -> None:
+    """Raise UnprocessableError if value is not a valid URL."""
+    if not re.match(r"^https?://.+", value):
+        raise UnprocessableError(
+            "Answer must be a valid URL starting with http:// or https://"
+        )
+
+
 # ---------------------------------------------------------------------------
-# Public validators
+# Settings (config) validators
+# ---------------------------------------------------------------------------
+
+
+_VALID_INPUT_TYPES = frozenset({"text", "email", "url", "tel"})
+
+
+def validate_short_text_settings(settings: dict | None) -> None:
+    """Validate settings for short_text questions.
+
+    Optional fields:
+    - placeholder: string or null
+    - max_length: integer <= 255 (default 255)
+    - input_type: one of text, email, url, tel (default text)
+    """
+    if settings is None:
+        return
+
+    if "placeholder" in settings and settings["placeholder"] is not None:
+        if not isinstance(settings["placeholder"], str):
+            raise UnprocessableError("settings.placeholder must be a string or null")
+
+    if "max_length" in settings:
+        max_length = settings["max_length"]
+        if not isinstance(max_length, int) or isinstance(max_length, bool):
+            raise UnprocessableError("settings.max_length must be an integer")
+        if max_length <= 0:
+            raise UnprocessableError("settings.max_length must be > 0")
+        if max_length > 255:
+            raise UnprocessableError("settings.max_length must be <= 255 for short_text")
+
+    if "input_type" in settings:
+        input_type = settings["input_type"]
+        if input_type not in _VALID_INPUT_TYPES:
+            raise UnprocessableError(
+                f"settings.input_type must be one of: {', '.join(sorted(_VALID_INPUT_TYPES))}"
+            )
+
+
+def validate_long_text_settings(settings: dict | None) -> None:
+    """Validate settings for long_text questions.
+
+    Optional fields:
+    - placeholder: string or null
+    - max_length: integer <= 5000 (default 5000)
+    - rows: integer > 0 (default 4)
+    """
+    if settings is None:
+        return
+
+    if "placeholder" in settings and settings["placeholder"] is not None:
+        if not isinstance(settings["placeholder"], str):
+            raise UnprocessableError("settings.placeholder must be a string or null")
+
+    if "max_length" in settings:
+        max_length = settings["max_length"]
+        if not isinstance(max_length, int) or isinstance(max_length, bool):
+            raise UnprocessableError("settings.max_length must be an integer")
+        if max_length <= 0:
+            raise UnprocessableError("settings.max_length must be > 0")
+        if max_length > 5000:
+            raise UnprocessableError("settings.max_length must be <= 5000 for long_text")
+
+    if "rows" in settings:
+        rows = settings["rows"]
+        if not isinstance(rows, int) or isinstance(rows, bool):
+            raise UnprocessableError("settings.rows must be an integer")
+        if rows <= 0:
+            raise UnprocessableError("settings.rows must be > 0")
+
+
+def validate_huge_text_settings(settings: dict | None) -> None:
+    """Validate settings for huge_text questions.
+
+    Optional fields:
+    - placeholder: string or null
+    - max_length: integer <= 50000 (default 50000)
+    - rows: integer > 0 (default 10)
+    - rich_text: boolean (default false)
+    """
+    if settings is None:
+        return
+
+    if "placeholder" in settings and settings["placeholder"] is not None:
+        if not isinstance(settings["placeholder"], str):
+            raise UnprocessableError("settings.placeholder must be a string or null")
+
+    if "max_length" in settings:
+        max_length = settings["max_length"]
+        if not isinstance(max_length, int) or isinstance(max_length, bool):
+            raise UnprocessableError("settings.max_length must be an integer")
+        if max_length <= 0:
+            raise UnprocessableError("settings.max_length must be > 0")
+        if max_length > 50000:
+            raise UnprocessableError("settings.max_length must be <= 50000 for huge_text")
+
+    if "rows" in settings:
+        rows = settings["rows"]
+        if not isinstance(rows, int) or isinstance(rows, bool):
+            raise UnprocessableError("settings.rows must be an integer")
+        if rows <= 0:
+            raise UnprocessableError("settings.rows must be > 0")
+
+    if "rich_text" in settings:
+        if not isinstance(settings["rich_text"], bool):
+            raise UnprocessableError("settings.rich_text must be a boolean")
+
+
+# ---------------------------------------------------------------------------
+# Public answer validators
 # ---------------------------------------------------------------------------
 
 
@@ -77,11 +208,27 @@ def validate_short_text_answer(answer: dict, question) -> None:
     """Validate a submitted answer for a short_text question.
 
     answer: {"value": str | None}
-    Applies min_length, max_length, regex from question.validation.
+    - Enforces max_length from settings (if set).
+    - Validates email/url format when input_type setting specifies it.
+    - Applies min_length, max_length, regex from question.validation.
     """
     value = _validate_text_value(answer, question)
     if value is None:
         return
+
+    settings = question.settings or {}
+    max_length = settings.get("max_length", 255)
+    if len(value) > max_length:
+        raise UnprocessableError(
+            f"Answer must be at most {max_length} character(s) long"
+        )
+
+    input_type = settings.get("input_type", "text")
+    if input_type == "email":
+        _check_email_format(value)
+    elif input_type == "url":
+        _check_url_format(value)
+
     _apply_text_validation_rules(value, question.validation)
 
 
@@ -89,11 +236,41 @@ def validate_long_text_answer(answer: dict, question) -> None:
     """Validate a submitted answer for a long_text question.
 
     answer: {"value": str | None}
-    Applies min_length, max_length, regex from question.validation.
+    - Enforces max_length from settings (if set).
+    - Applies min_length, max_length, regex from question.validation.
     """
     value = _validate_text_value(answer, question)
     if value is None:
         return
+
+    settings = question.settings or {}
+    max_length = settings.get("max_length", 5000)
+    if len(value) > max_length:
+        raise UnprocessableError(
+            f"Answer must be at most {max_length} character(s) long"
+        )
+
+    _apply_text_validation_rules(value, question.validation)
+
+
+def validate_huge_text_answer(answer: dict, question) -> None:
+    """Validate a submitted answer for a huge_text question.
+
+    answer: {"value": str | None}
+    - Enforces max_length from settings (if set).
+    - Applies min_length, max_length, regex from question.validation.
+    """
+    value = _validate_text_value(answer, question)
+    if value is None:
+        return
+
+    settings = question.settings or {}
+    max_length = settings.get("max_length", 50000)
+    if len(value) > max_length:
+        raise UnprocessableError(
+            f"Answer must be at most {max_length} character(s) long"
+        )
+
     _apply_text_validation_rules(value, question.validation)
 
 
@@ -108,14 +285,7 @@ def validate_email_answer(answer: dict, question) -> None:
     if value is None:
         return
 
-    # Basic structural check
-    if "@" not in value or value.startswith("@") or value.endswith("@"):
-        raise UnprocessableError("Answer must be a valid email address")
-
-    local, _, domain = value.partition("@")
-    if not local or not domain or "." not in domain:
-        raise UnprocessableError("Answer must be a valid email address")
-
+    _check_email_format(value)
     _apply_text_validation_rules(value, question.validation)
 
 
@@ -150,9 +320,5 @@ def validate_url_answer(answer: dict, question) -> None:
     if value is None:
         return
 
-    if not re.match(r"^https?://.+", value):
-        raise UnprocessableError(
-            "Answer must be a valid URL starting with http:// or https://"
-        )
-
+    _check_url_format(value)
     _apply_text_validation_rules(value, question.validation)

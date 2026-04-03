@@ -37,8 +37,12 @@ from app.services.validators.scalar_validators import (
     validate_rating_answer,
 )
 from app.services.validators.text_validators import (
+    validate_short_text_settings,
+    validate_long_text_settings,
+    validate_huge_text_settings,
     validate_short_text_answer,
     validate_long_text_answer,
+    validate_huge_text_answer,
     validate_email_answer,
     validate_phone_answer,
     validate_url_answer,
@@ -84,7 +88,7 @@ __all__ = [
 _CHOICE_TYPES = frozenset({"single_choice", "dropdown", "multiple_choice"})
 _MATRIX_TYPES = frozenset({"matrix", "matrix_dropdown", "matrix_dynamic"})
 _SCALAR_TYPES = frozenset({"numeric", "rating", "boolean", "date"})
-_TEXT_TYPES = frozenset({"short_text", "long_text", "email", "phone", "url"})
+_TEXT_TYPES = frozenset({"short_text", "long_text", "huge_text", "email", "phone", "url"})
 _MISC_TYPES = frozenset({"scale", "yes_no", "time", "datetime", "file_upload", "number"})
 # Special types that require answer_options in their config/answer validators
 _SPECIAL_CHOICE_TYPES = frozenset({"ranking", "image_picker"})
@@ -111,6 +115,10 @@ _CONFIG_VALIDATORS: dict[str, Callable] = {
     # special (choice-like: require answer_options)
     "ranking": validate_ranking_settings,
     "image_picker": validate_image_picker_settings,
+    # text
+    "short_text": validate_short_text_settings,
+    "long_text": validate_long_text_settings,
+    "huge_text": validate_huge_text_settings,
     # special (scalar-like: no answer_options needed)
     "file_upload": validate_file_upload_settings,
     "expression": validate_expression_settings,
@@ -136,6 +144,7 @@ _ANSWER_VALIDATORS: dict[str, Callable] = {
     # text (signature: answer, question)
     "short_text": validate_short_text_answer,
     "long_text": validate_long_text_answer,
+    "huge_text": validate_huge_text_answer,
     "email": validate_email_answer,
     "phone": validate_phone_answer,
     "url": validate_url_answer,

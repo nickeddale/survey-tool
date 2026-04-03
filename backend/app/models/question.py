@@ -11,6 +11,7 @@ from app.database import Base
 VALID_QUESTION_TYPES = (
     "short_text",
     "long_text",
+    "huge_text",
     "single_choice",
     "multiple_choice",
     "dropdown",
