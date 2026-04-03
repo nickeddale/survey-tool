@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-03T07:01:06.726Z",
+  "lastUpdated": "2026-04-03T08:41:58.242Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1367,6 +1367,26 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-03-iss-071-51-expression-language-lexertokenizer.md",
+      "ticketId": "ISS-071",
+      "title": "5.1: Expression Language Lexer/Tokenizer",
+      "date": "2026-04-03",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -1438,7 +1458,8 @@
       "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
       "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md",
       "2026-04-03-iss-070-414-question-type-test-suite.md",
-      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md"
+      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md",
+      "2026-04-03-iss-071-51-expression-language-lexertokenizer.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1504,7 +1525,8 @@
       "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
       "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md",
       "2026-04-03-iss-070-414-question-type-test-suite.md",
-      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md"
+      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md",
+      "2026-04-03-iss-071-51-expression-language-lexertokenizer.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1628,7 +1650,8 @@
       "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
       "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md",
       "2026-04-03-iss-070-414-question-type-test-suite.md",
-      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md"
+      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md",
+      "2026-04-03-iss-071-51-expression-language-lexertokenizer.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1716,7 +1739,8 @@
       "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
       "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md",
       "2026-04-03-iss-070-414-question-type-test-suite.md",
-      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md"
+      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md",
+      "2026-04-03-iss-071-51-expression-language-lexertokenizer.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1784,7 +1808,8 @@
       "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
       "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md",
       "2026-04-03-iss-070-414-question-type-test-suite.md",
-      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md"
+      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md",
+      "2026-04-03-iss-071-51-expression-language-lexertokenizer.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1836,7 +1861,8 @@
       "2026-04-02-iss-058-42-backend-choice-question-types-radio-dropdown-ch.md",
       "2026-04-02-iss-059-43-backend-matrix-question-types-matrix-matrixdrop.md",
       "2026-04-02-iss-060-44-backend-scalar-question-types-numeric-rating-bo.md",
-      "2026-04-02-iss-061-45-backend-special-question-types-ranking-imagepic.md"
+      "2026-04-02-iss-061-45-backend-special-question-types-ranking-imagepic.md",
+      "2026-04-03-iss-071-51-expression-language-lexertokenizer.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1895,7 +1921,8 @@
       "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
       "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md",
       "2026-04-03-iss-070-414-question-type-test-suite.md",
-      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md"
+      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md",
+      "2026-04-03-iss-071-51-expression-language-lexertokenizer.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1962,7 +1989,8 @@
       "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
       "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md",
       "2026-04-03-iss-070-414-question-type-test-suite.md",
-      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md"
+      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md",
+      "2026-04-03-iss-071-51-expression-language-lexertokenizer.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -2012,7 +2040,8 @@
       "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
       "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
       "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md",
-      "2026-04-03-iss-070-414-question-type-test-suite.md"
+      "2026-04-03-iss-070-414-question-type-test-suite.md",
+      "2026-04-03-iss-071-51-expression-language-lexertokenizer.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md"
