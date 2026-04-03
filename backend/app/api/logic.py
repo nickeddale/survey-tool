@@ -1,23 +1,29 @@
-"""Logic validation API router.
+"""Logic validation and flow resolution API router.
 
 Provides:
     POST /surveys/{id}/logic/validate-expression
         Validates expression syntax and semantic correctness against
         the question codes of a given survey.
+
+    POST /surveys/{id}/logic/resolve-flow
+        Resolves the survey navigation flow given a set of answers,
+        an optional current question, and a direction (forward/backward).
 """
 
 from __future__ import annotations
 
 import uuid
-from typing import Literal
+from typing import Any, Dict, List, Literal, Optional
 
 from fastapi import APIRouter, Depends, status
 from pydantic import BaseModel
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.database import get_db
 from app.dependencies import get_current_user
+from app.models.answer_option import AnswerOption
 from app.models.question import Question
 from app.models.question_group import QuestionGroup
 from app.models.survey import Survey
@@ -27,7 +33,19 @@ from app.services.expression_engine import (
     ExpressionWarning,
     validate_expression,
 )
-from app.utils.errors import NotFoundError
+from app.services.expressions.flow import (
+    NavigationPosition,
+    get_first_visible_question,
+    get_next_question,
+    get_previous_question,
+    build_ordered_pairs,
+)
+from app.services.expressions.piping import pipe_all
+from app.services.expressions.relevance import (
+    CircularRelevanceError,
+    evaluate_relevance,
+)
+from app.utils.errors import NotFoundError, UnprocessableError
 
 router = APIRouter(prefix="/surveys", tags=["logic"])
 
@@ -198,4 +216,247 @@ async def validate_expression_endpoint(
             )
             for w in validation_result.warnings
         ],
+    )
+
+
+# ---------------------------------------------------------------------------
+# Resolve-flow schemas
+# ---------------------------------------------------------------------------
+
+
+class ResolveFlowRequest(BaseModel):
+    """Request body for the resolve-flow endpoint.
+
+    Attributes:
+        answers:       Flat dict of question code → current answer value.
+        from_question: Optional code of the question the user is currently on.
+                       When None, the response navigates to the first visible
+                       question.
+        direction:     Navigation direction — 'forward' (default) or 'backward'.
+    """
+
+    answers: Dict[str, Any] = {}
+    from_question: Optional[str] = None
+    direction: Literal["forward", "backward"] = "forward"
+
+
+class ResolveFlowResponse(BaseModel):
+    """Response body for the resolve-flow endpoint.
+
+    Attributes:
+        next_question:      Code of the next question to display, or null when
+                            at the end (forward) or beginning (backward) of survey.
+        visible_questions:  Codes of all currently visible questions.
+        hidden_questions:   Codes of all currently hidden questions.
+        visible_groups:     UUIDs (as strings) of currently visible groups.
+        hidden_groups:      UUIDs (as strings) of currently hidden groups.
+        piped_texts:        Dict of piped text entries for all questions/options.
+        validation_results: Per-question relevance expression validation output.
+    """
+
+    next_question: Optional[str]
+    visible_questions: List[str]
+    hidden_questions: List[str]
+    visible_groups: List[str]
+    hidden_groups: List[str]
+    piped_texts: Dict[str, str]
+    validation_results: Dict[str, Any]
+
+
+# ---------------------------------------------------------------------------
+# Resolve-flow route
+# ---------------------------------------------------------------------------
+
+
+@router.post(
+    "/{survey_id}/logic/resolve-flow",
+    response_model=ResolveFlowResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def resolve_flow_endpoint(
+    survey_id: str,
+    payload: ResolveFlowRequest,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> ResolveFlowResponse:
+    """Resolve the survey navigation flow for a given answer state.
+
+    Computes:
+      - Which questions and groups are currently visible or hidden (relevance).
+      - The next question to display (based on direction and from_question).
+      - Piped texts for all question titles, descriptions, and answer option labels.
+      - Per-question relevance expression validation results.
+
+    This endpoint performs no database writes.
+
+    Returns 422 if a circular relevance expression is detected.
+    Returns 404 if from_question references an unknown question code, or if
+    the survey does not exist / is not owned by the current user.
+    """
+    parsed_survey_id = _parse_survey_uuid(survey_id)
+
+    # ------------------------------------------------------------------
+    # Load survey with full eager-load chain in a single query.
+    # WHERE id = :id AND user_id = :user_id prevents existence leaking.
+    # ------------------------------------------------------------------
+    result = await session.execute(
+        select(Survey)
+        .where(
+            Survey.id == parsed_survey_id,
+            Survey.user_id == current_user.id,
+        )
+        .options(
+            selectinload(Survey.groups).selectinload(QuestionGroup.questions).selectinload(Question.answer_options)
+        )
+    )
+    survey = result.scalar_one_or_none()
+    if survey is None:
+        raise NotFoundError("Survey not found")
+
+    # ------------------------------------------------------------------
+    # Use the flat answers dict from the payload as the expression context.
+    # evaluate_relevance() accepts this directly.
+    # ------------------------------------------------------------------
+    answers: Dict[str, Any] = dict(payload.answers)
+
+    # ------------------------------------------------------------------
+    # Evaluate relevance to determine visible/hidden sets.
+    # CircularRelevanceError → HTTP 422.
+    # ------------------------------------------------------------------
+    try:
+        relevance_result = evaluate_relevance(survey, answers=answers)
+    except CircularRelevanceError as exc:
+        raise UnprocessableError(
+            f"Circular reference detected in relevance expressions: {' -> '.join(exc.cycle)}"
+        ) from exc
+
+    # ------------------------------------------------------------------
+    # Build code maps from the survey for navigation lookups.
+    # ------------------------------------------------------------------
+    # id -> code maps for questions and groups
+    question_id_to_code: Dict[uuid.UUID, str] = {}
+    question_code_to_id: Dict[str, uuid.UUID] = {}
+    question_code_to_group_id: Dict[str, uuid.UUID] = {}
+
+    for group in survey.groups:
+        for question in group.questions:
+            if question.parent_id is None:  # top-level only
+                question_id_to_code[question.id] = question.code
+                question_code_to_id[question.code] = question.id
+                question_code_to_group_id[question.code] = group.id
+
+    # ------------------------------------------------------------------
+    # Resolve navigation position.
+    # ------------------------------------------------------------------
+    next_question_code: Optional[str] = None
+
+    if payload.from_question is None:
+        # Start at the first visible question.
+        pos = get_first_visible_question(survey, answers=answers)
+        if pos is not None:
+            next_question_code = question_id_to_code.get(pos.question_id)
+    else:
+        # Validate the from_question code.
+        if payload.from_question not in question_code_to_id:
+            raise NotFoundError(
+                f"Question with code '{payload.from_question}' not found in this survey"
+            )
+
+        current_group_id = question_code_to_group_id[payload.from_question]
+        current_question_id = question_code_to_id[payload.from_question]
+        current_pos = NavigationPosition(
+            group_id=current_group_id,
+            question_id=current_question_id,
+        )
+
+        if payload.direction == "forward":
+            next_pos = get_next_question(survey, current_pos, answers=answers)
+        else:
+            next_pos = get_previous_question(survey, current_pos, answers=answers)
+
+        if next_pos is not None:
+            next_question_code = question_id_to_code.get(next_pos.question_id)
+
+    # ------------------------------------------------------------------
+    # Collect visible/hidden question codes and group UUID strings.
+    # ------------------------------------------------------------------
+    visible_questions = [
+        question_id_to_code[qid]
+        for qid in relevance_result.visible_question_ids
+        if qid in question_id_to_code
+    ]
+    hidden_questions = [
+        question_id_to_code[qid]
+        for qid in relevance_result.hidden_question_ids
+        if qid in question_id_to_code
+    ]
+    visible_groups = [str(gid) for gid in relevance_result.visible_group_ids]
+    hidden_groups = [str(gid) for gid in relevance_result.hidden_group_ids]
+
+    # ------------------------------------------------------------------
+    # Apply piping to all top-level questions and their answer options.
+    # ------------------------------------------------------------------
+    all_questions: List[Any] = []
+    for group in survey.groups:
+        all_questions.extend(group.questions)
+
+    piped_texts = pipe_all(all_questions, answers)
+
+    # ------------------------------------------------------------------
+    # Validate each question's relevance expression and collect results.
+    # Build known_variables and sort_orders for forward-reference detection.
+    # ------------------------------------------------------------------
+    all_question_codes: List[str] = []
+    all_sort_orders: Dict[str, int] = {}
+    for group in survey.groups:
+        for question in group.questions:
+            if question.parent_id is None:
+                all_question_codes.append(question.code)
+                all_sort_orders[question.code] = question.sort_order
+
+    validation_results: Dict[str, Any] = {}
+    for group in survey.groups:
+        for question in group.questions:
+            if question.parent_id is not None:
+                continue
+            if question.relevance is None:
+                validation_results[question.code] = {
+                    "parsed_variables": [],
+                    "errors": [],
+                    "warnings": [],
+                }
+                continue
+            try:
+                vr = validate_expression(
+                    expression=question.relevance,
+                    known_variables=all_question_codes,
+                    question_sort_orders=all_sort_orders,
+                    current_sort_order=all_sort_orders.get(question.code),
+                )
+                validation_results[question.code] = {
+                    "parsed_variables": vr.parsed_variables,
+                    "errors": [
+                        {"message": e.message, "position": e.position, "code": e.code}
+                        for e in vr.errors
+                    ],
+                    "warnings": [
+                        {"message": w.message, "position": w.position, "code": w.code}
+                        for w in vr.warnings
+                    ],
+                }
+            except Exception as exc:
+                validation_results[question.code] = {
+                    "parsed_variables": [],
+                    "errors": [{"message": str(exc), "position": 0, "code": "EVALUATION_ERROR"}],
+                    "warnings": [],
+                }
+
+    return ResolveFlowResponse(
+        next_question=next_question_code,
+        visible_questions=visible_questions,
+        hidden_questions=hidden_questions,
+        visible_groups=visible_groups,
+        hidden_groups=hidden_groups,
+        piped_texts=piped_texts,
+        validation_results=validation_results,
     )
