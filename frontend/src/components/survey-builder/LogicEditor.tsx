@@ -12,6 +12,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import type { BuilderQuestion } from '../../store/builderStore'
 import surveyService from '../../services/surveyService'
+import type { ValidateExpressionResult } from '../../types/survey'
+import { ExpressionPreview } from './ExpressionPreview'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -608,13 +610,12 @@ export function LogicEditor({
   // Raw expression state (only used in raw mode)
   const [rawValue, setRawValue] = useState(value)
 
-  // Validation state
-  const [validationResult, setValidationResult] = useState<{
-    valid: boolean
-    errors: string[]
-    warnings: string[]
-  } | null>(null)
+  // Validation state — uses structured errors/warnings matching backend schema
+  const [validationResult, setValidationResult] = useState<ValidateExpressionResult | null>(null)
   const [isValidating, setIsValidating] = useState(false)
+
+  // Test Expression panel toggle
+  const [showTestPanel, setShowTestPanel] = useState(false)
 
   const validateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -654,7 +655,7 @@ export function LogicEditor({
         } finally {
           setIsValidating(false)
         }
-      }, 600)
+      }, 500)
     },
     [surveyId],
   )
@@ -786,12 +787,27 @@ export function LogicEditor({
 
       {/* Validation feedback */}
       {isValidating && (
-        <p className="text-xs text-muted-foreground" data-testid="logic-editor-validating">
-          Validating…
-        </p>
+        <div className="flex items-center gap-1.5" data-testid="logic-editor-validating">
+          <svg
+            className="animate-spin h-3 w-3 text-muted-foreground"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+            />
+          </svg>
+          <span className="text-xs text-muted-foreground">Validating…</span>
+        </div>
       )}
       {!isValidating && validationResult && (
-        <div>
+        <div className="space-y-1">
+          {/* Errors with position highlighting */}
           {validationResult.errors.map((err, i) => (
             <p
               key={i}
@@ -799,9 +815,13 @@ export function LogicEditor({
               role="alert"
               data-testid="logic-editor-error"
             >
-              {err}
+              {err.position > 0 ? (
+                <span className="font-mono text-destructive/70 mr-1">[col {err.position}]</span>
+              ) : null}
+              {err.message}
             </p>
           ))}
+          {/* Warnings (amber) with position info */}
           {validationResult.warnings.map((warn, i) => (
             <p
               key={i}
@@ -809,15 +829,71 @@ export function LogicEditor({
               role="status"
               data-testid="logic-editor-warning"
             >
-              {warn}
+              {warn.position > 0 ? (
+                <span className="font-mono text-amber-500/80 mr-1">[col {warn.position}]</span>
+              ) : null}
+              {warn.message}
             </p>
           ))}
-          {validationResult.valid && validationResult.errors.length === 0 && previewExpression && (
-            <p className="text-xs text-green-600" data-testid="logic-editor-valid">
+          {/* Valid indicator with green check */}
+          {validationResult.errors.length === 0 && previewExpression && (
+            <p className="flex items-center gap-1 text-xs text-green-600" data-testid="logic-editor-valid">
+              <svg
+                className="h-3 w-3"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
               Expression is valid
             </p>
           )}
+          {/* Referenced variables list */}
+          {validationResult.parsed_variables.length > 0 && (
+            <p className="text-xs text-muted-foreground" data-testid="logic-editor-variables">
+              References:{' '}
+              {validationResult.parsed_variables.map((v, i) => (
+                <span key={v}>
+                  <span className="font-mono">{'{'}
+                  {v}
+                  {'}'}</span>
+                  {i < validationResult.parsed_variables.length - 1 ? ', ' : ''}
+                </span>
+              ))}
+            </p>
+          )}
+          {/* Test Expression toggle button */}
+          {validationResult.errors.length === 0 && previewExpression && (
+            <button
+              type="button"
+              className={`text-xs px-2 py-0.5 rounded border transition-colors ${
+                showTestPanel
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-background text-muted-foreground border-input hover:bg-muted'
+              }`}
+              onClick={() => setShowTestPanel((v) => !v)}
+              disabled={disabled}
+              data-testid="logic-editor-test-toggle"
+            >
+              {showTestPanel ? 'Hide Test' : 'Test Expression'}
+            </button>
+          )}
         </div>
+      )}
+
+      {/* Test Expression panel */}
+      {showTestPanel && validationResult && validationResult.errors.length === 0 && previewExpression && (
+        <ExpressionPreview
+          surveyId={surveyId}
+          expression={previewExpression}
+          parsedVariables={validationResult.parsed_variables}
+          disabled={disabled}
+        />
       )}
     </div>
   )
