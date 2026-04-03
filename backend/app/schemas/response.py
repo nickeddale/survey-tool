@@ -19,6 +19,11 @@ class ResponseCreate(BaseModel):
     answers: list[AnswerInput] = []
 
 
+class ResponseUpdate(BaseModel):
+    status: str | None = None
+    answers: list[AnswerInput] = []
+
+
 # ---------------------------------------------------------------------------
 # Output schemas
 # ---------------------------------------------------------------------------

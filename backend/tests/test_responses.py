@@ -525,3 +525,188 @@ async def test_validation_error_detail_has_no_extra_top_level_keys(client: Async
     # Only these three keys should be in detail
     detail_keys = set(body["detail"].keys())
     assert detail_keys == {"code", "message", "errors"}
+
+
+# --------------------------------------------------------------------------- #
+# PATCH /surveys/{id}/responses/{rid} — completion flow (ISS-085)
+# --------------------------------------------------------------------------- #
+
+
+async def add_question_with_relevance(
+    client: AsyncClient,
+    headers: dict,
+    survey_id: str,
+    code: str,
+    relevance: str,
+    is_required: bool = True,
+) -> str:
+    """Add a required short_text question with a relevance expression; return question id."""
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": f"Group for {code}"},
+        headers=headers,
+    )
+    assert group_resp.status_code == 201
+    group_id = group_resp.json()["id"]
+
+    q_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={
+            "title": f"Question {code}",
+            "question_type": "short_text",
+            "code": code,
+            "is_required": is_required,
+            "relevance": relevance,
+        },
+        headers=headers,
+    )
+    assert q_resp.status_code == 201
+    return q_resp.json()["id"]
+
+
+@pytest.mark.asyncio
+async def test_patch_complete_sets_completed_at(client: AsyncClient):
+    """PATCH with status:complete on a valid response sets completed_at and status."""
+    headers = await auth_headers(client, email="complete_ok@example.com")
+    survey_id = await create_survey(client, headers, title="Complete Survey")
+    question_id = await add_required_short_text_question(
+        client, headers, survey_id, code="Q1"
+    )
+    await activate_survey(client, headers, survey_id)
+
+    # Submit a response with the required answer
+    post_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": question_id, "value": "My answer"}]},
+    )
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # Complete the response
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"status": "complete"},
+    )
+    assert patch_resp.status_code == 200
+    body = patch_resp.json()
+    assert body["status"] == "complete"
+    assert body["completed_at"] is not None
+    assert body["id"] == response_id
+
+
+@pytest.mark.asyncio
+async def test_patch_complete_hidden_required_question_skipped(client: AsyncClient):
+    """A required question hidden by relevance expression is not validated on completion."""
+    headers = await auth_headers(client, email="hidden_req@example.com")
+    survey_id = await create_survey(client, headers, title="Hidden Required Survey")
+
+    # Q1: always visible, required
+    q1_id = await add_required_short_text_question(
+        client, headers, survey_id, code="Q1"
+    )
+    # Q2: only visible when Q1 == 'show_q2', required — will be hidden in this test
+    await add_question_with_relevance(
+        client, headers, survey_id, code="Q2",
+        relevance="{Q1} == 'show_q2'", is_required=True,
+    )
+    await activate_survey(client, headers, survey_id)
+
+    # Submit a response answering Q1 with a value that hides Q2
+    post_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": q1_id, "value": "hide_q2"}]},
+    )
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # Complete — Q2 is hidden, so even though it's required, no error should occur
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"status": "complete"},
+    )
+    assert patch_resp.status_code == 200
+    body = patch_resp.json()
+    assert body["status"] == "complete"
+    assert body["completed_at"] is not None
+
+
+@pytest.mark.asyncio
+async def test_patch_complete_visible_required_question_missing_answer_returns_422(
+    client: AsyncClient,
+):
+    """PATCH with status:complete returns 422 when a visible required question has no answer."""
+    headers = await auth_headers(client, email="vis_req_missing@example.com")
+    survey_id = await create_survey(client, headers, title="Visible Required Survey")
+    await add_required_short_text_question(client, headers, survey_id, code="VREQ")
+    await activate_survey(client, headers, survey_id)
+
+    # Submit an empty response (no answers)
+    post_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={},
+    )
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # Attempt to complete — required visible question has no answer
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"status": "complete"},
+    )
+    assert patch_resp.status_code == 422
+    body = patch_resp.json()
+    assert body["detail"]["code"] == "VALIDATION_ERROR"
+    errors = body["detail"]["errors"]
+    assert isinstance(errors, list)
+    assert len(errors) >= 1
+    question_codes = {e["question_code"] for e in errors}
+    assert "VREQ" in question_codes
+
+
+@pytest.mark.asyncio
+async def test_patch_complete_nonexistent_response_returns_404(client: AsyncClient):
+    """PATCH on a non-existent response returns 404."""
+    survey_id, _question_id, _headers = await create_active_survey(client)
+
+    nonexistent_response_id = "00000000-0000-0000-0000-000000000000"
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{nonexistent_response_id}",
+        json={"status": "complete"},
+    )
+    assert patch_resp.status_code == 404
+    body = patch_resp.json()
+    assert body["detail"]["code"] == "NOT_FOUND"
+
+
+@pytest.mark.asyncio
+async def test_patch_complete_already_completed_returns_409(client: AsyncClient):
+    """PATCH on an already-completed response returns 409 CONFLICT."""
+    headers = await auth_headers(client, email="already_done@example.com")
+    survey_id = await create_survey(client, headers, title="Already Done Survey")
+    q_id = await add_required_short_text_question(
+        client, headers, survey_id, code="ADQ"
+    )
+    await activate_survey(client, headers, survey_id)
+
+    post_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": q_id, "value": "done"}]},
+    )
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # Complete once
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"status": "complete"},
+    )
+    assert patch_resp.status_code == 200
+
+    # Attempt to complete again — should fail with 409
+    patch_resp2 = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"status": "complete"},
+    )
+    assert patch_resp2.status_code == 409
+    body = patch_resp2.json()
+    assert body["detail"]["code"] == "CONFLICT"
