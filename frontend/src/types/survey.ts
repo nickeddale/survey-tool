@@ -7,6 +7,7 @@ export interface AnswerOptionResponse {
   title: string
   sort_order: number
   assessment_value: number
+  image_url?: string | null
   created_at: string
 }
 
