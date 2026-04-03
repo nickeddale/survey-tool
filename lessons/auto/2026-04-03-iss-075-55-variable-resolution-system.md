@@ -2,70 +2,48 @@
 date: "2026-04-03"
 ticket_id: "ISS-075"
 ticket_title: "5.5: Variable Resolution System"
-categories: ["testing", "api", "database", "ui", "bug-fix", "feature", "security", "documentation", "config", "ci-cd"]
+categories: ["expression-engine", "data-modeling", "type-coercion", "testing"]
 outcome: "success"
 complexity: "medium"
 files_modified: []
 ---
 
-```markdown
----
-date: "2026-04-03"
-ticket_id: "ISS-075"
-ticket_title: "5.5: Variable Resolution System"
-categories: ["expressions", "models", "variable-resolution", "testing"]
-outcome: "success"
-complexity: "medium"
-files_modified:
-  - backend/app/services/expressions/resolver.py
-  - backend/app/services/expressions/__init__.py
-  - backend/app/models/response.py
-  - backend/app/models/response_answer.py
-  - backend/app/models/participant.py
-  - backend/app/models/__init__.py
-  - backend/tests/test_expressions_resolver.py
----
-
 # Lessons Learned: 5.5: Variable Resolution System
 
 ## What Worked Well
-- Flat dict context format mapped cleanly to the existing evaluator.py interface — no changes to downstream evaluation logic were required
-- Mock/stub objects for Response, ResponseAnswer, and Participant were sufficient for unit tests; no database fixtures needed for resolver logic
-- Separating type conversion logic into a dedicated helper kept build_expression_context readable and individually testable
-- Treating unanswered/null answers as Python None aligned naturally with the evaluator's null-handling behavior
+- The flat dict approach for the expression context is clean and maps naturally to how the evaluator consumes variables — no special-casing needed downstream.
+- Separating type coercion into small, focused helpers (`_to_number`, `_to_bool`, `_coerce_value`) kept `build_expression_context` readable and independently testable.
+- Mock-based unit tests with dedicated factory helpers (`_make_question`, `_make_answer`, `_make_response`, `_make_participant`) made the test suite fast and expressive without needing a database.
+- Including integration tests that pipe resolver output directly into `evaluate()` caught any interface mismatches between the two layers early.
+- Exporting `build_expression_context` and `ResolverError` from the package `__init__.py` alongside the evaluator kept the public API surface clean and consistent.
 
 ## What Was Challenging
-- Determining the correct suffix conventions ({Q1_SQ001}, {Q1_other}, {Q1_comment}) required careful reading of the question model and existing AST node definitions before writing any code
-- Ensuring RESPONDENT.attribute keys were flattened correctly from JSONB without colliding with question code keys required explicit namespace separation
-- Verifying the end-to-end path (resolver output → evaluate()) required understanding the exact context dict format the evaluator expected, which was not immediately obvious from the evaluator signature alone
+- Key derivation logic for subquestions required careful attention: other-text and comment answer types must always use the **parent** question code (e.g., `Q1_other`, not `Q1_SQ001_other`), which is a non-obvious rule that could easily be implemented incorrectly.
+- Python's `bool` being a subclass of `int` required an explicit guard in `_to_number` to avoid silently coercing booleans to 0/1 when they should remain `True`/`False`.
+- Deciding when a scalar stored for a list-type question should be wrapped in a list (rather than rejected) required a deliberate design choice about forward-compatibility with inconsistent stored data.
 
 ## Key Technical Insights
-1. The expression context dict uses flat string keys — dotted names like RESPONDENT.language must be stored as the literal string key `"RESPONDENT.language"`, not as nested dicts; this matches how the AST evaluator resolves dotted identifiers.
-2. Multi-select/checkbox answer values stored as JSONB arrays should be converted directly to Python lists so the evaluator's `in` operator and `count()` function work without additional adaptation.
-3. Missing participant should produce zero RESPONDENT keys (not an error or empty nested dict) — the evaluator will naturally return null for any unresolved RESPONDENT reference.
-4. Question type drives type conversion at resolution time, not at evaluation time — converting to int/float/bool/list/None in the resolver keeps the evaluator generic and type-agnostic.
-5. UUID primary keys must use Python-side `default=uuid.uuid4`, not `server_default=gen_random_uuid()`, because the pgcrypto extension is not guaranteed to be enabled.
+1. **Parent code always wins for suffixes**: For `_other` and `_comment` keys, the parent question code is used regardless of whether the answer belongs to a subquestion. This keeps the context key space predictable for expression authors.
+2. **Whole-float normalization**: Floats that are mathematically integers (e.g., `2.0`) are coerced to `int` to avoid surprising comparisons like `{Q1} == 2` failing when the stored value is `2.0`.
+3. **Empty string for list types becomes `[]`**: An empty string value on a list-type question normalizes to an empty list, preventing downstream `count()` or `in` operations from crashing on unexpected types.
+4. **RESPONDENT namespace is additive**: Participant attributes are injected as `RESPONDENT.<key>` keys only when a participant is provided; the resolver is still valid and usable without one (e.g., for anonymous responses).
+5. **`answer_type` constants belong on the model**: Defining `ANSWER_TYPE_ANSWER`, `ANSWER_TYPE_OTHER`, `ANSWER_TYPE_COMMENT` as constants on `response_answer.py` rather than in the resolver prevents magic strings from spreading across the codebase.
 
 ## Reusable Patterns
-- **Import smoke-test before alembic**: `python -c "from app.models.response import Response; from app.models.response_answer import ResponseAnswer; from app.models.participant import Participant"` — surfaces broken imports with clean tracebacks instead of cryptic alembic errors.
-- **Dual model registration**: Import all new models in both `alembic/env.py` AND `app/models/__init__.py` before any alembic command; missing either causes silent migration failures.
-- **Manual migration authoring**: Manually write Alembic migrations for tables with timestamp columns — autogenerate silently drops `server_default` for `created_at`/`updated_at` and omits `onupdate` entirely.
-- **Function-scoped async fixtures**: All async SQLAlchemy test fixtures must use `scope="function"` — session scope causes asyncpg event loop mismatch errors under pytest-asyncio.
-- **asyncpg DATABASE_URL override**: Tests must explicitly set `DATABASE_URL` to `postgresql+asyncpg://` scheme; the environment default may use psycopg2 scheme, causing silent or confusing failures.
-- **asyncio_mode = 'auto'**: Set in `[tool.pytest.ini_options]` in pyproject.toml to avoid per-test `@pytest.mark.asyncio` decoration.
-- **No passlib**: Use `bcrypt.hashpw`/`bcrypt.checkpw`/`bcrypt.gensalt` directly — passlib 1.7.x is incompatible with bcrypt >= 4.x.
+- **Flat context dict from nested ORM data**: Iterating ORM relationships and building a flat `{key: coerced_value}` dict is a clean pattern for bridging between relational data and an expression evaluator. Reuse this shape for any future variable namespace (e.g., `SURVEY.*`, `LOOP.*`).
+- **Guard `bool` before `int` in numeric coercions**: Any function that coerces to number must check `isinstance(value, bool)` first, since `bool` passes `isinstance(value, (int, float))`.
+- **Factory helpers in test modules**: `_make_*` helper functions that return configured mock objects dramatically reduce test boilerplate and should be used in any test module dealing with complex ORM-like models.
+- **Integration tests as a contract**: A small set of end-to-end tests (resolver → evaluator) that exercise real expression strings serves as a regression net whenever either layer changes.
 
 ## Files to Review for Similar Tasks
-- `backend/app/services/expressions/resolver.py` — reference implementation for flat context dict construction and type conversion dispatch
-- `backend/app/services/expressions/evaluator.py` — authoritative source for expected context dict format and how dotted identifiers are resolved
-- `backend/app/services/expressions/__init__.py` — public API surface; shows how to export new resolver functions alongside existing evaluator exports
-- `backend/tests/test_expressions_resolver.py` — reference test patterns for mock-based resolver unit tests and end-to-end evaluate() integration tests
-- `backend/app/models/response.py`, `response_answer.py`, `participant.py` — reference SQLAlchemy model patterns for JSONB columns, UUID PKs, and timestamp columns
+- `backend/app/services/expressions/resolver.py` — reference implementation for building expression context from ORM data.
+- `backend/tests/test_expressions_resolver.py` — reference for mock-based test structure and factory helper pattern.
+- `backend/app/services/expressions/__init__.py` — shows how to expose a multi-module package through a single clean public API.
+- `backend/app/models/response_answer.py` — shows where to anchor answer-type constants to avoid magic strings.
 
 ## Gotchas and Pitfalls
-- Do not store RESPONDENT attributes as a nested dict in the context — the evaluator resolves `RESPONDENT.language` as a flat key lookup, not recursive dict traversal.
-- Do not rely on alembic autogenerate for new models with timestamp columns — `server_default=func.now()` and `onupdate` will be silently dropped; always manually inspect and author the migration.
-- asyncpg is pinned to `<0.30` — do not upgrade without explicit re-testing of the full async engine connection path.
-- Never run `docker-compose up -d` unscoped — the frontend stub will fail on missing nginx.conf; always scope to `postgres` or `backend` only.
-- The volume mount `./backend:/app` masks container .egg-info artifacts — if alembic or pytest cannot resolve `app.*` imports, verify editable install artifacts exist on the host.
-```
+- **Subquestion key format is `PARENT_CHILD`, not `CHILD` alone**: Forgetting to prepend the parent code produces keys that collide or go unresolved when a survey has multiple matrix questions with identically-coded subquestions.
+- **`lazy="raise"` on the `question` relationship**: `ResponseAnswer.question` will raise if accessed without an explicit join or `joinedload`. Tests must configure this relationship manually or mock it; callers must eager-load it.
+- **Do not coerce `None` to a list for list-type questions**: An unanswered list question should resolve to `None`, not `[]`. Wrapping `None` in a list would break null-checks in expressions like `{Q1} == null`.
+- **`image_picker` must be in `_LIST_QUESTION_TYPES`**: It is easy to overlook when adding new question types; omitting it causes image picker answers to be treated as scalars and break `count()` or `in` expressions.
+- **RESPONDENT attributes come from JSONB, not columns**: Participant attributes are stored in an untyped JSONB field. Values arrive as raw JSON types (strings, numbers, booleans) with no schema enforcement, so downstream expressions must tolerate heterogeneous types.
