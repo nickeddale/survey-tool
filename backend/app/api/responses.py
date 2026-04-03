@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Literal
 
 from fastapi import APIRouter, Depends, Query, Request, status
+from fastapi.responses import JSONResponse, StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -18,6 +19,12 @@ from app.schemas.response import (
     ResponseStatusUpdate,
     ResponseSummary,
     ResponseUpdate,
+)
+from app.services.export_service import (
+    build_csv_headers,
+    build_json_export,
+    generate_csv_stream,
+    get_responses_for_export,
 )
 from app.services.response_service import (
     complete_response,
@@ -145,6 +152,84 @@ async def submit_response(
         answers=answers if answers else None,
     )
     return ResponseResponse.model_validate(response)
+
+
+@router.get(
+    "/{survey_id}/responses/export",
+    status_code=status.HTTP_200_OK,
+)
+async def export_survey_responses(
+    survey_id: str,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+    format: str = Query(default="csv"),
+    columns: str | None = Query(default=None),
+    status_filter: str | None = Query(default=None, alias="status"),
+    started_after: datetime | None = Query(default=None),
+    started_before: datetime | None = Query(default=None),
+    completed_after: datetime | None = Query(default=None),
+    completed_before: datetime | None = Query(default=None),
+):
+    """Export all responses for a survey as CSV (default) or JSON.
+
+    Requires authentication. Survey must be owned by the authenticated user;
+    returns 404 otherwise (no ownership oracle).
+
+    Query parameters:
+        format: 'csv' (default) or 'json'
+        columns: comma-separated list of question codes to include (default: all)
+        status: filter by response status
+        started_after/before: datetime range filters for started_at
+        completed_after/before: datetime range filters for completed_at
+
+    CSV format:
+        - One row per response
+        - Metadata columns: response_id, status, started_at, completed_at, ip_address
+        - Question columns: question codes as headers (matrix: Q5_SQ001 style)
+        - Multi-value answers (multiple_choice) are comma-joined within the cell
+
+    JSON format:
+        - Array of response objects with 'answers' dict keyed by question code
+    """
+    parsed_survey_id = _parse_survey_id(survey_id)
+
+    # Parse columns filter
+    column_list: list[str] | None = None
+    if columns is not None:
+        column_list = [c.strip() for c in columns.split(",") if c.strip()]
+
+    responses = await get_responses_for_export(
+        session,
+        survey_id=parsed_survey_id,
+        user_id=current_user.id,
+        status=status_filter,
+        started_after=started_after,
+        started_before=started_before,
+        completed_after=completed_after,
+        completed_before=completed_before,
+    )
+
+    headers = build_csv_headers(responses, columns=column_list)
+
+    if format.lower() == "json":
+        data = build_json_export(responses, headers)
+        filename = f"survey_{survey_id}_responses.json"
+        return JSONResponse(
+            content=data,
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"',
+            },
+        )
+
+    # Default: CSV
+    filename = f"survey_{survey_id}_responses.csv"
+    return StreamingResponse(
+        generate_csv_stream(responses, headers),
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+        },
+    )
 
 
 @router.get(
