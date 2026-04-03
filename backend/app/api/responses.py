@@ -1,19 +1,29 @@
 """Public endpoint for submitting survey responses."""
 
 import uuid
+from datetime import datetime
+from typing import Literal
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
-from app.schemas.response import ResponseCreate, ResponseResponse, ResponseStatusUpdate, ResponseUpdate
+from app.schemas.response import (
+    ResponseCreate,
+    ResponseListResponse,
+    ResponseResponse,
+    ResponseStatusUpdate,
+    ResponseSummary,
+    ResponseUpdate,
+)
 from app.services.response_service import (
     complete_response,
     create_response,
     disqualify_response,
     get_response_with_answers,
+    list_responses,
     save_partial_response,
 )
 from app.utils.errors import ForbiddenError, NotFoundError, UnprocessableError
@@ -53,6 +63,55 @@ def _extract_metadata(request: Request) -> dict:
         "user_agent": request.headers.get("User-Agent"),
         "referrer": request.headers.get("Referer"),
     }
+
+
+@router.get(
+    "/{survey_id}/responses",
+    response_model=ResponseListResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def list_survey_responses(
+    survey_id: str,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+    page: int = Query(default=1, ge=1),
+    per_page: int = Query(default=20, ge=1, le=100),
+    status_filter: str | None = Query(default=None, alias="status"),
+    started_after: datetime | None = Query(default=None),
+    started_before: datetime | None = Query(default=None),
+    completed_after: datetime | None = Query(default=None),
+    completed_before: datetime | None = Query(default=None),
+    sort_by: Literal["started_at", "completed_at", "status"] = Query(default="started_at"),
+    sort_order: Literal["asc", "desc"] = Query(default="desc"),
+) -> ResponseListResponse:
+    """List responses for a survey with filtering and pagination. Requires authentication."""
+    parsed_survey_id = _parse_survey_id(survey_id)
+
+    responses, total = await list_responses(
+        session,
+        survey_id=parsed_survey_id,
+        user_id=current_user.id,
+        status=status_filter,
+        started_after=started_after,
+        started_before=started_before,
+        completed_after=completed_after,
+        completed_before=completed_before,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        page=page,
+        per_page=per_page,
+    )
+
+    items = [ResponseSummary.model_validate(r) for r in responses]
+    pages = max(1, (total + per_page - 1) // per_page)
+
+    return ResponseListResponse(
+        items=items,
+        total=total,
+        page=page,
+        per_page=per_page,
+        pages=pages,
+    )
 
 
 @router.post(

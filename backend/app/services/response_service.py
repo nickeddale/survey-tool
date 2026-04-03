@@ -2,8 +2,9 @@
 
 import uuid
 from datetime import datetime, timezone
+from typing import Literal
 
-from sqlalchemy import select
+from sqlalchemy import asc, desc, func, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -385,6 +386,97 @@ async def get_response_with_answers(
         raise NotFoundError("Response not found")
 
     return response
+
+
+async def list_responses(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+    user_id: uuid.UUID,
+    status: str | None = None,
+    started_after: datetime | None = None,
+    started_before: datetime | None = None,
+    completed_after: datetime | None = None,
+    completed_before: datetime | None = None,
+    sort_by: Literal["started_at", "completed_at", "status"] = "started_at",
+    sort_order: Literal["asc", "desc"] = "desc",
+    page: int = 1,
+    per_page: int = 20,
+) -> tuple[list[Response], int]:
+    """List responses for a survey with optional filtering and sorting.
+
+    Enforces survey ownership: the survey must exist AND belong to the authenticated
+    user — both missing and unauthorized surveys return NotFoundError (no 404-oracle).
+
+    Args:
+        session: The async database session.
+        survey_id: The UUID of the survey to list responses for.
+        user_id: The UUID of the authenticated user (ownership check).
+        status: Optional filter by response status.
+        started_after: Optional filter: responses started after this datetime.
+        started_before: Optional filter: responses started before this datetime.
+        completed_after: Optional filter: responses completed after this datetime.
+        completed_before: Optional filter: responses completed before this datetime.
+        sort_by: Column to sort by (started_at, completed_at, status).
+        sort_order: Sort direction (asc or desc).
+        page: Page number (1-indexed).
+        per_page: Number of items per page.
+
+    Returns:
+        A tuple of (list of Response objects, total count matching filters).
+
+    Raises:
+        NotFoundError: If the survey does not exist or does not belong to user_id.
+    """
+    # Validate survey existence AND ownership in a single query
+    survey_result = await session.execute(
+        select(Survey).where(Survey.id == survey_id, Survey.user_id == user_id)
+    )
+    survey = survey_result.scalar_one_or_none()
+    if survey is None:
+        raise NotFoundError("Survey not found")
+
+    # Build base WHERE conditions for responses
+    conditions = [Response.survey_id == survey_id]
+
+    if status is not None:
+        conditions.append(Response.status == status)
+    if started_after is not None:
+        conditions.append(Response.started_at > started_after)
+    if started_before is not None:
+        conditions.append(Response.started_at < started_before)
+    if completed_after is not None:
+        conditions.append(Response.completed_at > completed_after)
+    if completed_before is not None:
+        conditions.append(Response.completed_at < completed_before)
+
+    # Separate COUNT(*) query for accurate total (not affected by LIMIT/OFFSET)
+    count_result = await session.execute(
+        select(func.count()).select_from(Response).where(*conditions)
+    )
+    total = count_result.scalar_one()
+
+    # Determine sort column and direction
+    sort_column_map = {
+        "started_at": Response.started_at,
+        "completed_at": Response.completed_at,
+        "status": Response.status,
+    }
+    sort_col = sort_column_map[sort_by]
+    order_fn = asc if sort_order == "asc" else desc
+    order_expr = order_fn(sort_col)
+
+    # Paginated data query
+    offset = (page - 1) * per_page
+    data_result = await session.execute(
+        select(Response)
+        .where(*conditions)
+        .order_by(order_expr)
+        .limit(per_page)
+        .offset(offset)
+    )
+    responses = list(data_result.scalars().all())
+
+    return responses, total
 
 
 async def disqualify_response(
