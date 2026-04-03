@@ -692,9 +692,20 @@ export const handlers = [
   // POST /api/v1/surveys/:surveyId/logic/validate-expression
   http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async ({ request }) => {
     const body = (await request.json()) as { expression: string }
-    const isValid = Boolean(body.expression && body.expression.trim())
+    const hasExpression = Boolean(body.expression && body.expression.trim())
+    // Return structured response matching ValidateExpressionResult (backend ValidateExpressionResponse)
+    // errors and warnings are structured objects with message/position/code fields
+    const errors: Array<{ message: string; position: number; code: string }> = hasExpression
+      ? []
+      : [{ message: 'Expression cannot be empty', position: 0, code: 'SYNTAX_ERROR' }]
     return HttpResponse.json(
-      { valid: isValid, errors: [], warnings: [] },
+      {
+        parsed_variables: hasExpression
+          ? (body.expression.match(/\{([^}]+)\}/g) ?? []).map((m: string) => m.slice(1, -1))
+          : [],
+        errors,
+        warnings: [] as Array<{ message: string; position: number; code: string }>,
+      },
       { status: 200 },
     )
   }),

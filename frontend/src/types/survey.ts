@@ -98,6 +98,39 @@ export interface ApiKeyCreate {
 
 export type SurveyStatus = 'draft' | 'active' | 'closed' | 'archived'
 
+// ---------------------------------------------------------------------------
+// Expression validation types (matching backend ExpressionErrorSchema /
+// ExpressionWarningSchema / ValidateExpressionResponse)
+// ---------------------------------------------------------------------------
+
+export type ExpressionErrorCode =
+  | 'SYNTAX_ERROR'
+  | 'UNKNOWN_VARIABLE'
+  | 'TYPE_MISMATCH'
+  | 'UNSUPPORTED_FUNCTION'
+  | 'FORWARD_REFERENCE'
+
+export interface ExpressionError {
+  message: string
+  position: number
+  code: ExpressionErrorCode
+}
+
+export interface ExpressionWarning {
+  message: string
+  position: number
+  code: string
+}
+
+export interface ValidateExpressionResult {
+  /** Variable names (question codes) found in the expression, in order of first occurrence. */
+  parsed_variables: string[]
+  /** Validation errors (syntax + semantic). Expression is invalid when non-empty. */
+  errors: ExpressionError[]
+  /** Advisory warnings (non-fatal). */
+  warnings: ExpressionWarning[]
+}
+
 export interface SurveyCreatePayload {
   title: string
   description?: string | null

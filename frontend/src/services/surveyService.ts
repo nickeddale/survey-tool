@@ -1,5 +1,5 @@
 import apiClient from './apiClient'
-import type { SurveyResponse, SurveyFullResponse, SurveyListResponse, SurveyCreatePayload, SurveyUpdatePayload, AnswerOptionResponse, QuestionResponse, QuestionUpdatePayload, QuestionCreatePayload, QuestionGroupResponse, QuestionGroupCreatePayload, QuestionGroupUpdatePayload, GroupReorderPayload } from '../types/survey'
+import type { SurveyResponse, SurveyFullResponse, SurveyListResponse, SurveyCreatePayload, SurveyUpdatePayload, AnswerOptionResponse, QuestionResponse, QuestionUpdatePayload, QuestionCreatePayload, QuestionGroupResponse, QuestionGroupCreatePayload, QuestionGroupUpdatePayload, GroupReorderPayload, ValidateExpressionResult } from '../types/survey'
 
 export interface AnswerOptionCreatePayload {
   code: string
@@ -39,11 +39,8 @@ export interface ValidateExpressionPayload {
   question_code?: string
 }
 
-export interface ValidateExpressionResult {
-  valid: boolean
-  errors: string[]
-  warnings: string[]
-}
+// Re-export ValidateExpressionResult from types/survey for convenience
+export type { ValidateExpressionResult } from '../types/survey'
 
 class SurveyService {
   async fetchSurveys(params: SurveyFetchParams = {}): Promise<SurveyListResponse> {
