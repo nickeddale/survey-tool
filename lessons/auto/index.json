@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-03T18:12:15.230Z",
+  "lastUpdated": "2026-04-03T18:27:44.874Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1985,6 +1985,29 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-03-iss-102-77-webhook-event-dispatching.md",
+      "ticketId": "ISS-102",
+      "title": "7.7: Webhook Event Dispatching",
+      "date": "2026-04-03",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "refactoring",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -2083,7 +2106,8 @@
       "2026-04-03-iss-098-73-quota-model-and-crud-endpoints.md",
       "2026-04-03-iss-099-74-quota-enforcement-during-response-submission.md",
       "2026-04-03-iss-100-75-assessment-model-scoring-engine-and-crud-endpoi.md",
-      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md"
+      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md",
+      "2026-04-03-iss-102-77-webhook-event-dispatching.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2175,7 +2199,8 @@
       "2026-04-03-iss-098-73-quota-model-and-crud-endpoints.md",
       "2026-04-03-iss-099-74-quota-enforcement-during-response-submission.md",
       "2026-04-03-iss-100-75-assessment-model-scoring-engine-and-crud-endpoi.md",
-      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md"
+      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md",
+      "2026-04-03-iss-102-77-webhook-event-dispatching.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2253,7 +2278,8 @@
       "2026-04-03-iss-098-73-quota-model-and-crud-endpoints.md",
       "2026-04-03-iss-099-74-quota-enforcement-during-response-submission.md",
       "2026-04-03-iss-100-75-assessment-model-scoring-engine-and-crud-endpoi.md",
-      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md"
+      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md",
+      "2026-04-03-iss-102-77-webhook-event-dispatching.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2348,7 +2374,8 @@
       "2026-04-03-iss-098-73-quota-model-and-crud-endpoints.md",
       "2026-04-03-iss-099-74-quota-enforcement-during-response-submission.md",
       "2026-04-03-iss-100-75-assessment-model-scoring-engine-and-crud-endpoi.md",
-      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md"
+      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md",
+      "2026-04-03-iss-102-77-webhook-event-dispatching.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2375,7 +2402,8 @@
       "2026-04-03-iss-082-512-expression-language-test-suite.md",
       "2026-04-03-iss-083-61-response-model-and-submission-endpoint.md",
       "2026-04-03-iss-091-69-survey-statistics-endpoint.md",
-      "2026-04-03-iss-097-72-participant-token-validation-during-response-su.md"
+      "2026-04-03-iss-097-72-participant-token-validation-during-response-su.md",
+      "2026-04-03-iss-102-77-webhook-event-dispatching.md"
     ],
     "bug-fix": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2468,7 +2496,8 @@
       "2026-04-03-iss-098-73-quota-model-and-crud-endpoints.md",
       "2026-04-03-iss-099-74-quota-enforcement-during-response-submission.md",
       "2026-04-03-iss-100-75-assessment-model-scoring-engine-and-crud-endpoi.md",
-      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md"
+      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md",
+      "2026-04-03-iss-102-77-webhook-event-dispatching.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2562,7 +2591,8 @@
       "2026-04-03-iss-098-73-quota-model-and-crud-endpoints.md",
       "2026-04-03-iss-099-74-quota-enforcement-during-response-submission.md",
       "2026-04-03-iss-100-75-assessment-model-scoring-engine-and-crud-endpoi.md",
-      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md"
+      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md",
+      "2026-04-03-iss-102-77-webhook-event-dispatching.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2611,7 +2641,8 @@
       "2026-04-03-iss-096-71-participant-model-and-crud-endpoints.md",
       "2026-04-03-iss-097-72-participant-token-validation-during-response-su.md",
       "2026-04-03-iss-098-73-quota-model-and-crud-endpoints.md",
-      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md"
+      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md",
+      "2026-04-03-iss-102-77-webhook-event-dispatching.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2640,7 +2671,8 @@
       "2026-04-03-iss-084-62-server-side-answer-validation.md",
       "2026-04-03-iss-085-63-relevance-aware-validation-and-response-complet.md",
       "2026-04-03-iss-096-71-participant-model-and-crud-endpoints.md",
-      "2026-04-03-iss-098-73-quota-model-and-crud-endpoints.md"
+      "2026-04-03-iss-098-73-quota-model-and-crud-endpoints.md",
+      "2026-04-03-iss-102-77-webhook-event-dispatching.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2722,7 +2754,8 @@
       "2026-04-03-iss-098-73-quota-model-and-crud-endpoints.md",
       "2026-04-03-iss-099-74-quota-enforcement-during-response-submission.md",
       "2026-04-03-iss-100-75-assessment-model-scoring-engine-and-crud-endpoi.md",
-      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md"
+      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md",
+      "2026-04-03-iss-102-77-webhook-event-dispatching.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2815,7 +2848,8 @@
       "2026-04-03-iss-098-73-quota-model-and-crud-endpoints.md",
       "2026-04-03-iss-099-74-quota-enforcement-during-response-submission.md",
       "2026-04-03-iss-100-75-assessment-model-scoring-engine-and-crud-endpoi.md",
-      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md"
+      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md",
+      "2026-04-03-iss-102-77-webhook-event-dispatching.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -2890,7 +2924,8 @@
       "2026-04-03-iss-098-73-quota-model-and-crud-endpoints.md",
       "2026-04-03-iss-099-74-quota-enforcement-during-response-submission.md",
       "2026-04-03-iss-100-75-assessment-model-scoring-engine-and-crud-endpoi.md",
-      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md"
+      "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md",
+      "2026-04-03-iss-102-77-webhook-event-dispatching.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
