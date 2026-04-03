@@ -180,3 +180,34 @@ export interface QuestionCreatePayload {
 export interface GroupReorderPayload {
   group_ids: string[]
 }
+
+// ---------------------------------------------------------------------------
+// Flow resolution types (matching backend ResolveFlowRequest / ResolveFlowResponse)
+// POST /surveys/{id}/logic/resolve-flow
+// ---------------------------------------------------------------------------
+
+export interface ResolveFlowAnswerInput {
+  question_id: string
+  value: unknown
+}
+
+export interface ResolveFlowRequest {
+  answers: ResolveFlowAnswerInput[]
+  /** Optional: current question id to compute next navigation target */
+  current_question_id?: string | null
+}
+
+export interface ResolveFlowResponse {
+  /** Question ids that should be visible (i.e. their relevance is truthy) */
+  visible_questions: string[]
+  /** Question ids that should be hidden */
+  hidden_questions: string[]
+  /** Group ids that should be visible */
+  visible_groups: string[]
+  /** Group ids that should be hidden */
+  hidden_groups: string[]
+  /** Piped text substitutions: maps question/group id to text with variables resolved */
+  piped_texts: Record<string, string>
+  /** Next question id to navigate to (for skip logic) — may be null */
+  next_question_id: string | null
+}

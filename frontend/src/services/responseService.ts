@@ -7,6 +7,7 @@
  */
 
 import apiClient from './apiClient'
+import type { ResolveFlowRequest, ResolveFlowResponse } from '../types/survey'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -85,6 +86,21 @@ class ResponseService {
     const response = await apiClient.patch<ResponseResponse>(
       `/surveys/${surveyId}/responses/${responseId}`,
       { status: 'complete', answers },
+    )
+    return response.data
+  }
+
+  /**
+   * Resolve survey flow logic: determines which questions/groups are visible
+   * and computes piped text substitutions for the given answer state.
+   */
+  async resolveFlow(
+    surveyId: string,
+    data: ResolveFlowRequest,
+  ): Promise<ResolveFlowResponse> {
+    const response = await apiClient.post<ResolveFlowResponse>(
+      `/surveys/${surveyId}/logic/resolve-flow`,
+      data,
     )
     return response.data
   }

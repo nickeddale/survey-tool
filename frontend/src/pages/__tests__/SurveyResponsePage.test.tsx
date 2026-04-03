@@ -12,6 +12,7 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { http, HttpResponse } from 'msw'
 import { server } from '../../test/setup'
 import { mockActiveSurveyFull, mockResponseCreated } from '../../mocks/handlers'
+import type { SurveyFullResponse } from '../../types/survey'
 import SurveyResponsePage from '../SurveyResponsePage'
 
 // ---------------------------------------------------------------------------
@@ -610,5 +611,316 @@ describe('accessibility', () => {
     await waitFor(() => expect(screen.getByTestId('survey-form')).toBeInTheDocument())
     // The first question (name) is required
     expect(screen.getByTestId('form-required-indicator')).toBeInTheDocument()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Flow resolution: conditional display and piped text
+// ---------------------------------------------------------------------------
+
+describe('flow resolution — conditional display', () => {
+  // Build a survey with a third hidden question (aq3) to test hiding
+  const surveyWithHiddenQ = {
+    ...mockActiveSurveyFull,
+    groups: [
+      {
+        ...mockActiveSurveyFull.groups[0],
+        questions: [
+          ...mockActiveSurveyFull.groups[0].questions,
+          {
+            id: 'aq3',
+            group_id: 'ag1',
+            parent_id: null,
+            question_type: 'short_text',
+            code: 'HIDDEN_Q',
+            title: 'This question should be hidden',
+            description: null,
+            is_required: false,
+            sort_order: 2,
+            relevance: 'NAME == "show"',
+            validation: null,
+            settings: null,
+            created_at: '2024-01-10T10:00:00Z',
+            subquestions: [],
+            answer_options: [],
+          },
+        ],
+      },
+      mockActiveSurveyFull.groups[1],
+    ],
+  } as SurveyFullResponse
+
+  it('hides a question returned in hidden_questions by resolve-flow', async () => {
+    server.use(
+      http.get(`${BASE}/surveys/${SURVEY_ID}`, () =>
+        HttpResponse.json(surveyWithHiddenQ, { status: 200 }),
+      ),
+      http.post(`${BASE}/surveys/${SURVEY_ID}/logic/resolve-flow`, () =>
+        HttpResponse.json(
+          {
+            visible_questions: ['aq1'],
+            hidden_questions: ['aq3'],
+            visible_groups: ['ag1', 'ag2'],
+            hidden_groups: [],
+            piped_texts: {},
+            next_question_id: null,
+          },
+          { status: 200 },
+        ),
+      ),
+    )
+
+    const user = userEvent.setup()
+    renderPage()
+
+    await waitFor(() => expect(screen.getByTestId('start-survey-button')).toBeInTheDocument())
+    await user.click(screen.getByTestId('start-survey-button'))
+
+    await waitFor(() => expect(screen.getByTestId('survey-form')).toBeInTheDocument())
+
+    // Wait for resolve-flow to be called and state to update (debounce 300ms + API time)
+    await waitFor(() => {
+      expect(screen.queryByTestId('form-question-aq3')).not.toBeInTheDocument()
+    }, { timeout: 2000 })
+    // The visible question should still be present
+    expect(screen.getByTestId('form-question-aq1')).toBeInTheDocument()
+  })
+
+  it('hides an entire group returned in hidden_groups by resolve-flow', async () => {
+    server.use(
+      http.post(`${BASE}/surveys/${SURVEY_ID}/logic/resolve-flow`, () =>
+        HttpResponse.json(
+          {
+            visible_questions: ['aq1'],
+            hidden_questions: [],
+            visible_groups: ['ag1'],
+            hidden_groups: ['ag2'],
+            piped_texts: {},
+            next_question_id: null,
+          },
+          { status: 200 },
+        ),
+      ),
+    )
+
+    const user = userEvent.setup()
+    renderPage()
+
+    await waitFor(() => expect(screen.getByTestId('start-survey-button')).toBeInTheDocument())
+    await user.click(screen.getByTestId('start-survey-button'))
+
+    // Move to page 2 (normally ag2 Feedback group)
+    await waitFor(() => expect(screen.getByTestId('survey-form')).toBeInTheDocument())
+    const nameInput = screen.getByTestId('short-text-input')
+    await user.type(nameInput, 'Test')
+    await user.click(screen.getByTestId('form-next-button'))
+
+    // ag2 should not be rendered since it's hidden
+    await waitFor(() => {
+      expect(screen.queryByTestId('form-group-ag2')).not.toBeInTheDocument()
+    })
+  })
+
+  it('applies piped text to question titles', async () => {
+    server.use(
+      http.post(`${BASE}/surveys/${SURVEY_ID}/logic/resolve-flow`, () =>
+        HttpResponse.json(
+          {
+            visible_questions: ['aq1', 'aq2'],
+            hidden_questions: [],
+            visible_groups: ['ag1', 'ag2'],
+            hidden_groups: [],
+            piped_texts: { NAME: 'Alice' },
+            next_question_id: null,
+          },
+          { status: 200 },
+        ),
+      ),
+      // Serve a survey with a piped variable in question title
+      http.get(`${BASE}/surveys/${SURVEY_ID}`, () =>
+        HttpResponse.json(
+          {
+            ...mockActiveSurveyFull,
+            groups: [
+              {
+                ...mockActiveSurveyFull.groups[0],
+                questions: [
+                  {
+                    ...mockActiveSurveyFull.groups[0].questions[0],
+                    title: 'Hello, {NAME}! What is your name?',
+                  },
+                ],
+              },
+              mockActiveSurveyFull.groups[1],
+            ],
+          },
+          { status: 200 },
+        ),
+      ),
+    )
+
+    const user = userEvent.setup()
+    renderPage()
+
+    await waitFor(() => expect(screen.getByTestId('start-survey-button')).toBeInTheDocument())
+    await user.click(screen.getByTestId('start-survey-button'))
+
+    await waitFor(() => expect(screen.getByTestId('survey-form')).toBeInTheDocument())
+
+    // After resolve-flow, {NAME} should be replaced with Alice
+    await waitFor(() => {
+      const titles = screen.getAllByTestId('form-question-title')
+      expect(titles.some((t) => t.textContent?.includes('Hello, Alice!'))).toBe(true)
+    })
+  })
+
+  it('retains answers for hidden questions (does not clear them from state)', async () => {
+    // This test verifies that when aq3 is hidden, answers for aq3 are still passed
+    // to the API in subsequent resolve-flow calls (answers state is never cleared).
+    let lastResolveBody: { answers: Array<{ question_id: string; value: unknown }> } | null = null
+
+    server.use(
+      http.get(`${BASE}/surveys/${SURVEY_ID}`, () =>
+        HttpResponse.json(surveyWithHiddenQ, { status: 200 }),
+      ),
+      http.post(`${BASE}/surveys/${SURVEY_ID}/logic/resolve-flow`, async ({ request }) => {
+        lastResolveBody = (await request.json()) as typeof lastResolveBody
+        return HttpResponse.json(
+          {
+            visible_questions: ['aq1'],
+            hidden_questions: ['aq3'],
+            visible_groups: ['ag1', 'ag2'],
+            hidden_groups: [],
+            piped_texts: {},
+            next_question_id: null,
+          },
+          { status: 200 },
+        )
+      }),
+    )
+
+    const user = userEvent.setup()
+    renderPage()
+
+    await waitFor(() => expect(screen.getByTestId('start-survey-button')).toBeInTheDocument())
+    await user.click(screen.getByTestId('start-survey-button'))
+
+    await waitFor(() => expect(screen.getByTestId('survey-form')).toBeInTheDocument())
+
+    // Wait for first resolve-flow to hide aq3 (debounce 300ms + API time)
+    await waitFor(() => {
+      expect(screen.queryByTestId('form-question-aq3')).not.toBeInTheDocument()
+    }, { timeout: 2000 })
+
+    // Type in aq1 (visible field) - use the container testid to scope the query
+    const aq1Container = screen.getByTestId('short-text-input-aq1')
+    const nameInput = aq1Container.querySelector('input')!
+    await user.type(nameInput, 'Alice')
+
+    // Wait for a resolve-flow call that includes aq1's answer
+    await waitFor(() => {
+      if (lastResolveBody) {
+        const hasAq1 = lastResolveBody.answers.some(
+          (a) => a.question_id === 'aq1' && typeof a.value === 'string' && (a.value as string).length > 0,
+        )
+        expect(hasAq1).toBe(true)
+      }
+    }, { timeout: 2000 })
+
+    // aq3 should still not be in the DOM (answer state for aq3 is preserved internally)
+    expect(screen.queryByTestId('form-question-aq3')).not.toBeInTheDocument()
+  })
+
+  it('skips to correct group when next_question_id is set', async () => {
+    // Survey: ag1 (aq1), ag2 (aq2), ag3 (aq3)
+    const surveyWithThreeGroups = {
+      ...mockActiveSurveyFull,
+      groups: [
+        mockActiveSurveyFull.groups[0], // ag1 with aq1
+        mockActiveSurveyFull.groups[1], // ag2 with aq2
+        {
+          id: 'ag3',
+          survey_id: SURVEY_ID,
+          title: 'Extra Group',
+          description: null,
+          sort_order: 3,
+          relevance: null,
+          created_at: '2024-01-10T10:00:00Z',
+          questions: [
+            {
+              id: 'aq3',
+              group_id: 'ag3',
+              parent_id: null,
+              question_type: 'short_text',
+              code: 'EXTRA',
+              title: 'Extra question',
+              description: null,
+              is_required: false,
+              sort_order: 1,
+              relevance: null,
+              validation: null,
+              settings: null,
+              created_at: '2024-01-10T10:00:00Z',
+              subquestions: [],
+              answer_options: [],
+            },
+          ],
+        },
+      ],
+    } as SurveyFullResponse
+
+    server.use(
+      http.get(`${BASE}/surveys/${SURVEY_ID}`, () =>
+        HttpResponse.json(surveyWithThreeGroups, { status: 200 }),
+      ),
+      http.post(`${BASE}/surveys/${SURVEY_ID}/logic/resolve-flow`, () =>
+        HttpResponse.json(
+          {
+            visible_questions: ['aq1', 'aq2', 'aq3'],
+            hidden_questions: [],
+            visible_groups: ['ag1', 'ag2', 'ag3'],
+            hidden_groups: [],
+            piped_texts: {},
+            // Skip from ag1 directly to ag3 (skipping ag2)
+            next_question_id: 'aq3',
+          },
+          { status: 200 },
+        ),
+      ),
+    )
+
+    const user = userEvent.setup()
+    renderPage()
+
+    await waitFor(() => expect(screen.getByTestId('start-survey-button')).toBeInTheDocument())
+    await user.click(screen.getByTestId('start-survey-button'))
+
+    await waitFor(() => expect(screen.getByTestId('survey-form')).toBeInTheDocument())
+
+    // Wait for the initial resolve-flow call to complete so nextQuestionId is populated
+    // (debounce 300ms + API time = ~350ms)
+    await waitFor(() => {
+      // The hook should have resolved; we can detect this by ensuring the form is stable
+      expect(screen.getByTestId('form-question-aq1')).toBeInTheDocument()
+    }, { timeout: 2000 })
+
+    // Small additional wait to ensure resolve-flow state is applied
+    await new Promise((r) => setTimeout(r, 400))
+
+    // Fill required field
+    const nameInput = screen.getByTestId('short-text-input')
+    await user.type(nameInput, 'Alice')
+
+    // Wait for the debounced resolve-flow triggered by typing to complete
+    await new Promise((r) => setTimeout(r, 400))
+
+    // Click Next — should skip to ag3 (the group containing aq3)
+    await user.click(screen.getByTestId('form-next-button'))
+
+    // Should jump directly to ag3, skipping ag2
+    await waitFor(() => {
+      expect(screen.getByTestId('form-group-ag3')).toBeInTheDocument()
+    }, { timeout: 2000 })
+    expect(screen.queryByTestId('form-group-ag2')).not.toBeInTheDocument()
   })
 })

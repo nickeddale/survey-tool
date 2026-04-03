@@ -11,7 +11,7 @@
  *   7. On Submit → validate all → complete response → clear localStorage → show thank-you
  */
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import surveyService from '../services/surveyService'
 import responseService from '../services/responseService'
@@ -20,6 +20,7 @@ import type { SurveyFullResponse, QuestionGroupResponse, QuestionResponse } from
 import type { BuilderQuestion } from '../store/builderStore'
 import type { QuestionAnswer } from '../utils/validation'
 import { useValidation, type AnswerMap } from '../hooks/useValidation'
+import { useFlowResolution } from '../hooks/useFlowResolution'
 import { ApiError } from '../types/api'
 import { Skeleton } from '../components/ui/skeleton'
 import { Button } from '../components/ui/button'
@@ -68,6 +69,42 @@ function answersToInput(answers: AnswerMap): AnswerInput[] {
 /** Flatten all questions from all groups into a single array. */
 function flattenQuestions(groups: QuestionGroupResponse[]): QuestionResponse[] {
   return groups.flatMap((g) => [...g.questions].sort((a, b) => a.sort_order - b.sort_order))
+}
+
+/**
+ * Replace {variable} placeholders in a string using the pipedTexts map.
+ * Falls back to the original text if no piped text is available for a given id.
+ */
+function applyPipedText(text: string, pipedTexts: Record<string, string>): string {
+  return text.replace(/\{([^}]+)\}/g, (match, key) => pipedTexts[key] ?? match)
+}
+
+/**
+ * Apply piped text substitutions and filter out hidden questions from survey groups.
+ * Hidden questions are removed from display but answers are retained in AnswerMap.
+ */
+function buildVisibleSurvey(
+  survey: SurveyFullResponse,
+  hiddenQuestions: Set<string>,
+  hiddenGroups: Set<string>,
+  pipedTexts: Record<string, string>,
+): SurveyFullResponse {
+  const visibleGroups = survey.groups
+    .filter((g) => !hiddenGroups.has(g.id))
+    .map((g) => ({
+      ...g,
+      title: applyPipedText(g.title, pipedTexts),
+      description: g.description ? applyPipedText(g.description, pipedTexts) : g.description,
+      questions: g.questions
+        .filter((q) => !hiddenQuestions.has(q.id))
+        .map((q) => ({
+          ...q,
+          title: applyPipedText(q.title, pipedTexts),
+          description: q.description ? applyPipedText(q.description, pipedTexts) : q.description,
+        })),
+    }))
+
+  return { ...survey, groups: visibleGroups }
 }
 
 // ---------------------------------------------------------------------------
@@ -215,6 +252,18 @@ function SurveyResponsePage() {
   const { errors, validateAll, clearErrors } = useValidation()
 
   // -------------------------------------------------------------------------
+  // Flow resolution (conditional display + piped text)
+  // Only active while the form is on screen; no-ops when survey_id is absent.
+  // -------------------------------------------------------------------------
+
+  const {
+    hiddenQuestions,
+    hiddenGroups,
+    pipedTexts,
+    nextQuestionId,
+  } = useFlowResolution(screen === 'form' ? survey_id : undefined, answers)
+
+  // -------------------------------------------------------------------------
   // Fetch survey
   // -------------------------------------------------------------------------
 
@@ -253,8 +302,15 @@ function SurveyResponsePage() {
   // Derived state
   // -------------------------------------------------------------------------
 
-  const sortedGroups = survey
-    ? [...survey.groups].sort((a, b) => a.sort_order - b.sort_order)
+  // Build a survey with hidden questions/groups removed and piped text applied.
+  // This is memoized to avoid rebuilding on every render.
+  const visibleSurvey = useMemo(() => {
+    if (!survey) return null
+    return buildVisibleSurvey(survey, hiddenQuestions, hiddenGroups, pipedTexts)
+  }, [survey, hiddenQuestions, hiddenGroups, pipedTexts])
+
+  const sortedGroups = visibleSurvey
+    ? [...visibleSurvey.groups].sort((a, b) => a.sort_order - b.sort_order)
     : []
   const onePagePerGroup = survey?.settings?.one_page_per_group !== false
   const totalPages = onePagePerGroup ? sortedGroups.length : 1
@@ -317,13 +373,29 @@ function SurveyResponsePage() {
       // Non-fatal: continue even if save fails
     }
 
+    // Skip logic: if resolve-flow returned a next_question_id, jump to the group
+    // containing that question (skipping any hidden groups in between).
+    if (nextQuestionId && onePagePerGroup) {
+      const targetIndex = sortedGroups.findIndex((g) =>
+        g.questions.some((q) => q.id === nextQuestionId),
+      )
+      if (targetIndex !== -1 && targetIndex !== currentPage) {
+        setCurrentPage(targetIndex)
+        clearErrors()
+        if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+        return
+      }
+    }
+
     setCurrentPage((p) => p + 1)
     clearErrors()
     // Scroll to top on page change (safe guard for test environments)
     if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
-  }, [survey, survey_id, responseId, sortedGroups, currentPage, answers, validateAll, clearErrors])
+  }, [survey, survey_id, responseId, sortedGroups, currentPage, answers, validateAll, clearErrors, nextQuestionId, onePagePerGroup])
 
   const handlePrev = useCallback(() => {
     if (currentPage > 0) {
@@ -338,7 +410,7 @@ function SurveyResponsePage() {
   const handleSubmit = useCallback(async () => {
     if (!survey || !survey_id || !responseId) return
 
-    // Validate all questions on the current page (or all questions for single-page mode)
+    // Validate all visible questions on the current page (or all visible questions for single-page mode)
     let questionsToValidate: BuilderQuestion[]
     if (onePagePerGroup) {
       const currentGroup = sortedGroups[currentPage]
@@ -439,7 +511,7 @@ function SurveyResponsePage() {
         )}
         <div className="flex-1 flex flex-col">
           <SurveyForm
-            survey={survey}
+            survey={visibleSurvey ?? survey}
             currentPage={currentPage}
             answers={answers}
             errors={errors}

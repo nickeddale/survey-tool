@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-03T15:21:31.300Z",
+  "lastUpdated": "2026-04-03T15:52:20.357Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1806,6 +1806,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-03-iss-093-611-frontend-conditional-display-and-piping-in-res.md",
+      "ticketId": "ISS-093",
+      "title": "6.11: Frontend — Conditional Display and Piping in Response Form",
+      "date": "2026-04-03",
+      "categories": [
+        "react-hooks",
+        "survey-logic",
+        "conditional-rendering",
+        "api-integration",
+        "debouncing"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "high"
     }
   ],
   "categoryIndex": {
@@ -2700,6 +2716,21 @@
     ],
     "schema-design": [
       "2026-04-03-iss-089-67-response-detail-endpoint.md"
+    ],
+    "react-hooks": [
+      "2026-04-03-iss-093-611-frontend-conditional-display-and-piping-in-res.md"
+    ],
+    "survey-logic": [
+      "2026-04-03-iss-093-611-frontend-conditional-display-and-piping-in-res.md"
+    ],
+    "conditional-rendering": [
+      "2026-04-03-iss-093-611-frontend-conditional-display-and-piping-in-res.md"
+    ],
+    "api-integration": [
+      "2026-04-03-iss-093-611-frontend-conditional-display-and-piping-in-res.md"
+    ],
+    "debouncing": [
+      "2026-04-03-iss-093-611-frontend-conditional-display-and-piping-in-res.md"
     ]
   },
   "fileIndex": {}
