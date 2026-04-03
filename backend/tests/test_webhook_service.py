@@ -246,6 +246,261 @@ async def test_deliver_webhook_connection_error_does_not_raise():
         )
 
 
+@pytest.mark.asyncio
+async def test_deliver_webhook_includes_user_agent_header():
+    """_deliver_webhook should include User-Agent: SurveyTool/1.0 in all requests."""
+    captured_headers = []
+
+    async def mock_post(url, content, headers, **kwargs):
+        captured_headers.append(dict(headers))
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        return mock_response
+
+    mock_client = AsyncMock()
+    mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+    mock_client.__aexit__ = AsyncMock(return_value=False)
+    mock_client.post = mock_post
+
+    with patch("httpx.AsyncClient", return_value=mock_client):
+        await _deliver_webhook(
+            url="https://example.com/hook",
+            payload={"event": "test"},
+            secret="",
+            webhook_id=uuid.uuid4(),
+        )
+
+    assert len(captured_headers) == 1
+    assert captured_headers[0].get("User-Agent") == "SurveyTool/1.0"
+
+
+@pytest.mark.asyncio
+async def test_deliver_webhook_uses_correct_timeout():
+    """_deliver_webhook should configure httpx.AsyncClient with connect=5s and read=10s."""
+    import httpx as _httpx
+
+    captured_timeout = []
+
+    def mock_async_client_cls(**kwargs):
+        captured_timeout.append(kwargs.get("timeout"))
+        mock_client = AsyncMock()
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=False)
+
+        async def mock_post(url, content, headers, **kwargs):
+            mock_response = MagicMock()
+            mock_response.status_code = 200
+            return mock_response
+
+        mock_client.post = mock_post
+        return mock_client
+
+    with patch("httpx.AsyncClient", side_effect=mock_async_client_cls):
+        await _deliver_webhook(
+            url="https://example.com/hook",
+            payload={"event": "test"},
+            secret="",
+            webhook_id=uuid.uuid4(),
+        )
+
+    assert len(captured_timeout) == 1
+    timeout = captured_timeout[0]
+    assert isinstance(timeout, _httpx.Timeout)
+    assert timeout.connect == 5.0
+    assert timeout.read == 10.0
+
+
+@pytest.mark.asyncio
+async def test_deliver_webhook_no_sleep_on_first_attempt_success():
+    """asyncio.sleep should NOT be called when delivery succeeds on the first attempt."""
+    mock_client = AsyncMock()
+    mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+    mock_client.__aexit__ = AsyncMock(return_value=False)
+
+    async def mock_post(url, content, headers, **kwargs):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        return mock_response
+
+    mock_client.post = mock_post
+
+    with patch("httpx.AsyncClient", return_value=mock_client):
+        with patch("asyncio.sleep", new_callable=AsyncMock) as mock_sleep:
+            await _deliver_webhook(
+                url="https://example.com/hook",
+                payload={"event": "test"},
+                secret="",
+                webhook_id=uuid.uuid4(),
+            )
+
+    mock_sleep.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_deliver_webhook_retries_on_timeout_exception():
+    """_deliver_webhook should retry on httpx.TimeoutException with backoff delays."""
+    import httpx as _httpx
+
+    call_count = 0
+
+    async def mock_post(url, content, headers, **kwargs):
+        nonlocal call_count
+        call_count += 1
+        raise _httpx.TimeoutException("timed out")
+
+    mock_client = AsyncMock()
+    mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+    mock_client.__aexit__ = AsyncMock(return_value=False)
+    mock_client.post = mock_post
+
+    with patch("httpx.AsyncClient", return_value=mock_client):
+        with patch("asyncio.sleep", new_callable=AsyncMock) as mock_sleep:
+            await _deliver_webhook(
+                url="https://example.com/hook",
+                payload={"event": "test"},
+                secret="",
+                webhook_id=uuid.uuid4(),
+            )
+
+    # Should have made 4 total attempts (1 initial + 3 retries)
+    assert call_count == 4
+    # asyncio.sleep called 3 times with backoff delays
+    assert mock_sleep.call_count == 3
+    delays = [call.args[0] for call in mock_sleep.call_args_list]
+    assert delays == [10, 60, 300]
+
+
+@pytest.mark.asyncio
+async def test_deliver_webhook_retries_on_connect_error():
+    """_deliver_webhook should retry on httpx.ConnectError."""
+    import httpx as _httpx
+
+    call_count = 0
+
+    async def mock_post(url, content, headers, **kwargs):
+        nonlocal call_count
+        call_count += 1
+        raise _httpx.ConnectError("connection refused")
+
+    mock_client = AsyncMock()
+    mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+    mock_client.__aexit__ = AsyncMock(return_value=False)
+    mock_client.post = mock_post
+
+    with patch("httpx.AsyncClient", return_value=mock_client):
+        with patch("asyncio.sleep", new_callable=AsyncMock) as mock_sleep:
+            await _deliver_webhook(
+                url="https://example.com/hook",
+                payload={"event": "test"},
+                secret="",
+                webhook_id=uuid.uuid4(),
+            )
+
+    assert call_count == 4
+    assert mock_sleep.call_count == 3
+    delays = [call.args[0] for call in mock_sleep.call_args_list]
+    assert delays == [10, 60, 300]
+
+
+@pytest.mark.asyncio
+async def test_deliver_webhook_retries_on_5xx_response():
+    """_deliver_webhook should retry on HTTP 5xx responses."""
+    call_count = 0
+
+    async def mock_post(url, content, headers, **kwargs):
+        nonlocal call_count
+        call_count += 1
+        mock_response = MagicMock()
+        mock_response.status_code = 503
+        return mock_response
+
+    mock_client = AsyncMock()
+    mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+    mock_client.__aexit__ = AsyncMock(return_value=False)
+    mock_client.post = mock_post
+
+    with patch("httpx.AsyncClient", return_value=mock_client):
+        with patch("asyncio.sleep", new_callable=AsyncMock) as mock_sleep:
+            await _deliver_webhook(
+                url="https://example.com/hook",
+                payload={"event": "test"},
+                secret="",
+                webhook_id=uuid.uuid4(),
+            )
+
+    assert call_count == 4
+    assert mock_sleep.call_count == 3
+    delays = [call.args[0] for call in mock_sleep.call_args_list]
+    assert delays == [10, 60, 300]
+
+
+@pytest.mark.asyncio
+async def test_deliver_webhook_no_retry_on_4xx():
+    """_deliver_webhook should NOT retry on HTTP 4xx responses."""
+    call_count = 0
+
+    async def mock_post(url, content, headers, **kwargs):
+        nonlocal call_count
+        call_count += 1
+        mock_response = MagicMock()
+        mock_response.status_code = 404
+        return mock_response
+
+    mock_client = AsyncMock()
+    mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+    mock_client.__aexit__ = AsyncMock(return_value=False)
+    mock_client.post = mock_post
+
+    with patch("httpx.AsyncClient", return_value=mock_client):
+        with patch("asyncio.sleep", new_callable=AsyncMock) as mock_sleep:
+            await _deliver_webhook(
+                url="https://example.com/hook",
+                payload={"event": "test"},
+                secret="",
+                webhook_id=uuid.uuid4(),
+            )
+
+    assert call_count == 1
+    mock_sleep.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_deliver_webhook_success_after_two_failures():
+    """_deliver_webhook should succeed after 2 transient failures with correct backoff."""
+    import httpx as _httpx
+
+    call_count = 0
+
+    async def mock_post(url, content, headers, **kwargs):
+        nonlocal call_count
+        call_count += 1
+        if call_count <= 2:
+            raise _httpx.TimeoutException("timed out")
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        return mock_response
+
+    mock_client = AsyncMock()
+    mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+    mock_client.__aexit__ = AsyncMock(return_value=False)
+    mock_client.post = mock_post
+
+    with patch("httpx.AsyncClient", return_value=mock_client):
+        with patch("asyncio.sleep", new_callable=AsyncMock) as mock_sleep:
+            await _deliver_webhook(
+                url="https://example.com/hook",
+                payload={"event": "test"},
+                secret="",
+                webhook_id=uuid.uuid4(),
+            )
+
+    assert call_count == 3
+    # Sleep called twice: after attempt 1 (10s) and attempt 2 (60s)
+    assert mock_sleep.call_count == 2
+    delays = [call.args[0] for call in mock_sleep.call_args_list]
+    assert delays == [10, 60]
+
+
 # ---------------------------------------------------------------------------
 # Integration fixtures
 # ---------------------------------------------------------------------------
