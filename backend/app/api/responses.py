@@ -19,6 +19,7 @@ from app.schemas.response import (
     ResponseStatusUpdate,
     ResponseSummary,
     ResponseUpdate,
+    SurveyStatisticsResponse,
 )
 from app.services.export_service import (
     build_csv_headers,
@@ -32,6 +33,7 @@ from app.services.response_service import (
     disqualify_response,
     get_response_detail,
     get_response_with_answers,
+    get_survey_statistics,
     list_responses,
     save_partial_response,
 )
@@ -72,6 +74,32 @@ def _extract_metadata(request: Request) -> dict:
         "user_agent": request.headers.get("User-Agent"),
         "referrer": request.headers.get("Referer"),
     }
+
+
+@router.get(
+    "/{survey_id}/statistics",
+    response_model=SurveyStatisticsResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def get_survey_statistics_endpoint(
+    survey_id: str,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> SurveyStatisticsResponse:
+    """Return aggregate statistics for a survey. Requires authentication.
+
+    Survey must be owned by the authenticated user; returns 404 otherwise.
+    Returns total/complete/incomplete/disqualified response counts, completion rate,
+    average completion time, and per-question summaries.
+    """
+    parsed_survey_id = _parse_survey_id(survey_id)
+
+    stats = await get_survey_statistics(
+        session,
+        survey_id=parsed_survey_id,
+        user_id=current_user.id,
+    )
+    return SurveyStatisticsResponse(**stats)
 
 
 @router.get(
