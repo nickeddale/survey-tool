@@ -380,44 +380,49 @@ async def import_survey(
 ) -> Survey:
     """Create a new survey from an exported JSON dict.
 
+    The entire import is wrapped in a savepoint so that any failure
+    (invalid question type, DB constraint, etc.) rolls back all previously
+    created records — all-or-nothing creation.
+
     Raises HTTP 400 if the format is invalid.
     """
     _validate_import_payload(data)
 
-    now = datetime.now(timezone.utc)
-    new_title = title if title is not None else data["title"]
+    async with session.begin_nested():
+        now = datetime.now(timezone.utc)
+        new_title = title if title is not None else data["title"]
 
-    new_survey = Survey(
-        id=uuid.uuid4(),
-        user_id=user_id,
-        title=new_title,
-        description=data.get("description"),
-        status="draft",
-        welcome_message=data.get("welcome_message"),
-        end_message=data.get("end_message"),
-        default_language=data.get("default_language", "en"),
-        settings=data.get("settings"),
-        created_at=now,
-        updated_at=now,
-    )
-    session.add(new_survey)
-    await session.flush()
-
-    for group_data in data["groups"]:
-        new_group = QuestionGroup(
+        new_survey = Survey(
             id=uuid.uuid4(),
-            survey_id=new_survey.id,
-            title=group_data["title"],
-            description=group_data.get("description"),
-            sort_order=group_data.get("sort_order", 1),
-            relevance=group_data.get("relevance"),
+            user_id=user_id,
+            title=new_title,
+            description=data.get("description"),
+            status="draft",
+            welcome_message=data.get("welcome_message"),
+            end_message=data.get("end_message"),
+            default_language=data.get("default_language", "en"),
+            settings=data.get("settings"),
             created_at=now,
+            updated_at=now,
         )
-        session.add(new_group)
+        session.add(new_survey)
         await session.flush()
 
-        for question_data in group_data["questions"]:
-            await _import_question(session, new_group.id, question_data, None, now)
+        for group_data in data["groups"]:
+            new_group = QuestionGroup(
+                id=uuid.uuid4(),
+                survey_id=new_survey.id,
+                title=group_data["title"],
+                description=group_data.get("description"),
+                sort_order=group_data.get("sort_order", 1),
+                relevance=group_data.get("relevance"),
+                created_at=now,
+            )
+            session.add(new_group)
+            await session.flush()
+
+            for question_data in group_data["questions"]:
+                await _import_question(session, new_group.id, question_data, None, now)
 
     # Reload for response
     result = await session.execute(

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-03T06:19:40.172Z",
+  "lastUpdated": "2026-04-03T06:26:48.915Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1309,6 +1309,26 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md",
+      "ticketId": "ISS-069",
+      "title": "4.13: Survey JSON Export/Import (Full Structure)",
+      "date": "2026-04-03",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -1377,7 +1397,8 @@
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
       "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
       "2026-04-03-iss-067-411-frontend-special-input-components.md",
-      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
+      "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1440,7 +1461,8 @@
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
       "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
       "2026-04-03-iss-067-411-frontend-special-input-components.md",
-      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
+      "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1493,7 +1515,8 @@
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
       "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
       "2026-04-03-iss-067-411-frontend-special-input-components.md",
-      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
+      "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1559,7 +1582,8 @@
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
       "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
       "2026-04-03-iss-067-411-frontend-special-input-components.md",
-      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
+      "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1644,7 +1668,8 @@
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
       "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
       "2026-04-03-iss-067-411-frontend-special-input-components.md",
-      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
+      "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1709,7 +1734,8 @@
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
       "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
       "2026-04-03-iss-067-411-frontend-special-input-components.md",
-      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
+      "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1817,7 +1843,8 @@
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
       "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
       "2026-04-03-iss-067-411-frontend-special-input-components.md",
-      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
+      "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1881,7 +1908,8 @@
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
       "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
       "2026-04-03-iss-067-411-frontend-special-input-components.md",
-      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
+      "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -1929,7 +1957,8 @@
       "2026-04-02-iss-061-45-backend-special-question-types-ranking-imagepic.md",
       "2026-04-03-iss-063-47-frontend-text-input-components.md",
       "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
-      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
+      "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md"
