@@ -1166,3 +1166,337 @@ async def test_partial_save_on_complete_response_returns_422(client: AsyncClient
     assert patch_resp.status_code == 422
     body = patch_resp.json()
     assert body["detail"]["code"] == "UNPROCESSABLE"
+
+
+# --------------------------------------------------------------------------- #
+# GET /surveys/{id}/responses — response listing (ISS-088)
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.asyncio
+async def test_list_responses_no_filters_returns_200(client: AsyncClient):
+    """GET /surveys/{id}/responses returns 200 with pagination envelope."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    # Submit a couple of responses
+    await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+
+    assert "items" in body
+    assert "total" in body
+    assert "page" in body
+    assert "per_page" in body
+    assert "pages" in body
+    assert body["total"] == 2
+    assert body["page"] == 1
+    assert len(body["items"]) == 2
+
+
+@pytest.mark.asyncio
+async def test_list_responses_item_fields(client: AsyncClient):
+    """Each item in the list contains exactly the summary fields."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    item = resp.json()["items"][0]
+
+    # Required fields
+    assert "id" in item
+    assert "status" in item
+    assert "started_at" in item
+    assert "completed_at" in item
+    assert "ip_address" in item
+    assert "participant_id" in item
+
+    # No extra sensitive fields like answers or metadata_
+    assert "answers" not in item
+    assert "metadata_" not in item
+
+
+@pytest.mark.asyncio
+async def test_list_responses_status_filter(client: AsyncClient):
+    """Status filter returns only responses matching the status."""
+    headers = await auth_headers(client, email="list_status@example.com")
+    survey_id = await create_survey(client, headers, title="Status Filter Survey")
+    q_id = await add_required_short_text_question(client, headers, survey_id, code="SF1")
+    await activate_survey(client, headers, survey_id)
+
+    # Incomplete response
+    post1 = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post1.status_code == 201
+
+    # Complete response
+    post2 = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": q_id, "value": "done"}]},
+    )
+    assert post2.status_code == 201
+    response_id_2 = post2.json()["id"]
+    await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id_2}",
+        json={"status": "complete"},
+    )
+
+    # Filter for incomplete only
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses?status=incomplete",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["total"] == 1
+    assert all(item["status"] == "incomplete" for item in body["items"])
+
+    # Filter for complete only
+    resp2 = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses?status=complete",
+        headers=headers,
+    )
+    assert resp2.status_code == 200
+    body2 = resp2.json()
+    assert body2["total"] == 1
+    assert all(item["status"] == "complete" for item in body2["items"])
+
+
+@pytest.mark.asyncio
+async def test_list_responses_pagination(client: AsyncClient):
+    """Pagination splits results correctly and total reflects full count."""
+    headers = await auth_headers(client, email="list_paginate@example.com")
+    survey_id = await create_survey(client, headers, title="Paginate Survey")
+    await add_group_and_question(client, headers, survey_id)
+    await activate_survey(client, headers, survey_id)
+
+    # Create 5 responses
+    for _ in range(5):
+        await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+
+    # Page 1 with per_page=2
+    resp_p1 = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses?page=1&per_page=2",
+        headers=headers,
+    )
+    assert resp_p1.status_code == 200
+    body_p1 = resp_p1.json()
+    assert body_p1["total"] == 5
+    assert body_p1["page"] == 1
+    assert body_p1["per_page"] == 2
+    assert body_p1["pages"] == 3
+    assert len(body_p1["items"]) == 2
+
+    # Page 3 (last page with 1 item)
+    resp_p3 = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses?page=3&per_page=2",
+        headers=headers,
+    )
+    assert resp_p3.status_code == 200
+    body_p3 = resp_p3.json()
+    assert body_p3["total"] == 5
+    assert body_p3["page"] == 3
+    assert len(body_p3["items"]) == 1
+
+
+@pytest.mark.asyncio
+async def test_list_responses_total_reflects_full_filtered_count(client: AsyncClient):
+    """Total must reflect the full filtered count, not just the current page size."""
+    headers = await auth_headers(client, email="list_total@example.com")
+    survey_id = await create_survey(client, headers, title="Total Count Survey")
+    await add_group_and_question(client, headers, survey_id)
+    await activate_survey(client, headers, survey_id)
+
+    # Create 4 responses
+    for _ in range(4):
+        await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+
+    # Request page 2 with per_page=2 — items on this page = 2, but total should still be 4
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses?page=2&per_page=2",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["total"] == 4  # full count, not len(page items)
+    assert len(body["items"]) == 2
+
+
+@pytest.mark.asyncio
+async def test_list_responses_sort_by_started_at_desc(client: AsyncClient):
+    """Default sort (started_at desc) returns most-recent first."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    r1 = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert r1.status_code == 201
+    r2 = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert r2.status_code == 201
+    r2_id = r2.json()["id"]
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses?sort_by=started_at&sort_order=desc",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    items = resp.json()["items"]
+    assert len(items) >= 2
+    # Most recently created (r2) should be first
+    assert items[0]["id"] == r2_id
+
+
+@pytest.mark.asyncio
+async def test_list_responses_sort_by_started_at_asc(client: AsyncClient):
+    """Sort by started_at asc returns oldest first."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    r1 = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert r1.status_code == 201
+    r1_id = r1.json()["id"]
+    r2 = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert r2.status_code == 201
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses?sort_by=started_at&sort_order=asc",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    items = resp.json()["items"]
+    assert len(items) >= 2
+    # Oldest (r1) should be first
+    assert items[0]["id"] == r1_id
+
+
+@pytest.mark.asyncio
+async def test_list_responses_sort_by_status(client: AsyncClient):
+    """Sort by status is accepted without error."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses?sort_by=status&sort_order=asc",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_list_responses_empty_when_no_responses(client: AsyncClient):
+    """Returns empty items list and total=0 when survey has no responses."""
+    headers = await auth_headers(client, email="list_empty@example.com")
+    survey_id = await create_survey(client, headers, title="Empty Survey")
+    await add_group_and_question(client, headers, survey_id)
+    await activate_survey(client, headers, survey_id)
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["total"] == 0
+    assert body["items"] == []
+    assert body["pages"] == 1
+
+
+@pytest.mark.asyncio
+async def test_list_responses_404_unknown_survey(client: AsyncClient):
+    """Returns 404 for a non-existent survey ID."""
+    headers = await auth_headers(client, email="list_404@example.com")
+
+    nonexistent_id = "00000000-0000-0000-0000-000000000000"
+    resp = await client.get(
+        f"{SURVEYS_URL}/{nonexistent_id}/responses",
+        headers=headers,
+    )
+    assert resp.status_code == 404
+    body = resp.json()
+    assert body["detail"]["code"] == "NOT_FOUND"
+
+
+@pytest.mark.asyncio
+async def test_list_responses_404_survey_owned_by_other_user(client: AsyncClient):
+    """Survey owned by another user returns 404, not 403 (prevents 404-oracle)."""
+    # Owner creates the survey
+    owner_headers = await auth_headers(client, email="owner_list@example.com")
+    survey_id = await create_survey(client, owner_headers, title="Owner Survey")
+    await add_group_and_question(client, owner_headers, survey_id)
+    await activate_survey(client, owner_headers, survey_id)
+
+    # Different user tries to list responses
+    other_headers = await auth_headers(client, email="other_list@example.com")
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        headers=other_headers,
+    )
+    assert resp.status_code == 404
+    body = resp.json()
+    assert body["detail"]["code"] == "NOT_FOUND"
+
+
+@pytest.mark.asyncio
+async def test_list_responses_401_when_unauthenticated(client: AsyncClient):
+    """Returns 403 when no auth credentials are provided."""
+    survey_id, _question_id, _headers = await create_active_survey(client)
+
+    resp = await client.get(f"{SURVEYS_URL}/{survey_id}/responses")
+    assert resp.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_list_responses_started_after_filter(client: AsyncClient):
+    """started_after filter excludes responses started before the cutoff."""
+    import asyncio
+    from datetime import timezone
+
+    headers = await auth_headers(client, email="list_started_after@example.com")
+    survey_id = await create_survey(client, headers, title="Started After Survey")
+    await add_group_and_question(client, headers, survey_id)
+    await activate_survey(client, headers, survey_id)
+
+    # Submit one response, record time, then submit another
+    r1 = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert r1.status_code == 201
+    r1_started_at = r1.json()["started_at"]
+
+    # Brief delay to ensure r2.started_at > r1.started_at
+    await asyncio.sleep(0.05)
+
+    r2 = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert r2.status_code == 201
+    r2_id = r2.json()["id"]
+
+    # Filter: only responses started after r1
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses?started_after={r1_started_at}",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    item_ids = [item["id"] for item in body["items"]]
+    assert r2_id in item_ids
+    # r1 was started_at the cutoff boundary, so it should not be included (strict >)
+    assert r1.json()["id"] not in item_ids
+
+
+@pytest.mark.asyncio
+async def test_list_responses_invalid_survey_id_returns_404(client: AsyncClient):
+    """Returns 404 for a non-UUID survey_id in the path."""
+    headers = await auth_headers(client, email="list_invalid_id@example.com")
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/not-a-valid-uuid/responses",
+        headers=headers,
+    )
+    assert resp.status_code == 404
+    body = resp.json()
+    assert body["detail"]["code"] == "NOT_FOUND"

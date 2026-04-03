@@ -43,6 +43,25 @@ class ResponseAnswerResponse(BaseModel):
     created_at: datetime
 
 
+class ResponseSummary(BaseModel):
+    model_config = {"from_attributes": True}
+
+    id: uuid.UUID
+    status: str
+    started_at: datetime
+    completed_at: datetime | None
+    ip_address: str | None
+    participant_id: uuid.UUID | None
+
+
+class ResponseListResponse(BaseModel):
+    items: list[ResponseSummary]
+    total: int
+    page: int
+    per_page: int
+    pages: int
+
+
 class ResponseResponse(BaseModel):
     model_config = {"from_attributes": True}
 
