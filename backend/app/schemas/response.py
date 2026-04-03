@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import Any
+from typing import Any, Union
 
 from pydantic import BaseModel, model_validator
 
@@ -133,3 +133,90 @@ class ResponseDetail(BaseModel):
     metadata: dict[str, Any] | None
     participant_id: uuid.UUID | None
     answers: list[ResponseAnswerDetail]
+
+
+# ---------------------------------------------------------------------------
+# Survey statistics schemas
+# ---------------------------------------------------------------------------
+
+
+class ChoiceOptionStat(BaseModel):
+    """Count and percentage for a single choice option."""
+
+    option_code: str
+    option_title: str | None
+    count: int
+    percentage: float
+
+
+class ChoiceQuestionStats(BaseModel):
+    """Per-question statistics for choice question types."""
+
+    question_type: str
+    response_count: int
+    options: list[ChoiceOptionStat]
+
+
+class NumericQuestionStats(BaseModel):
+    """Per-question statistics for numeric question types."""
+
+    question_type: str
+    response_count: int
+    mean: float | None
+    median: float | None
+    min: float | None
+    max: float | None
+
+
+class RatingDistributionEntry(BaseModel):
+    """Count for a single rating value."""
+
+    value: str
+    count: int
+
+
+class RatingQuestionStats(BaseModel):
+    """Per-question statistics for rating question types."""
+
+    question_type: str
+    response_count: int
+    average: float | None
+    distribution: list[RatingDistributionEntry]
+
+
+class TextQuestionStats(BaseModel):
+    """Per-question statistics for text question types."""
+
+    question_type: str
+    response_count: int
+
+
+QuestionStatsUnion = Union[
+    ChoiceQuestionStats, NumericQuestionStats, RatingQuestionStats, TextQuestionStats
+]
+
+
+class QuestionStatistics(BaseModel):
+    """Statistics for a single question, including type-specific summary."""
+
+    question_id: uuid.UUID
+    question_code: str
+    question_title: str
+    question_type: str
+    stats: QuestionStatsUnion
+
+
+class SurveyStatisticsResponse(BaseModel):
+    """Aggregate statistics for a survey, including per-question summaries."""
+
+    survey_id: uuid.UUID
+    total_responses: int
+    complete_responses: int
+    incomplete_responses: int
+    disqualified_responses: int
+    completion_rate: float
+    average_completion_time_seconds: float | None
+    questions: list[QuestionStatistics]
+
+
+SurveyStatisticsResponse.model_rebuild()

@@ -1,10 +1,11 @@
 """Service layer for survey response creation and management."""
 
+import statistics
 import uuid
 from datetime import datetime, timezone
 from typing import Any, Literal
 
-from sqlalchemy import asc, desc, func, select
+from sqlalchemy import asc, desc, extract, func, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -581,6 +582,272 @@ async def get_response_detail(
         "metadata": response.metadata_,
         "participant_id": response.participant_id,
         "answers": enriched_answers,
+    }
+
+
+async def get_survey_statistics(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+    user_id: uuid.UUID,
+) -> dict:
+    """Compute aggregate statistics for a survey and its questions.
+
+    Enforces survey ownership via a single JOIN query (survey.user_id == user_id).
+    Returns 404 for both missing surveys and unauthorized access to avoid leaking existence.
+
+    Args:
+        session: The async database session.
+        survey_id: The UUID of the survey.
+        user_id: The UUID of the authenticated user (ownership check).
+
+    Returns:
+        A dict suitable for constructing a SurveyStatisticsResponse schema.
+
+    Raises:
+        NotFoundError: If the survey does not exist or is not owned by user_id.
+    """
+    # Verify survey ownership
+    survey_result = await session.execute(
+        select(Survey).where(Survey.id == survey_id, Survey.user_id == user_id)
+    )
+    survey = survey_result.scalar_one_or_none()
+    if survey is None:
+        raise NotFoundError("Survey not found")
+
+    # --- Response count aggregations by status ---
+    status_counts_result = await session.execute(
+        select(Response.status, func.count().label("cnt"))
+        .where(Response.survey_id == survey_id)
+        .group_by(Response.status)
+    )
+    status_map: dict[str, int] = {}
+    for row in status_counts_result:
+        status_map[row.status] = row.cnt
+
+    total_responses = sum(status_map.values())
+    complete_responses = status_map.get("complete", 0)
+    incomplete_responses = status_map.get("incomplete", 0)
+    disqualified_responses = status_map.get("disqualified", 0)
+
+    completion_rate = (complete_responses / total_responses) if total_responses > 0 else 0.0
+
+    # --- Average completion time (seconds) for complete responses ---
+    avg_time_result = await session.execute(
+        select(
+            func.avg(
+                extract("epoch", Response.completed_at) - extract("epoch", Response.started_at)
+            )
+        ).where(
+            Response.survey_id == survey_id,
+            Response.status == "complete",
+            Response.completed_at.is_not(None),
+        )
+    )
+    avg_time_seconds: float | None = avg_time_result.scalar_one_or_none()
+
+    # --- Per-question statistics ---
+    # Fetch all questions in the survey (via question_group join), ordered for consistency
+    questions_result = await session.execute(
+        select(Question)
+        .join(QuestionGroup, Question.group_id == QuestionGroup.id)
+        .where(QuestionGroup.survey_id == survey_id)
+        .order_by(QuestionGroup.sort_order, Question.sort_order)
+    )
+    questions = list(questions_result.scalars().all())
+
+    # Categorize question types
+    CHOICE_TYPES = {"single_choice", "dropdown", "image_picker", "yes_no"}
+    MULTI_CHOICE_TYPES = {"multiple_choice"}
+    NUMERIC_TYPES = {"number", "numeric", "scale"}
+    RATING_TYPES = {"rating"}
+    # All others treated as text (short_text, long_text, huge_text, email, phone, url, date, time, datetime, etc.)
+
+    question_stats_list = []
+
+    for question in questions:
+        qtype = question.question_type
+        question_id = question.id
+
+        # Fetch all answers for this question from the survey's responses
+        answers_result = await session.execute(
+            select(ResponseAnswer.value)
+            .join(Response, ResponseAnswer.response_id == Response.id)
+            .where(
+                Response.survey_id == survey_id,
+                ResponseAnswer.question_id == question_id,
+                ResponseAnswer.value.is_not(None),
+            )
+        )
+        raw_values = [row[0] for row in answers_result.fetchall()]
+        response_count = len(raw_values)
+
+        if qtype in CHOICE_TYPES:
+            # Single-value choice: value is a string (option code)
+            # Fetch answer options for percentage calculation
+            options_result = await session.execute(
+                select(AnswerOption)
+                .where(AnswerOption.question_id == question_id)
+                .order_by(AnswerOption.sort_order)
+            )
+            answer_options = list(options_result.scalars().all())
+            option_map = {opt.code: opt.title for opt in answer_options}
+
+            # Count occurrences per option code
+            code_counts: dict[str, int] = {}
+            for val in raw_values:
+                code = str(val)
+                code_counts[code] = code_counts.get(code, 0) + 1
+
+            # Build options list (include all defined options, even those with 0 responses)
+            options_out = []
+            total_choice = response_count if response_count > 0 else 1
+            for opt in answer_options:
+                cnt = code_counts.get(opt.code, 0)
+                options_out.append({
+                    "option_code": opt.code,
+                    "option_title": opt.title,
+                    "count": cnt,
+                    "percentage": round(cnt / total_choice * 100, 2),
+                })
+            # Include any coded responses for options not in answer_options
+            for code, cnt in code_counts.items():
+                if code not in option_map:
+                    options_out.append({
+                        "option_code": code,
+                        "option_title": None,
+                        "count": cnt,
+                        "percentage": round(cnt / total_choice * 100, 2),
+                    })
+
+            stats = {
+                "question_type": qtype,
+                "response_count": response_count,
+                "options": options_out,
+            }
+
+        elif qtype in MULTI_CHOICE_TYPES:
+            # Multiple choice: value is a list of codes
+            options_result = await session.execute(
+                select(AnswerOption)
+                .where(AnswerOption.question_id == question_id)
+                .order_by(AnswerOption.sort_order)
+            )
+            answer_options = list(options_result.scalars().all())
+            option_map = {opt.code: opt.title for opt in answer_options}
+
+            code_counts = {}
+            total_selections = 0
+            for val in raw_values:
+                if isinstance(val, list):
+                    for code in val:
+                        c = str(code)
+                        code_counts[c] = code_counts.get(c, 0) + 1
+                        total_selections += 1
+                elif val is not None:
+                    c = str(val)
+                    code_counts[c] = code_counts.get(c, 0) + 1
+                    total_selections += 1
+
+            options_out = []
+            total_denom = total_selections if total_selections > 0 else 1
+            for opt in answer_options:
+                cnt = code_counts.get(opt.code, 0)
+                options_out.append({
+                    "option_code": opt.code,
+                    "option_title": opt.title,
+                    "count": cnt,
+                    "percentage": round(cnt / total_denom * 100, 2),
+                })
+            for code, cnt in code_counts.items():
+                if code not in option_map:
+                    options_out.append({
+                        "option_code": code,
+                        "option_title": None,
+                        "count": cnt,
+                        "percentage": round(cnt / total_denom * 100, 2),
+                    })
+
+            stats = {
+                "question_type": qtype,
+                "response_count": response_count,
+                "options": options_out,
+            }
+
+        elif qtype in NUMERIC_TYPES:
+            # Numeric: compute mean, median, min, max Python-side
+            numeric_vals: list[float] = []
+            for val in raw_values:
+                try:
+                    numeric_vals.append(float(val))
+                except (TypeError, ValueError):
+                    pass
+
+            if numeric_vals:
+                mean_val = sum(numeric_vals) / len(numeric_vals)
+                median_val = statistics.median(numeric_vals)
+                min_val = min(numeric_vals)
+                max_val = max(numeric_vals)
+            else:
+                mean_val = median_val = min_val = max_val = None
+
+            stats = {
+                "question_type": qtype,
+                "response_count": len(numeric_vals),
+                "mean": mean_val,
+                "median": median_val,
+                "min": min_val,
+                "max": max_val,
+            }
+
+        elif qtype in RATING_TYPES:
+            # Rating: compute average and distribution
+            numeric_vals = []
+            dist_counts: dict[str, int] = {}
+            for val in raw_values:
+                s = str(val)
+                dist_counts[s] = dist_counts.get(s, 0) + 1
+                try:
+                    numeric_vals.append(float(val))
+                except (TypeError, ValueError):
+                    pass
+
+            average = sum(numeric_vals) / len(numeric_vals) if numeric_vals else None
+            distribution = [
+                {"value": k, "count": v}
+                for k, v in sorted(dist_counts.items(), key=lambda x: x[0])
+            ]
+
+            stats = {
+                "question_type": qtype,
+                "response_count": response_count,
+                "average": average,
+                "distribution": distribution,
+            }
+
+        else:
+            # Text and all other types: just count responses
+            stats = {
+                "question_type": qtype,
+                "response_count": response_count,
+            }
+
+        question_stats_list.append({
+            "question_id": question.id,
+            "question_code": question.code,
+            "question_title": question.title,
+            "question_type": qtype,
+            "stats": stats,
+        })
+
+    return {
+        "survey_id": survey_id,
+        "total_responses": total_responses,
+        "complete_responses": complete_responses,
+        "incomplete_responses": incomplete_responses,
+        "disqualified_responses": disqualified_responses,
+        "completion_rate": round(completion_rate, 4),
+        "average_completion_time_seconds": avg_time_seconds,
+        "questions": question_stats_list,
     }
 
 
