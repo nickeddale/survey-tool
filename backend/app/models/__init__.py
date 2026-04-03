@@ -5,3 +5,6 @@ from app.models.survey import Survey  # noqa: F401
 from app.models.question_group import QuestionGroup  # noqa: F401
 from app.models.question import Question  # noqa: F401
 from app.models.answer_option import AnswerOption  # noqa: F401
+from app.models.participant import Participant  # noqa: F401
+from app.models.response import Response  # noqa: F401
+from app.models.response_answer import ResponseAnswer  # noqa: F401

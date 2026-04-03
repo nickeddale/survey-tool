@@ -26,6 +26,10 @@ from app.services.expressions.evaluator import (
     Evaluator,
     EvaluationError,
 )
+from app.services.expressions.resolver import (
+    build_expression_context,
+    ResolverError,
+)
 
 __all__ = [
     # Lexer
@@ -48,4 +52,7 @@ __all__ = [
     "evaluate",
     "Evaluator",
     "EvaluationError",
+    # Resolver
+    "build_expression_context",
+    "ResolverError",
 ]
