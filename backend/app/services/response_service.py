@@ -23,6 +23,7 @@ from app.services.expressions.relevance import evaluate_relevance
 from app.services.expressions.resolver import build_expression_context
 from app.services.quota_service import evaluate_and_enforce_quotas
 from app.utils.errors import AnswerValidationError, ConflictError, ForbiddenError, NotFoundError, UnprocessableError
+from app.services.webhook_service import dispatch_webhook_event
 
 
 async def _check_survey_requires_participants(
@@ -295,6 +296,17 @@ async def create_response(
             ) from exc
 
     await session.refresh(response)
+
+    dispatch_webhook_event(
+        event="response.started",
+        survey_id=survey_id,
+        data={
+            "response_id": str(response.id),
+            "survey_id": str(survey_id),
+            "started_at": response.started_at.isoformat() if response.started_at else None,
+        },
+    )
+
     return response
 
 
@@ -417,6 +429,17 @@ async def complete_response(
         await session.flush()
 
     await session.refresh(response)
+
+    dispatch_webhook_event(
+        event="response.completed",
+        survey_id=survey_id,
+        data={
+            "response_id": str(response.id),
+            "survey_id": str(survey_id),
+            "completed_at": response.completed_at.isoformat() if response.completed_at else None,
+        },
+    )
+
     return response
 
 

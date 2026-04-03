@@ -22,6 +22,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.quota import Quota
 from app.models.response import Response
+from app.services.webhook_service import dispatch_webhook_event
 from app.utils.errors import ForbiddenError
 
 
@@ -246,23 +247,30 @@ async def _emit_quota_reached(
     response_id: uuid.UUID,
     new_count: int,
 ) -> None:
-    """Emit a quota.reached event.
+    """Emit a quota.reached webhook event.
 
-    Currently a structured log / no-op stub. When a webhook system is available,
-    this should enqueue a webhook delivery with the following payload:
-        {
-            "event": "quota.reached",
+    Dispatches a fire-and-forget webhook with quota details. The session
+    parameter is accepted for signature compatibility but not passed to the
+    dispatcher (which opens its own session to avoid lifetime issues).
+
+    Args:
+        session: The current async database session (not forwarded to dispatcher).
+        quota: The Quota ORM object whose limit was just reached.
+        response_id: The UUID of the response that triggered the limit.
+        new_count: The new current_count value after increment.
+    """
+    dispatch_webhook_event(
+        event="quota.reached",
+        survey_id=quota.survey_id,
+        data={
             "quota_id": str(quota.id),
+            "quota_name": quota.name,
             "survey_id": str(quota.survey_id),
             "response_id": str(response_id),
             "current_count": new_count,
             "limit": quota.limit,
-        }
-
-    The stub is intentionally idempotent and does not raise.
-    """
-    # Future: enqueue webhook event
-    pass  # noqa: PIE790
+        },
+    )
 
 
 # ---------------------------------------------------------------------------

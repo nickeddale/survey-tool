@@ -9,6 +9,7 @@ from sqlalchemy.orm import selectinload
 from app.models.question import Question
 from app.models.question_group import QuestionGroup
 from app.models.survey import Survey
+from app.services.webhook_service import dispatch_webhook_event
 
 
 async def create_survey(
@@ -177,6 +178,17 @@ async def activate_survey(
     session.add(survey)
     await session.flush()
     await session.refresh(survey)
+
+    dispatch_webhook_event(
+        event="survey.activated",
+        survey_id=survey.id,
+        data={
+            "survey_id": str(survey.id),
+            "title": survey.title,
+            "status": survey.status,
+        },
+    )
+
     return survey
 
 
@@ -196,6 +208,17 @@ async def close_survey(
     session.add(survey)
     await session.flush()
     await session.refresh(survey)
+
+    dispatch_webhook_event(
+        event="survey.closed",
+        survey_id=survey.id,
+        data={
+            "survey_id": str(survey.id),
+            "title": survey.title,
+            "status": survey.status,
+        },
+    )
+
     return survey
 
 
