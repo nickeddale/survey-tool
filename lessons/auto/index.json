@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-03T20:25:53.392Z",
+  "lastUpdated": "2026-04-03T20:38:48.472Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2062,6 +2062,25 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-03-iss-107-712-frontend-webhook-management-ui.md",
+      "ticketId": "ISS-107",
+      "title": "7.12: Frontend — Webhook Management UI",
+      "date": "2026-04-03",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -2163,7 +2182,8 @@
       "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md",
       "2026-04-03-iss-102-77-webhook-event-dispatching.md",
       "2026-04-03-iss-103-78-webhook-hmac-sha256-signing-and-retry-logic.md",
-      "2026-04-03-iss-105-710-frontend-quota-management-ui.md"
+      "2026-04-03-iss-105-710-frontend-quota-management-ui.md",
+      "2026-04-03-iss-107-712-frontend-webhook-management-ui.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2257,7 +2277,8 @@
       "2026-04-03-iss-100-75-assessment-model-scoring-engine-and-crud-endpoi.md",
       "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md",
       "2026-04-03-iss-102-77-webhook-event-dispatching.md",
-      "2026-04-03-iss-103-78-webhook-hmac-sha256-signing-and-retry-logic.md"
+      "2026-04-03-iss-103-78-webhook-hmac-sha256-signing-and-retry-logic.md",
+      "2026-04-03-iss-107-712-frontend-webhook-management-ui.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2337,7 +2358,8 @@
       "2026-04-03-iss-100-75-assessment-model-scoring-engine-and-crud-endpoi.md",
       "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md",
       "2026-04-03-iss-102-77-webhook-event-dispatching.md",
-      "2026-04-03-iss-103-78-webhook-hmac-sha256-signing-and-retry-logic.md"
+      "2026-04-03-iss-103-78-webhook-hmac-sha256-signing-and-retry-logic.md",
+      "2026-04-03-iss-107-712-frontend-webhook-management-ui.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2434,7 +2456,8 @@
       "2026-04-03-iss-100-75-assessment-model-scoring-engine-and-crud-endpoi.md",
       "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md",
       "2026-04-03-iss-102-77-webhook-event-dispatching.md",
-      "2026-04-03-iss-103-78-webhook-hmac-sha256-signing-and-retry-logic.md"
+      "2026-04-03-iss-103-78-webhook-hmac-sha256-signing-and-retry-logic.md",
+      "2026-04-03-iss-107-712-frontend-webhook-management-ui.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2557,7 +2580,8 @@
       "2026-04-03-iss-100-75-assessment-model-scoring-engine-and-crud-endpoi.md",
       "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md",
       "2026-04-03-iss-102-77-webhook-event-dispatching.md",
-      "2026-04-03-iss-103-78-webhook-hmac-sha256-signing-and-retry-logic.md"
+      "2026-04-03-iss-103-78-webhook-hmac-sha256-signing-and-retry-logic.md",
+      "2026-04-03-iss-107-712-frontend-webhook-management-ui.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2653,7 +2677,8 @@
       "2026-04-03-iss-100-75-assessment-model-scoring-engine-and-crud-endpoi.md",
       "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md",
       "2026-04-03-iss-102-77-webhook-event-dispatching.md",
-      "2026-04-03-iss-103-78-webhook-hmac-sha256-signing-and-retry-logic.md"
+      "2026-04-03-iss-103-78-webhook-hmac-sha256-signing-and-retry-logic.md",
+      "2026-04-03-iss-107-712-frontend-webhook-management-ui.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2819,7 +2844,8 @@
       "2026-04-03-iss-100-75-assessment-model-scoring-engine-and-crud-endpoi.md",
       "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md",
       "2026-04-03-iss-102-77-webhook-event-dispatching.md",
-      "2026-04-03-iss-103-78-webhook-hmac-sha256-signing-and-retry-logic.md"
+      "2026-04-03-iss-103-78-webhook-hmac-sha256-signing-and-retry-logic.md",
+      "2026-04-03-iss-107-712-frontend-webhook-management-ui.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2914,7 +2940,8 @@
       "2026-04-03-iss-100-75-assessment-model-scoring-engine-and-crud-endpoi.md",
       "2026-04-03-iss-101-76-webhook-model-and-crud-endpoints.md",
       "2026-04-03-iss-102-77-webhook-event-dispatching.md",
-      "2026-04-03-iss-103-78-webhook-hmac-sha256-signing-and-retry-logic.md"
+      "2026-04-03-iss-103-78-webhook-hmac-sha256-signing-and-retry-logic.md",
+      "2026-04-03-iss-107-712-frontend-webhook-management-ui.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
