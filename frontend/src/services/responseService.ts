@@ -7,7 +7,7 @@
  */
 
 import apiClient from './apiClient'
-import type { ResolveFlowRequest, ResolveFlowResponse } from '../types/survey'
+import type { ResolveFlowRequest, ResolveFlowResponse, ResponseListResponse, ResponseDetailFull } from '../types/survey'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -101,6 +101,43 @@ class ResponseService {
     const response = await apiClient.post<ResolveFlowResponse>(
       `/surveys/${surveyId}/logic/resolve-flow`,
       data,
+    )
+    return response.data
+  }
+
+  // ---------------------------------------------------------------------------
+  // Admin (authenticated) response methods
+  // ---------------------------------------------------------------------------
+
+  /**
+   * List responses for a survey. Requires authentication.
+   */
+  async listResponses(
+    surveyId: string,
+    params: {
+      page?: number
+      per_page?: number
+      status?: string
+      sort_by?: 'started_at' | 'completed_at' | 'status'
+      sort_order?: 'asc' | 'desc'
+    } = {},
+  ): Promise<ResponseListResponse> {
+    const response = await apiClient.get<ResponseListResponse>(
+      `/surveys/${surveyId}/responses`,
+      { params },
+    )
+    return response.data
+  }
+
+  /**
+   * Get full response detail with enriched answers. Requires authentication.
+   */
+  async getResponseDetail(
+    surveyId: string,
+    responseId: string,
+  ): Promise<ResponseDetailFull> {
+    const response = await apiClient.get<ResponseDetailFull>(
+      `/surveys/${surveyId}/responses/${responseId}/detail`,
     )
     return response.data
   }

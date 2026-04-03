@@ -12,6 +12,8 @@ import SurveyFormPage from './pages/SurveyFormPage'
 import SurveyBuilderPage from './pages/SurveyBuilderPage'
 import SurveyPreviewPage from './pages/SurveyPreviewPage'
 import SurveyResponsePage from './pages/SurveyResponsePage'
+import ResponsesPage from './pages/ResponsesPage'
+import ResponseDetailPage from './pages/ResponseDetailPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 function App() {
@@ -37,6 +39,8 @@ function App() {
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/surveys/new" element={<SurveyFormPage />} />
               <Route path="/surveys/:id/edit" element={<SurveyFormPage />} />
+              <Route path="/surveys/:id/responses/:rid" element={<ResponseDetailPage />} />
+              <Route path="/surveys/:id/responses" element={<ResponsesPage />} />
               <Route path="/surveys/:id" element={<SurveyDetailPage />} />
               <Route path="/surveys" element={<SurveysPage />} />
             </Route>

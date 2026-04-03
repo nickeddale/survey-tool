@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-03T15:52:20.357Z",
+  "lastUpdated": "2026-04-03T16:01:06.781Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1822,6 +1822,26 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "high"
+    },
+    {
+      "file": "2026-04-03-iss-094-612-frontend-response-list-and-detail-pages-admin.md",
+      "ticketId": "ISS-094",
+      "title": "6.12: Frontend — Response List and Detail Pages (Admin)",
+      "date": "2026-04-03",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -1913,7 +1933,8 @@
       "2026-04-03-iss-089-67-response-detail-endpoint.md",
       "2026-04-03-iss-090-68-response-export-endpoint-csv-and-json.md",
       "2026-04-03-iss-091-69-survey-statistics-endpoint.md",
-      "2026-04-03-iss-092-610-frontend-public-survey-response-form.md"
+      "2026-04-03-iss-092-610-frontend-public-survey-response-form.md",
+      "2026-04-03-iss-094-612-frontend-response-list-and-detail-pages-admin.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1998,7 +2019,8 @@
       "2026-04-03-iss-088-66-response-listing-and-filtering-endpoint.md",
       "2026-04-03-iss-090-68-response-export-endpoint-csv-and-json.md",
       "2026-04-03-iss-091-69-survey-statistics-endpoint.md",
-      "2026-04-03-iss-092-610-frontend-public-survey-response-form.md"
+      "2026-04-03-iss-092-610-frontend-public-survey-response-form.md",
+      "2026-04-03-iss-094-612-frontend-response-list-and-detail-pages-admin.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2069,7 +2091,8 @@
       "2026-04-03-iss-087-65-partial-response-saving-resume-later.md",
       "2026-04-03-iss-088-66-response-listing-and-filtering-endpoint.md",
       "2026-04-03-iss-090-68-response-export-endpoint-csv-and-json.md",
-      "2026-04-03-iss-091-69-survey-statistics-endpoint.md"
+      "2026-04-03-iss-091-69-survey-statistics-endpoint.md",
+      "2026-04-03-iss-094-612-frontend-response-list-and-detail-pages-admin.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2157,7 +2180,8 @@
       "2026-04-03-iss-088-66-response-listing-and-filtering-endpoint.md",
       "2026-04-03-iss-090-68-response-export-endpoint-csv-and-json.md",
       "2026-04-03-iss-091-69-survey-statistics-endpoint.md",
-      "2026-04-03-iss-092-610-frontend-public-survey-response-form.md"
+      "2026-04-03-iss-092-610-frontend-public-survey-response-form.md",
+      "2026-04-03-iss-094-612-frontend-response-list-and-detail-pages-admin.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2269,7 +2293,8 @@
       "2026-04-03-iss-088-66-response-listing-and-filtering-endpoint.md",
       "2026-04-03-iss-090-68-response-export-endpoint-csv-and-json.md",
       "2026-04-03-iss-091-69-survey-statistics-endpoint.md",
-      "2026-04-03-iss-092-610-frontend-public-survey-response-form.md"
+      "2026-04-03-iss-092-610-frontend-public-survey-response-form.md",
+      "2026-04-03-iss-094-612-frontend-response-list-and-detail-pages-admin.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2356,7 +2381,8 @@
       "2026-04-03-iss-088-66-response-listing-and-filtering-endpoint.md",
       "2026-04-03-iss-090-68-response-export-endpoint-csv-and-json.md",
       "2026-04-03-iss-091-69-survey-statistics-endpoint.md",
-      "2026-04-03-iss-092-610-frontend-public-survey-response-form.md"
+      "2026-04-03-iss-092-610-frontend-public-survey-response-form.md",
+      "2026-04-03-iss-094-612-frontend-response-list-and-detail-pages-admin.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2503,7 +2529,8 @@
       "2026-04-03-iss-087-65-partial-response-saving-resume-later.md",
       "2026-04-03-iss-088-66-response-listing-and-filtering-endpoint.md",
       "2026-04-03-iss-091-69-survey-statistics-endpoint.md",
-      "2026-04-03-iss-092-610-frontend-public-survey-response-form.md"
+      "2026-04-03-iss-092-610-frontend-public-survey-response-form.md",
+      "2026-04-03-iss-094-612-frontend-response-list-and-detail-pages-admin.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2589,7 +2616,8 @@
       "2026-04-03-iss-088-66-response-listing-and-filtering-endpoint.md",
       "2026-04-03-iss-090-68-response-export-endpoint-csv-and-json.md",
       "2026-04-03-iss-091-69-survey-statistics-endpoint.md",
-      "2026-04-03-iss-092-610-frontend-public-survey-response-form.md"
+      "2026-04-03-iss-092-610-frontend-public-survey-response-form.md",
+      "2026-04-03-iss-094-612-frontend-response-list-and-detail-pages-admin.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -2657,7 +2685,8 @@
       "2026-04-03-iss-088-66-response-listing-and-filtering-endpoint.md",
       "2026-04-03-iss-090-68-response-export-endpoint-csv-and-json.md",
       "2026-04-03-iss-091-69-survey-statistics-endpoint.md",
-      "2026-04-03-iss-092-610-frontend-public-survey-response-form.md"
+      "2026-04-03-iss-092-610-frontend-public-survey-response-form.md",
+      "2026-04-03-iss-094-612-frontend-response-list-and-detail-pages-admin.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",

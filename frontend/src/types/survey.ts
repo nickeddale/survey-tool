@@ -211,3 +211,47 @@ export interface ResolveFlowResponse {
   /** Next question id to navigate to (for skip logic) — may be null */
   next_question_id: string | null
 }
+
+// ---------------------------------------------------------------------------
+// Admin response list / detail types (matching backend ResponseSummary,
+// ResponseListResponse, ResponseAnswerDetail, ResponseDetail)
+// ---------------------------------------------------------------------------
+
+export interface ResponseSummary {
+  id: string
+  status: string
+  started_at: string
+  completed_at: string | null
+  ip_address: string | null
+  participant_id: string | null
+}
+
+export interface ResponseListResponse {
+  items: ResponseSummary[]
+  total: number
+  page: number
+  per_page: number
+  pages: number
+}
+
+export interface ResponseAnswerDetail {
+  question_id: string
+  question_code: string
+  question_title: string
+  question_type: string
+  value: unknown
+  values: unknown[] | null
+  selected_option_title: string | null
+  subquestion_label: string | null
+}
+
+export interface ResponseDetailFull {
+  id: string
+  status: string
+  started_at: string
+  completed_at: string | null
+  ip_address: string | null
+  metadata: Record<string, unknown> | null
+  participant_id: string | null
+  answers: ResponseAnswerDetail[]
+}
