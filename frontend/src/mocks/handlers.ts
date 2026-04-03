@@ -169,6 +169,115 @@ export const mockSurveyFull = {
   options: [],
 }
 
+// Active survey for public response form tests (mockSurveyFull has draft status)
+export const mockActiveSurveyFull = {
+  id: '10000000-0000-0000-0000-000000000099',
+  user_id: '00000000-0000-0000-0000-000000000001',
+  title: 'Active Customer Survey',
+  description: 'Help us improve our service',
+  status: 'active',
+  welcome_message: 'Thanks for taking the time to fill out this survey!',
+  end_message: 'We appreciate your feedback!',
+  default_language: 'en',
+  settings: { one_page_per_group: true },
+  created_at: '2024-01-10T10:00:00Z',
+  updated_at: '2024-01-15T12:00:00Z',
+  groups: [
+    {
+      id: 'ag1',
+      survey_id: '10000000-0000-0000-0000-000000000099',
+      title: 'About You',
+      description: 'Tell us a bit about yourself',
+      sort_order: 1,
+      relevance: null,
+      created_at: '2024-01-10T10:00:00Z',
+      questions: [
+        {
+          id: 'aq1',
+          group_id: 'ag1',
+          parent_id: null,
+          question_type: 'short_text',
+          code: 'NAME',
+          title: 'What is your name?',
+          description: null,
+          is_required: true,
+          sort_order: 1,
+          relevance: null,
+          validation: null,
+          settings: null,
+          created_at: '2024-01-10T10:00:00Z',
+          subquestions: [],
+          answer_options: [],
+        },
+      ],
+    },
+    {
+      id: 'ag2',
+      survey_id: '10000000-0000-0000-0000-000000000099',
+      title: 'Feedback',
+      description: null,
+      sort_order: 2,
+      relevance: null,
+      created_at: '2024-01-10T10:00:00Z',
+      questions: [
+        {
+          id: 'aq2',
+          group_id: 'ag2',
+          parent_id: null,
+          question_type: 'radio',
+          code: 'RATING',
+          title: 'How satisfied are you?',
+          description: null,
+          is_required: false,
+          sort_order: 1,
+          relevance: null,
+          validation: null,
+          settings: null,
+          created_at: '2024-01-10T10:00:00Z',
+          subquestions: [],
+          answer_options: [
+            {
+              id: 'ao1',
+              question_id: 'aq2',
+              code: 'S1',
+              title: 'Very Satisfied',
+              sort_order: 1,
+              assessment_value: 5,
+              created_at: '2024-01-10T10:00:00Z',
+            },
+            {
+              id: 'ao2',
+              question_id: 'aq2',
+              code: 'S2',
+              title: 'Satisfied',
+              sort_order: 2,
+              assessment_value: 4,
+              created_at: '2024-01-10T10:00:00Z',
+            },
+          ],
+        },
+      ],
+    },
+  ],
+  questions: [],
+  options: [],
+}
+
+// Mock response data for response service tests
+export const mockResponseCreated = {
+  id: 'r-00000000-0000-0000-0000-000000000001',
+  survey_id: '10000000-0000-0000-0000-000000000099',
+  participant_id: null,
+  status: 'in_progress',
+  ip_address: null,
+  metadata_: null,
+  started_at: '2024-01-15T10:00:00Z',
+  completed_at: null,
+  created_at: '2024-01-15T10:00:00Z',
+  updated_at: '2024-01-15T10:00:00Z',
+  answers: [],
+}
+
 export const mockUser = {
   id: '00000000-0000-0000-0000-000000000001',
   email: 'test@example.com',
@@ -294,7 +403,15 @@ export const handlers = [
   }),
 
   // GET /api/v1/surveys/:id
+  // The public response page calls surveyService.getSurvey() unauthenticated.
+  // We allow unauthenticated access for mockActiveSurveyFull (public survey mock).
+  // All other survey reads require authentication.
   http.get(`${BASE}/surveys/:id`, ({ request, params }) => {
+    // Allow unauthenticated access for the public active survey
+    if (params.id === mockActiveSurveyFull.id) {
+      return HttpResponse.json(mockActiveSurveyFull, { status: 200 })
+    }
+
     const authHeader = request.headers.get('Authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
@@ -724,5 +841,33 @@ export const handlers = [
       { ...mockUser, name: body.name ?? mockUser.name },
       { status: 200 },
     )
+  }),
+
+  // ---------------------------------------------------------------------------
+  // Public response endpoints (no auth required)
+  // ---------------------------------------------------------------------------
+
+  // POST /api/v1/surveys/:surveyId/responses — create new response (public)
+  http.post(`${BASE}/surveys/:surveyId/responses`, async ({ params }) => {
+    const response = {
+      ...mockResponseCreated,
+      survey_id: params.surveyId as string,
+    }
+    return HttpResponse.json(response, { status: 201 })
+  }),
+
+  // PATCH /api/v1/surveys/:surveyId/responses/:responseId — save progress or complete (public)
+  http.patch(`${BASE}/surveys/:surveyId/responses/:responseId`, async ({ request, params }) => {
+    const body = (await request.json()) as { status?: string; answers?: unknown[] }
+    const isComplete = body.status === 'complete'
+    const response = {
+      ...mockResponseCreated,
+      id: params.responseId as string,
+      survey_id: params.surveyId as string,
+      status: isComplete ? 'complete' : 'in_progress',
+      completed_at: isComplete ? new Date().toISOString() : null,
+      updated_at: new Date().toISOString(),
+    }
+    return HttpResponse.json(response, { status: 200 })
   }),
 ]

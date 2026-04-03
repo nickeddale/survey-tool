@@ -11,6 +11,7 @@ import SurveyDetailPage from './pages/SurveyDetailPage'
 import SurveyFormPage from './pages/SurveyFormPage'
 import SurveyBuilderPage from './pages/SurveyBuilderPage'
 import SurveyPreviewPage from './pages/SurveyPreviewPage'
+import SurveyResponsePage from './pages/SurveyResponsePage'
 import NotFoundPage from './pages/NotFoundPage'
 
 function App() {
@@ -18,6 +19,9 @@ function App() {
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AuthProvider>
         <Routes>
+          {/* Public survey response form — no auth required */}
+          <Route path="/s/:survey_id" element={<SurveyResponsePage />} />
+
           {/* Redirect root to dashboard (ProtectedRoute will redirect to /login if needed) */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
