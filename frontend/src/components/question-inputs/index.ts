@@ -28,3 +28,15 @@ export type { MatrixDropdownInputProps } from './MatrixDropdownInput'
 
 export { MatrixDynamicInput } from './MatrixDynamicInput'
 export type { MatrixDynamicInputProps } from './MatrixDynamicInput'
+
+export { NumericInput } from './NumericInput'
+export type { NumericInputProps } from './NumericInput'
+
+export { RatingInput } from './RatingInput'
+export type { RatingInputProps } from './RatingInput'
+
+export { BooleanInput } from './BooleanInput'
+export type { BooleanInputProps } from './BooleanInput'
+
+export { DateInput } from './DateInput'
+export type { DateInputProps } from './DateInput'
