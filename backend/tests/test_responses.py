@@ -877,3 +877,292 @@ async def test_disqualify_nonexistent_response_returns_404(client: AsyncClient):
     assert patch_resp.status_code == 404
     body = patch_resp.json()
     assert body["detail"]["code"] == "NOT_FOUND"
+
+
+# --------------------------------------------------------------------------- #
+# PATCH /surveys/{id}/responses/{rid} — partial save (ISS-087)
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.asyncio
+async def test_partial_save_returns_200_with_answers(client: AsyncClient):
+    """PATCH with answers and no status performs partial save and returns 200 with answers."""
+    survey_id, question_id, _headers = await create_active_survey(client)
+
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"answers": [{"question_id": question_id, "value": "partial answer"}]},
+    )
+    assert patch_resp.status_code == 200
+    body = patch_resp.json()
+    assert body["status"] == "incomplete"
+    assert body["id"] == response_id
+    assert len(body["answers"]) == 1
+    assert body["answers"][0]["question_id"] == question_id
+    assert body["answers"][0]["value"] == "partial answer"
+
+
+@pytest.mark.asyncio
+async def test_partial_save_status_remains_incomplete(client: AsyncClient):
+    """Partial save does not change status from 'incomplete'."""
+    survey_id, question_id, _headers = await create_active_survey(client)
+
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"answers": [{"question_id": question_id, "value": "hello"}]},
+    )
+    assert patch_resp.status_code == 200
+    assert patch_resp.json()["status"] == "incomplete"
+    assert patch_resp.json()["completed_at"] is None
+
+
+@pytest.mark.asyncio
+async def test_partial_save_does_not_validate_required_fields(client: AsyncClient):
+    """Partial save does not enforce required-field validation."""
+    headers = await auth_headers(client, email="partial_novalidate@example.com")
+    survey_id = await create_survey(client, headers, title="Required Partial Survey")
+    # Required question — partial save must not fail even when missing
+    await add_required_short_text_question(client, headers, survey_id, code="REQ_P")
+    await activate_survey(client, headers, survey_id)
+
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # Partial save with NO answers at all — should still return 200
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"answers": []},
+    )
+    assert patch_resp.status_code == 200
+    assert patch_resp.json()["status"] == "incomplete"
+
+
+@pytest.mark.asyncio
+async def test_multiple_partial_saves_merge_answers(client: AsyncClient):
+    """Multiple partial saves accumulate and overwrite answers for the same question."""
+    headers = await auth_headers(client, email="multi_partial@example.com")
+    survey_id = await create_survey(client, headers, title="Multi Partial Survey")
+
+    # Add two questions
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": "Group"},
+        headers=headers,
+    )
+    assert group_resp.status_code == 201
+    group_id = group_resp.json()["id"]
+
+    q1_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": "Q1", "question_type": "short_text", "code": "Q1"},
+        headers=headers,
+    )
+    assert q1_resp.status_code == 201
+    q1_id = q1_resp.json()["id"]
+
+    q2_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": "Q2", "question_type": "short_text", "code": "Q2"},
+        headers=headers,
+    )
+    assert q2_resp.status_code == 201
+    q2_id = q2_resp.json()["id"]
+
+    await activate_survey(client, headers, survey_id)
+
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # First partial save: only Q1
+    patch1 = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"answers": [{"question_id": q1_id, "value": "first"}]},
+    )
+    assert patch1.status_code == 200
+    body1 = patch1.json()
+    assert len(body1["answers"]) == 1
+
+    # Second partial save: overwrite Q1 and add Q2
+    patch2 = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={
+            "answers": [
+                {"question_id": q1_id, "value": "updated"},
+                {"question_id": q2_id, "value": "added"},
+            ]
+        },
+    )
+    assert patch2.status_code == 200
+    body2 = patch2.json()
+    assert len(body2["answers"]) == 2
+    values_by_qid = {a["question_id"]: a["value"] for a in body2["answers"]}
+    assert values_by_qid[q1_id] == "updated"
+    assert values_by_qid[q2_id] == "added"
+
+
+@pytest.mark.asyncio
+async def test_partial_save_nonexistent_response_returns_404(client: AsyncClient):
+    """PATCH partial save on a non-existent response returns 404."""
+    survey_id, question_id, _headers = await create_active_survey(client)
+
+    nonexistent_id = "00000000-0000-0000-0000-000000000000"
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{nonexistent_id}",
+        json={"answers": [{"question_id": question_id, "value": "val"}]},
+    )
+    assert patch_resp.status_code == 404
+    body = patch_resp.json()
+    assert body["detail"]["code"] == "NOT_FOUND"
+
+
+@pytest.mark.asyncio
+async def test_complete_after_partial_save_validates_correctly(client: AsyncClient):
+    """PATCH with status='complete' after partial saves still triggers full validation."""
+    headers = await auth_headers(client, email="complete_after_partial@example.com")
+    survey_id = await create_survey(client, headers, title="Complete After Partial Survey")
+    q_id = await add_required_short_text_question(
+        client, headers, survey_id, code="CAP"
+    )
+    await activate_survey(client, headers, survey_id)
+
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # Partial save with the required answer
+    patch_partial = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"answers": [{"question_id": q_id, "value": "my answer"}]},
+    )
+    assert patch_partial.status_code == 200
+
+    # Complete — should succeed because required answer is now present
+    patch_complete = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"status": "complete"},
+    )
+    assert patch_complete.status_code == 200
+    body = patch_complete.json()
+    assert body["status"] == "complete"
+    assert body["completed_at"] is not None
+
+
+# --------------------------------------------------------------------------- #
+# GET /surveys/{id}/responses/{rid} — resume (ISS-087)
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.asyncio
+async def test_get_response_returns_current_answers(client: AsyncClient):
+    """GET /surveys/{id}/responses/{rid} returns the response with its saved answers."""
+    survey_id, question_id, _headers = await create_active_survey(client)
+
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # Save some partial answers
+    await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"answers": [{"question_id": question_id, "value": "saved answer"}]},
+    )
+
+    # GET to retrieve current answers for resume
+    get_resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+    )
+    assert get_resp.status_code == 200
+    body = get_resp.json()
+    assert body["id"] == response_id
+    assert body["survey_id"] == survey_id
+    assert body["status"] == "incomplete"
+    assert len(body["answers"]) == 1
+    assert body["answers"][0]["question_id"] == question_id
+    assert body["answers"][0]["value"] == "saved answer"
+
+
+@pytest.mark.asyncio
+async def test_get_response_no_auth_required(client: AsyncClient):
+    """GET response endpoint is public — no Authorization header needed."""
+    survey_id, _question_id, _headers = await create_active_survey(client)
+
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    get_resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+    )
+    assert get_resp.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_get_response_nonexistent_returns_404(client: AsyncClient):
+    """GET on a non-existent response returns 404."""
+    survey_id, _question_id, _headers = await create_active_survey(client)
+
+    nonexistent_id = "00000000-0000-0000-0000-000000000000"
+    get_resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{nonexistent_id}",
+    )
+    assert get_resp.status_code == 404
+    body = get_resp.json()
+    assert body["detail"]["code"] == "NOT_FOUND"
+
+
+@pytest.mark.asyncio
+async def test_get_response_empty_answers_when_none_saved(client: AsyncClient):
+    """GET response returns empty answers list when no partial saves have occurred."""
+    survey_id, _question_id, _headers = await create_active_survey(client)
+
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    get_resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+    )
+    assert get_resp.status_code == 200
+    body = get_resp.json()
+    assert body["answers"] == []
+
+
+@pytest.mark.asyncio
+async def test_partial_save_on_complete_response_returns_422(client: AsyncClient):
+    """Partial save on a completed response returns 422."""
+    headers = await auth_headers(client, email="partial_on_complete@example.com")
+    survey_id = await create_survey(client, headers, title="Complete Partial Survey")
+    q_id = await add_required_short_text_question(client, headers, survey_id, code="CPC")
+    await activate_survey(client, headers, survey_id)
+
+    post_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": q_id, "value": "done"}]},
+    )
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # Complete the response
+    await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"status": "complete"},
+    )
+
+    # Partial save on completed response should fail
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"answers": [{"question_id": q_id, "value": "override"}]},
+    )
+    assert patch_resp.status_code == 422
+    body = patch_resp.json()
+    assert body["detail"]["code"] == "UNPROCESSABLE"
