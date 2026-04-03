@@ -15,6 +15,7 @@ from app.api.logic import router as logic_router
 from app.api.question_groups import router as question_groups_router
 from app.api.questions import router as questions_router
 from app.api.questions import subquestions_router
+from app.api.responses import router as responses_router
 from app.api.surveys import router as surveys_router
 from app.config import settings
 from app.utils.errors import (
@@ -183,6 +184,7 @@ app.include_router(question_groups_router, prefix="/api/v1")
 app.include_router(questions_router, prefix="/api/v1")
 app.include_router(subquestions_router, prefix="/api/v1")
 app.include_router(answer_options_router, prefix="/api/v1")
+app.include_router(responses_router, prefix="/api/v1")
 
 
 @app.get("/health")
