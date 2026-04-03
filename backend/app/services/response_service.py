@@ -21,6 +21,7 @@ from app.models.survey import Survey
 from app.services.validators import validate_answer
 from app.services.expressions.relevance import evaluate_relevance
 from app.services.expressions.resolver import build_expression_context
+from app.services.quota_service import evaluate_and_enforce_quotas
 from app.utils.errors import AnswerValidationError, ConflictError, ForbiddenError, NotFoundError, UnprocessableError
 
 
@@ -358,6 +359,21 @@ async def complete_response(
     relevance_result = evaluate_relevance(survey, answers=expression_context)
 
     visible_question_ids = relevance_result.visible_question_ids
+
+    # Build answer lookup dict (question_id -> value) for quota condition evaluation
+    answer_lookup = {ra.question_id: ra.value for ra in response.answers}
+
+    # Evaluate and enforce quotas (must happen before completion but after relevance)
+    quota_result = await evaluate_and_enforce_quotas(
+        session=session,
+        survey_id=survey_id,
+        response_id=response_id,
+        answer_lookup=answer_lookup,
+    )
+    # quota_result.disqualified will only be True if no ForbiddenError was raised
+    # (terminate quotas raise immediately); hide_question quotas restrict visible ids
+    if quota_result.hidden_question_ids:
+        visible_question_ids = visible_question_ids - quota_result.hidden_question_ids
 
     # Build the list of current answers as dicts for validation
     answer_dicts = [

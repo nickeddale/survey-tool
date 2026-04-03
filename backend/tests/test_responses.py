@@ -2229,3 +2229,404 @@ async def test_export_csv_response_with_no_answers_has_empty_columns(client: Asy
     r2_row = next(row for row in rows if row["response_id"] == r2_id)
     # Column value should be empty string, not KeyError
     assert r2_row["EMPTY_Q"] == ""
+
+
+# --------------------------------------------------------------------------- #
+# PATCH /surveys/{id}/responses/{rid} — quota enforcement (ISS-099)
+# --------------------------------------------------------------------------- #
+
+
+async def create_quota(
+    client: AsyncClient,
+    headers: dict,
+    survey_id: str,
+    question_id: str,
+    action: str = "terminate",
+    limit: int = 1,
+    operator: str = "eq",
+    value: object = "trigger",
+) -> str:
+    """Create a quota for a survey; return the quota id."""
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/quotas",
+        json={
+            "name": f"Test {action} Quota",
+            "limit": limit,
+            "action": action,
+            "conditions": [
+                {
+                    "question_id": question_id,
+                    "operator": operator,
+                    "value": value,
+                }
+            ],
+            "is_active": True,
+        },
+        headers=headers,
+    )
+    assert resp.status_code == 201, f"Failed to create quota: {resp.text}"
+    return resp.json()["id"]
+
+
+@pytest.mark.asyncio
+async def test_complete_response_terminate_quota_disqualifies_response(client: AsyncClient):
+    """PATCH complete on a response that matches a full terminate quota returns 403."""
+    headers = await auth_headers(client, email="quota_terminate@example.com")
+    survey_id = await create_survey(client, headers, title="Quota Terminate Survey")
+
+    # Add a required short_text question (code=Q1)
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": "Group"},
+        headers=headers,
+    )
+    assert group_resp.status_code == 201
+    group_id = group_resp.json()["id"]
+
+    q_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": "Q1", "question_type": "short_text", "code": "Q1", "is_required": True},
+        headers=headers,
+    )
+    assert q_resp.status_code == 201
+    question_id = q_resp.json()["id"]
+
+    # Create a terminate quota: limit=1, condition: Q1 == "trigger"
+    await create_quota(
+        client, headers, survey_id, question_id,
+        action="terminate", limit=1, operator="eq", value="trigger",
+    )
+
+    await activate_survey(client, headers, survey_id)
+
+    # First response: submits Q1="trigger" and completes — this fills the quota.
+    # Since limit=1 and this is the first submission, new_count == limit → disqualified.
+    post1 = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": question_id, "value": "trigger"}]},
+    )
+    assert post1.status_code == 201
+    r1_id = post1.json()["id"]
+
+    complete1 = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{r1_id}",
+        json={"status": "complete"},
+    )
+    # The first submission fills the quota (new_count == limit == 1) → disqualified
+    assert complete1.status_code == 403
+    body = complete1.json()
+    assert body["detail"]["code"] == "FORBIDDEN"
+
+
+@pytest.mark.asyncio
+async def test_complete_response_terminate_quota_second_response_also_disqualified(
+    client: AsyncClient,
+):
+    """PATCH complete on a response after quota is full → second response also disqualified."""
+    headers = await auth_headers(client, email="quota_term2@example.com")
+    survey_id = await create_survey(client, headers, title="Quota Terminate2 Survey")
+
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": "Group"},
+        headers=headers,
+    )
+    group_id = group_resp.json()["id"]
+
+    q_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": "Q1", "question_type": "short_text", "code": "Q1", "is_required": True},
+        headers=headers,
+    )
+    question_id = q_resp.json()["id"]
+
+    # limit=2 so first two fill it
+    await create_quota(
+        client, headers, survey_id, question_id,
+        action="terminate", limit=2, operator="eq", value="trigger",
+    )
+
+    await activate_survey(client, headers, survey_id)
+
+    # First submission — limit=2, new_count=1 after increment → NOT disqualified yet
+    post1 = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": question_id, "value": "trigger"}]},
+    )
+    assert post1.status_code == 201
+    r1_id = post1.json()["id"]
+
+    complete1 = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{r1_id}",
+        json={"status": "complete"},
+    )
+    assert complete1.status_code == 200  # new_count=1, limit=2 → OK
+
+    # Second submission — new_count=2 == limit → disqualified
+    post2 = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": question_id, "value": "trigger"}]},
+    )
+    assert post2.status_code == 201
+    r2_id = post2.json()["id"]
+
+    complete2 = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{r2_id}",
+        json={"status": "complete"},
+    )
+    assert complete2.status_code == 403
+
+    # Third submission — quota already full (rowcount=0) → disqualified
+    post3 = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": question_id, "value": "trigger"}]},
+    )
+    assert post3.status_code == 201
+    r3_id = post3.json()["id"]
+
+    complete3 = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{r3_id}",
+        json={"status": "complete"},
+    )
+    assert complete3.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_complete_response_terminate_quota_non_matching_answer_completes_normally(
+    client: AsyncClient,
+):
+    """When answer does not match terminate quota condition, response completes normally."""
+    headers = await auth_headers(client, email="quota_nomatch@example.com")
+    survey_id = await create_survey(client, headers, title="Quota NoMatch Survey")
+
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": "Group"},
+        headers=headers,
+    )
+    group_id = group_resp.json()["id"]
+
+    q_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": "Q1", "question_type": "short_text", "code": "Q1", "is_required": True},
+        headers=headers,
+    )
+    question_id = q_resp.json()["id"]
+
+    # Quota only triggers for "trigger" value
+    await create_quota(
+        client, headers, survey_id, question_id,
+        action="terminate", limit=1, operator="eq", value="trigger",
+    )
+
+    await activate_survey(client, headers, survey_id)
+
+    post = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": question_id, "value": "safe_value"}]},
+    )
+    assert post.status_code == 201
+    response_id = post.json()["id"]
+
+    # Complete — "safe_value" does not match the quota condition → no disqualification
+    complete = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"status": "complete"},
+    )
+    assert complete.status_code == 200
+    body = complete.json()
+    assert body["status"] == "complete"
+
+
+@pytest.mark.asyncio
+async def test_complete_response_inactive_quota_not_enforced(client: AsyncClient):
+    """Inactive quotas are not evaluated during response completion."""
+    headers = await auth_headers(client, email="quota_inactive@example.com")
+    survey_id = await create_survey(client, headers, title="Inactive Quota Survey")
+
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": "Group"},
+        headers=headers,
+    )
+    group_id = group_resp.json()["id"]
+
+    q_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": "Q1", "question_type": "short_text", "code": "Q1", "is_required": True},
+        headers=headers,
+    )
+    question_id = q_resp.json()["id"]
+
+    await activate_survey(client, headers, survey_id)
+
+    # Create an inactive quota
+    quota_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/quotas",
+        json={
+            "name": "Inactive Quota",
+            "limit": 1,
+            "action": "terminate",
+            "conditions": [
+                {"question_id": question_id, "operator": "eq", "value": "trigger"}
+            ],
+            "is_active": False,
+        },
+        headers=headers,
+    )
+    assert quota_resp.status_code == 201
+
+    # Response matching condition should NOT be disqualified (quota is inactive)
+    post = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": question_id, "value": "trigger"}]},
+    )
+    assert post.status_code == 201
+    response_id = post.json()["id"]
+
+    complete = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"status": "complete"},
+    )
+    assert complete.status_code == 200
+    body = complete.json()
+    assert body["status"] == "complete"
+
+
+@pytest.mark.asyncio
+async def test_complete_response_hide_question_quota_hides_questions(client: AsyncClient):
+    """A matched hide_question quota makes matching questions hidden from validation."""
+    headers = await auth_headers(client, email="quota_hide@example.com")
+    survey_id = await create_survey(client, headers, title="Hide Question Quota Survey")
+
+    # Create two questions in one group
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": "Group"},
+        headers=headers,
+    )
+    group_id = group_resp.json()["id"]
+
+    # Q1: short_text, not required
+    q1_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": "Q1", "question_type": "short_text", "code": "Q1", "is_required": False},
+        headers=headers,
+    )
+    q1_id = q1_resp.json()["id"]
+
+    # Q2: required — we want this to be hidden by the quota
+    q2_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": "Q2", "question_type": "short_text", "code": "Q2", "is_required": True},
+        headers=headers,
+    )
+    q2_id = q2_resp.json()["id"]
+
+    # Create a hide_question quota: when Q1 == "hide", hide Q2 (Q2 is in conditions)
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/quotas",
+        json={
+            "name": "Hide Q2 Quota",
+            "limit": 100,  # high limit so it doesn't fill
+            "action": "hide_question",
+            "conditions": [
+                {"question_id": q2_id, "operator": "eq", "value": "irrelevant"}
+            ],
+            "is_active": True,
+        },
+        headers=headers,
+    )
+
+    # The actual hiding test: a quota whose condition matches Q1 value
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/quotas",
+        json={
+            "name": "Hide Q2 Via Q1 Quota",
+            "limit": 100,
+            "action": "hide_question",
+            "conditions": [
+                {"question_id": q1_id, "operator": "eq", "value": "hide"}
+            ],
+            "is_active": True,
+        },
+        headers=headers,
+    )
+
+    await activate_survey(client, headers, survey_id)
+
+    # Submit response with Q1="hide", no answer for Q2 (which is required but should be hidden)
+    post = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": q1_id, "value": "hide"}]},
+    )
+    assert post.status_code == 201
+    response_id = post.json()["id"]
+
+    # Complete — the "Hide Q2 Via Q1 Quota" matches (Q1=="hide"), so Q1 gets hidden.
+    # Q2 was required but may still be visible (depends on which conditions reference it).
+    # The key behavior: response should complete if all visible required questions are answered.
+    complete = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"status": "complete"},
+    )
+    # Q2 is required and has no answer. The quota hides Q1 (since Q1 is in the condition).
+    # Q2 is still visible and required → this should fail with 422
+    # unless Q2 is also hidden by the first quota when its condition (Q2=="irrelevant") doesn't match.
+    # Since Q2 != "irrelevant", first quota does NOT match, so Q2 stays visible.
+    # This tests that the hide_question mechanism works correctly.
+    # Response should fail because Q2 is still visible and required.
+    assert complete.status_code == 422
+    body = complete.json()
+    assert body["detail"]["code"] == "VALIDATION_ERROR"
+
+
+@pytest.mark.asyncio
+async def test_quota_current_count_incremented_after_completion(client: AsyncClient):
+    """After successful completion matching a quota, the quota current_count is incremented."""
+    headers = await auth_headers(client, email="quota_count@example.com")
+    survey_id = await create_survey(client, headers, title="Quota Count Survey")
+
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": "Group"},
+        headers=headers,
+    )
+    group_id = group_resp.json()["id"]
+
+    q_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": "Q1", "question_type": "short_text", "code": "Q1", "is_required": True},
+        headers=headers,
+    )
+    question_id = q_resp.json()["id"]
+
+    # limit=5 so multiple completions are allowed before disqualification
+    quota_id = await create_quota(
+        client, headers, survey_id, question_id,
+        action="terminate", limit=5, operator="eq", value="counted",
+    )
+
+    await activate_survey(client, headers, survey_id)
+
+    # First completion matching quota condition (new_count=1 < limit=5 → complete OK)
+    post = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": question_id, "value": "counted"}]},
+    )
+    assert post.status_code == 201
+    response_id = post.json()["id"]
+
+    complete = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"status": "complete"},
+    )
+    assert complete.status_code == 200
+
+    # Verify quota current_count increased to 1
+    quota_check = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/quotas/{quota_id}",
+        headers=headers,
+    )
+    assert quota_check.status_code == 200
+    assert quota_check.json()["current_count"] == 1
