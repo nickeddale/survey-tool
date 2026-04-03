@@ -6,9 +6,11 @@ from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.schemas.response import ResponseCreate, ResponseResponse, ResponseUpdate
-from app.services.response_service import complete_response, create_response
-from app.utils.errors import NotFoundError, UnprocessableError
+from app.dependencies import get_current_user
+from app.models.user import User
+from app.schemas.response import ResponseCreate, ResponseResponse, ResponseStatusUpdate, ResponseUpdate
+from app.services.response_service import complete_response, create_response, disqualify_response
+from app.utils.errors import ForbiddenError, NotFoundError, UnprocessableError
 
 router = APIRouter(prefix="/surveys", tags=["responses"])
 
@@ -104,4 +106,37 @@ async def update_response(
             f"Unsupported status value: '{payload.status}'. Only 'complete' is accepted."
         )
 
+    return ResponseResponse.model_validate(response)
+
+
+@router.patch(
+    "/{survey_id}/responses/{response_id}/status",
+    response_model=ResponseResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def update_response_status(
+    survey_id: str,
+    response_id: str,
+    payload: ResponseStatusUpdate,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> ResponseResponse:
+    """Admin endpoint to update response status. Requires authentication.
+
+    Only 'disqualified' is accepted as a target status via this endpoint.
+    Invalid status values return 422.
+    """
+    parsed_survey_id = _parse_survey_id(survey_id)
+    parsed_response_id = _parse_response_id(response_id)
+
+    if payload.status != "disqualified":
+        raise UnprocessableError(
+            f"Invalid status transition: only 'disqualified' is accepted. Got '{payload.status}'."
+        )
+
+    response = await disqualify_response(
+        session,
+        survey_id=parsed_survey_id,
+        response_id=parsed_response_id,
+    )
     return ResponseResponse.model_validate(response)

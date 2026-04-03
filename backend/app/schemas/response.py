@@ -24,6 +24,10 @@ class ResponseUpdate(BaseModel):
     answers: list[AnswerInput] = []
 
 
+class ResponseStatusUpdate(BaseModel):
+    status: str
+
+
 # ---------------------------------------------------------------------------
 # Output schemas
 # ---------------------------------------------------------------------------
