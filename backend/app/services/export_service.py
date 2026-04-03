@@ -105,6 +105,7 @@ async def clone_survey(
         end_message=original.end_message,
         default_language=original.default_language,
         settings=original.settings,
+        translations=original.translations or {},
         created_at=now,
         updated_at=now,
     )
@@ -119,6 +120,7 @@ async def clone_survey(
             description=group.description,
             sort_order=group.sort_order,
             relevance=group.relevance,
+            translations=group.translations or {},
             created_at=now,
         )
         session.add(new_group)
@@ -148,6 +150,7 @@ async def clone_survey(
                 relevance=question.relevance,
                 validation=question.validation,
                 settings=question.settings,
+                translations=question.translations or {},
                 created_at=now,
             )
             session.add(new_question)
@@ -161,6 +164,7 @@ async def clone_survey(
                     title=option.title,
                     sort_order=option.sort_order,
                     assessment_value=option.assessment_value,
+                    translations=option.translations or {},
                     created_at=now,
                 )
                 session.add(new_option)
@@ -191,6 +195,7 @@ async def clone_survey(
                 relevance=question.relevance,
                 validation=question.validation,
                 settings=question.settings,
+                translations=question.translations or {},
                 created_at=now,
             )
             session.add(new_subquestion)
@@ -204,6 +209,7 @@ async def clone_survey(
                     title=option.title,
                     sort_order=option.sort_order,
                     assessment_value=option.assessment_value,
+                    translations=option.translations or {},
                     created_at=now,
                 )
                 session.add(new_option)
@@ -237,6 +243,7 @@ def _export_option(option: AnswerOption) -> dict[str, Any]:
         "title": option.title,
         "sort_order": option.sort_order,
         "assessment_value": option.assessment_value,
+        "translations": option.translations or {},
     }
 
 
@@ -251,6 +258,7 @@ def _export_question(question: Question) -> dict[str, Any]:
         "relevance": question.relevance,
         "validation": question.validation,
         "settings": question.settings,
+        "translations": question.translations or {},
         "answer_options": [_export_option(o) for o in question.answer_options],
         "subquestions": [_export_question(sq) for sq in question.subquestions],
     }
@@ -264,6 +272,7 @@ def _export_group(group: QuestionGroup) -> dict[str, Any]:
         "description": group.description,
         "sort_order": group.sort_order,
         "relevance": group.relevance,
+        "translations": group.translations or {},
         "questions": [_export_question(q) for q in top_level],
     }
 
@@ -290,6 +299,7 @@ async def export_survey(
         "end_message": survey.end_message,
         "default_language": survey.default_language,
         "settings": survey.settings,
+        "translations": survey.translations or {},
         "groups": [_export_group(g) for g in survey.groups],
     }
 
@@ -413,6 +423,7 @@ async def import_survey(
             end_message=data.get("end_message"),
             default_language=data.get("default_language", "en"),
             settings=data.get("settings"),
+            translations=data.get("translations") or {},
             created_at=now,
             updated_at=now,
         )
@@ -427,6 +438,7 @@ async def import_survey(
                 description=group_data.get("description"),
                 sort_order=group_data.get("sort_order", 1),
                 relevance=group_data.get("relevance"),
+                translations=group_data.get("translations") or {},
                 created_at=now,
             )
             session.add(new_group)
@@ -473,6 +485,7 @@ async def _import_question(
         relevance=question_data.get("relevance"),
         validation=question_data.get("validation"),
         settings=question_data.get("settings"),
+        translations=question_data.get("translations") or {},
         created_at=now,
     )
     session.add(new_question)
@@ -486,6 +499,7 @@ async def _import_question(
             title=option_data["title"],
             sort_order=option_data.get("sort_order", 1),
             assessment_value=option_data.get("assessment_value", 0),
+            translations=option_data.get("translations") or {},
             created_at=now,
         )
         session.add(new_option)

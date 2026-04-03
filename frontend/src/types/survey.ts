@@ -1,5 +1,8 @@
 // Survey-related TypeScript types matching backend schemas
 
+/** Translations map: { "fr": { "title": "...", "description": "..." }, "es": {...} } */
+export type TranslationsMap = Record<string, Record<string, string>>
+
 export interface AnswerOptionResponse {
   id: string
   question_id: string
@@ -8,6 +11,7 @@ export interface AnswerOptionResponse {
   sort_order: number
   assessment_value: number
   image_url?: string | null
+  translations?: TranslationsMap
   created_at: string
 }
 
@@ -24,6 +28,7 @@ export interface QuestionResponse {
   relevance: string | null
   validation: Record<string, unknown> | null
   settings: Record<string, unknown> | null
+  translations?: TranslationsMap
   created_at: string
   subquestions: QuestionResponse[]
   answer_options: AnswerOptionResponse[]
@@ -36,6 +41,7 @@ export interface QuestionGroupResponse {
   description: string | null
   sort_order: number
   relevance: string | null
+  translations?: TranslationsMap
   created_at: string
   questions: QuestionResponse[]
 }
@@ -50,6 +56,7 @@ export interface SurveyResponse {
   end_message: string | null
   default_language: string
   settings: Record<string, unknown> | null
+  translations?: TranslationsMap
   created_at: string
   updated_at: string
 }

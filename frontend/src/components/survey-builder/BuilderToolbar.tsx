@@ -20,6 +20,7 @@ import {
   ArrowLeft,
   Eye,
   EyeOff,
+  Languages,
   Lock,
   MoreHorizontal,
   Plus,
@@ -89,6 +90,8 @@ interface BuilderToolbarProps {
   surveyId: string
   isPreviewMode: boolean
   onTogglePreview: () => void
+  isTranslationMode: boolean
+  onToggleTranslation: () => void
   readOnly: boolean
   undoRedoPendingRef: React.MutableRefObject<boolean>
 }
@@ -101,6 +104,8 @@ export function BuilderToolbar({
   surveyId,
   isPreviewMode,
   onTogglePreview,
+  isTranslationMode,
+  onToggleTranslation,
   readOnly,
   undoRedoPendingRef,
 }: BuilderToolbarProps) {
@@ -444,6 +449,28 @@ export function BuilderToolbar({
             </Button>
           </TooltipTrigger>
           <TooltipContent>Open full survey preview page</TooltipContent>
+        </Tooltip>
+
+        {/* Translations toggle */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant={isTranslationMode ? 'default' : 'outline'}
+              size="sm"
+              className="h-8 gap-1 shrink-0"
+              onClick={onToggleTranslation}
+              aria-pressed={isTranslationMode}
+              data-testid="translation-mode-toggle"
+            >
+              <Languages size={14} />
+              <span className="hidden sm:inline">
+                {isTranslationMode ? 'Exit Translations' : 'Translations'}
+              </span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {isTranslationMode ? 'Exit translation mode' : 'Toggle translation editor'}
+          </TooltipContent>
         </Tooltip>
 
         {/* Activate button (draft only) */}

@@ -12,6 +12,7 @@ from app.schemas.question import (
     QuestionListResponse,
     QuestionReorderRequest,
     QuestionResponse,
+    QuestionTranslationsUpdate,
     QuestionUpdate,
     SubquestionCreate,
 )
@@ -24,6 +25,7 @@ from app.services.question_service import (
     reorder_questions,
     update_question,
 )
+from app.services.translation_service import merge_translations
 from app.utils.errors import ConflictError, NotFoundError, UnprocessableError
 
 router = APIRouter(
@@ -201,6 +203,39 @@ async def patch(
 
     update_fields = payload.model_dump(exclude_unset=True)
     question = await update_question(session, question, **update_fields)
+    return QuestionResponse.model_validate(question)
+
+
+@router.patch("/{question_id}/translations", response_model=QuestionResponse)
+async def update_translations(
+    survey_id: str,
+    group_id: str,
+    question_id: str,
+    payload: QuestionTranslationsUpdate,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> QuestionResponse:
+    """Update translations for a specific language in a question."""
+    parsed_survey_id = _parse_uuid(survey_id, "Survey")
+    parsed_group_id = _parse_uuid(group_id, "Group")
+    parsed_question_id = _parse_uuid(question_id, "Question")
+
+    question = await get_question_by_id(
+        session,
+        survey_id=parsed_survey_id,
+        group_id=parsed_group_id,
+        question_id=parsed_question_id,
+        user_id=current_user.id,
+    )
+    if question is None:
+        raise NotFoundError("Question not found")
+
+    new_translations = merge_translations(
+        question.translations or {},
+        payload.lang,
+        payload.translations,
+    )
+    question = await update_question(session, question, translations=new_translations)
     return QuestionResponse.model_validate(question)
 
 

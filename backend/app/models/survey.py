@@ -5,6 +5,7 @@ import sqlalchemy as sa
 from sqlalchemy import DateTime, ForeignKey, String, text
 from sqlalchemy.dialects.postgresql import ENUM, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from typing import Any
 
 from app.database import Base
 
@@ -63,6 +64,12 @@ class Survey(Base):
         JSONB,
         nullable=True,
         default=dict,
+    )
+    translations: Mapped[dict[str, Any]] = mapped_column(
+        JSONB,
+        nullable=False,
+        default=dict,
+        server_default=text("'{}'"),
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

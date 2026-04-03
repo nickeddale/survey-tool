@@ -1,0 +1,197 @@
+"""Translation service for multi-language support.
+
+Provides functions to:
+- apply_translation: overlay translated fields on an entity dict for a given language
+- get_supported_languages: enumerate languages present in a survey's translations
+- merge_translations: update or insert translation entries for a given language
+"""
+from typing import Any
+
+
+# ---------------------------------------------------------------------------
+# Translatable fields per entity type
+# ---------------------------------------------------------------------------
+
+SURVEY_TRANSLATABLE_FIELDS = frozenset(["title", "description", "welcome_message", "end_message"])
+GROUP_TRANSLATABLE_FIELDS = frozenset(["title", "description"])
+QUESTION_TRANSLATABLE_FIELDS = frozenset(["title", "description"])
+OPTION_TRANSLATABLE_FIELDS = frozenset(["title"])
+
+
+def apply_translation(
+    entity_dict: dict[str, Any],
+    lang: str,
+    fallback_lang: str,
+    translatable_fields: frozenset[str],
+) -> dict[str, Any]:
+    """Overlay translated fields on an entity dict for the requested language.
+
+    Looks up ``entity_dict["translations"][lang]`` for each translatable field.
+    If the field is present in the requested language, it replaces the default value.
+    If the requested language is not found or a field is missing, falls back to:
+      1. fallback_lang translations (if different from lang)
+      2. original default field value
+
+    Args:
+        entity_dict: A dict representation of the entity (e.g. from model_dump()).
+        lang: The requested language code (e.g. "fr").
+        fallback_lang: The survey's default_language used as fallback (e.g. "en").
+        translatable_fields: Set of field names that can be translated.
+
+    Returns:
+        A new dict with translated fields overlaid. Does not mutate the input.
+    """
+    translations: dict[str, Any] = entity_dict.get("translations") or {}
+    lang_translations: dict[str, str] = translations.get(lang, {})
+    fallback_translations: dict[str, str] = {}
+    if lang != fallback_lang:
+        fallback_translations = translations.get(fallback_lang, {})
+
+    result = dict(entity_dict)
+    for field in translatable_fields:
+        if field not in result:
+            continue
+        translated_value = lang_translations.get(field)
+        if translated_value is not None:
+            result[field] = translated_value
+        elif fallback_translations:
+            fallback_value = fallback_translations.get(field)
+            if fallback_value is not None:
+                result[field] = fallback_value
+        # else: keep original value
+
+    return result
+
+
+def get_supported_languages(survey_dict: dict[str, Any]) -> list[str]:
+    """Return list of language codes present in survey translations.
+
+    Gathers languages from the survey itself and all nested groups, questions,
+    and answer options. Returns a deduplicated sorted list.
+
+    Args:
+        survey_dict: A dict representation of the full survey (with groups, questions, options).
+
+    Returns:
+        Sorted list of unique language codes found in any translations JSONB field.
+    """
+    langs: set[str] = set()
+
+    def collect(entity: dict[str, Any]) -> None:
+        translations = entity.get("translations") or {}
+        langs.update(translations.keys())
+
+    collect(survey_dict)
+    for group in survey_dict.get("groups", []):
+        collect(group)
+        for question in group.get("questions", []):
+            collect(question)
+            for option in question.get("answer_options", []):
+                collect(option)
+            for subquestion in question.get("subquestions", []):
+                collect(subquestion)
+                for option in subquestion.get("answer_options", []):
+                    collect(option)
+
+    return sorted(langs)
+
+
+def merge_translations(
+    existing_translations: dict[str, Any],
+    lang: str,
+    field_values: dict[str, str],
+) -> dict[str, Any]:
+    """Merge new field translations into the existing translations dict.
+
+    Creates or updates the language entry with the provided field values.
+    Only non-None values are written; None values remove a field from the translation.
+
+    Args:
+        existing_translations: The current translations JSONB dict.
+        lang: Language code to update (e.g. "fr").
+        field_values: Dict of field_name -> translated_string (or None to remove).
+
+    Returns:
+        A new translations dict with the updated language entry.
+    """
+    result = dict(existing_translations)
+    lang_entry = dict(result.get(lang, {}))
+
+    for field, value in field_values.items():
+        if value is None:
+            lang_entry.pop(field, None)
+        else:
+            lang_entry[field] = value
+
+    if lang_entry:
+        result[lang] = lang_entry
+    else:
+        result.pop(lang, None)
+
+    return result
+
+
+def apply_survey_translations(
+    survey_dict: dict[str, Any],
+    lang: str,
+) -> dict[str, Any]:
+    """Apply translations to a full survey dict (including all nested entities).
+
+    Uses the survey's ``default_language`` as the fallback.
+
+    Args:
+        survey_dict: Full survey dict with groups → questions → answer_options.
+        lang: Target language code.
+
+    Returns:
+        New dict with all translatable fields overlaid with translated values.
+    """
+    fallback_lang = survey_dict.get("default_language", "en")
+
+    # Apply to survey level
+    result = apply_translation(survey_dict, lang, fallback_lang, SURVEY_TRANSLATABLE_FIELDS)
+
+    # Apply to groups
+    translated_groups = []
+    for group in result.get("groups", []):
+        translated_group = apply_translation(group, lang, fallback_lang, GROUP_TRANSLATABLE_FIELDS)
+
+        # Apply to questions
+        translated_questions = []
+        for question in translated_group.get("questions", []):
+            translated_question = apply_translation(
+                question, lang, fallback_lang, QUESTION_TRANSLATABLE_FIELDS
+            )
+
+            # Apply to answer options
+            translated_options = [
+                apply_translation(opt, lang, fallback_lang, OPTION_TRANSLATABLE_FIELDS)
+                for opt in translated_question.get("answer_options", [])
+            ]
+            translated_question = dict(translated_question)
+            translated_question["answer_options"] = translated_options
+
+            # Apply to subquestions
+            translated_subquestions = []
+            for subq in translated_question.get("subquestions", []):
+                translated_subq = apply_translation(
+                    subq, lang, fallback_lang, QUESTION_TRANSLATABLE_FIELDS
+                )
+                translated_subq_opts = [
+                    apply_translation(opt, lang, fallback_lang, OPTION_TRANSLATABLE_FIELDS)
+                    for opt in translated_subq.get("answer_options", [])
+                ]
+                translated_subq = dict(translated_subq)
+                translated_subq["answer_options"] = translated_subq_opts
+                translated_subquestions.append(translated_subq)
+
+            translated_question["subquestions"] = translated_subquestions
+            translated_questions.append(translated_question)
+
+        translated_group = dict(translated_group)
+        translated_group["questions"] = translated_questions
+        translated_groups.append(translated_group)
+
+    result = dict(result)
+    result["groups"] = translated_groups
+    return result

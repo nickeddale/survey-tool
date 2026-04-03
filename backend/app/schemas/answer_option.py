@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -18,6 +19,11 @@ class AnswerOptionUpdate(BaseModel):
     assessment_value: int | None = None
 
 
+class AnswerOptionTranslationsUpdate(BaseModel):
+    lang: str
+    translations: dict[str, str | None]
+
+
 class AnswerOptionResponse(BaseModel):
     model_config = {"from_attributes": True}
 
@@ -27,6 +33,7 @@ class AnswerOptionResponse(BaseModel):
     title: str
     sort_order: int
     assessment_value: int
+    translations: dict[str, Any] = {}
     created_at: datetime
 
 
