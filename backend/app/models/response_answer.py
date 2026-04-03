@@ -11,7 +11,7 @@ differentiated by the answer_type column.
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, String, text
+from sqlalchemy import DateTime, ForeignKey, String, UniqueConstraint, text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -28,6 +28,9 @@ ANSWER_TYPE_COMMENT = "comment"
 
 class ResponseAnswer(Base):
     __tablename__ = "response_answers"
+    __table_args__ = (
+        UniqueConstraint("response_id", "question_id", name="uq_response_answers_response_question"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
