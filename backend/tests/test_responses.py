@@ -710,3 +710,170 @@ async def test_patch_complete_already_completed_returns_409(client: AsyncClient)
     assert patch_resp2.status_code == 409
     body = patch_resp2.json()
     assert body["detail"]["code"] == "CONFLICT"
+
+
+# --------------------------------------------------------------------------- #
+# PATCH /surveys/{id}/responses/{rid}/status — disqualification (ISS-086)
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.asyncio
+async def test_disqualify_incomplete_response_returns_200(client: AsyncClient):
+    """Admin can disqualify an incomplete response."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/status",
+        json={"status": "disqualified"},
+        headers=headers,
+    )
+    assert patch_resp.status_code == 200
+    body = patch_resp.json()
+    assert body["status"] == "disqualified"
+    assert body["id"] == response_id
+
+
+@pytest.mark.asyncio
+async def test_disqualify_complete_response_returns_200(client: AsyncClient):
+    """Admin can disqualify a complete response."""
+    headers = await auth_headers(client, email="disq_complete@example.com")
+    survey_id = await create_survey(client, headers, title="Disq Complete Survey")
+    q_id = await add_required_short_text_question(client, headers, survey_id, code="DCQ")
+    await activate_survey(client, headers, survey_id)
+
+    post_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": q_id, "value": "answer"}]},
+    )
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # Complete the response first
+    await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"status": "complete"},
+    )
+
+    # Now disqualify it
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/status",
+        json={"status": "disqualified"},
+        headers=headers,
+    )
+    assert patch_resp.status_code == 200
+    body = patch_resp.json()
+    assert body["status"] == "disqualified"
+
+
+@pytest.mark.asyncio
+async def test_disqualify_already_disqualified_returns_422(client: AsyncClient):
+    """Attempting to disqualify an already-disqualified response returns 422."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # First disqualification
+    first_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/status",
+        json={"status": "disqualified"},
+        headers=headers,
+    )
+    assert first_resp.status_code == 200
+
+    # Second disqualification — should fail with 422
+    second_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/status",
+        json={"status": "disqualified"},
+        headers=headers,
+    )
+    assert second_resp.status_code == 422
+    body = second_resp.json()
+    assert body["detail"]["code"] == "UNPROCESSABLE"
+
+
+@pytest.mark.asyncio
+async def test_complete_disqualified_response_returns_422(client: AsyncClient):
+    """Attempting to complete a disqualified response returns 422."""
+    survey_id, question_id, headers = await create_active_survey(client)
+
+    post_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": question_id, "value": "test answer"}]},
+    )
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # Disqualify it
+    disq_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/status",
+        json={"status": "disqualified"},
+        headers=headers,
+    )
+    assert disq_resp.status_code == 200
+
+    # Attempt to complete — should fail with 422
+    complete_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"status": "complete"},
+    )
+    assert complete_resp.status_code == 422
+    body = complete_resp.json()
+    assert body["detail"]["code"] == "UNPROCESSABLE"
+
+
+@pytest.mark.asyncio
+async def test_disqualify_status_endpoint_requires_auth(client: AsyncClient):
+    """PATCH /status without auth returns 403."""
+    survey_id, _question_id, _headers = await create_active_survey(client)
+
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # No auth headers
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/status",
+        json={"status": "disqualified"},
+    )
+    assert patch_resp.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_disqualify_invalid_status_value_returns_422(client: AsyncClient):
+    """PATCH /status with an unrecognized status returns 422."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/status",
+        json={"status": "incomplete"},
+        headers=headers,
+    )
+    assert patch_resp.status_code == 422
+    body = patch_resp.json()
+    assert body["detail"]["code"] == "UNPROCESSABLE"
+
+
+@pytest.mark.asyncio
+async def test_disqualify_nonexistent_response_returns_404(client: AsyncClient):
+    """PATCH /status on a non-existent response returns 404."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    nonexistent_id = "00000000-0000-0000-0000-000000000000"
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{nonexistent_id}/status",
+        json={"status": "disqualified"},
+        headers=headers,
+    )
+    assert patch_resp.status_code == 404
+    body = patch_resp.json()
+    assert body["detail"]["code"] == "NOT_FOUND"

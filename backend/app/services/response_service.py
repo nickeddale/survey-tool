@@ -238,6 +238,9 @@ async def complete_response(
     if response.status == "complete":
         raise ConflictError("Response is already complete")
 
+    if response.status == "disqualified":
+        raise UnprocessableError("Cannot complete a disqualified response")
+
     # Build expression context from current answers
     expression_context = build_expression_context(response, participant=None)
 
@@ -279,6 +282,49 @@ async def complete_response(
     # Mark complete
     response.status = "complete"
     response.completed_at = datetime.now(timezone.utc)
+    session.add(response)
+    await session.flush()
+    await session.refresh(response)
+    return response
+
+
+async def disqualify_response(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+    response_id: uuid.UUID,
+) -> Response:
+    """Disqualify a survey response (admin action).
+
+    Transitions the response to 'disqualified' status. Valid transitions are:
+    - incomplete -> disqualified
+    - complete -> disqualified
+
+    Invalid transitions (disqualified -> anything) raise UnprocessableError (422).
+
+    Args:
+        session: The async database session.
+        survey_id: The UUID of the survey (used to scope the lookup).
+        response_id: The UUID of the response to disqualify.
+
+    Raises:
+        NotFoundError: If the response does not exist for this survey.
+        UnprocessableError: If the response is already disqualified (422).
+    """
+    result = await session.execute(
+        select(Response).where(
+            Response.id == response_id,
+            Response.survey_id == survey_id,
+        )
+    )
+    response = result.scalar_one_or_none()
+
+    if response is None:
+        raise NotFoundError("Response not found")
+
+    if response.status == "disqualified":
+        raise UnprocessableError("Response is already disqualified")
+
+    response.status = "disqualified"
     session.add(response)
     await session.flush()
     await session.refresh(response)
