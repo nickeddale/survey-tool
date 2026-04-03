@@ -12,6 +12,7 @@ from app.dependencies import get_current_user
 from app.models.user import User
 from app.schemas.response import (
     ResponseCreate,
+    ResponseDetail,
     ResponseListResponse,
     ResponseResponse,
     ResponseStatusUpdate,
@@ -22,6 +23,7 @@ from app.services.response_service import (
     complete_response,
     create_response,
     disqualify_response,
+    get_response_detail,
     get_response_with_answers,
     list_responses,
     save_partial_response,
@@ -143,6 +145,37 @@ async def submit_response(
         answers=answers if answers else None,
     )
     return ResponseResponse.model_validate(response)
+
+
+@router.get(
+    "/{survey_id}/responses/{response_id}/detail",
+    response_model=ResponseDetail,
+    status_code=status.HTTP_200_OK,
+)
+async def get_response_detail_endpoint(
+    survey_id: str,
+    response_id: str,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> ResponseDetail:
+    """Retrieve full response detail with enriched answer data. Requires authentication.
+
+    Returns all answers enriched with question metadata (code, title, type).
+    Choice questions include selected_option_title. Matrix answers include subquestion_label.
+    Survey must be owned by the authenticated user; returns 404 otherwise (no ownership oracle).
+
+    Requires responses:read scope for API key authentication.
+    """
+    parsed_survey_id = _parse_survey_id(survey_id)
+    parsed_response_id = _parse_response_id(response_id)
+
+    detail = await get_response_detail(
+        session,
+        survey_id=parsed_survey_id,
+        response_id=parsed_response_id,
+        user_id=current_user.id,
+    )
+    return ResponseDetail(**detail)
 
 
 @router.get(

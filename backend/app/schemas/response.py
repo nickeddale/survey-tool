@@ -10,6 +10,7 @@ from pydantic import BaseModel, model_validator
 # ---------------------------------------------------------------------------
 
 
+
 class AnswerInput(BaseModel):
     question_id: uuid.UUID
     value: Any = None
@@ -101,3 +102,34 @@ class ResponseResponse(BaseModel):
                 "answers": answers,
             }
         return data
+
+
+# ---------------------------------------------------------------------------
+# Response detail schemas (authenticated, enriched)
+# ---------------------------------------------------------------------------
+
+
+class ResponseAnswerDetail(BaseModel):
+    """Enriched answer schema including question metadata and resolved labels."""
+
+    question_id: uuid.UUID
+    question_code: str
+    question_title: str
+    question_type: str
+    value: Any
+    values: list[Any] | None = None
+    selected_option_title: str | None = None
+    subquestion_label: str | None = None
+
+
+class ResponseDetail(BaseModel):
+    """Full response detail with enriched answers. Returned by authenticated detail endpoint."""
+
+    id: uuid.UUID
+    status: str
+    started_at: datetime
+    completed_at: datetime | None
+    ip_address: str | None
+    metadata: dict[str, Any] | None
+    participant_id: uuid.UUID | None
+    answers: list[ResponseAnswerDetail]

@@ -1500,3 +1500,278 @@ async def test_list_responses_invalid_survey_id_returns_404(client: AsyncClient)
     assert resp.status_code == 404
     body = resp.json()
     assert body["detail"]["code"] == "NOT_FOUND"
+
+
+# --------------------------------------------------------------------------- #
+# GET /surveys/{id}/responses/{rid}/detail — response detail (ISS-089)
+# --------------------------------------------------------------------------- #
+
+
+async def add_choice_question(
+    client: AsyncClient,
+    headers: dict,
+    survey_id: str,
+    code: str = "CHOICE1",
+) -> tuple[str, str, str]:
+    """Add a single_choice question with two options. Returns (question_id, opt1_code, opt2_code)."""
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": f"Group for {code}"},
+        headers=headers,
+    )
+    assert group_resp.status_code == 201
+    group_id = group_resp.json()["id"]
+
+    q_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": f"Choice Question {code}", "question_type": "single_choice", "code": code},
+        headers=headers,
+    )
+    assert q_resp.status_code == 201
+    question_id = q_resp.json()["id"]
+
+    # Add two answer options
+    opt1_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/questions/{question_id}/options",
+        json={"code": "opt_a", "title": "Option A"},
+        headers=headers,
+    )
+    assert opt1_resp.status_code == 201
+    opt1_code = opt1_resp.json()["code"]
+
+    opt2_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/questions/{question_id}/options",
+        json={"code": "opt_b", "title": "Option B"},
+        headers=headers,
+    )
+    assert opt2_resp.status_code == 201
+    opt2_code = opt2_resp.json()["code"]
+
+    return question_id, opt1_code, opt2_code
+
+
+@pytest.mark.asyncio
+async def test_get_response_detail_returns_200_with_full_metadata(client: AsyncClient):
+    """Authenticated GET /detail returns 200 with response metadata fields."""
+    survey_id, question_id, headers = await create_active_survey(client)
+
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # Save an answer
+    await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"answers": [{"question_id": question_id, "value": "my answer"}]},
+    )
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/detail",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+
+    # Verify metadata fields
+    assert body["id"] == response_id
+    assert body["status"] == "incomplete"
+    assert "started_at" in body
+    assert "completed_at" in body
+    assert "ip_address" in body
+    assert "metadata" in body
+    assert "participant_id" in body
+    assert "answers" in body
+
+
+@pytest.mark.asyncio
+async def test_get_response_detail_answers_have_question_metadata(client: AsyncClient):
+    """Each answer in detail response includes question_id, question_code, question_title, question_type."""
+    headers = await auth_headers(client, email="detail_meta@example.com")
+    survey_id = await create_survey(client, headers, title="Detail Meta Survey")
+
+    # Add a question with explicit code
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": "Group"},
+        headers=headers,
+    )
+    assert group_resp.status_code == 201
+    group_id = group_resp.json()["id"]
+
+    q_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": "My Text Question", "question_type": "short_text", "code": "TQ1"},
+        headers=headers,
+    )
+    assert q_resp.status_code == 201
+    question_id = q_resp.json()["id"]
+    await activate_survey(client, headers, survey_id)
+
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"answers": [{"question_id": question_id, "value": "hello"}]},
+    )
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/detail",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert len(body["answers"]) == 1
+    answer = body["answers"][0]
+
+    assert answer["question_id"] == question_id
+    assert answer["question_code"] == "TQ1"
+    assert answer["question_title"] == "My Text Question"
+    assert answer["question_type"] == "short_text"
+    assert answer["value"] == "hello"
+
+
+@pytest.mark.asyncio
+async def test_get_response_detail_unauthenticated_returns_403(client: AsyncClient):
+    """GET /detail without auth credentials returns 403."""
+    survey_id, _question_id, _headers = await create_active_survey(client)
+
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/detail",
+    )
+    assert resp.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_get_response_detail_wrong_owner_returns_404(client: AsyncClient):
+    """GET /detail for a response on another user's survey returns 404 (no ownership oracle)."""
+    # Owner creates survey and response
+    owner_headers = await auth_headers(client, email="detail_owner@example.com")
+    survey_id = await create_survey(client, owner_headers, title="Owner Detail Survey")
+    await add_group_and_question(client, owner_headers, survey_id)
+    await activate_survey(client, owner_headers, survey_id)
+
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # Other user attempts to access it
+    other_headers = await auth_headers(client, email="detail_other@example.com")
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/detail",
+        headers=other_headers,
+    )
+    assert resp.status_code == 404
+    body = resp.json()
+    assert body["detail"]["code"] == "NOT_FOUND"
+
+
+@pytest.mark.asyncio
+async def test_get_response_detail_nonexistent_response_returns_404(client: AsyncClient):
+    """GET /detail for a non-existent response_id returns 404."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    nonexistent_id = "00000000-0000-0000-0000-000000000000"
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{nonexistent_id}/detail",
+        headers=headers,
+    )
+    assert resp.status_code == 404
+    body = resp.json()
+    assert body["detail"]["code"] == "NOT_FOUND"
+
+
+@pytest.mark.asyncio
+async def test_get_response_detail_invalid_uuid_returns_404(client: AsyncClient):
+    """GET /detail with a non-UUID response_id returns 404."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/not-a-uuid/detail",
+        headers=headers,
+    )
+    assert resp.status_code == 404
+    body = resp.json()
+    assert body["detail"]["code"] == "NOT_FOUND"
+
+
+@pytest.mark.asyncio
+async def test_get_response_detail_empty_answers_when_none_saved(client: AsyncClient):
+    """GET /detail returns empty answers list when no answers were saved."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/detail",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["answers"] == []
+
+
+@pytest.mark.asyncio
+async def test_get_response_detail_choice_question_includes_selected_option_title(
+    client: AsyncClient,
+):
+    """Choice question answer includes selected_option_title resolved from answer_options."""
+    headers = await auth_headers(client, email="detail_choice@example.com")
+    survey_id = await create_survey(client, headers, title="Choice Detail Survey")
+
+    question_id, opt_a_code, _opt_b_code = await add_choice_question(
+        client, headers, survey_id, code="CHOICE1"
+    )
+    await activate_survey(client, headers, survey_id)
+
+    post_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": question_id, "value": opt_a_code}]},
+    )
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/detail",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert len(body["answers"]) == 1
+    answer = body["answers"][0]
+    assert answer["question_type"] == "single_choice"
+    assert answer["selected_option_title"] == "Option A"
+
+
+@pytest.mark.asyncio
+async def test_get_response_detail_sensitive_fields_present_when_authenticated(
+    client: AsyncClient,
+):
+    """Authenticated detail response includes ip_address and metadata fields."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    post_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={},
+        headers={"X-Forwarded-For": "198.51.100.1"},
+    )
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/detail",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    # ip_address and metadata must be explicitly present in the authenticated response
+    assert "ip_address" in body
+    assert body["ip_address"] == "198.51.100.1"
+    assert "metadata" in body
