@@ -689,6 +689,16 @@ export const handlers = [
     return HttpResponse.json(updated, { status: 200 })
   }),
 
+  // POST /api/v1/surveys/:surveyId/logic/validate-expression
+  http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async ({ request }) => {
+    const body = (await request.json()) as { expression: string }
+    const isValid = Boolean(body.expression && body.expression.trim())
+    return HttpResponse.json(
+      { valid: isValid, errors: [], warnings: [] },
+      { status: 200 },
+    )
+  }),
+
   // PATCH /api/v1/auth/me
   http.patch(`${BASE}/auth/me`, async ({ request }) => {
     const authHeader = request.headers.get('Authorization')

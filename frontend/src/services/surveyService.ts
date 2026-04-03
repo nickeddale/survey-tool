@@ -34,6 +34,17 @@ export interface DashboardStats {
   archived: number
 }
 
+export interface ValidateExpressionPayload {
+  expression: string
+  question_code?: string
+}
+
+export interface ValidateExpressionResult {
+  valid: boolean
+  errors: string[]
+  warnings: string[]
+}
+
 class SurveyService {
   async fetchSurveys(params: SurveyFetchParams = {}): Promise<SurveyListResponse> {
     const response = await apiClient.get<SurveyListResponse>('/surveys', { params })
@@ -186,6 +197,17 @@ class SurveyService {
     await apiClient.patch(`/surveys/${surveyId}/questions/${questionId}/options/reorder`, {
       ordered_ids: orderedIds,
     })
+  }
+
+  async validateExpression(
+    surveyId: string,
+    data: ValidateExpressionPayload,
+  ): Promise<ValidateExpressionResult> {
+    const response = await apiClient.post<ValidateExpressionResult>(
+      `/surveys/${surveyId}/logic/validate-expression`,
+      data,
+    )
+    return response.data
   }
 
   async getDashboardStats(): Promise<{ stats: DashboardStats; recentSurveys: SurveyResponse[] }> {

@@ -12,6 +12,7 @@ import surveyService from '../../services/surveyService'
 import type { BuilderQuestion } from '../../store/builderStore'
 import { QuestionSettingsForm } from './settings/QuestionSettingsForm'
 import { AnswerOptionsEditor } from './AnswerOptionsEditor'
+import { LogicEditor } from './LogicEditor'
 import {
   getDefaultSettings,
   getCompatibleSettings,
@@ -467,18 +468,15 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
       </div>
 
       {/* Relevance expression */}
-      <div>
-        <p className="text-xs font-medium text-muted-foreground mb-1">Relevance Expression</p>
-        <input
-          type="text"
-          className="w-full rounded-md border border-input bg-background px-2 py-1.5 text-sm font-mono
-            focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+      <div data-testid="property-question-relevance">
+        <p className="text-xs font-medium text-muted-foreground mb-1">Show this question IF</p>
+        <LogicEditor
+          surveyId={surveyId}
+          currentSortOrder={selectedQuestion.sort_order}
+          previousQuestions={groups.flatMap((g) => g.questions) as BuilderQuestion[]}
           value={relevance}
-          onChange={(e) => handleRelevanceChange(e.target.value)}
+          onChange={handleRelevanceChange}
           disabled={readOnly}
-          aria-label="Relevance expression"
-          placeholder="e.g. Q1 == 'yes'"
-          data-testid="property-question-relevance"
         />
       </div>
 

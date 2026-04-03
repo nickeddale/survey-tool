@@ -402,21 +402,25 @@ describe('description field', () => {
 // ---------------------------------------------------------------------------
 
 describe('relevance expression', () => {
-  it('updates builder store on relevance change', async () => {
+  it('updates builder store on relevance change via raw mode', async () => {
     const user = userEvent.setup()
     useBuilderStore.getState().setSelectedItem({ type: 'question', id: Q1.id })
     renderEditor()
 
-    const relEl = screen.getByTestId('property-question-relevance')
+    // Switch to raw mode to edit directly
     await act(async () => {
-      await user.clear(relEl)
-      await user.type(relEl, "Q0 == 'yes'")
+      await user.click(screen.getByTestId('logic-editor-mode-raw'))
+    })
+
+    const relEl = screen.getByTestId('logic-editor-raw-input')
+    await act(async () => {
+      fireEvent.change(relEl, { target: { value: "{Q0} == 'yes'" } })
     })
 
     await waitFor(() => {
       const { groups } = useBuilderStore.getState()
       const q = groups.flatMap((g) => g.questions).find((q) => q.id === Q1.id)
-      expect(q?.relevance).toBe("Q0 == 'yes'")
+      expect(q?.relevance).toBe("{Q0} == 'yes'")
     })
   })
 })
@@ -515,7 +519,7 @@ describe('read-only mode', () => {
     expect(screen.getByTestId('property-question-type')).toBeDisabled()
     expect(screen.getByTestId('property-question-description')).toBeDisabled()
     expect(screen.getByTestId('property-question-required')).toBeDisabled()
-    expect(screen.getByTestId('property-question-relevance')).toBeDisabled()
+    expect(screen.getByTestId('logic-editor-mode-visual')).toBeDisabled()
     expect(screen.getByTestId('property-question-validation')).toBeDisabled()
   })
 
