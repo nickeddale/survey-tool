@@ -632,6 +632,17 @@ function SurveyDetailPage() {
           Quotas
         </Button>
 
+        {/* Manage Assessments */}
+        <Button
+          variant="outline"
+          onClick={() => navigate(`/surveys/${survey.id}/assessments`)}
+          aria-label="Manage assessments"
+          data-testid="manage-assessments-button"
+        >
+          <BarChart2 size={14} />
+          Assessments
+        </Button>
+
         {/* Always-available actions */}
         {survey.status === 'draft' && (
           <Button
