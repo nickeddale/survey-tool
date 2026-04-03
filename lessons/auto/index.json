@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-03T06:39:15.005Z",
+  "lastUpdated": "2026-04-03T07:01:06.726Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1349,6 +1349,24 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md",
+      "ticketId": "ISS-057",
+      "title": "4.1: Backend — Text Question Types (short_text, long_text, huge_text)",
+      "date": "2026-04-03",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -1419,7 +1437,8 @@
       "2026-04-03-iss-067-411-frontend-special-input-components.md",
       "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
       "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md",
-      "2026-04-03-iss-070-414-question-type-test-suite.md"
+      "2026-04-03-iss-070-414-question-type-test-suite.md",
+      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1484,7 +1503,8 @@
       "2026-04-03-iss-067-411-frontend-special-input-components.md",
       "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
       "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md",
-      "2026-04-03-iss-070-414-question-type-test-suite.md"
+      "2026-04-03-iss-070-414-question-type-test-suite.md",
+      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1607,7 +1627,8 @@
       "2026-04-03-iss-067-411-frontend-special-input-components.md",
       "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
       "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md",
-      "2026-04-03-iss-070-414-question-type-test-suite.md"
+      "2026-04-03-iss-070-414-question-type-test-suite.md",
+      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1694,7 +1715,8 @@
       "2026-04-03-iss-067-411-frontend-special-input-components.md",
       "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
       "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md",
-      "2026-04-03-iss-070-414-question-type-test-suite.md"
+      "2026-04-03-iss-070-414-question-type-test-suite.md",
+      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1761,7 +1783,8 @@
       "2026-04-03-iss-067-411-frontend-special-input-components.md",
       "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
       "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md",
-      "2026-04-03-iss-070-414-question-type-test-suite.md"
+      "2026-04-03-iss-070-414-question-type-test-suite.md",
+      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1871,7 +1894,8 @@
       "2026-04-03-iss-067-411-frontend-special-input-components.md",
       "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
       "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md",
-      "2026-04-03-iss-070-414-question-type-test-suite.md"
+      "2026-04-03-iss-070-414-question-type-test-suite.md",
+      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1937,7 +1961,8 @@
       "2026-04-03-iss-067-411-frontend-special-input-components.md",
       "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
       "2026-04-03-iss-069-413-survey-json-exportimport-full-structure.md",
-      "2026-04-03-iss-070-414-question-type-test-suite.md"
+      "2026-04-03-iss-070-414-question-type-test-suite.md",
+      "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",

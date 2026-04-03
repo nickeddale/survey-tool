@@ -154,18 +154,18 @@ async def setup_survey_group(client: AsyncClient, email_suffix: str) -> tuple[di
 
 
 # ---------------------------------------------------------------------------
-# 1a. Text types (no settings validators — always valid)
+# 1a. Text types — settings and validation
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("qtype", ["short_text", "long_text", "email", "phone", "url"])
+@pytest.mark.parametrize("qtype", ["short_text", "long_text", "huge_text", "email", "phone", "url"])
 def test_text_type_config_valid(qtype):
-    """Text types have no settings validator — any settings pass."""
+    """Text types with None settings always pass."""
     errors = validate_question_config(qtype, settings=None, validation=None)
     assert errors == []
 
 
-@pytest.mark.parametrize("qtype", ["short_text", "long_text", "email", "phone", "url"])
+@pytest.mark.parametrize("qtype", ["short_text", "long_text", "huge_text", "email", "phone", "url"])
 def test_text_type_config_with_validation_rules(qtype):
     """Text types accept min_length/max_length/regex validation rules."""
     errors = validate_question_config(
@@ -176,13 +176,202 @@ def test_text_type_config_with_validation_rules(qtype):
     assert errors == []
 
 
-@pytest.mark.parametrize("qtype", ["short_text", "long_text", "email", "phone", "url"])
+@pytest.mark.parametrize("qtype", ["short_text", "long_text", "huge_text", "email", "phone", "url"])
 def test_text_type_config_invalid_validation_type(qtype):
     """Validation min_length must be an integer."""
     errors = validate_question_config(
         qtype,
         settings=None,
         validation={"min_length": "five"},
+    )
+    assert len(errors) > 0
+
+
+# short_text settings
+
+
+def test_short_text_settings_valid():
+    errors = validate_question_config(
+        "short_text",
+        settings={"placeholder": "Enter text", "max_length": 100, "input_type": "text"},
+        validation=None,
+    )
+    assert errors == []
+
+
+def test_short_text_settings_valid_email_input_type():
+    errors = validate_question_config(
+        "short_text",
+        settings={"input_type": "email"},
+        validation=None,
+    )
+    assert errors == []
+
+
+def test_short_text_settings_invalid_input_type():
+    errors = validate_question_config(
+        "short_text",
+        settings={"input_type": "number"},
+        validation=None,
+    )
+    assert len(errors) > 0
+
+
+def test_short_text_settings_max_length_too_large():
+    errors = validate_question_config(
+        "short_text",
+        settings={"max_length": 256},
+        validation=None,
+    )
+    assert len(errors) > 0
+
+
+def test_short_text_settings_max_length_at_boundary():
+    errors = validate_question_config(
+        "short_text",
+        settings={"max_length": 255},
+        validation=None,
+    )
+    assert errors == []
+
+
+def test_short_text_settings_max_length_zero():
+    errors = validate_question_config(
+        "short_text",
+        settings={"max_length": 0},
+        validation=None,
+    )
+    assert len(errors) > 0
+
+
+def test_short_text_settings_placeholder_not_string():
+    errors = validate_question_config(
+        "short_text",
+        settings={"placeholder": 123},
+        validation=None,
+    )
+    assert len(errors) > 0
+
+
+def test_short_text_settings_placeholder_null_ok():
+    errors = validate_question_config(
+        "short_text",
+        settings={"placeholder": None},
+        validation=None,
+    )
+    assert errors == []
+
+
+# long_text settings
+
+
+def test_long_text_settings_valid():
+    errors = validate_question_config(
+        "long_text",
+        settings={"placeholder": "Write here", "max_length": 1000, "rows": 6},
+        validation=None,
+    )
+    assert errors == []
+
+
+def test_long_text_settings_max_length_too_large():
+    errors = validate_question_config(
+        "long_text",
+        settings={"max_length": 5001},
+        validation=None,
+    )
+    assert len(errors) > 0
+
+
+def test_long_text_settings_max_length_at_boundary():
+    errors = validate_question_config(
+        "long_text",
+        settings={"max_length": 5000},
+        validation=None,
+    )
+    assert errors == []
+
+
+def test_long_text_settings_rows_zero():
+    errors = validate_question_config(
+        "long_text",
+        settings={"rows": 0},
+        validation=None,
+    )
+    assert len(errors) > 0
+
+
+def test_long_text_settings_rows_negative():
+    errors = validate_question_config(
+        "long_text",
+        settings={"rows": -1},
+        validation=None,
+    )
+    assert len(errors) > 0
+
+
+def test_long_text_settings_rows_valid():
+    errors = validate_question_config(
+        "long_text",
+        settings={"rows": 4},
+        validation=None,
+    )
+    assert errors == []
+
+
+# huge_text settings
+
+
+def test_huge_text_settings_valid():
+    errors = validate_question_config(
+        "huge_text",
+        settings={"placeholder": None, "max_length": 50000, "rows": 10, "rich_text": False},
+        validation=None,
+    )
+    assert errors == []
+
+
+def test_huge_text_settings_rich_text_true():
+    errors = validate_question_config(
+        "huge_text",
+        settings={"rich_text": True},
+        validation=None,
+    )
+    assert errors == []
+
+
+def test_huge_text_settings_rich_text_not_bool():
+    errors = validate_question_config(
+        "huge_text",
+        settings={"rich_text": "yes"},
+        validation=None,
+    )
+    assert len(errors) > 0
+
+
+def test_huge_text_settings_max_length_too_large():
+    errors = validate_question_config(
+        "huge_text",
+        settings={"max_length": 50001},
+        validation=None,
+    )
+    assert len(errors) > 0
+
+
+def test_huge_text_settings_max_length_at_boundary():
+    errors = validate_question_config(
+        "huge_text",
+        settings={"max_length": 50000},
+        validation=None,
+    )
+    assert errors == []
+
+
+def test_huge_text_settings_rows_zero():
+    errors = validate_question_config(
+        "huge_text",
+        settings={"rows": 0},
+        validation=None,
     )
     assert len(errors) > 0
 
@@ -709,13 +898,13 @@ def test_html_config_content_not_string():
 
 
 @pytest.mark.parametrize("qtype", [
-    "short_text", "long_text", "email", "phone", "url",
+    "short_text", "long_text", "huge_text", "email", "phone", "url",
     "numeric", "rating", "boolean", "date",
     "scale", "yes_no", "time", "datetime", "file_upload", "number",
     "expression", "html",
 ])
 def test_none_settings_always_valid(qtype):
-    """All types with no settings validator or scalar settings accept None settings."""
+    """All types accept None settings (config validators return early on None)."""
     errors = validate_question_config(qtype, settings=None, validation=None)
     assert errors == []
 
@@ -785,6 +974,50 @@ def test_short_text_answer_max_length_violation():
     assert len(errors) > 0
 
 
+def test_short_text_answer_settings_max_length_exceeded():
+    """Exceeding settings.max_length should fail even without validation JSONB."""
+    q = make_question("short_text", settings={"max_length": 5})
+    errors = validate_answer({"value": "toolong"}, q)
+    assert len(errors) > 0
+
+
+def test_short_text_answer_settings_max_length_ok():
+    q = make_question("short_text", settings={"max_length": 10})
+    errors = validate_answer({"value": "hello"}, q)
+    assert errors == []
+
+
+def test_short_text_answer_input_type_email_valid():
+    q = make_question("short_text", settings={"input_type": "email"})
+    errors = validate_answer({"value": "user@example.com"}, q)
+    assert errors == []
+
+
+def test_short_text_answer_input_type_email_invalid():
+    q = make_question("short_text", settings={"input_type": "email"})
+    errors = validate_answer({"value": "not-an-email"}, q)
+    assert len(errors) > 0
+
+
+def test_short_text_answer_input_type_url_valid():
+    q = make_question("short_text", settings={"input_type": "url"})
+    errors = validate_answer({"value": "https://example.com"}, q)
+    assert errors == []
+
+
+def test_short_text_answer_input_type_url_invalid():
+    q = make_question("short_text", settings={"input_type": "url"})
+    errors = validate_answer({"value": "not-a-url"}, q)
+    assert len(errors) > 0
+
+
+def test_short_text_answer_input_type_tel_no_format_check():
+    """tel input_type has no format validation — any string passes."""
+    q = make_question("short_text", settings={"input_type": "tel"})
+    errors = validate_answer({"value": "anything goes"}, q)
+    assert errors == []
+
+
 def test_long_text_answer_valid():
     q = make_question("long_text")
     errors = validate_answer({"value": "A longer answer text here."}, q)
@@ -795,6 +1028,42 @@ def test_long_text_answer_required_empty():
     q = make_question("long_text", is_required=True)
     errors = validate_answer({"value": ""}, q)
     assert len(errors) > 0
+
+
+def test_long_text_answer_settings_max_length_exceeded():
+    q = make_question("long_text", settings={"max_length": 10})
+    errors = validate_answer({"value": "this is too long"}, q)
+    assert len(errors) > 0
+
+
+def test_huge_text_answer_valid():
+    q = make_question("huge_text")
+    errors = validate_answer({"value": "A very long essay response here."}, q)
+    assert errors == []
+
+
+def test_huge_text_answer_required_empty():
+    q = make_question("huge_text", is_required=True)
+    errors = validate_answer({"value": ""}, q)
+    assert len(errors) > 0
+
+
+def test_huge_text_answer_null_not_required():
+    q = make_question("huge_text")
+    errors = validate_answer({"value": None}, q)
+    assert errors == []
+
+
+def test_huge_text_answer_settings_max_length_exceeded():
+    q = make_question("huge_text", settings={"max_length": 20})
+    errors = validate_answer({"value": "this string is definitely longer than twenty characters"}, q)
+    assert len(errors) > 0
+
+
+def test_huge_text_answer_settings_max_length_ok():
+    q = make_question("huge_text", settings={"max_length": 100})
+    errors = validate_answer({"value": "short answer"}, q)
+    assert errors == []
 
 
 def test_email_answer_valid():
@@ -1653,7 +1922,7 @@ def test_question_validation_error_has_field_and_message():
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("qtype", [
-    "short_text", "long_text", "email", "phone", "url",
+    "short_text", "long_text", "huge_text", "email", "phone", "url",
     "numeric", "rating", "boolean", "date",
     "single_choice", "dropdown", "multiple_choice",
     "matrix", "matrix_dropdown", "matrix_dynamic",
@@ -1826,6 +2095,101 @@ async def test_create_numeric_with_min_max_validation(client: AsyncClient):
     data = resp.json()
     assert data["settings"]["min_value"] == 0
     assert data["settings"]["max_value"] == 100
+
+
+@pytest.mark.asyncio
+async def test_create_short_text_with_valid_settings(client: AsyncClient):
+    headers, survey_id, group_id = await setup_survey_group(client, "st_settings")
+    resp = await create_question(
+        client, headers, survey_id, group_id, "short_text",
+        settings={"max_length": 100, "input_type": "email"},
+    )
+    assert resp.status_code == 201
+    data = resp.json()
+    assert data["settings"]["max_length"] == 100
+    assert data["settings"]["input_type"] == "email"
+
+
+@pytest.mark.asyncio
+async def test_create_short_text_invalid_input_type_422(client: AsyncClient):
+    headers, survey_id, group_id = await setup_survey_group(client, "st_badinput")
+    resp = await create_question(
+        client, headers, survey_id, group_id, "short_text",
+        settings={"input_type": "number"},
+    )
+    assert resp.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_create_short_text_max_length_too_large_422(client: AsyncClient):
+    headers, survey_id, group_id = await setup_survey_group(client, "st_badmaxlen")
+    resp = await create_question(
+        client, headers, survey_id, group_id, "short_text",
+        settings={"max_length": 1000},
+    )
+    assert resp.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_create_long_text_with_valid_settings(client: AsyncClient):
+    headers, survey_id, group_id = await setup_survey_group(client, "lt_settings")
+    resp = await create_question(
+        client, headers, survey_id, group_id, "long_text",
+        settings={"max_length": 2000, "rows": 8},
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.asyncio
+async def test_create_long_text_rows_zero_422(client: AsyncClient):
+    headers, survey_id, group_id = await setup_survey_group(client, "lt_badrows")
+    resp = await create_question(
+        client, headers, survey_id, group_id, "long_text",
+        settings={"rows": 0},
+    )
+    assert resp.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_create_long_text_max_length_too_large_422(client: AsyncClient):
+    headers, survey_id, group_id = await setup_survey_group(client, "lt_badmaxlen")
+    resp = await create_question(
+        client, headers, survey_id, group_id, "long_text",
+        settings={"max_length": 9999},
+    )
+    assert resp.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_create_huge_text_with_valid_settings(client: AsyncClient):
+    headers, survey_id, group_id = await setup_survey_group(client, "ht_settings")
+    resp = await create_question(
+        client, headers, survey_id, group_id, "huge_text",
+        settings={"max_length": 10000, "rows": 12, "rich_text": True},
+    )
+    assert resp.status_code == 201
+    data = resp.json()
+    assert data["settings"]["rich_text"] is True
+
+
+@pytest.mark.asyncio
+async def test_create_huge_text_rich_text_not_bool_422(client: AsyncClient):
+    headers, survey_id, group_id = await setup_survey_group(client, "ht_badbool")
+    resp = await create_question(
+        client, headers, survey_id, group_id, "huge_text",
+        settings={"rich_text": "yes"},
+    )
+    assert resp.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_create_huge_text_max_length_too_large_422(client: AsyncClient):
+    headers, survey_id, group_id = await setup_survey_group(client, "ht_badmaxlen")
+    resp = await create_question(
+        client, headers, survey_id, group_id, "huge_text",
+        settings={"max_length": 100000},
+    )
+    assert resp.status_code == 422
 
 
 # ---------------------------------------------------------------------------
