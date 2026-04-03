@@ -9,7 +9,13 @@ from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
 from app.schemas.response import ResponseCreate, ResponseResponse, ResponseStatusUpdate, ResponseUpdate
-from app.services.response_service import complete_response, create_response, disqualify_response
+from app.services.response_service import (
+    complete_response,
+    create_response,
+    disqualify_response,
+    get_response_with_answers,
+    save_partial_response,
+)
 from app.utils.errors import ForbiddenError, NotFoundError, UnprocessableError
 
 router = APIRouter(prefix="/surveys", tags=["responses"])
@@ -80,6 +86,28 @@ async def submit_response(
     return ResponseResponse.model_validate(response)
 
 
+@router.get(
+    "/{survey_id}/responses/{response_id}",
+    response_model=ResponseResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def get_response(
+    survey_id: str,
+    response_id: str,
+    session: AsyncSession = Depends(get_db),
+) -> ResponseResponse:
+    """Retrieve a survey response with its current answers for resume functionality. Public endpoint."""
+    parsed_survey_id = _parse_survey_id(survey_id)
+    parsed_response_id = _parse_response_id(response_id)
+
+    response = await get_response_with_answers(
+        session,
+        survey_id=parsed_survey_id,
+        response_id=parsed_response_id,
+    )
+    return ResponseResponse.model_validate(response)
+
+
 @router.patch(
     "/{survey_id}/responses/{response_id}",
     response_model=ResponseResponse,
@@ -91,7 +119,11 @@ async def update_response(
     payload: ResponseUpdate,
     session: AsyncSession = Depends(get_db),
 ) -> ResponseResponse:
-    """Update a survey response. Triggers completion flow when status='complete'."""
+    """Update a survey response.
+
+    - status='complete': triggers completion validation and marks response complete.
+    - status=None with answers: performs a partial save (upsert answers, no validation).
+    """
     parsed_survey_id = _parse_survey_id(survey_id)
     parsed_response_id = _parse_response_id(response_id)
 
@@ -100,6 +132,17 @@ async def update_response(
             session,
             survey_id=parsed_survey_id,
             response_id=parsed_response_id,
+        )
+    elif payload.status is None:
+        answers = [
+            {"question_id": a.question_id, "value": a.value}
+            for a in payload.answers
+        ]
+        response = await save_partial_response(
+            session,
+            survey_id=parsed_survey_id,
+            response_id=parsed_response_id,
+            answers=answers,
         )
     else:
         raise UnprocessableError(

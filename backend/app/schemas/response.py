@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 
 # ---------------------------------------------------------------------------
@@ -56,3 +56,29 @@ class ResponseResponse(BaseModel):
     completed_at: datetime | None
     created_at: datetime
     updated_at: datetime
+    answers: list[ResponseAnswerResponse] = []
+
+    @model_validator(mode="before")
+    @classmethod
+    def _extract_answers_safely(cls, data: Any) -> Any:
+        """Convert ORM Response to dict, safely handling un-loaded answers relationship."""
+        if not isinstance(data, dict):
+            # ORM object — extract all fields manually to avoid lazy='raise' on answers
+            try:
+                answers = list(data.answers)
+            except Exception:
+                answers = []
+            return {
+                "id": data.id,
+                "survey_id": data.survey_id,
+                "participant_id": data.participant_id,
+                "status": data.status,
+                "ip_address": data.ip_address,
+                "metadata_": data.metadata_,
+                "started_at": data.started_at,
+                "completed_at": data.completed_at,
+                "created_at": data.created_at,
+                "updated_at": data.updated_at,
+                "answers": answers,
+            }
+        return data

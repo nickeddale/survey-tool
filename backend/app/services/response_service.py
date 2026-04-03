@@ -4,6 +4,7 @@ import uuid
 from datetime import datetime, timezone
 
 from sqlalchemy import select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -285,6 +286,104 @@ async def complete_response(
     session.add(response)
     await session.flush()
     await session.refresh(response)
+    return response
+
+
+async def save_partial_response(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+    response_id: uuid.UUID,
+    answers: list[dict],
+) -> Response:
+    """Save partial answers for a survey response without triggering completion validation.
+
+    Upserts (insert or update) each answer using ON CONFLICT DO UPDATE on the
+    (response_id, question_id) unique constraint. Multiple calls accumulate/overwrite
+    answers; status remains 'incomplete'. No required-field or type validation is run.
+
+    Args:
+        session: The async database session.
+        survey_id: The UUID of the survey (used to scope the response lookup).
+        response_id: The UUID of the response to update.
+        answers: List of {'question_id': UUID, 'value': any} dicts to upsert.
+
+    Raises:
+        NotFoundError: If the response does not exist for this survey.
+        UnprocessableError: If the response is complete or disqualified.
+    """
+    result = await session.execute(
+        select(Response)
+        .where(Response.id == response_id, Response.survey_id == survey_id)
+        .options(selectinload(Response.answers))
+    )
+    response = result.scalar_one_or_none()
+
+    if response is None:
+        raise NotFoundError("Response not found")
+
+    if response.status == "complete":
+        raise UnprocessableError("Cannot save partial answers on a completed response")
+
+    if response.status == "disqualified":
+        raise UnprocessableError("Cannot save partial answers on a disqualified response")
+
+    if answers:
+        for answer in answers:
+            stmt = (
+                pg_insert(ResponseAnswer)
+                .values(
+                    id=uuid.uuid4(),
+                    response_id=response_id,
+                    question_id=answer["question_id"],
+                    value=answer["value"],
+                )
+                .on_conflict_do_update(
+                    constraint="uq_response_answers_response_question",
+                    set_={"value": answer["value"]},
+                )
+            )
+            await session.execute(stmt)
+
+    # Update the response's updated_at timestamp
+    response.updated_at = datetime.now(timezone.utc)
+    session.add(response)
+    await session.flush()
+
+    # Reload the response with its updated answers
+    await session.refresh(response)
+    result2 = await session.execute(
+        select(Response)
+        .where(Response.id == response_id)
+        .options(selectinload(Response.answers))
+    )
+    return result2.scalar_one()
+
+
+async def get_response_with_answers(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+    response_id: uuid.UUID,
+) -> Response:
+    """Load a response with all its current answers for resume functionality.
+
+    Args:
+        session: The async database session.
+        survey_id: The UUID of the survey (used to scope the lookup).
+        response_id: The UUID of the response to retrieve.
+
+    Raises:
+        NotFoundError: If the response does not exist for this survey.
+    """
+    result = await session.execute(
+        select(Response)
+        .where(Response.id == response_id, Response.survey_id == survey_id)
+        .options(selectinload(Response.answers))
+    )
+    response = result.scalar_one_or_none()
+
+    if response is None:
+        raise NotFoundError("Response not found")
+
     return response
 
 
