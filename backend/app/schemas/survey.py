@@ -27,6 +27,11 @@ class SurveyUpdate(BaseModel):
     settings: dict[str, Any] | None = None
 
 
+class SurveyTranslationsUpdate(BaseModel):
+    lang: str
+    translations: dict[str, str | None]
+
+
 class SurveyResponse(BaseModel):
     model_config = {"from_attributes": True}
 
@@ -39,6 +44,7 @@ class SurveyResponse(BaseModel):
     end_message: str | None
     default_language: str
     settings: dict[str, Any] | None
+    translations: dict[str, Any] = {}
     created_at: datetime
     updated_at: datetime
 
@@ -70,6 +76,7 @@ class SurveyExportAnswerOption(BaseModel):
     title: str
     sort_order: int
     assessment_value: int
+    translations: dict[str, Any] = {}
 
 
 class SurveyExportQuestion(BaseModel):
@@ -82,6 +89,7 @@ class SurveyExportQuestion(BaseModel):
     relevance: str | None = None
     validation: dict[str, Any] | None = None
     settings: dict[str, Any] | None = None
+    translations: dict[str, Any] = {}
     answer_options: list[SurveyExportAnswerOption] = []
     subquestions: list["SurveyExportQuestion"] = []
 
@@ -94,6 +102,7 @@ class SurveyExportGroup(BaseModel):
     description: str | None = None
     sort_order: int = 1
     relevance: str | None = None
+    translations: dict[str, Any] = {}
     questions: list[SurveyExportQuestion] = []
 
 
@@ -105,6 +114,7 @@ class SurveyExportResponse(BaseModel):
     end_message: str | None = None
     default_language: str = "en"
     settings: dict[str, Any] | None = None
+    translations: dict[str, Any] = {}
     groups: list[SurveyExportGroup] = []
 
 

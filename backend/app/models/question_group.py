@@ -1,9 +1,10 @@
 import uuid
 from datetime import datetime
+from typing import Any
 
 import sqlalchemy as sa
 from sqlalchemy import DateTime, ForeignKey, Integer, String, text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -39,6 +40,12 @@ class QuestionGroup(Base):
     relevance: Mapped[str | None] = mapped_column(
         sa.Text,
         nullable=True,
+    )
+    translations: Mapped[dict[str, Any]] = mapped_column(
+        JSONB,
+        nullable=False,
+        default=dict,
+        server_default=text("'{}'"),
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

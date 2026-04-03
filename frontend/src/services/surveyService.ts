@@ -1,6 +1,11 @@
 import apiClient from './apiClient'
 import type { SurveyResponse, SurveyFullResponse, SurveyListResponse, SurveyCreatePayload, SurveyUpdatePayload, AnswerOptionResponse, QuestionResponse, QuestionUpdatePayload, QuestionCreatePayload, QuestionGroupResponse, QuestionGroupCreatePayload, QuestionGroupUpdatePayload, GroupReorderPayload, ValidateExpressionResult } from '../types/survey'
 
+export interface TranslationsUpdatePayload {
+  lang: string
+  translations: Record<string, string | null>
+}
+
 export interface AnswerOptionCreatePayload {
   code: string
   title: string
@@ -48,8 +53,9 @@ class SurveyService {
     return response.data
   }
 
-  async getSurvey(id: string): Promise<SurveyFullResponse> {
-    const response = await apiClient.get<SurveyFullResponse>(`/surveys/${id}`)
+  async getSurvey(id: string, lang?: string): Promise<SurveyFullResponse> {
+    const params = lang ? { lang } : undefined
+    const response = await apiClient.get<SurveyFullResponse>(`/surveys/${id}`, { params })
     return response.data
   }
 
@@ -194,6 +200,59 @@ class SurveyService {
     await apiClient.patch(`/surveys/${surveyId}/questions/${questionId}/options/reorder`, {
       ordered_ids: orderedIds,
     })
+  }
+
+  // ---------------------------------------------------------------------------
+  // Translation methods
+  // ---------------------------------------------------------------------------
+
+  async updateSurveyTranslations(
+    surveyId: string,
+    data: TranslationsUpdatePayload,
+  ): Promise<SurveyResponse> {
+    const response = await apiClient.patch<SurveyResponse>(
+      `/surveys/${surveyId}/translations`,
+      data,
+    )
+    return response.data
+  }
+
+  async updateGroupTranslations(
+    surveyId: string,
+    groupId: string,
+    data: TranslationsUpdatePayload,
+  ): Promise<QuestionGroupResponse> {
+    const response = await apiClient.patch<QuestionGroupResponse>(
+      `/surveys/${surveyId}/groups/${groupId}/translations`,
+      data,
+    )
+    return response.data
+  }
+
+  async updateQuestionTranslations(
+    surveyId: string,
+    groupId: string,
+    questionId: string,
+    data: TranslationsUpdatePayload,
+  ): Promise<QuestionResponse> {
+    const response = await apiClient.patch<QuestionResponse>(
+      `/surveys/${surveyId}/groups/${groupId}/questions/${questionId}/translations`,
+      data,
+    )
+    return response.data
+  }
+
+  async updateOptionTranslations(
+    surveyId: string,
+    questionId: string,
+    optionId: string,
+    data: TranslationsUpdatePayload,
+  ): Promise<AnswerOptionResponse> {
+    const response = await apiClient.patch<AnswerOptionResponse>(
+      `/surveys/${surveyId}/questions/${questionId}/options/${optionId}/translations`,
+      data,
+    )
+    return response.data
   }
 
   async validateExpression(

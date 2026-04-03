@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import Any
 
 import sqlalchemy as sa
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, text
@@ -97,6 +98,12 @@ class Question(Base):
     settings: Mapped[dict | None] = mapped_column(
         JSONB,
         nullable=True,
+    )
+    translations: Mapped[dict[str, Any]] = mapped_column(
+        JSONB,
+        nullable=False,
+        default=dict,
+        server_default=text("'{}'"),
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

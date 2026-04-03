@@ -12,7 +12,7 @@
  */
 
 import { useEffect, useState, useCallback, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import surveyService from '../services/surveyService'
 import responseService from '../services/responseService'
 import type { AnswerInput } from '../services/responseService'
@@ -234,10 +234,24 @@ function ThankYouScreen({ survey }: { survey: SurveyFullResponse }) {
 
 type PageScreen = 'welcome' | 'form' | 'end'
 
+const LANGUAGE_LABELS: Record<string, string> = {
+  en: 'English',
+  es: 'Spanish',
+  fr: 'French',
+  de: 'German',
+  pt: 'Portuguese',
+  zh: 'Chinese',
+  ja: 'Japanese',
+  ar: 'Arabic',
+}
+
 function SurveyResponsePage() {
   const { survey_id } = useParams<{ survey_id: string }>()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const langParam = searchParams.get('lang') ?? undefined
 
   const [survey, setSurvey] = useState<SurveyFullResponse | null>(null)
+  const [activeLang, setActiveLang] = useState<string | undefined>(langParam)
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
 
@@ -264,6 +278,18 @@ function SurveyResponsePage() {
   } = useFlowResolution(screen === 'form' ? survey_id : undefined, answers)
 
   // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // Derive available languages from survey translations
+  // -------------------------------------------------------------------------
+
+  const availableLanguages = useMemo(() => {
+    if (!survey) return []
+    const langs = new Set<string>([survey.default_language])
+    Object.keys(survey.translations ?? {}).forEach(l => langs.add(l))
+    return Array.from(langs)
+  }, [survey])
+
+  // -------------------------------------------------------------------------
   // Fetch survey
   // -------------------------------------------------------------------------
 
@@ -275,7 +301,7 @@ function SurveyResponsePage() {
       setIsLoading(true)
       setLoadError(null)
       try {
-        const data = await surveyService.getSurvey(survey_id!)
+        const data = await surveyService.getSurvey(survey_id!, activeLang)
         if (!cancelled) {
           setSurvey(data)
         }
@@ -296,7 +322,12 @@ function SurveyResponsePage() {
     return () => {
       cancelled = true
     }
-  }, [survey_id]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [survey_id, activeLang]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function handleLangChange(lang: string) {
+    setActiveLang(lang)
+    setSearchParams(lang ? { lang } : {})
+  }
 
   // -------------------------------------------------------------------------
   // Derived state
@@ -542,6 +573,29 @@ function SurveyResponsePage() {
             role="alert"
           >
             {submitError}
+          </div>
+        </div>
+      )}
+      {/* Language switcher (shown when survey has multiple languages) */}
+      {availableLanguages.length > 1 && (
+        <div className="flex justify-end max-w-2xl mx-auto px-8 pt-4" data-testid="language-switcher">
+          <div className="flex items-center gap-2">
+            <label htmlFor="lang-select" className="text-sm text-muted-foreground">
+              Language:
+            </label>
+            <select
+              id="lang-select"
+              value={activeLang ?? survey.default_language}
+              onChange={e => handleLangChange(e.target.value)}
+              className="px-2 py-1 rounded border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              data-testid="response-lang-select"
+            >
+              {availableLanguages.map(lang => (
+                <option key={lang} value={lang}>
+                  {LANGUAGE_LABELS[lang] ?? lang}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       )}

@@ -10,6 +10,7 @@ from app.schemas.question_group import (
     QuestionGroupCreate,
     QuestionGroupReorderRequest,
     QuestionGroupResponse,
+    QuestionGroupTranslationsUpdate,
     QuestionGroupUpdate,
 )
 from app.services.question_group_service import (
@@ -20,6 +21,7 @@ from app.services.question_group_service import (
     reorder_groups,
     update_group,
 )
+from app.services.translation_service import merge_translations
 from app.utils.errors import NotFoundError
 
 router = APIRouter(prefix="/surveys/{survey_id}/groups", tags=["question_groups"])
@@ -131,6 +133,35 @@ async def patch(
         raise NotFoundError("Group not found")
     update_fields = payload.model_dump(exclude_unset=True)
     group = await update_group(session, group, **update_fields)
+    return QuestionGroupResponse.model_validate(group)
+
+
+@router.patch("/{group_id}/translations", response_model=QuestionGroupResponse)
+async def update_translations(
+    survey_id: str,
+    group_id: str,
+    payload: QuestionGroupTranslationsUpdate,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> QuestionGroupResponse:
+    """Update translations for a specific language in a question group."""
+    parsed_survey_id = _parse_uuid(survey_id, "Survey")
+    parsed_group_id = _parse_uuid(group_id, "Group")
+    group = await get_group_by_id(
+        session,
+        survey_id=parsed_survey_id,
+        group_id=parsed_group_id,
+        user_id=current_user.id,
+    )
+    if group is None:
+        raise NotFoundError("Group not found")
+
+    new_translations = merge_translations(
+        group.translations or {},
+        payload.lang,
+        payload.translations,
+    )
+    group = await update_group(session, group, translations=new_translations)
     return QuestionGroupResponse.model_validate(group)
 
 

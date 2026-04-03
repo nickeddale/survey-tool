@@ -45,6 +45,7 @@ interface BuilderState {
   surveyId: string | null
   title: string
   status: string
+  defaultLanguage: string
 
   // Structure
   groups: BuilderGroup[]
@@ -53,6 +54,10 @@ interface BuilderState {
   selectedItem: SelectedItem
   isLoading: boolean
   error: string | null
+
+  // Translation UI state
+  isTranslationMode: boolean
+  translationLang: string
 
   // Save state
   saveStatus: SaveStatus
@@ -104,6 +109,10 @@ interface BuilderActions {
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
 
+  // Translation mode actions
+  setTranslationMode: (enabled: boolean) => void
+  setTranslationLang: (lang: string) => void
+
   // Save status actions
   setSaveStatus: (status: SaveStatus, error?: string | null) => void
   setLastSavedAt: (date: Date | null) => void
@@ -141,10 +150,13 @@ const initialState: BuilderState = {
   surveyId: null,
   title: '',
   status: '',
+  defaultLanguage: 'en',
   groups: [],
   selectedItem: null,
   isLoading: false,
   error: null,
+  isTranslationMode: false,
+  translationLang: 'fr',
   saveStatus: 'idle',
   lastSavedAt: null,
   saveError: null,
@@ -165,6 +177,7 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
         state.surveyId = survey.id
         state.title = survey.title
         state.status = survey.status
+        state.defaultLanguage = survey.default_language ?? 'en'
         // Build nested structure: groups with their questions
         state.groups = survey.groups.map((g) => ({
           ...g,
@@ -380,6 +393,16 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
     setError: (error: string | null) =>
       set((state) => {
         state.error = error
+      }),
+
+    setTranslationMode: (enabled: boolean) =>
+      set((state) => {
+        state.isTranslationMode = enabled
+      }),
+
+    setTranslationLang: (lang: string) =>
+      set((state) => {
+        state.translationLang = lang
       }),
 
     setSaveStatus: (status: SaveStatus, error: string | null = null) =>

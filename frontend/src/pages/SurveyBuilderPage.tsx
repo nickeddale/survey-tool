@@ -649,6 +649,8 @@ function SurveyBuilderPage() {
     redo,
     undoStack,
     redoStack,
+    isTranslationMode,
+    setTranslationMode,
   } = useBuilderStore()
 
   const readOnly = status !== '' && status !== 'draft'
@@ -804,6 +806,8 @@ function SurveyBuilderPage() {
         surveyId={surveyId ?? ''}
         isPreviewMode={isPreviewMode}
         onTogglePreview={() => setIsPreviewMode((prev) => !prev)}
+        isTranslationMode={isTranslationMode}
+        onToggleTranslation={() => setTranslationMode(!isTranslationMode)}
         readOnly={readOnly}
         undoRedoPendingRef={undoRedoPendingRef}
       />

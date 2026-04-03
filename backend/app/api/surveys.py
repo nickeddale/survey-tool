@@ -14,6 +14,7 @@ from app.schemas.survey import (
     SurveyImportRequest,
     SurveyListResponse,
     SurveyResponse,
+    SurveyTranslationsUpdate,
     SurveyUpdate,
 )
 from app.services.export_service import (
@@ -31,6 +32,10 @@ from app.services.survey_service import (
     get_survey_full_by_id,
     list_surveys,
     update_survey,
+)
+from app.services.translation_service import (
+    apply_survey_translations,
+    merge_translations,
 )
 from app.utils.errors import NotFoundError
 
@@ -97,6 +102,7 @@ async def list_all(
 async def get_one(
     survey_id: str,
     include: str | None = Query(None),
+    lang: str | None = Query(None, description="Language code for translated content (e.g. 'fr')"),
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> SurveyFullResponse:
@@ -104,7 +110,15 @@ async def get_one(
     survey = await get_survey_full_by_id(session, parsed_id, current_user.id)
     if survey is None:
         raise NotFoundError("Survey not found")
-    return SurveyFullResponse.model_validate(survey)
+
+    validated = SurveyFullResponse.model_validate(survey)
+
+    if lang and lang != survey.default_language:
+        survey_dict = validated.model_dump()
+        translated_dict = apply_survey_translations(survey_dict, lang)
+        return SurveyFullResponse.model_validate(translated_dict)
+
+    return validated
 
 
 @router.patch("/{survey_id}", response_model=SurveyResponse)
@@ -121,6 +135,28 @@ async def patch(
 
     update_fields = payload.model_dump(exclude_unset=True)
     survey = await update_survey(session, survey, **update_fields)
+    return SurveyResponse.model_validate(survey)
+
+
+@router.patch("/{survey_id}/translations", response_model=SurveyResponse)
+async def update_translations(
+    survey_id: str,
+    payload: SurveyTranslationsUpdate,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> SurveyResponse:
+    """Update translations for a specific language in a survey."""
+    parsed_id = _parse_survey_id(survey_id)
+    survey = await get_survey_by_id(session, parsed_id, current_user.id)
+    if survey is None:
+        raise NotFoundError("Survey not found")
+
+    new_translations = merge_translations(
+        survey.translations or {},
+        payload.lang,
+        payload.translations,
+    )
+    survey = await update_survey(session, survey, translations=new_translations)
     return SurveyResponse.model_validate(survey)
 
 

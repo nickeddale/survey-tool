@@ -12,6 +12,7 @@ from app.schemas.answer_option import (
     AnswerOptionListResponse,
     AnswerOptionReorderRequest,
     AnswerOptionResponse,
+    AnswerOptionTranslationsUpdate,
     AnswerOptionUpdate,
 )
 from app.services.answer_option_service import (
@@ -22,6 +23,7 @@ from app.services.answer_option_service import (
     reorder_answer_options,
     update_answer_option,
 )
+from app.services.translation_service import merge_translations
 from app.utils.errors import ConflictError, NotFoundError
 
 router = APIRouter(
@@ -185,6 +187,39 @@ async def patch(
         option = await update_answer_option(session, option, **update_fields)
     except IntegrityError:
         raise ConflictError("An option with that code already exists for this question")
+    return AnswerOptionResponse.model_validate(option)
+
+
+@router.patch("/{option_id}/translations", response_model=AnswerOptionResponse)
+async def update_translations(
+    survey_id: str,
+    question_id: str,
+    option_id: str,
+    payload: AnswerOptionTranslationsUpdate,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> AnswerOptionResponse:
+    """Update translations for a specific language in an answer option."""
+    parsed_survey_id = _parse_uuid(survey_id, "Survey")
+    parsed_question_id = _parse_uuid(question_id, "Question")
+    parsed_option_id = _parse_uuid(option_id, "Option")
+
+    option = await get_answer_option_by_id(
+        session,
+        survey_id=parsed_survey_id,
+        question_id=parsed_question_id,
+        option_id=parsed_option_id,
+        user_id=current_user.id,
+    )
+    if option is None:
+        raise NotFoundError("Answer option not found")
+
+    new_translations = merge_translations(
+        option.translations or {},
+        payload.lang,
+        payload.translations,
+    )
+    option = await update_answer_option(session, option, translations=new_translations)
     return AnswerOptionResponse.model_validate(option)
 
 

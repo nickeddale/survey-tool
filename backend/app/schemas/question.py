@@ -51,6 +51,11 @@ class QuestionUpdate(BaseModel):
         return v
 
 
+class QuestionTranslationsUpdate(BaseModel):
+    lang: str
+    translations: dict[str, str | None]
+
+
 class QuestionResponse(BaseModel):
     model_config = {"from_attributes": True}
 
@@ -66,6 +71,7 @@ class QuestionResponse(BaseModel):
     relevance: str | None
     validation: dict[str, Any] | None
     settings: dict[str, Any] | None
+    translations: dict[str, Any] = {}
     created_at: datetime
     subquestions: list["QuestionResponse"] = []
     answer_options: list[AnswerOptionResponse] = []

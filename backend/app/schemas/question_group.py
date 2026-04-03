@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
 
@@ -22,6 +22,11 @@ class QuestionGroupUpdate(BaseModel):
     relevance: str | None = None
 
 
+class QuestionGroupTranslationsUpdate(BaseModel):
+    lang: str
+    translations: dict[str, str | None]
+
+
 class QuestionGroupResponse(BaseModel):
     model_config = {"from_attributes": True}
 
@@ -31,6 +36,7 @@ class QuestionGroupResponse(BaseModel):
     description: str | None
     sort_order: int
     relevance: str | None
+    translations: dict[str, Any] = {}
     created_at: datetime
     questions: list["QuestionResponse"] = []
 
