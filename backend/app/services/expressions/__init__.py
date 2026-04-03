@@ -30,6 +30,30 @@ from app.services.expressions.resolver import (
     build_expression_context,
     ResolverError,
 )
+from app.services.expressions.relevance import (
+    evaluate_relevance,
+    RelevanceResult,
+    CircularRelevanceError,
+    RelevanceEvaluationError,
+    clear_relevance_cache,
+)
+from app.services.expressions.flow import (
+    NavigationPosition,
+    build_ordered_pairs,
+    get_visible_flow,
+    get_next_question,
+    get_previous_question,
+    get_first_visible_question,
+    get_next_group,
+    get_previous_group,
+    get_first_visible_group,
+)
+from app.services.expressions.piping import (
+    pipe,
+    pipe_question,
+    pipe_all,
+    PipingError,
+)
 
 __all__ = [
     # Lexer
@@ -55,4 +79,25 @@ __all__ = [
     # Resolver
     "build_expression_context",
     "ResolverError",
+    # Relevance
+    "evaluate_relevance",
+    "RelevanceResult",
+    "CircularRelevanceError",
+    "RelevanceEvaluationError",
+    "clear_relevance_cache",
+    # Flow / skip logic
+    "NavigationPosition",
+    "build_ordered_pairs",
+    "get_visible_flow",
+    "get_next_question",
+    "get_previous_question",
+    "get_first_visible_question",
+    "get_next_group",
+    "get_previous_group",
+    "get_first_visible_group",
+    # Piping / string interpolation
+    "pipe",
+    "pipe_question",
+    "pipe_all",
+    "PipingError",
 ]
