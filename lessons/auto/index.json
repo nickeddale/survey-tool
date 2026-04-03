@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-03T16:01:06.781Z",
+  "lastUpdated": "2026-04-03T16:21:03.262Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1842,6 +1842,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-03-iss-095-613-frontend-response-export-ui-and-statistics-das.md",
+      "ticketId": "ISS-095",
+      "title": "6.13: Frontend — Response Export UI and Statistics Dashboard",
+      "date": "2026-04-03",
+      "categories": [
+        "frontend",
+        "data-visualization",
+        "file-download",
+        "typescript",
+        "react"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -2690,7 +2706,8 @@
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
-      "2026-04-03-iss-080-510-frontend-relevance-expression-builder-ui.md"
+      "2026-04-03-iss-080-510-frontend-relevance-expression-builder-ui.md",
+      "2026-04-03-iss-095-613-frontend-response-export-ui-and-statistics-das.md"
     ],
     "vitest": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md"
@@ -2723,7 +2740,8 @@
       "2026-04-03-iss-077-57-skip-logic-implementation.md"
     ],
     "react": [
-      "2026-04-03-iss-080-510-frontend-relevance-expression-builder-ui.md"
+      "2026-04-03-iss-080-510-frontend-relevance-expression-builder-ui.md",
+      "2026-04-03-iss-095-613-frontend-response-export-ui-and-statistics-das.md"
     ],
     "expression-builder": [
       "2026-04-03-iss-080-510-frontend-relevance-expression-builder-ui.md"
@@ -2760,6 +2778,15 @@
     ],
     "debouncing": [
       "2026-04-03-iss-093-611-frontend-conditional-display-and-piping-in-res.md"
+    ],
+    "data-visualization": [
+      "2026-04-03-iss-095-613-frontend-response-export-ui-and-statistics-das.md"
+    ],
+    "file-download": [
+      "2026-04-03-iss-095-613-frontend-response-export-ui-and-statistics-das.md"
+    ],
+    "typescript": [
+      "2026-04-03-iss-095-613-frontend-response-export-ui-and-statistics-das.md"
     ]
   },
   "fileIndex": {}

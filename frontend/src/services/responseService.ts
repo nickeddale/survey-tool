@@ -7,7 +7,7 @@
  */
 
 import apiClient from './apiClient'
-import type { ResolveFlowRequest, ResolveFlowResponse, ResponseListResponse, ResponseDetailFull } from '../types/survey'
+import type { ResolveFlowRequest, ResolveFlowResponse, ResponseListResponse, ResponseDetailFull, SurveyStatisticsResponse, ExportParams } from '../types/survey'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -138,6 +138,44 @@ class ResponseService {
   ): Promise<ResponseDetailFull> {
     const response = await apiClient.get<ResponseDetailFull>(
       `/surveys/${surveyId}/responses/${responseId}/detail`,
+    )
+    return response.data
+  }
+
+  /**
+   * Export survey responses as CSV or JSON. Requires authentication.
+   * Returns a Blob for file download.
+   */
+  async exportResponses(
+    surveyId: string,
+    params: ExportParams,
+  ): Promise<Blob> {
+    const queryParams: Record<string, string> = {
+      format: params.format,
+    }
+    if (params.status && params.status !== 'all') {
+      queryParams.status = params.status
+    }
+    if (params.columns && params.columns.length > 0) {
+      queryParams.columns = params.columns.join(',')
+    }
+
+    const response = await apiClient.get(
+      `/surveys/${surveyId}/responses/export`,
+      {
+        params: queryParams,
+        responseType: 'blob',
+      },
+    )
+    return response.data as Blob
+  }
+
+  /**
+   * Get aggregate statistics for a survey. Requires authentication.
+   */
+  async getSurveyStatistics(surveyId: string): Promise<SurveyStatisticsResponse> {
+    const response = await apiClient.get<SurveyStatisticsResponse>(
+      `/surveys/${surveyId}/statistics`,
     )
     return response.data
   }

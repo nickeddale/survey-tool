@@ -255,3 +255,81 @@ export interface ResponseDetailFull {
   participant_id: string | null
   answers: ResponseAnswerDetail[]
 }
+
+// ---------------------------------------------------------------------------
+// Export types
+// ---------------------------------------------------------------------------
+
+export interface ExportParams {
+  format: 'csv' | 'json'
+  status?: string
+  columns?: string[]
+}
+
+// ---------------------------------------------------------------------------
+// Statistics types (matching backend SurveyStatisticsResponse)
+// ---------------------------------------------------------------------------
+
+export interface ChoiceOptionStat {
+  option_code: string
+  option_title: string | null
+  count: number
+  percentage: number
+}
+
+export interface ChoiceQuestionStats {
+  question_type: string
+  response_count: number
+  options: ChoiceOptionStat[]
+}
+
+export interface NumericQuestionStats {
+  question_type: string
+  response_count: number
+  mean: number | null
+  median: number | null
+  min: number | null
+  max: number | null
+}
+
+export interface RatingDistributionEntry {
+  value: string
+  count: number
+}
+
+export interface RatingQuestionStats {
+  question_type: string
+  response_count: number
+  average: number | null
+  distribution: RatingDistributionEntry[]
+}
+
+export interface TextQuestionStats {
+  question_type: string
+  response_count: number
+}
+
+export type QuestionStatsUnion =
+  | ChoiceQuestionStats
+  | NumericQuestionStats
+  | RatingQuestionStats
+  | TextQuestionStats
+
+export interface QuestionStatistics {
+  question_id: string
+  question_code: string
+  question_title: string
+  question_type: string
+  stats: QuestionStatsUnion
+}
+
+export interface SurveyStatisticsResponse {
+  survey_id: string
+  total_responses: number
+  complete_responses: number
+  incomplete_responses: number
+  disqualified_responses: number
+  completion_rate: number
+  average_completion_time_seconds: number | null
+  questions: QuestionStatistics[]
+}
