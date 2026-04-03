@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Pencil, Copy, Download, Trash2, ChevronRight, ChevronDown } from 'lucide-react'
+import { ArrowLeft, Pencil, Copy, Download, Trash2, ChevronRight, ChevronDown, List } from 'lucide-react'
 import surveyService from '../services/surveyService'
 import type { SurveyFullResponse, QuestionGroupResponse, QuestionResponse } from '../types/survey'
 import { ApiError } from '../types/api'
@@ -609,6 +609,17 @@ function SurveyDetailPage() {
         )}
 
         <div className="flex-1" />
+
+        {/* View Responses */}
+        <Button
+          variant="outline"
+          onClick={() => navigate(`/surveys/${survey.id}/responses`)}
+          aria-label="View responses"
+          data-testid="view-responses-button"
+        >
+          <List size={14} />
+          Responses
+        </Button>
 
         {/* Always-available actions */}
         {survey.status === 'draft' && (
