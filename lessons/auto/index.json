@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-03T06:08:51.139Z",
+  "lastUpdated": "2026-04-03T06:19:40.172Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1287,6 +1287,28 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
+      "ticketId": "ISS-068",
+      "title": "4.12: Frontend — Client-Side Validation Framework",
+      "date": "2026-04-03",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "refactoring",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -1354,7 +1376,8 @@
       "2026-04-03-iss-064-48-frontend-choice-input-components.md",
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
       "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
-      "2026-04-03-iss-067-411-frontend-special-input-components.md"
+      "2026-04-03-iss-067-411-frontend-special-input-components.md",
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1416,7 +1439,8 @@
       "2026-04-03-iss-063-47-frontend-text-input-components.md",
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
       "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
-      "2026-04-03-iss-067-411-frontend-special-input-components.md"
+      "2026-04-03-iss-067-411-frontend-special-input-components.md",
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1468,7 +1492,8 @@
       "2026-04-03-iss-064-48-frontend-choice-input-components.md",
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
       "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
-      "2026-04-03-iss-067-411-frontend-special-input-components.md"
+      "2026-04-03-iss-067-411-frontend-special-input-components.md",
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1533,7 +1558,8 @@
       "2026-04-03-iss-064-48-frontend-choice-input-components.md",
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
       "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
-      "2026-04-03-iss-067-411-frontend-special-input-components.md"
+      "2026-04-03-iss-067-411-frontend-special-input-components.md",
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1553,7 +1579,8 @@
       "2026-04-02-iss-041-35-drag-and-drop-for-question-reordering-within-an.md",
       "2026-04-02-iss-044-38-question-type-specific-settings-forms.md",
       "2026-04-02-iss-062-46-backend-question-validation-engine.md",
-      "2026-04-03-iss-066-410-frontend-scalar-input-components.md"
+      "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
     ],
     "bug-fix": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1616,7 +1643,8 @@
       "2026-04-03-iss-064-48-frontend-choice-input-components.md",
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
       "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
-      "2026-04-03-iss-067-411-frontend-special-input-components.md"
+      "2026-04-03-iss-067-411-frontend-special-input-components.md",
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1680,7 +1708,8 @@
       "2026-04-03-iss-064-48-frontend-choice-input-components.md",
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
       "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
-      "2026-04-03-iss-067-411-frontend-special-input-components.md"
+      "2026-04-03-iss-067-411-frontend-special-input-components.md",
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1713,7 +1742,8 @@
       "2026-04-02-iss-048-312-undoredo-support.md",
       "2026-04-02-iss-056-chore-address-react-router-v7-future-flag-warnings.md",
       "2026-04-03-iss-063-47-frontend-text-input-components.md",
-      "2026-04-03-iss-066-410-frontend-scalar-input-components.md"
+      "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1786,7 +1816,8 @@
       "2026-04-03-iss-064-48-frontend-choice-input-components.md",
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
       "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
-      "2026-04-03-iss-067-411-frontend-special-input-components.md"
+      "2026-04-03-iss-067-411-frontend-special-input-components.md",
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1849,7 +1880,8 @@
       "2026-04-03-iss-064-48-frontend-choice-input-components.md",
       "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
       "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
-      "2026-04-03-iss-067-411-frontend-special-input-components.md"
+      "2026-04-03-iss-067-411-frontend-special-input-components.md",
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -1896,7 +1928,8 @@
       "2026-04-02-iss-062-46-backend-question-validation-engine.md",
       "2026-04-02-iss-061-45-backend-special-question-types-ranking-imagepic.md",
       "2026-04-03-iss-063-47-frontend-text-input-components.md",
-      "2026-04-03-iss-066-410-frontend-scalar-input-components.md"
+      "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md"
