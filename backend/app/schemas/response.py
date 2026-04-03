@@ -18,6 +18,7 @@ class AnswerInput(BaseModel):
 
 class ResponseCreate(BaseModel):
     answers: list[AnswerInput] = []
+    participant_token: str | None = None
 
 
 class ResponseUpdate(BaseModel):

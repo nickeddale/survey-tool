@@ -178,6 +178,7 @@ async def submit_response(
         ip_address=ip,
         metadata=meta,
         answers=answers if answers else None,
+        token=payload.participant_token,
     )
     return ResponseResponse.model_validate(response)
 

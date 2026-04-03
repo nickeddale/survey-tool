@@ -5,13 +5,14 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any, Literal
 
-from sqlalchemy import asc, desc, extract, func, select
+from sqlalchemy import asc, desc, extract, func, select, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.models.answer_option import AnswerOption
+from app.models.participant import Participant
 from app.models.question import Question
 from app.models.question_group import QuestionGroup
 from app.models.response import Response
@@ -20,7 +21,74 @@ from app.models.survey import Survey
 from app.services.validators import validate_answer
 from app.services.expressions.relevance import evaluate_relevance
 from app.services.expressions.resolver import build_expression_context
-from app.utils.errors import AnswerValidationError, ConflictError, NotFoundError, UnprocessableError
+from app.utils.errors import AnswerValidationError, ConflictError, ForbiddenError, NotFoundError, UnprocessableError
+
+
+async def _check_survey_requires_participants(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+) -> bool:
+    """Return True if the survey has at least one Participant row, False otherwise.
+
+    Surveys with participants require a valid token on response submission.
+    Surveys with no participants allow anonymous responses.
+    """
+    result = await session.execute(
+        select(Participant.id).where(Participant.survey_id == survey_id).limit(1)
+    )
+    return result.scalar_one_or_none() is not None
+
+
+async def _validate_participant_token(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+    token: str,
+) -> Participant:
+    """Validate a participant token and return the Participant row.
+
+    Checks:
+        - Token exists for the given survey
+        - Current time is within valid_from/valid_until window (if set)
+        - uses_remaining is None (unlimited) or > 0
+        - completed is False
+
+    Args:
+        session: The async database session.
+        survey_id: The UUID of the survey.
+        token: The participant token string submitted with the response.
+
+    Returns:
+        The validated Participant ORM row.
+
+    Raises:
+        ForbiddenError: If the token is invalid, expired, exhausted, or already completed.
+    """
+    now = datetime.now(timezone.utc)
+
+    result = await session.execute(
+        select(Participant).where(
+            Participant.token == token,
+            Participant.survey_id == survey_id,
+        )
+    )
+    participant = result.scalar_one_or_none()
+
+    if participant is None:
+        raise ForbiddenError("Invalid participant token")
+
+    if participant.valid_from is not None and now < participant.valid_from:
+        raise ForbiddenError("Participant token is not yet valid")
+
+    if participant.valid_until is not None and now > participant.valid_until:
+        raise ForbiddenError("Participant token has expired")
+
+    if participant.uses_remaining is not None and participant.uses_remaining <= 0:
+        raise ForbiddenError("Participant token has no remaining uses")
+
+    if participant.completed:
+        raise ForbiddenError("Participant has already completed this survey")
+
+    return participant
 
 
 async def _validate_answers(
@@ -111,11 +179,15 @@ async def create_response(
     ip_address: str | None = None,
     metadata: dict | None = None,
     answers: list[dict] | None = None,
+    token: str | None = None,
 ) -> Response:
     """Create a new survey response.
 
     Verifies the survey exists and is active, validates all submitted answers,
     creates the Response record, and optionally bulk-inserts initial ResponseAnswer rows.
+
+    If the survey has participants, a valid participant token must be provided.
+    The token's uses_remaining is atomically decremented within the same transaction.
 
     Args:
         session: The async database session.
@@ -123,10 +195,12 @@ async def create_response(
         ip_address: The respondent's IP address (from request).
         metadata: Metadata dict (user-agent, referrer, etc.).
         answers: Optional list of {'question_id': UUID, 'value': any} dicts.
+        token: Optional participant token string. Required when the survey has participants.
 
     Raises:
         NotFoundError: If the survey does not exist.
         UnprocessableError: If the survey is not in 'active' status.
+        ForbiddenError: If the survey requires a participant token and none/invalid was given.
         AnswerValidationError: If any answers fail validation (422, collects ALL errors).
         ConflictError: If a duplicate question_id appears in initial answers.
     """
@@ -143,6 +217,29 @@ async def create_response(
         raise UnprocessableError(
             f"Survey is not accepting responses: status is '{survey.status}'"
         )
+
+    # Participant token validation
+    participant: Participant | None = None
+    requires_participants = await _check_survey_requires_participants(session, survey_id)
+    if requires_participants:
+        if token is None:
+            raise ForbiddenError("This survey requires a participant token")
+        participant = await _validate_participant_token(session, survey_id, token)
+
+        # Atomically decrement uses_remaining (only if it is not unlimited/None)
+        if participant.uses_remaining is not None:
+            stmt = (
+                update(Participant)
+                .where(
+                    Participant.id == participant.id,
+                    Participant.uses_remaining > 0,
+                )
+                .values(uses_remaining=Participant.uses_remaining - 1)
+            )
+            result2 = await session.execute(stmt)
+            if result2.rowcount == 0:
+                # Race condition: another request consumed the last use
+                raise ForbiddenError("Participant token has no remaining uses")
 
     # Validate all answers before persisting anything
     if answers:
@@ -163,6 +260,7 @@ async def create_response(
         ip_address=ip_address,
         metadata_=metadata or {},
         started_at=datetime.now(timezone.utc),
+        participant_id=participant.id if participant is not None else None,
     )
     session.add(response)
     await session.flush()  # get the response.id assigned
@@ -244,8 +342,16 @@ async def complete_response(
     if response.status == "disqualified":
         raise UnprocessableError("Cannot complete a disqualified response")
 
-    # Build expression context from current answers
-    expression_context = build_expression_context(response, participant=None)
+    # Load the linked participant (if any) for expression context and completion tracking
+    linked_participant: Participant | None = None
+    if response.participant_id is not None:
+        participant_result = await session.execute(
+            select(Participant).where(Participant.id == response.participant_id)
+        )
+        linked_participant = participant_result.scalar_one_or_none()
+
+    # Build expression context from current answers (with participant for RESPONDENT.* piping)
+    expression_context = build_expression_context(response, participant=linked_participant)
 
     # Evaluate relevance to determine visible vs. hidden questions
     survey = response.survey
@@ -287,6 +393,13 @@ async def complete_response(
     response.completed_at = datetime.now(timezone.utc)
     session.add(response)
     await session.flush()
+
+    # Mark the participant as completed (if linked)
+    if linked_participant is not None:
+        linked_participant.completed = True
+        session.add(linked_participant)
+        await session.flush()
+
     await session.refresh(response)
     return response
 
