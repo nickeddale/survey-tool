@@ -19,3 +19,12 @@ export type { DropdownInputProps } from './DropdownInput'
 
 export { CheckboxInput } from './CheckboxInput'
 export type { CheckboxInputProps } from './CheckboxInput'
+
+export { MatrixInput } from './MatrixInput'
+export type { MatrixInputProps } from './MatrixInput'
+
+export { MatrixDropdownInput } from './MatrixDropdownInput'
+export type { MatrixDropdownInputProps } from './MatrixDropdownInput'
+
+export { MatrixDynamicInput } from './MatrixDynamicInput'
+export type { MatrixDynamicInputProps } from './MatrixDynamicInput'
