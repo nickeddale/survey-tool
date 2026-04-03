@@ -30,6 +30,7 @@ from app.models.answer_option import AnswerOption  # noqa: F401
 from app.models.participant import Participant  # noqa: F401
 from app.models.response import Response  # noqa: F401
 from app.models.response_answer import ResponseAnswer  # noqa: F401
+from app.models.quota import Quota  # noqa: F401
 
 target_metadata = Base.metadata
 
