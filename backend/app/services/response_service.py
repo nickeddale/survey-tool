@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime, timezone
-from typing import Literal
+from typing import Any, Literal
 
 from sqlalchemy import asc, desc, func, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
@@ -477,6 +477,111 @@ async def list_responses(
     responses = list(data_result.scalars().all())
 
     return responses, total
+
+
+async def get_response_detail(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+    response_id: uuid.UUID,
+    user_id: uuid.UUID,
+) -> dict:
+    """Load a response with fully enriched answer data for the authenticated detail endpoint.
+
+    Verifies survey ownership (survey.user_id == user_id) in a single joined query.
+    Returns 404 for both not-found and wrong-owner cases to avoid ownership leakage.
+
+    Eagerly loads answers → question → answer_options and answers → question → subquestions
+    to avoid N+1 queries.
+
+    Args:
+        session: The async database session.
+        survey_id: The UUID of the survey.
+        response_id: The UUID of the response.
+        user_id: The UUID of the authenticated user (ownership check).
+
+    Returns:
+        A dict suitable for constructing a ResponseDetail schema.
+
+    Raises:
+        NotFoundError: If the response/survey does not exist or the survey is not owned by user_id.
+    """
+    from app.schemas.response import ResponseAnswerDetail, ResponseDetail
+
+    # Single query joining Response -> Survey, enforcing ownership
+    result = await session.execute(
+        select(Response)
+        .join(Survey, Response.survey_id == Survey.id)
+        .where(
+            Response.id == response_id,
+            Response.survey_id == survey_id,
+            Survey.user_id == user_id,
+        )
+        .options(
+            selectinload(Response.answers).selectinload(ResponseAnswer.question).selectinload(
+                Question.answer_options
+            ),
+            selectinload(Response.answers).selectinload(ResponseAnswer.question).selectinload(
+                Question.subquestions
+            ),
+        )
+    )
+    response = result.scalar_one_or_none()
+
+    if response is None:
+        raise NotFoundError("Response not found")
+
+    # Build enriched answer list
+    enriched_answers: list[ResponseAnswerDetail] = []
+    for answer in response.answers:
+        question = answer.question
+        raw_value = answer.value
+
+        # Resolve selected_option_title for choice questions
+        selected_option_title: str | None = None
+        choice_types = {"single_choice", "dropdown", "image_picker"}
+        if question.question_type in choice_types and raw_value is not None:
+            # raw_value is a string (option code) for single-choice questions
+            option_code = str(raw_value)
+            for opt in question.answer_options:
+                if opt.code == option_code:
+                    selected_option_title = opt.title
+                    break
+
+        # Resolve subquestion_label for matrix questions
+        subquestion_label: str | None = None
+        matrix_types = {"matrix", "matrix_single", "matrix_multiple", "matrix_dropdown", "matrix_dynamic"}
+        if question.question_type in matrix_types and question.parent_id is not None:
+            # This question IS a subquestion — use its own title as the label
+            subquestion_label = question.title
+
+        # Build values list for multiple-choice answers
+        values: list[Any] | None = None
+        if question.question_type == "multiple_choice" and isinstance(raw_value, list):
+            values = raw_value
+
+        enriched_answers.append(
+            ResponseAnswerDetail(
+                question_id=question.id,
+                question_code=question.code,
+                question_title=question.title,
+                question_type=question.question_type,
+                value=raw_value,
+                values=values,
+                selected_option_title=selected_option_title,
+                subquestion_label=subquestion_label,
+            )
+        )
+
+    return {
+        "id": response.id,
+        "status": response.status,
+        "started_at": response.started_at,
+        "completed_at": response.completed_at,
+        "ip_address": response.ip_address,
+        "metadata": response.metadata_,
+        "participant_id": response.participant_id,
+        "answers": enriched_answers,
+    }
 
 
 async def disqualify_response(

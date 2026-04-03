@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-03T12:21:11.876Z",
+  "lastUpdated": "2026-04-03T12:28:48.136Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1729,6 +1729,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-03-iss-089-67-response-detail-endpoint.md",
+      "ticketId": "ISS-089",
+      "title": "6.7: Response Detail Endpoint",
+      "date": "2026-04-03",
+      "categories": [
+        "fastapi",
+        "sqlalchemy",
+        "authentication",
+        "schema-design",
+        "testing"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -1816,7 +1832,8 @@
       "2026-04-03-iss-085-63-relevance-aware-validation-and-response-complet.md",
       "2026-04-03-iss-086-64-response-status-management-and-disqualification.md",
       "2026-04-03-iss-087-65-partial-response-saving-resume-later.md",
-      "2026-04-03-iss-088-66-response-listing-and-filtering-endpoint.md"
+      "2026-04-03-iss-088-66-response-listing-and-filtering-endpoint.md",
+      "2026-04-03-iss-089-67-response-detail-endpoint.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2582,6 +2599,18 @@
     ],
     "ui-components": [
       "2026-04-03-iss-080-510-frontend-relevance-expression-builder-ui.md"
+    ],
+    "fastapi": [
+      "2026-04-03-iss-089-67-response-detail-endpoint.md"
+    ],
+    "sqlalchemy": [
+      "2026-04-03-iss-089-67-response-detail-endpoint.md"
+    ],
+    "authentication": [
+      "2026-04-03-iss-089-67-response-detail-endpoint.md"
+    ],
+    "schema-design": [
+      "2026-04-03-iss-089-67-response-detail-endpoint.md"
     ]
   },
   "fileIndex": {}
