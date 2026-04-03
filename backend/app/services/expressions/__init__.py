@@ -48,6 +48,12 @@ from app.services.expressions.flow import (
     get_previous_group,
     get_first_visible_group,
 )
+from app.services.expressions.piping import (
+    pipe,
+    pipe_question,
+    pipe_all,
+    PipingError,
+)
 
 __all__ = [
     # Lexer
@@ -89,4 +95,9 @@ __all__ = [
     "get_next_group",
     "get_previous_group",
     "get_first_visible_group",
+    # Piping / string interpolation
+    "pipe",
+    "pipe_question",
+    "pipe_all",
+    "PipingError",
 ]
