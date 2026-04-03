@@ -10,6 +10,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.api.answer_options import router as answer_options_router
+from app.api.assessments import router as assessments_router
 from app.api.auth import router as auth_router
 from app.api.logic import router as logic_router
 from app.api.participants import router as participants_router
@@ -200,6 +201,7 @@ app.include_router(answer_options_router, prefix="/api/v1")
 app.include_router(responses_router, prefix="/api/v1")
 app.include_router(participants_router, prefix="/api/v1")
 app.include_router(quotas_router, prefix="/api/v1")
+app.include_router(assessments_router, prefix="/api/v1")
 
 
 @app.get("/health")
