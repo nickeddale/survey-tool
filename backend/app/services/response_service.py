@@ -6,13 +6,17 @@ from datetime import datetime, timezone
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.models.answer_option import AnswerOption
 from app.models.question import Question
+from app.models.question_group import QuestionGroup
 from app.models.response import Response
 from app.models.response_answer import ResponseAnswer
 from app.models.survey import Survey
 from app.services.validators import validate_answer
+from app.services.expressions.relevance import evaluate_relevance
+from app.services.expressions.resolver import build_expression_context
 from app.utils.errors import AnswerValidationError, ConflictError, NotFoundError, UnprocessableError
 
 
@@ -20,21 +24,33 @@ async def _validate_answers(
     session: AsyncSession,
     answers: list[dict],
     survey_id: uuid.UUID,
+    visible_question_ids: set[uuid.UUID],
 ) -> list[dict]:
-    """Validate all submitted answers against their question definitions.
+    """Validate submitted answers against their question definitions.
+
+    Only validates answers for questions in visible_question_ids.
+    Answers for hidden questions are skipped (not validated, not errored).
 
     Fetches each question (scoped to the survey via question_group), retrieves its
-    answer_options and subquestions, and calls validate_answer() for each.
-    Collects ALL errors across ALL questions before returning — never short-circuits.
+    answer_options and subquestions, and calls validate_answer() for each visible one.
+    Collects ALL errors across ALL visible questions before returning — never short-circuits.
+
+    Args:
+        visible_question_ids: Set of question UUIDs that are visible and should be validated.
+                              Questions not in this set are skipped entirely.
 
     Returns:
         A list of error dicts with keys: question_code, field, message.
-        An empty list means all answers are valid.
+        An empty list means all visible answers are valid.
     """
     errors: list[dict] = []
 
     for answer in answers:
         question_id = answer["question_id"]
+
+        # Skip validation for hidden questions — they are preserved but not checked.
+        if question_id not in visible_question_ids:
+            continue
 
         # Fetch the Question, joining through question_group to enforce survey ownership
         result = await session.execute(
@@ -127,7 +143,11 @@ async def create_response(
 
     # Validate all answers before persisting anything
     if answers:
-        validation_errors = await _validate_answers(session, answers, survey_id)
+        # For create_response, all questions are visible (no relevance filtering yet)
+        all_question_ids = {a["question_id"] for a in answers}
+        validation_errors = await _validate_answers(
+            session, answers, survey_id, visible_question_ids=all_question_ids
+        )
         if validation_errors:
             raise AnswerValidationError(
                 message="One or more answers failed validation",
@@ -172,5 +192,94 @@ async def create_response(
                 "Duplicate question_id in answers"
             ) from exc
 
+    await session.refresh(response)
+    return response
+
+
+async def complete_response(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+    response_id: uuid.UUID,
+) -> Response:
+    """Complete a survey response after relevance-aware validation.
+
+    Loads the response with its answers (and each answer's question), evaluates
+    relevance expressions to determine which questions are visible, then validates
+    only visible question answers. On success, sets status='complete' and
+    completed_at=now(). Answers for hidden questions are preserved but not validated.
+
+    Args:
+        session: The async database session.
+        survey_id: The UUID of the survey.
+        response_id: The UUID of the response to complete.
+
+    Raises:
+        NotFoundError: If the response does not exist for this survey.
+        ConflictError: If the response is already complete.
+        AnswerValidationError: If any visible answers fail validation (422, all errors).
+    """
+    # Load the response with its answers, each answer's question (and question's group),
+    # plus the survey with its groups and their questions for relevance evaluation.
+    result = await session.execute(
+        select(Response)
+        .where(Response.id == response_id, Response.survey_id == survey_id)
+        .options(
+            selectinload(Response.answers).selectinload(ResponseAnswer.question),
+            selectinload(Response.survey).selectinload(Survey.groups).selectinload(
+                QuestionGroup.questions
+            ),
+        )
+    )
+    response = result.scalar_one_or_none()
+
+    if response is None:
+        raise NotFoundError("Response not found")
+
+    if response.status == "complete":
+        raise ConflictError("Response is already complete")
+
+    # Build expression context from current answers
+    expression_context = build_expression_context(response, participant=None)
+
+    # Evaluate relevance to determine visible vs. hidden questions
+    survey = response.survey
+    relevance_result = evaluate_relevance(survey, answers=expression_context)
+
+    visible_question_ids = relevance_result.visible_question_ids
+
+    # Build the list of current answers as dicts for validation
+    answer_dicts = [
+        {"question_id": ra.question_id, "value": ra.value}
+        for ra in response.answers
+    ]
+
+    # Also need to validate that all visible required questions have answers.
+    # Collect the set of question_ids that have answers submitted.
+    answered_question_ids = {ra.question_id for ra in response.answers}
+
+    # For each visible question in the survey, check if required ones are answered.
+    # We need to validate required-but-unanswered questions too, not just submitted ones.
+    # Build a list of "virtual" answers for required visible questions with no answer.
+    for group in survey.groups:
+        for question in group.questions:
+            if question.id in visible_question_ids and question.id not in answered_question_ids:
+                # Add a virtual "no answer" entry so _validate_answers can check required
+                answer_dicts.append({"question_id": question.id, "value": None})
+
+    # Validate only visible questions
+    validation_errors = await _validate_answers(
+        session, answer_dicts, survey_id, visible_question_ids=visible_question_ids
+    )
+    if validation_errors:
+        raise AnswerValidationError(
+            message="One or more answers failed validation",
+            errors=validation_errors,
+        )
+
+    # Mark complete
+    response.status = "complete"
+    response.completed_at = datetime.now(timezone.utc)
+    session.add(response)
+    await session.flush()
     await session.refresh(response)
     return response
