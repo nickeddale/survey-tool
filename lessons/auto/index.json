@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-03T09:27:39.922Z",
+  "lastUpdated": "2026-04-03T09:33:51.690Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1465,6 +1465,29 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-03-iss-076-56-conditional-display-relevance-expressions.md",
+      "ticketId": "ISS-076",
+      "title": "5.6: Conditional Display / Relevance Expressions",
+      "date": "2026-04-03",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "refactoring",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -1541,7 +1564,8 @@
       "2026-04-03-iss-072-52-expression-language-parser-ast-generation.md",
       "2026-04-03-iss-073-53-expression-evaluator.md",
       "2026-04-03-iss-074-54-expression-validation-endpoint.md",
-      "2026-04-03-iss-075-55-variable-resolution-system.md"
+      "2026-04-03-iss-075-55-variable-resolution-system.md",
+      "2026-04-03-iss-076-56-conditional-display-relevance-expressions.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1612,7 +1636,8 @@
       "2026-04-03-iss-072-52-expression-language-parser-ast-generation.md",
       "2026-04-03-iss-073-53-expression-evaluator.md",
       "2026-04-03-iss-074-54-expression-validation-endpoint.md",
-      "2026-04-03-iss-075-55-variable-resolution-system.md"
+      "2026-04-03-iss-075-55-variable-resolution-system.md",
+      "2026-04-03-iss-076-56-conditional-display-relevance-expressions.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1671,7 +1696,8 @@
       "2026-04-03-iss-072-52-expression-language-parser-ast-generation.md",
       "2026-04-03-iss-073-53-expression-evaluator.md",
       "2026-04-03-iss-074-54-expression-validation-endpoint.md",
-      "2026-04-03-iss-075-55-variable-resolution-system.md"
+      "2026-04-03-iss-075-55-variable-resolution-system.md",
+      "2026-04-03-iss-076-56-conditional-display-relevance-expressions.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1745,7 +1771,8 @@
       "2026-04-03-iss-072-52-expression-language-parser-ast-generation.md",
       "2026-04-03-iss-073-53-expression-evaluator.md",
       "2026-04-03-iss-074-54-expression-validation-endpoint.md",
-      "2026-04-03-iss-075-55-variable-resolution-system.md"
+      "2026-04-03-iss-075-55-variable-resolution-system.md",
+      "2026-04-03-iss-076-56-conditional-display-relevance-expressions.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1766,7 +1793,8 @@
       "2026-04-02-iss-044-38-question-type-specific-settings-forms.md",
       "2026-04-02-iss-062-46-backend-question-validation-engine.md",
       "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
-      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md"
+      "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
+      "2026-04-03-iss-076-56-conditional-display-relevance-expressions.md"
     ],
     "bug-fix": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1838,7 +1866,8 @@
       "2026-04-03-iss-072-52-expression-language-parser-ast-generation.md",
       "2026-04-03-iss-073-53-expression-evaluator.md",
       "2026-04-03-iss-074-54-expression-validation-endpoint.md",
-      "2026-04-03-iss-075-55-variable-resolution-system.md"
+      "2026-04-03-iss-075-55-variable-resolution-system.md",
+      "2026-04-03-iss-076-56-conditional-display-relevance-expressions.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1911,7 +1940,8 @@
       "2026-04-03-iss-072-52-expression-language-parser-ast-generation.md",
       "2026-04-03-iss-073-53-expression-evaluator.md",
       "2026-04-03-iss-074-54-expression-validation-endpoint.md",
-      "2026-04-03-iss-075-55-variable-resolution-system.md"
+      "2026-04-03-iss-075-55-variable-resolution-system.md",
+      "2026-04-03-iss-076-56-conditional-display-relevance-expressions.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1948,7 +1978,8 @@
       "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
       "2026-04-03-iss-072-52-expression-language-parser-ast-generation.md",
       "2026-04-03-iss-073-53-expression-evaluator.md",
-      "2026-04-03-iss-074-54-expression-validation-endpoint.md"
+      "2026-04-03-iss-074-54-expression-validation-endpoint.md",
+      "2026-04-03-iss-076-56-conditional-display-relevance-expressions.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -1970,7 +2001,8 @@
       "2026-04-03-iss-071-51-expression-language-lexertokenizer.md",
       "2026-04-03-iss-072-52-expression-language-parser-ast-generation.md",
       "2026-04-03-iss-073-53-expression-evaluator.md",
-      "2026-04-03-iss-075-55-variable-resolution-system.md"
+      "2026-04-03-iss-075-55-variable-resolution-system.md",
+      "2026-04-03-iss-076-56-conditional-display-relevance-expressions.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2033,7 +2065,8 @@
       "2026-04-03-iss-071-51-expression-language-lexertokenizer.md",
       "2026-04-03-iss-073-53-expression-evaluator.md",
       "2026-04-03-iss-074-54-expression-validation-endpoint.md",
-      "2026-04-03-iss-075-55-variable-resolution-system.md"
+      "2026-04-03-iss-075-55-variable-resolution-system.md",
+      "2026-04-03-iss-076-56-conditional-display-relevance-expressions.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2105,7 +2138,8 @@
       "2026-04-03-iss-072-52-expression-language-parser-ast-generation.md",
       "2026-04-03-iss-073-53-expression-evaluator.md",
       "2026-04-03-iss-074-54-expression-validation-endpoint.md",
-      "2026-04-03-iss-075-55-variable-resolution-system.md"
+      "2026-04-03-iss-075-55-variable-resolution-system.md",
+      "2026-04-03-iss-076-56-conditional-display-relevance-expressions.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -2159,7 +2193,8 @@
       "2026-04-03-iss-071-51-expression-language-lexertokenizer.md",
       "2026-04-03-iss-072-52-expression-language-parser-ast-generation.md",
       "2026-04-03-iss-074-54-expression-validation-endpoint.md",
-      "2026-04-03-iss-075-55-variable-resolution-system.md"
+      "2026-04-03-iss-075-55-variable-resolution-system.md",
+      "2026-04-03-iss-076-56-conditional-display-relevance-expressions.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md"
