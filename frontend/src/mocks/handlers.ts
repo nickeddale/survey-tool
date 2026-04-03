@@ -847,6 +847,22 @@ export const handlers = [
   // Public response endpoints (no auth required)
   // ---------------------------------------------------------------------------
 
+  // POST /api/v1/surveys/:surveyId/logic/resolve-flow — resolve conditional display (public)
+  http.post(`${BASE}/surveys/:surveyId/logic/resolve-flow`, async () => {
+    // Default: all questions/groups visible, no piped texts, no skip target
+    return HttpResponse.json(
+      {
+        visible_questions: [],
+        hidden_questions: [],
+        visible_groups: [],
+        hidden_groups: [],
+        piped_texts: {},
+        next_question_id: null,
+      },
+      { status: 200 },
+    )
+  }),
+
   // POST /api/v1/surveys/:surveyId/responses — create new response (public)
   http.post(`${BASE}/surveys/:surveyId/responses`, async ({ params }) => {
     const response = {

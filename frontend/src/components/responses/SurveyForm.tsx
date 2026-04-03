@@ -286,7 +286,7 @@ function GroupForm({ group, answers, errors, onChange }: GroupFormProps) {
         {sortedQuestions.map((question) => (
           <div
             key={question.id}
-            className="rounded-lg border border-border bg-background p-4 space-y-3"
+            className="rounded-lg border border-border bg-background p-4 space-y-3 transition-all duration-300 ease-in-out animate-in fade-in slide-in-from-top-1"
             data-testid={`form-question-${question.id}`}
           >
             {/* Question header */}
