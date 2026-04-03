@@ -37,6 +37,17 @@ from app.services.expressions.relevance import (
     RelevanceEvaluationError,
     clear_relevance_cache,
 )
+from app.services.expressions.flow import (
+    NavigationPosition,
+    build_ordered_pairs,
+    get_visible_flow,
+    get_next_question,
+    get_previous_question,
+    get_first_visible_question,
+    get_next_group,
+    get_previous_group,
+    get_first_visible_group,
+)
 
 __all__ = [
     # Lexer
@@ -68,4 +79,14 @@ __all__ = [
     "CircularRelevanceError",
     "RelevanceEvaluationError",
     "clear_relevance_cache",
+    # Flow / skip logic
+    "NavigationPosition",
+    "build_ordered_pairs",
+    "get_visible_flow",
+    "get_next_question",
+    "get_previous_question",
+    "get_first_visible_question",
+    "get_next_group",
+    "get_previous_group",
+    "get_first_visible_group",
 ]
