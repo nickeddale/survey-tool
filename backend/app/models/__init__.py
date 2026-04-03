@@ -10,3 +10,4 @@ from app.models.response import Response  # noqa: F401
 from app.models.response_answer import ResponseAnswer  # noqa: F401
 from app.models.quota import Quota  # noqa: F401
 from app.models.assessment import Assessment  # noqa: F401
+from app.models.webhook import Webhook  # noqa: F401
