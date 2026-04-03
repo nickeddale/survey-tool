@@ -303,6 +303,36 @@ export const mockNewTokens = {
   expires_in: 1800,
 }
 
+// Mock quota data
+export const mockQuotas = [
+  {
+    id: 'quota-00000000-0000-0000-0000-000000000001',
+    survey_id: '10000000-0000-0000-0000-000000000002',
+    name: 'Age 18-35 Limit',
+    limit: 100,
+    current_count: 45,
+    action: 'terminate',
+    conditions: [],
+    is_active: true,
+    created_at: '2024-01-10T10:00:00Z',
+    updated_at: '2024-01-10T10:00:00Z',
+  },
+  {
+    id: 'quota-00000000-0000-0000-0000-000000000002',
+    survey_id: '10000000-0000-0000-0000-000000000002',
+    name: 'Male Respondents',
+    limit: 50,
+    current_count: 50,
+    action: 'hide_question',
+    conditions: [
+      { question_id: 'q1', operator: 'eq', value: 'male' },
+    ],
+    is_active: false,
+    created_at: '2024-01-11T10:00:00Z',
+    updated_at: '2024-01-11T10:00:00Z',
+  },
+]
+
 // ---------------------------------------------------------------------------
 // Handlers
 // ---------------------------------------------------------------------------
@@ -885,5 +915,106 @@ export const handlers = [
       updated_at: new Date().toISOString(),
     }
     return HttpResponse.json(response, { status: 200 })
+  }),
+
+  // ---------------------------------------------------------------------------
+  // Quota endpoints
+  // ---------------------------------------------------------------------------
+
+  // GET /api/v1/surveys/:surveyId/quotas
+  http.get(`${BASE}/surveys/:surveyId/quotas`, ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const url = new URL(request.url)
+    const page = Math.max(1, parseInt(url.searchParams.get('page') ?? '1', 10) || 1)
+    const perPage = Math.max(1, parseInt(url.searchParams.get('per_page') ?? '10', 10) || 10)
+    const surveyQuotas = mockQuotas.filter((q) => q.survey_id === params.surveyId)
+    const total = surveyQuotas.length
+    const totalPages = Math.max(1, Math.ceil(total / perPage))
+    const start = (page - 1) * perPage
+    const items = surveyQuotas.slice(start, start + perPage)
+    return HttpResponse.json({ items, total, page, per_page: perPage, total_pages: totalPages }, { status: 200 })
+  }),
+
+  // GET /api/v1/surveys/:surveyId/quotas/:quotaId
+  http.get(`${BASE}/surveys/:surveyId/quotas/:quotaId`, ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const quota = mockQuotas.find((q) => q.id === params.quotaId && q.survey_id === params.surveyId)
+    if (!quota) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Quota not found' } },
+        { status: 404 },
+      )
+    }
+    return HttpResponse.json(quota, { status: 200 })
+  }),
+
+  // POST /api/v1/surveys/:surveyId/quotas
+  http.post(`${BASE}/surveys/:surveyId/quotas`, async ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const body = (await request.json()) as Record<string, unknown>
+    const newQuota = {
+      id: `quota-new-${Date.now()}`,
+      survey_id: params.surveyId as string,
+      name: (body.name as string) ?? 'New Quota',
+      limit: (body.limit as number) ?? 100,
+      current_count: 0,
+      action: (body.action as string) ?? 'terminate',
+      conditions: (body.conditions as unknown[]) ?? [],
+      is_active: (body.is_active as boolean) ?? true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+    return HttpResponse.json(newQuota, { status: 201 })
+  }),
+
+  // PATCH /api/v1/surveys/:surveyId/quotas/:quotaId
+  http.patch(`${BASE}/surveys/:surveyId/quotas/:quotaId`, async ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const quota = mockQuotas.find((q) => q.id === params.quotaId)
+    if (!quota) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Quota not found' } },
+        { status: 404 },
+      )
+    }
+    const body = (await request.json()) as Record<string, unknown>
+    const updated = { ...quota, ...body, updated_at: new Date().toISOString() }
+    return HttpResponse.json(updated, { status: 200 })
+  }),
+
+  // DELETE /api/v1/surveys/:surveyId/quotas/:quotaId
+  http.delete(`${BASE}/surveys/:surveyId/quotas/:quotaId`, ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    return new HttpResponse(null, { status: 204 })
   }),
 ]

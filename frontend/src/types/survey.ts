@@ -333,3 +333,55 @@ export interface SurveyStatisticsResponse {
   average_completion_time_seconds: number | null
   questions: QuestionStatistics[]
 }
+
+// ---------------------------------------------------------------------------
+// Quota types (matching backend QuotaCondition, QuotaCreate, QuotaUpdate,
+// QuotaResponse, QuotaListResponse)
+// ---------------------------------------------------------------------------
+
+export type QuotaAction = 'terminate' | 'hide_question'
+
+export type QuotaOperator = 'eq' | 'neq' | 'gt' | 'lt' | 'gte' | 'lte' | 'in' | 'contains'
+
+export interface QuotaCondition {
+  question_id: string
+  operator: QuotaOperator
+  value: string | number | boolean | string[]
+}
+
+export interface QuotaCreate {
+  name: string
+  limit: number
+  action: QuotaAction
+  conditions: QuotaCondition[]
+  is_active?: boolean
+}
+
+export interface QuotaUpdate {
+  name?: string
+  limit?: number
+  action?: QuotaAction
+  conditions?: QuotaCondition[]
+  is_active?: boolean
+}
+
+export interface QuotaResponse {
+  id: string
+  survey_id: string
+  name: string
+  limit: number
+  current_count: number
+  action: QuotaAction
+  conditions: QuotaCondition[]
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface QuotaListResponse {
+  items: QuotaResponse[]
+  total: number
+  page: number
+  per_page: number
+  total_pages: number
+}
