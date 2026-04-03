@@ -8,7 +8,7 @@ which can be referenced in expressions via {RESPONDENT.attribute}.
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, String, text
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -34,10 +34,38 @@ class Participant(Base):
         nullable=True,
         index=True,
     )
+    token: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+        unique=True,
+        index=True,
+    )
+    email: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+    )
     attributes: Mapped[dict | None] = mapped_column(
         JSONB,
         nullable=True,
         default=dict,
+    )
+    uses_remaining: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+    valid_from: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+    valid_until: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+    completed: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default=text("false"),
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
