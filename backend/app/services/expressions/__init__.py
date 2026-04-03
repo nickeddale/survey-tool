@@ -30,6 +30,13 @@ from app.services.expressions.resolver import (
     build_expression_context,
     ResolverError,
 )
+from app.services.expressions.relevance import (
+    evaluate_relevance,
+    RelevanceResult,
+    CircularRelevanceError,
+    RelevanceEvaluationError,
+    clear_relevance_cache,
+)
 
 __all__ = [
     # Lexer
@@ -55,4 +62,10 @@ __all__ = [
     # Resolver
     "build_expression_context",
     "ResolverError",
+    # Relevance
+    "evaluate_relevance",
+    "RelevanceResult",
+    "CircularRelevanceError",
+    "RelevanceEvaluationError",
+    "clear_relevance_cache",
 ]
