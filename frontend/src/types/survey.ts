@@ -385,3 +385,49 @@ export interface QuotaListResponse {
   per_page: number
   total_pages: number
 }
+
+// ---------------------------------------------------------------------------
+// Assessment types (matching backend AssessmentCreate, AssessmentUpdate,
+// AssessmentResponse, AssessmentListResponse)
+// ---------------------------------------------------------------------------
+
+export type AssessmentScope = 'total' | 'group'
+
+export interface AssessmentCreate {
+  name: string
+  scope: AssessmentScope
+  group_id?: string | null
+  min_score: number
+  max_score: number
+  message: string
+}
+
+export interface AssessmentUpdate {
+  name?: string
+  scope?: AssessmentScope
+  group_id?: string | null
+  min_score?: number
+  max_score?: number
+  message?: string
+}
+
+export interface AssessmentResponse {
+  id: string
+  survey_id: string
+  name: string
+  scope: AssessmentScope
+  group_id: string | null
+  min_score: number
+  max_score: number
+  message: string
+  created_at: string
+  updated_at: string
+}
+
+export interface AssessmentListResponse {
+  items: AssessmentResponse[]
+  total: number
+  page: number
+  per_page: number
+  total_pages: number
+}

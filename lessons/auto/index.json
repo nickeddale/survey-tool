@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-03T20:15:08.214Z",
+  "lastUpdated": "2026-04-03T20:25:53.392Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2046,6 +2046,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "high"
+    },
+    {
+      "file": "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md",
+      "ticketId": "ISS-106",
+      "title": "7.11: Frontend — Assessment Configuration UI",
+      "date": "2026-04-03",
+      "categories": [
+        "frontend",
+        "react",
+        "ui-components",
+        "crud",
+        "forms"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -2981,7 +2997,8 @@
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
       "2026-04-03-iss-080-510-frontend-relevance-expression-builder-ui.md",
       "2026-04-03-iss-095-613-frontend-response-export-ui-and-statistics-das.md",
-      "2026-04-03-iss-105-710-frontend-quota-management-ui.md"
+      "2026-04-03-iss-105-710-frontend-quota-management-ui.md",
+      "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md"
     ],
     "vitest": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md"
@@ -3016,7 +3033,8 @@
     "react": [
       "2026-04-03-iss-080-510-frontend-relevance-expression-builder-ui.md",
       "2026-04-03-iss-095-613-frontend-response-export-ui-and-statistics-das.md",
-      "2026-04-03-iss-105-710-frontend-quota-management-ui.md"
+      "2026-04-03-iss-105-710-frontend-quota-management-ui.md",
+      "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md"
     ],
     "expression-builder": [
       "2026-04-03-iss-080-510-frontend-relevance-expression-builder-ui.md"
@@ -3026,7 +3044,8 @@
     ],
     "ui-components": [
       "2026-04-03-iss-080-510-frontend-relevance-expression-builder-ui.md",
-      "2026-04-03-iss-105-710-frontend-quota-management-ui.md"
+      "2026-04-03-iss-105-710-frontend-quota-management-ui.md",
+      "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md"
     ],
     "fastapi": [
       "2026-04-03-iss-089-67-response-detail-endpoint.md"
@@ -3064,6 +3083,12 @@
     "typescript": [
       "2026-04-03-iss-095-613-frontend-response-export-ui-and-statistics-das.md",
       "2026-04-03-iss-105-710-frontend-quota-management-ui.md"
+    ],
+    "crud": [
+      "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md"
+    ],
+    "forms": [
+      "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md"
     ]
   },
   "fileIndex": {}

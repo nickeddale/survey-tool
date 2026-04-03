@@ -303,6 +303,34 @@ export const mockNewTokens = {
   expires_in: 1800,
 }
 
+// Mock assessment data
+export const mockAssessments = [
+  {
+    id: 'assessment-00000000-0000-0000-0000-000000000001',
+    survey_id: '10000000-0000-0000-0000-000000000002',
+    name: 'High Satisfaction',
+    scope: 'total',
+    group_id: null,
+    min_score: 8,
+    max_score: 10,
+    message: 'You are highly satisfied!',
+    created_at: '2024-01-10T10:00:00Z',
+    updated_at: '2024-01-10T10:00:00Z',
+  },
+  {
+    id: 'assessment-00000000-0000-0000-0000-000000000002',
+    survey_id: '10000000-0000-0000-0000-000000000002',
+    name: 'Group Score Low',
+    scope: 'group',
+    group_id: 'g1',
+    min_score: 0,
+    max_score: 3,
+    message: 'Needs improvement in this area.',
+    created_at: '2024-01-11T10:00:00Z',
+    updated_at: '2024-01-11T10:00:00Z',
+  },
+]
+
 // Mock quota data
 export const mockQuotas = [
   {
@@ -1008,6 +1036,107 @@ export const handlers = [
 
   // DELETE /api/v1/surveys/:surveyId/quotas/:quotaId
   http.delete(`${BASE}/surveys/:surveyId/quotas/:quotaId`, ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  // ---------------------------------------------------------------------------
+  // Assessment endpoints
+  // ---------------------------------------------------------------------------
+
+  // GET /api/v1/surveys/:surveyId/assessments
+  http.get(`${BASE}/surveys/:surveyId/assessments`, ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const url = new URL(request.url)
+    const page = Math.max(1, parseInt(url.searchParams.get('page') ?? '1', 10) || 1)
+    const perPage = Math.max(1, parseInt(url.searchParams.get('per_page') ?? '10', 10) || 10)
+    const surveyAssessments = mockAssessments.filter((a) => a.survey_id === params.surveyId)
+    const total = surveyAssessments.length
+    const totalPages = Math.max(1, Math.ceil(total / perPage))
+    const start = (page - 1) * perPage
+    const items = surveyAssessments.slice(start, start + perPage)
+    return HttpResponse.json({ items, total, page, per_page: perPage, total_pages: totalPages }, { status: 200 })
+  }),
+
+  // GET /api/v1/surveys/:surveyId/assessments/:assessmentId
+  http.get(`${BASE}/surveys/:surveyId/assessments/:assessmentId`, ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const assessment = mockAssessments.find((a) => a.id === params.assessmentId && a.survey_id === params.surveyId)
+    if (!assessment) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Assessment not found' } },
+        { status: 404 },
+      )
+    }
+    return HttpResponse.json(assessment, { status: 200 })
+  }),
+
+  // POST /api/v1/surveys/:surveyId/assessments
+  http.post(`${BASE}/surveys/:surveyId/assessments`, async ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const body = (await request.json()) as Record<string, unknown>
+    const newAssessment = {
+      id: `assessment-new-${Date.now()}`,
+      survey_id: params.surveyId as string,
+      name: (body.name as string) ?? 'New Assessment',
+      scope: (body.scope as string) ?? 'total',
+      group_id: (body.group_id as string | null) ?? null,
+      min_score: (body.min_score as number) ?? 0,
+      max_score: (body.max_score as number) ?? 10,
+      message: (body.message as string) ?? '',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+    return HttpResponse.json(newAssessment, { status: 201 })
+  }),
+
+  // PATCH /api/v1/surveys/:surveyId/assessments/:assessmentId
+  http.patch(`${BASE}/surveys/:surveyId/assessments/:assessmentId`, async ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const assessment = mockAssessments.find((a) => a.id === params.assessmentId)
+    if (!assessment) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Assessment not found' } },
+        { status: 404 },
+      )
+    }
+    const body = (await request.json()) as Record<string, unknown>
+    const updated = { ...assessment, ...body, updated_at: new Date().toISOString() }
+    return HttpResponse.json(updated, { status: 200 })
+  }),
+
+  // DELETE /api/v1/surveys/:surveyId/assessments/:assessmentId
+  http.delete(`${BASE}/surveys/:surveyId/assessments/:assessmentId`, ({ request }) => {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(

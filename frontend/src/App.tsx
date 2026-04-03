@@ -15,6 +15,7 @@ import SurveyResponsePage from './pages/SurveyResponsePage'
 import ResponsesPage from './pages/ResponsesPage'
 import ResponseDetailPage from './pages/ResponseDetailPage'
 import QuotasPage from './pages/QuotasPage'
+import AssessmentsPage from './pages/AssessmentsPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
               <Route path="/surveys/:id/responses/:rid" element={<ResponseDetailPage />} />
               <Route path="/surveys/:id/responses" element={<ResponsesPage />} />
               <Route path="/surveys/:id/quotas" element={<QuotasPage />} />
+              <Route path="/surveys/:id/assessments" element={<AssessmentsPage />} />
               <Route path="/surveys/:id" element={<SurveyDetailPage />} />
               <Route path="/surveys" element={<SurveysPage />} />
             </Route>
