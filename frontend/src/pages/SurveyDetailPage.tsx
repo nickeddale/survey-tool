@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Pencil, Copy, Download, Trash2, ChevronRight, ChevronDown, List } from 'lucide-react'
+import { ArrowLeft, Pencil, Copy, Download, Trash2, ChevronRight, ChevronDown, List, BarChart2 } from 'lucide-react'
 import surveyService from '../services/surveyService'
 import type { SurveyFullResponse, QuestionGroupResponse, QuestionResponse } from '../types/survey'
 import { ApiError } from '../types/api'
@@ -619,6 +619,17 @@ function SurveyDetailPage() {
         >
           <List size={14} />
           Responses
+        </Button>
+
+        {/* Manage Quotas */}
+        <Button
+          variant="outline"
+          onClick={() => navigate(`/surveys/${survey.id}/quotas`)}
+          aria-label="Manage quotas"
+          data-testid="manage-quotas-button"
+        >
+          <BarChart2 size={14} />
+          Quotas
         </Button>
 
         {/* Always-available actions */}
