@@ -46,3 +46,27 @@ class UnprocessableError(AppError):
 class RateLimitedError(AppError):
     status_code = 429
     code = "RATE_LIMITED"
+
+
+class AnswerValidationError(AppError):
+    """Raised when one or more submitted answers fail server-side validation.
+
+    Produces HTTP 422 with the shape:
+        {detail: {code: VALIDATION_ERROR, message, errors: [{question_code, field, message}]}}
+    """
+
+    status_code = 422
+    code = "VALIDATION_ERROR"
+
+    def __init__(self, message: str, errors: list[dict]) -> None:
+        super().__init__(message)
+        self.errors = errors
+
+    def to_response(self) -> dict:
+        return {
+            "detail": {
+                "code": self.code,
+                "message": self.message,
+                "errors": self.errors,
+            }
+        }
