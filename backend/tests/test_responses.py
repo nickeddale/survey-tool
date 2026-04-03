@@ -259,3 +259,269 @@ async def test_submit_response_error_format_matches_standard(client: AsyncClient
     assert "detail" in body
     assert "code" in body["detail"]
     assert "message" in body["detail"]
+
+
+# --------------------------------------------------------------------------- #
+# POST /surveys/{id}/responses — answer validation (ISS-084)
+# --------------------------------------------------------------------------- #
+
+
+async def add_required_short_text_question(
+    client: AsyncClient, headers: dict, survey_id: str, code: str = "Q1"
+) -> str:
+    """Add a required short_text question; return its id."""
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": "Group"},
+        headers=headers,
+    )
+    assert group_resp.status_code == 201
+    group_id = group_resp.json()["id"]
+
+    q_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={
+            "title": "Required text",
+            "question_type": "short_text",
+            "code": code,
+            "is_required": True,
+        },
+        headers=headers,
+    )
+    assert q_resp.status_code == 201
+    return q_resp.json()["id"]
+
+
+async def add_numeric_question(
+    client: AsyncClient, headers: dict, survey_id: str, code: str = "NUM1",
+    settings: dict | None = None,
+) -> str:
+    """Add a numeric question; return its id."""
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": "Numeric Group"},
+        headers=headers,
+    )
+    assert group_resp.status_code == 201
+    group_id = group_resp.json()["id"]
+
+    payload = {
+        "title": "Numeric question",
+        "question_type": "numeric",
+        "code": code,
+        "is_required": False,
+    }
+    if settings:
+        payload["settings"] = settings
+
+    q_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json=payload,
+        headers=headers,
+    )
+    assert q_resp.status_code == 201
+    return q_resp.json()["id"]
+
+
+@pytest.mark.asyncio
+async def test_valid_answers_return_201(client: AsyncClient):
+    """Submitting valid answers for all questions returns 201."""
+    headers = await auth_headers(client, email="valid_ans@example.com")
+    survey_id = await create_survey(client, headers, title="Validation Survey")
+    question_id = await add_group_and_question(client, headers, survey_id)
+    await activate_survey(client, headers, survey_id)
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": question_id, "value": "A valid answer"}]},
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.asyncio
+async def test_required_answer_missing_returns_422(client: AsyncClient):
+    """Omitting a value for a required question returns 422 with VALIDATION_ERROR."""
+    headers = await auth_headers(client, email="req_missing@example.com")
+    survey_id = await create_survey(client, headers, title="Required Survey")
+    question_id = await add_required_short_text_question(
+        client, headers, survey_id, code="REQ1"
+    )
+    await activate_survey(client, headers, survey_id)
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": question_id, "value": None}]},
+    )
+    assert resp.status_code == 422
+    body = resp.json()
+    assert body["detail"]["code"] == "VALIDATION_ERROR"
+    assert "message" in body["detail"]
+    errors = body["detail"]["errors"]
+    assert isinstance(errors, list)
+    assert len(errors) >= 1
+    assert errors[0]["question_code"] == "REQ1"
+    assert "field" in errors[0]
+    assert "message" in errors[0]
+
+
+@pytest.mark.asyncio
+async def test_invalid_numeric_answer_returns_422(client: AsyncClient):
+    """Submitting a string for a numeric question returns 422 with VALIDATION_ERROR."""
+    headers = await auth_headers(client, email="inv_num@example.com")
+    survey_id = await create_survey(client, headers, title="Numeric Survey")
+    question_id = await add_numeric_question(client, headers, survey_id, code="NUM1")
+    await activate_survey(client, headers, survey_id)
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": question_id, "value": "not-a-number"}]},
+    )
+    assert resp.status_code == 422
+    body = resp.json()
+    assert body["detail"]["code"] == "VALIDATION_ERROR"
+    errors = body["detail"]["errors"]
+    assert isinstance(errors, list)
+    assert len(errors) >= 1
+    assert errors[0]["question_code"] == "NUM1"
+
+
+@pytest.mark.asyncio
+async def test_multiple_invalid_answers_all_collected(client: AsyncClient):
+    """When multiple answers are invalid, ALL errors are returned (not just first)."""
+    headers = await auth_headers(client, email="multi_err@example.com")
+    survey_id = await create_survey(client, headers, title="Multi Error Survey")
+
+    # Two required questions
+    q1_id = await add_required_short_text_question(
+        client, headers, survey_id, code="Q1"
+    )
+    q2_id = await add_required_short_text_question(
+        client, headers, survey_id, code="Q2"
+    )
+    await activate_survey(client, headers, survey_id)
+
+    # Both answers are None (required → both fail)
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={
+            "answers": [
+                {"question_id": q1_id, "value": None},
+                {"question_id": q2_id, "value": None},
+            ]
+        },
+    )
+    assert resp.status_code == 422
+    body = resp.json()
+    assert body["detail"]["code"] == "VALIDATION_ERROR"
+    errors = body["detail"]["errors"]
+    assert isinstance(errors, list)
+    assert len(errors) == 2
+    question_codes = {e["question_code"] for e in errors}
+    assert "Q1" in question_codes
+    assert "Q2" in question_codes
+
+
+@pytest.mark.asyncio
+async def test_validation_error_shape_is_exact(client: AsyncClient):
+    """The error response shape must be exactly {detail: {code, message, errors: [{question_code, field, message}]}}."""
+    headers = await auth_headers(client, email="shape_test@example.com")
+    survey_id = await create_survey(client, headers, title="Shape Survey")
+    q_id = await add_required_short_text_question(
+        client, headers, survey_id, code="SQ1"
+    )
+    await activate_survey(client, headers, survey_id)
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": q_id, "value": None}]},
+    )
+    assert resp.status_code == 422
+    body = resp.json()
+
+    # Top-level shape
+    assert set(body.keys()) == {"detail"}
+    detail = body["detail"]
+    assert "code" in detail
+    assert "message" in detail
+    assert "errors" in detail
+
+    # Per-error shape
+    error = detail["errors"][0]
+    assert "question_code" in error
+    assert "field" in error
+    assert "message" in error
+
+
+@pytest.mark.asyncio
+async def test_unknown_question_id_returns_422(client: AsyncClient):
+    """Submitting an answer for a question_id not in the survey returns 422."""
+    headers = await auth_headers(client, email="unk_q@example.com")
+    survey_id = await create_survey(client, headers, title="Unknown Q Survey")
+    # At least one real question to activate
+    await add_group_and_question(client, headers, survey_id)
+    await activate_survey(client, headers, survey_id)
+
+    unknown_id = "00000000-0000-0000-0000-000000000099"
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": unknown_id, "value": "hello"}]},
+    )
+    assert resp.status_code == 422
+    body = resp.json()
+    assert body["detail"]["code"] == "VALIDATION_ERROR"
+    assert "errors" in body["detail"]
+
+
+@pytest.mark.asyncio
+async def test_numeric_value_exceeds_max_returns_422(client: AsyncClient):
+    """A numeric answer that exceeds max_value returns 422 with correct error."""
+    headers = await auth_headers(client, email="num_max@example.com")
+    survey_id = await create_survey(client, headers, title="Numeric Max Survey")
+    q_id = await add_numeric_question(
+        client, headers, survey_id, code="NMAX",
+        settings={"min_value": 0, "max_value": 10},
+    )
+    await activate_survey(client, headers, survey_id)
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": q_id, "value": 999}]},
+    )
+    assert resp.status_code == 422
+    body = resp.json()
+    assert body["detail"]["code"] == "VALIDATION_ERROR"
+    errors = body["detail"]["errors"]
+    assert len(errors) >= 1
+    assert errors[0]["question_code"] == "NMAX"
+
+
+@pytest.mark.asyncio
+async def test_no_answers_skips_validation(client: AsyncClient):
+    """Submitting no answers bypasses validation and returns 201."""
+    headers = await auth_headers(client, email="no_ans@example.com")
+    survey_id = await create_survey(client, headers, title="No Answers Survey")
+    await add_group_and_question(client, headers, survey_id)
+    await activate_survey(client, headers, survey_id)
+
+    resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert resp.status_code == 201
+
+
+@pytest.mark.asyncio
+async def test_validation_error_detail_has_no_extra_top_level_keys(client: AsyncClient):
+    """Ensure no unexpected extra keys appear in the detail payload."""
+    headers = await auth_headers(client, email="extra_keys@example.com")
+    survey_id = await create_survey(client, headers, title="Extra Keys Survey")
+    q_id = await add_required_short_text_question(
+        client, headers, survey_id, code="EK1"
+    )
+    await activate_survey(client, headers, survey_id)
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": q_id, "value": None}]},
+    )
+    body = resp.json()
+    # Only these three keys should be in detail
+    detail_keys = set(body["detail"].keys())
+    assert detail_keys == {"code", "message", "errors"}

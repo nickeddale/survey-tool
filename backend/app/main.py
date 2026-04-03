@@ -20,6 +20,7 @@ from app.api.surveys import router as surveys_router
 from app.config import settings
 from app.utils.errors import (
     AppError,
+    AnswerValidationError,
     ConflictError,
     ForbiddenError,
     NotFoundError,
@@ -89,6 +90,16 @@ def _make_error_response(status_code: int, code: str, message: str) -> JSONRespo
     return JSONResponse(
         status_code=status_code,
         content={"detail": {"code": code, "message": message}},
+    )
+
+
+@app.exception_handler(AnswerValidationError)
+async def answer_validation_error_handler(
+    request: Request, exc: AnswerValidationError
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=exc.to_response(),
     )
 
 
