@@ -431,3 +431,59 @@ export interface AssessmentListResponse {
   per_page: number
   total_pages: number
 }
+
+// ---------------------------------------------------------------------------
+// Webhook types (matching backend WebhookCreate, WebhookUpdate,
+// WebhookResponse, WebhookListResponse)
+// ---------------------------------------------------------------------------
+
+export type WebhookEvent =
+  | 'response.created'
+  | 'response.updated'
+  | 'response.completed'
+  | 'survey.activated'
+  | 'survey.closed'
+
+export interface WebhookCreate {
+  url: string
+  events: WebhookEvent[]
+  survey_id?: string | null
+  is_active?: boolean
+}
+
+export interface WebhookUpdate {
+  url?: string
+  events?: WebhookEvent[]
+  survey_id?: string | null
+  is_active?: boolean
+}
+
+export interface WebhookResponse {
+  id: string
+  user_id: string
+  url: string
+  events: WebhookEvent[]
+  survey_id: string | null
+  is_active: boolean
+  secret: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface WebhookCreateResponse extends WebhookResponse {
+  secret: string
+}
+
+export interface WebhookListResponse {
+  items: WebhookResponse[]
+  total: number
+  page: number
+  per_page: number
+  total_pages: number
+}
+
+export interface WebhookTestResult {
+  success: boolean
+  status_code: number | null
+  error: string | null
+}

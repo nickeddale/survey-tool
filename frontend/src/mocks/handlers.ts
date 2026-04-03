@@ -331,6 +331,32 @@ export const mockAssessments = [
   },
 ]
 
+// Mock webhook data
+export const mockWebhooks = [
+  {
+    id: 'webhook-00000000-0000-0000-0000-000000000001',
+    user_id: '00000000-0000-0000-0000-000000000001',
+    url: 'https://example.com/webhook/survey-responses',
+    events: ['response.completed', 'response.created'],
+    survey_id: null,
+    is_active: true,
+    secret: null,
+    created_at: '2024-01-10T10:00:00Z',
+    updated_at: '2024-01-10T10:00:00Z',
+  },
+  {
+    id: 'webhook-00000000-0000-0000-0000-000000000002',
+    user_id: '00000000-0000-0000-0000-000000000001',
+    url: 'https://myapp.io/api/hooks/survey-events',
+    events: ['survey.activated', 'survey.closed'],
+    survey_id: '10000000-0000-0000-0000-000000000002',
+    is_active: false,
+    secret: null,
+    created_at: '2024-01-11T10:00:00Z',
+    updated_at: '2024-01-11T10:00:00Z',
+  },
+]
+
 // Mock quota data
 export const mockQuotas = [
   {
@@ -1145,5 +1171,123 @@ export const handlers = [
       )
     }
     return new HttpResponse(null, { status: 204 })
+  }),
+
+  // ---------------------------------------------------------------------------
+  // Webhook endpoints
+  // ---------------------------------------------------------------------------
+
+  // GET /api/v1/webhooks
+  http.get(`${BASE}/webhooks`, ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const url = new URL(request.url)
+    const page = Math.max(1, parseInt(url.searchParams.get('page') ?? '1', 10) || 1)
+    const perPage = Math.max(1, parseInt(url.searchParams.get('per_page') ?? '10', 10) || 10)
+    const total = mockWebhooks.length
+    const totalPages = Math.max(1, Math.ceil(total / perPage))
+    const start = (page - 1) * perPage
+    const items = mockWebhooks.slice(start, start + perPage)
+    return HttpResponse.json({ items, total, page, per_page: perPage, total_pages: totalPages }, { status: 200 })
+  }),
+
+  // GET /api/v1/webhooks/:webhookId
+  http.get(`${BASE}/webhooks/:webhookId`, ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const webhook = mockWebhooks.find((w) => w.id === params.webhookId)
+    if (!webhook) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Webhook not found' } },
+        { status: 404 },
+      )
+    }
+    return HttpResponse.json(webhook, { status: 200 })
+  }),
+
+  // POST /api/v1/webhooks
+  http.post(`${BASE}/webhooks`, async ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const body = (await request.json()) as Record<string, unknown>
+    const newWebhook = {
+      id: `webhook-new-${Date.now()}`,
+      user_id: '00000000-0000-0000-0000-000000000001',
+      url: (body.url as string) ?? 'https://example.com/webhook',
+      events: (body.events as string[]) ?? [],
+      survey_id: (body.survey_id as string | null) ?? null,
+      is_active: (body.is_active as boolean) ?? true,
+      secret: 'mock-webhook-secret-abc123xyz456def789',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+    return HttpResponse.json(newWebhook, { status: 201 })
+  }),
+
+  // PATCH /api/v1/webhooks/:webhookId
+  http.patch(`${BASE}/webhooks/:webhookId`, async ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const webhook = mockWebhooks.find((w) => w.id === params.webhookId)
+    if (!webhook) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Webhook not found' } },
+        { status: 404 },
+      )
+    }
+    const body = (await request.json()) as Record<string, unknown>
+    const updated = { ...webhook, ...body, updated_at: new Date().toISOString() }
+    return HttpResponse.json(updated, { status: 200 })
+  }),
+
+  // DELETE /api/v1/webhooks/:webhookId
+  http.delete(`${BASE}/webhooks/:webhookId`, ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  // POST /api/v1/webhooks/:webhookId/test
+  http.post(`${BASE}/webhooks/:webhookId/test`, ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const webhook = mockWebhooks.find((w) => w.id === params.webhookId)
+    if (!webhook) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Webhook not found' } },
+        { status: 404 },
+      )
+    }
+    return HttpResponse.json({ success: true, status_code: 200, error: null }, { status: 200 })
   }),
 ]

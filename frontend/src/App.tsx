@@ -16,6 +16,7 @@ import ResponsesPage from './pages/ResponsesPage'
 import ResponseDetailPage from './pages/ResponseDetailPage'
 import QuotasPage from './pages/QuotasPage'
 import AssessmentsPage from './pages/AssessmentsPage'
+import WebhooksPage from './pages/WebhooksPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 function App() {
@@ -46,6 +47,7 @@ function App() {
               <Route path="/surveys/:id/quotas" element={<QuotasPage />} />
               <Route path="/surveys/:id/assessments" element={<AssessmentsPage />} />
               <Route path="/surveys/:id" element={<SurveyDetailPage />} />
+              <Route path="/webhooks" element={<WebhooksPage />} />
               <Route path="/surveys" element={<SurveysPage />} />
             </Route>
             {/* Full-screen pages outside AppLayout */}
