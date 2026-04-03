@@ -1775,3 +1775,457 @@ async def test_get_response_detail_sensitive_fields_present_when_authenticated(
     assert "ip_address" in body
     assert body["ip_address"] == "198.51.100.1"
     assert "metadata" in body
+
+
+# --------------------------------------------------------------------------- #
+# GET /surveys/{id}/responses/export — response export CSV/JSON (ISS-090)
+# --------------------------------------------------------------------------- #
+
+
+import csv as _csv
+import io as _io
+
+
+async def add_multiple_choice_question(
+    client: AsyncClient,
+    headers: dict,
+    survey_id: str,
+    code: str = "MC1",
+) -> str:
+    """Add a multiple_choice question; return question_id."""
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": f"Group for {code}"},
+        headers=headers,
+    )
+    assert group_resp.status_code == 201
+    group_id = group_resp.json()["id"]
+
+    q_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": f"MC Question {code}", "question_type": "multiple_choice", "code": code},
+        headers=headers,
+    )
+    assert q_resp.status_code == 201
+    return q_resp.json()["id"]
+
+
+async def add_matrix_question_with_subquestions(
+    client: AsyncClient,
+    headers: dict,
+    survey_id: str,
+    parent_code: str = "Q5",
+) -> tuple[str, list[str]]:
+    """Add a matrix question with two subquestions. Returns (parent_q_id, [subq1_id, subq2_id])."""
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": f"Group for {parent_code}"},
+        headers=headers,
+    )
+    assert group_resp.status_code == 201
+    group_id = group_resp.json()["id"]
+
+    parent_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": f"Matrix {parent_code}", "question_type": "matrix", "code": parent_code},
+        headers=headers,
+    )
+    assert parent_resp.status_code == 201
+    parent_id = parent_resp.json()["id"]
+
+    subq_ids = []
+    for i, sq_code in enumerate(["SQ001", "SQ002"], start=1):
+        sq_resp = await client.post(
+            f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+            json={
+                "title": f"Subquestion {sq_code}",
+                "question_type": "matrix",
+                "code": sq_code,
+                "parent_id": parent_id,
+                "sort_order": i,
+            },
+            headers=headers,
+        )
+        assert sq_resp.status_code == 201
+        subq_ids.append(sq_resp.json()["id"])
+
+    return parent_id, subq_ids
+
+
+def parse_csv_response(content: bytes) -> tuple[list[str], list[dict[str, str]]]:
+    """Parse CSV bytes into (headers, rows). Each row is a dict keyed by header."""
+    text = content.decode("utf-8")
+    reader = _csv.DictReader(_io.StringIO(text))
+    headers = reader.fieldnames or []
+    rows = list(reader)
+    return list(headers), rows
+
+
+@pytest.mark.asyncio
+async def test_export_csv_returns_200_with_correct_content_type(client: AsyncClient):
+    """GET /export returns 200 with text/csv content-type."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/export",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    assert "text/csv" in resp.headers["content-type"]
+
+
+@pytest.mark.asyncio
+async def test_export_csv_has_content_disposition_attachment(client: AsyncClient):
+    """GET /export CSV response includes Content-Disposition: attachment header."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/export",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    content_disp = resp.headers.get("content-disposition", "")
+    assert "attachment" in content_disp
+    assert ".csv" in content_disp
+
+
+@pytest.mark.asyncio
+async def test_export_json_returns_200_with_json_content_type(client: AsyncClient):
+    """GET /export?format=json returns 200 with application/json content-type."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/export?format=json",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    assert "application/json" in resp.headers["content-type"]
+
+
+@pytest.mark.asyncio
+async def test_export_json_has_content_disposition_attachment(client: AsyncClient):
+    """GET /export?format=json response includes Content-Disposition: attachment header."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/export?format=json",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    content_disp = resp.headers.get("content-disposition", "")
+    assert "attachment" in content_disp
+    assert ".json" in content_disp
+
+
+@pytest.mark.asyncio
+async def test_export_csv_empty_survey_has_headers_only(client: AsyncClient):
+    """Empty survey (no responses) returns valid CSV with only the header row."""
+    headers = await auth_headers(client, email="export_empty@example.com")
+    survey_id = await create_survey(client, headers, title="Export Empty Survey")
+    await add_group_and_question(client, headers, survey_id)
+    await activate_survey(client, headers, survey_id)
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/export",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    col_headers, rows = parse_csv_response(resp.content)
+    # At minimum the meta headers should be present
+    assert "response_id" in col_headers
+    assert "status" in col_headers
+    assert rows == []
+
+
+@pytest.mark.asyncio
+async def test_export_csv_rows_match_response_count(client: AsyncClient):
+    """CSV export contains one data row per response in the survey."""
+    survey_id, question_id, headers = await create_active_survey(client)
+
+    # Create 3 responses
+    for _ in range(3):
+        await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/export",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    _col_headers, rows = parse_csv_response(resp.content)
+    assert len(rows) == 3
+
+
+@pytest.mark.asyncio
+async def test_export_csv_includes_question_code_as_column(client: AsyncClient):
+    """CSV export includes question codes as column headers."""
+    headers = await auth_headers(client, email="export_q_code@example.com")
+    survey_id = await create_survey(client, headers, title="Export QCode Survey")
+
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": "Group"},
+        headers=headers,
+    )
+    group_id = group_resp.json()["id"]
+    q_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": "My Q", "question_type": "short_text", "code": "MYCODE"},
+        headers=headers,
+    )
+    question_id = q_resp.json()["id"]
+    await activate_survey(client, headers, survey_id)
+
+    # Submit a response with an answer
+    post_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": question_id, "value": "hello export"}]},
+    )
+    assert post_resp.status_code == 201
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/export",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    col_headers, rows = parse_csv_response(resp.content)
+    assert "MYCODE" in col_headers
+    assert len(rows) == 1
+    assert rows[0]["MYCODE"] == "hello export"
+
+
+@pytest.mark.asyncio
+async def test_export_csv_column_filter_only_includes_specified_codes(client: AsyncClient):
+    """columns param restricts CSV output to only those question codes."""
+    headers = await auth_headers(client, email="export_col_filter@example.com")
+    survey_id = await create_survey(client, headers, title="Column Filter Survey")
+
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": "Group"},
+        headers=headers,
+    )
+    group_id = group_resp.json()["id"]
+
+    q1_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": "Q1", "question_type": "short_text", "code": "QONE"},
+        headers=headers,
+    )
+    q1_id = q1_resp.json()["id"]
+
+    q2_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": "Q2", "question_type": "short_text", "code": "QTWO"},
+        headers=headers,
+    )
+    q2_id = q2_resp.json()["id"]
+    await activate_survey(client, headers, survey_id)
+
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [
+            {"question_id": q1_id, "value": "val1"},
+            {"question_id": q2_id, "value": "val2"},
+        ]},
+    )
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/export?columns=QONE",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    col_headers, rows = parse_csv_response(resp.content)
+    assert "QONE" in col_headers
+    assert "QTWO" not in col_headers
+    assert rows[0]["QONE"] == "val1"
+
+
+@pytest.mark.asyncio
+async def test_export_csv_status_filter_excludes_non_matching(client: AsyncClient):
+    """status filter only exports responses matching that status."""
+    headers = await auth_headers(client, email="export_status_filter@example.com")
+    survey_id = await create_survey(client, headers, title="Status Filter Export Survey")
+    q_id = await add_required_short_text_question(client, headers, survey_id, code="SFQ")
+    await activate_survey(client, headers, survey_id)
+
+    # Create one incomplete response
+    r1 = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert r1.status_code == 201
+
+    # Create one complete response
+    r2 = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": q_id, "value": "done"}]},
+    )
+    assert r2.status_code == 201
+    r2_id = r2.json()["id"]
+    await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{r2_id}",
+        json={"status": "complete"},
+    )
+
+    # Export with status=complete only
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/export?status=complete",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    _col_headers, rows = parse_csv_response(resp.content)
+    assert len(rows) == 1
+    assert rows[0]["status"] == "complete"
+
+
+@pytest.mark.asyncio
+async def test_export_json_returns_array_with_question_code_keys(client: AsyncClient):
+    """JSON export returns array of objects with question_code keys in 'answers'."""
+    headers = await auth_headers(client, email="export_json_keys@example.com")
+    survey_id = await create_survey(client, headers, title="JSON Keys Survey")
+
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": "Group"},
+        headers=headers,
+    )
+    group_id = group_resp.json()["id"]
+    q_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": "JSON Q", "question_type": "short_text", "code": "JSONQ"},
+        headers=headers,
+    )
+    question_id = q_resp.json()["id"]
+    await activate_survey(client, headers, survey_id)
+
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": question_id, "value": "json value"}]},
+    )
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/export?format=json",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert isinstance(data, list)
+    assert len(data) == 1
+    item = data[0]
+    assert "response_id" in item
+    assert "status" in item
+    assert "answers" in item
+    assert "JSONQ" in item["answers"]
+    assert item["answers"]["JSONQ"] == "json value"
+
+
+@pytest.mark.asyncio
+async def test_export_unauthenticated_returns_403(client: AsyncClient):
+    """GET /export without auth returns 403."""
+    survey_id, _question_id, _headers = await create_active_survey(client)
+
+    resp = await client.get(f"{SURVEYS_URL}/{survey_id}/responses/export")
+    assert resp.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_export_wrong_owner_returns_404(client: AsyncClient):
+    """GET /export for a survey owned by another user returns 404 (no ownership oracle)."""
+    owner_headers = await auth_headers(client, email="export_owner@example.com")
+    survey_id = await create_survey(client, owner_headers, title="Export Owner Survey")
+    await add_group_and_question(client, owner_headers, survey_id)
+    await activate_survey(client, owner_headers, survey_id)
+
+    other_headers = await auth_headers(client, email="export_other@example.com")
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/export",
+        headers=other_headers,
+    )
+    assert resp.status_code == 404
+    body = resp.json()
+    assert body["detail"]["code"] == "NOT_FOUND"
+
+
+@pytest.mark.asyncio
+async def test_export_route_not_captured_as_response_id(client: AsyncClient):
+    """Accessing /export with auth must not be captured as a UUID response_id path param."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    # If 'export' were captured as response_id, this would return 404 (response not found).
+    # With correct route ordering it should return 200 (export endpoint).
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/export",
+        headers=headers,
+    )
+    # Should NOT be treated as a response_id lookup
+    assert resp.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_export_csv_multiple_choice_values_joined(client: AsyncClient):
+    """multiple_choice answer values are comma-joined within the CSV cell."""
+    headers = await auth_headers(client, email="export_mc@example.com")
+    survey_id = await create_survey(client, headers, title="MC Export Survey")
+    mc_question_id = await add_multiple_choice_question(client, headers, survey_id, code="MC1")
+    await activate_survey(client, headers, survey_id)
+
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": mc_question_id, "value": ["opt_a", "opt_b", "opt_c"]}]},
+    )
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/export",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    col_headers, rows = parse_csv_response(resp.content)
+    assert "MC1" in col_headers
+    assert len(rows) == 1
+    cell = rows[0]["MC1"]
+    # Should be comma-separated
+    values = cell.split(",")
+    assert set(values) == {"opt_a", "opt_b", "opt_c"}
+
+
+@pytest.mark.asyncio
+async def test_export_csv_response_with_no_answers_has_empty_columns(client: AsyncClient):
+    """A response with no answers produces a row with empty-string values for all question columns."""
+    headers = await auth_headers(client, email="export_no_answers@example.com")
+    survey_id = await create_survey(client, headers, title="No Answers Export Survey")
+
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": "Group"},
+        headers=headers,
+    )
+    group_id = group_resp.json()["id"]
+    q_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": "Q", "question_type": "short_text", "code": "EMPTY_Q"},
+        headers=headers,
+    )
+    question_id = q_resp.json()["id"]
+    await activate_survey(client, headers, survey_id)
+
+    # Submit response WITH an answer so the column appears in export
+    r1 = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": question_id, "value": "answered"}]},
+    )
+    assert r1.status_code == 201
+
+    # Submit response WITHOUT an answer
+    r2 = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert r2.status_code == 201
+    r2_id = r2.json()["id"]
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/export",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    col_headers, rows = parse_csv_response(resp.content)
+    assert "EMPTY_Q" in col_headers
+
+    # Find the row for r2
+    r2_row = next(row for row in rows if row["response_id"] == r2_id)
+    # Column value should be empty string, not KeyError
+    assert r2_row["EMPTY_Q"] == ""
