@@ -30,17 +30,29 @@ from app.models.webhook import Webhook
 logger = logging.getLogger(__name__)
 
 
+_RETRY_DELAYS = [10, 60, 300]  # seconds between retry attempts (exponential backoff)
+_TIMEOUT = httpx.Timeout(connect=5.0, read=10.0, write=5.0, pool=5.0)
+_USER_AGENT = "SurveyTool/1.0"
+
+
 async def _deliver_webhook(
     url: str,
     payload: dict,
     secret: str,
     webhook_id: uuid.UUID,
 ) -> None:
-    """Deliver a single webhook payload via HTTP POST.
+    """Deliver a single webhook payload via HTTP POST with retry logic.
 
     Uses httpx.AsyncClient as a context manager to ensure connection cleanup.
     Catches all exceptions to ensure delivery failures never surface to callers.
     Computes HMAC-SHA256 signature if the webhook has a non-empty secret.
+
+    Retries up to 3 times with exponential backoff (10s, 60s, 300s) on:
+    - httpx.TimeoutException
+    - httpx.ConnectError
+    - HTTP 5xx responses
+
+    Does NOT retry on HTTP 4xx (client errors).
 
     Args:
         url: The target URL to POST to.
@@ -48,41 +60,107 @@ async def _deliver_webhook(
         secret: The webhook secret for HMAC signing (may be empty string).
         webhook_id: The webhook UUID for logging context.
     """
-    try:
-        body = json.dumps(payload, default=str)
-        headers = {"Content-Type": "application/json"}
+    body = json.dumps(payload, default=str)
+    body_bytes = body.encode("utf-8")
+    headers = {
+        "Content-Type": "application/json",
+        "User-Agent": _USER_AGENT,
+    }
 
-        if secret:
-            signature = hmac.new(
-                secret.encode("utf-8"),
-                body.encode("utf-8"),
-                hashlib.sha256,
-            ).hexdigest()
-            headers["X-Webhook-Signature"] = f"sha256={signature}"
+    if secret:
+        signature = hmac.new(
+            secret.encode("utf-8"),
+            body_bytes,
+            hashlib.sha256,
+        ).hexdigest()
+        headers["X-Webhook-Signature"] = f"sha256={signature}"
 
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            response = await client.post(url, content=body, headers=headers)
+    max_attempts = len(_RETRY_DELAYS) + 1  # 4 total: 1 initial + 3 retries
+    for attempt in range(max_attempts):
+        try:
+            async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
+                response = await client.post(url, content=body, headers=headers)
+
+            if response.status_code >= 500:
+                # Retriable server error
+                if attempt < len(_RETRY_DELAYS):
+                    delay = _RETRY_DELAYS[attempt]
+                    logger.warning(
+                        "Webhook delivery attempt %d/%d failed (status=%d): "
+                        "webhook_id=%s url=%s — retrying in %ds",
+                        attempt + 1,
+                        max_attempts,
+                        response.status_code,
+                        webhook_id,
+                        url,
+                        delay,
+                    )
+                    await asyncio.sleep(delay)
+                    continue
+                else:
+                    logger.warning(
+                        "Webhook delivery failed after %d attempts (status=%d): "
+                        "webhook_id=%s url=%s",
+                        max_attempts,
+                        response.status_code,
+                        webhook_id,
+                        url,
+                    )
+                    return
+
             if response.status_code >= 400:
+                # Non-retriable client error
                 logger.warning(
-                    "Webhook delivery failed: webhook_id=%s url=%s status=%d",
+                    "Webhook delivery failed (status=%d, not retrying): "
+                    "webhook_id=%s url=%s",
+                    response.status_code,
                     webhook_id,
                     url,
-                    response.status_code,
                 )
+                return
+
+            logger.debug(
+                "Webhook delivered successfully (attempt=%d, status=%d): "
+                "webhook_id=%s url=%s",
+                attempt + 1,
+                response.status_code,
+                webhook_id,
+                url,
+            )
+            return
+
+        except (httpx.TimeoutException, httpx.ConnectError) as exc:
+            if attempt < len(_RETRY_DELAYS):
+                delay = _RETRY_DELAYS[attempt]
+                logger.warning(
+                    "Webhook delivery attempt %d/%d failed (%s): "
+                    "webhook_id=%s url=%s — retrying in %ds",
+                    attempt + 1,
+                    max_attempts,
+                    exc,
+                    webhook_id,
+                    url,
+                    delay,
+                )
+                await asyncio.sleep(delay)
             else:
-                logger.debug(
-                    "Webhook delivered: webhook_id=%s url=%s status=%d",
+                logger.warning(
+                    "Webhook delivery failed after %d attempts (%s): "
+                    "webhook_id=%s url=%s",
+                    max_attempts,
+                    exc,
                     webhook_id,
                     url,
-                    response.status_code,
                 )
-    except Exception as exc:  # noqa: BLE001
-        logger.warning(
-            "Webhook delivery error: webhook_id=%s url=%s error=%s",
-            webhook_id,
-            url,
-            exc,
-        )
+
+        except Exception as exc:  # noqa: BLE001
+            logger.warning(
+                "Webhook delivery error (unretriable): webhook_id=%s url=%s error=%s",
+                webhook_id,
+                url,
+                exc,
+            )
+            return
 
 
 async def _dispatch_task(
