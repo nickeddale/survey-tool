@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Pencil, Copy, Download, Trash2, ChevronRight, ChevronDown, List, BarChart2 } from 'lucide-react'
+import { ArrowLeft, Pencil, Copy, Download, Trash2, ChevronRight, ChevronDown, List, BarChart2, Users } from 'lucide-react'
 import surveyService from '../services/surveyService'
 import type { SurveyFullResponse, QuestionGroupResponse, QuestionResponse } from '../types/survey'
 import { ApiError } from '../types/api'
@@ -641,6 +641,17 @@ function SurveyDetailPage() {
         >
           <BarChart2 size={14} />
           Assessments
+        </Button>
+
+        {/* Manage Participants */}
+        <Button
+          variant="outline"
+          onClick={() => navigate(`/surveys/${survey.id}/participants`)}
+          aria-label="Manage participants"
+          data-testid="manage-participants-button"
+        >
+          <Users size={14} />
+          Participants
         </Button>
 
         {/* Always-available actions */}
