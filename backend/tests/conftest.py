@@ -30,10 +30,31 @@ TEST_DATABASE_URL = settings.database_url
 async def engine():
     _engine = create_async_engine(TEST_DATABASE_URL, echo=False)
     async with _engine.begin() as conn:
+        await conn.exec_driver_sql(
+            "DO $$ BEGIN"
+            " IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'survey_status') THEN"
+            " CREATE TYPE survey_status AS ENUM ('draft', 'active', 'closed', 'archived');"
+            " END IF; END $$"
+        )
+        await conn.exec_driver_sql(
+            "DO $$ BEGIN"
+            " IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'quota_action') THEN"
+            " CREATE TYPE quota_action AS ENUM ('terminate', 'hide_question');"
+            " END IF; END $$"
+        )
+        await conn.exec_driver_sql(
+            "DO $$ BEGIN"
+            " IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'assessment_scope') THEN"
+            " CREATE TYPE assessment_scope AS ENUM ('total', 'group');"
+            " END IF; END $$"
+        )
         await conn.run_sync(Base.metadata.create_all)
     yield _engine
     async with _engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+        await conn.exec_driver_sql("DROP TYPE IF EXISTS assessment_scope")
+        await conn.exec_driver_sql("DROP TYPE IF EXISTS quota_action")
+        await conn.exec_driver_sql("DROP TYPE IF EXISTS survey_status")
     await _engine.dispose()
 
 
