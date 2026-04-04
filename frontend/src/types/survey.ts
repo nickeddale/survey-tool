@@ -494,3 +494,54 @@ export interface WebhookTestResult {
   status_code: number | null
   error: string | null
 }
+
+// ---------------------------------------------------------------------------
+// Participant types (matching backend ParticipantCreate, ParticipantUpdate,
+// ParticipantResponse, ParticipantCreateResponse, ParticipantListResponse)
+// ---------------------------------------------------------------------------
+
+export interface ParticipantCreate {
+  email?: string | null
+  attributes?: Record<string, unknown> | null
+  uses_remaining?: number | null
+  valid_from?: string | null
+  valid_until?: string | null
+}
+
+export interface ParticipantBatchCreate {
+  items: ParticipantCreate[]
+}
+
+export interface ParticipantUpdate {
+  email?: string | null
+  attributes?: Record<string, unknown> | null
+  uses_remaining?: number | null
+  valid_from?: string | null
+  valid_until?: string | null
+  completed?: boolean
+}
+
+export interface ParticipantResponse {
+  id: string
+  survey_id: string
+  external_id: string | null
+  email: string | null
+  attributes: Record<string, unknown> | null
+  uses_remaining: number | null
+  valid_from: string | null
+  valid_until: string | null
+  completed: boolean
+  created_at: string
+}
+
+export interface ParticipantCreateResponse extends ParticipantResponse {
+  token: string
+}
+
+export interface ParticipantListResponse {
+  items: ParticipantResponse[]
+  total: number
+  page: number
+  per_page: number
+  pages: number
+}

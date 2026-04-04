@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-04T10:23:56.883Z",
+  "lastUpdated": "2026-04-04T11:17:42.996Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2122,6 +2122,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-04-iss-104-79-frontend-participant-management-ui.md",
+      "ticketId": "ISS-104",
+      "title": "7.9: Frontend — Participant Management UI",
+      "date": "2026-04-04",
+      "categories": [
+        "frontend",
+        "react",
+        "typescript",
+        "msw",
+        "vitest"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "high"
     }
   ],
   "categoryIndex": {
@@ -3085,13 +3101,16 @@
       "2026-04-03-iss-080-510-frontend-relevance-expression-builder-ui.md",
       "2026-04-03-iss-095-613-frontend-response-export-ui-and-statistics-das.md",
       "2026-04-03-iss-105-710-frontend-quota-management-ui.md",
-      "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md"
+      "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md",
+      "2026-04-04-iss-104-79-frontend-participant-management-ui.md"
     ],
     "vitest": [
-      "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md"
+      "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
+      "2026-04-04-iss-104-79-frontend-participant-management-ui.md"
     ],
     "msw": [
-      "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md"
+      "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
+      "2026-04-04-iss-104-79-frontend-participant-management-ui.md"
     ],
     "react-testing-library": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md"
@@ -3121,7 +3140,8 @@
       "2026-04-03-iss-080-510-frontend-relevance-expression-builder-ui.md",
       "2026-04-03-iss-095-613-frontend-response-export-ui-and-statistics-das.md",
       "2026-04-03-iss-105-710-frontend-quota-management-ui.md",
-      "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md"
+      "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md",
+      "2026-04-04-iss-104-79-frontend-participant-management-ui.md"
     ],
     "expression-builder": [
       "2026-04-03-iss-080-510-frontend-relevance-expression-builder-ui.md"
@@ -3169,7 +3189,8 @@
     ],
     "typescript": [
       "2026-04-03-iss-095-613-frontend-response-export-ui-and-statistics-das.md",
-      "2026-04-03-iss-105-710-frontend-quota-management-ui.md"
+      "2026-04-03-iss-105-710-frontend-quota-management-ui.md",
+      "2026-04-04-iss-104-79-frontend-participant-management-ui.md"
     ],
     "crud": [
       "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md"
