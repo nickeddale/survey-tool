@@ -1,0 +1,32 @@
+# Python cache
+__pycache__
+**/__pycache__
+*.pyc
+*.pyo
+
+# Test artifacts
+.pytest_cache
+.mypy_cache
+tests/
+
+# Environment and secrets
+.env
+.env.*
+
+# Virtual environments
+venv/
+.venv/
+
+# Package metadata
+*.egg-info/
+
+# Version control
+.git
+.gitignore
+
+# Docker files
+Dockerfile
+.dockerignore
+
+# Documentation
+README*
