@@ -310,3 +310,41 @@ async def test_create_webhook_exceeds_limit_returns_429(client: AsyncClient):
 
     response = await client.post(url, json=payload, headers=headers)
     assert response.status_code == 429
+
+
+@pytest.mark.asyncio
+async def test_validate_expression_exceeds_limit_returns_429(client: AsyncClient):
+    """The (LIMIT+1)th POST /surveys/{id}/logic/validate-expression should return 429."""
+    headers = await _get_auth_headers(client, "rl_validate_expr@example.com")
+    survey_id = "00000000-0000-0000-0000-000000000004"
+    url = f"/api/v1/surveys/{survey_id}/logic/validate-expression"
+    payload = {"expression": "1 == 1"}
+
+    for _ in range(DEFAULT_MUTATING_LIMIT):
+        await client.post(url, json=payload, headers=headers)
+
+    response = await client.post(url, json=payload, headers=headers)
+    assert response.status_code == 429
+    body = response.json()
+    assert "detail" in body
+    assert body["detail"]["code"] == "RATE_LIMITED"
+    assert "message" in body["detail"]
+
+
+@pytest.mark.asyncio
+async def test_resolve_flow_exceeds_limit_returns_429(client: AsyncClient):
+    """The (LIMIT+1)th POST /surveys/{id}/logic/resolve-flow should return 429."""
+    headers = await _get_auth_headers(client, "rl_resolve_flow@example.com")
+    survey_id = "00000000-0000-0000-0000-000000000005"
+    url = f"/api/v1/surveys/{survey_id}/logic/resolve-flow"
+    payload = {"answers": {}, "direction": "forward"}
+
+    for _ in range(DEFAULT_MUTATING_LIMIT):
+        await client.post(url, json=payload, headers=headers)
+
+    response = await client.post(url, json=payload, headers=headers)
+    assert response.status_code == 429
+    body = response.json()
+    assert "detail" in body
+    assert body["detail"]["code"] == "RATE_LIMITED"
+    assert "message" in body["detail"]
