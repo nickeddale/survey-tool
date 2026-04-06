@@ -6,7 +6,7 @@
  * For images, shows an image thumbnail. For other types, shows file info.
  */
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import type { BuilderQuestion } from '../../store/builderStore'
 import type { FileUploadSettings } from '../../types/questionSettings'
 
@@ -70,7 +70,16 @@ interface FilePreviewProps {
 
 function FilePreview({ file, onRemove }: FilePreviewProps) {
   const isImage = file.type.startsWith('image/')
-  const [previewUrl] = useState(() => (isImage ? URL.createObjectURL(file) : null))
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!isImage) return
+    const url = URL.createObjectURL(file)
+    setPreviewUrl(url)
+    return () => {
+      URL.revokeObjectURL(url)
+    }
+  }, [file, isImage])
 
   return (
     <div
