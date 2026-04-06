@@ -10,18 +10,17 @@ Provides:
         an optional current question, and a direction (forward/backward).
 """
 
-from __future__ import annotations
-
 import uuid
 from typing import Any, Dict, List, Literal, Optional
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 from pydantic import BaseModel
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.database import get_db
+from app.limiter import RATE_LIMITS, limiter
 from app.dependencies import get_current_user
 from app.models.answer_option import AnswerOption
 from app.models.question import Question
@@ -134,7 +133,9 @@ def _parse_survey_uuid(value: str) -> uuid.UUID:
         "Always returns 200; validation failures are reported in the errors list, not as HTTP errors."
     ),
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def validate_expression_endpoint(
+    request: Request,
     survey_id: str,
     payload: ValidateExpressionRequest,
     current_user: User = Depends(get_current_user),
@@ -283,7 +284,9 @@ class ResolveFlowResponse(BaseModel):
         "piped text substitutions, and per-question relevance validation for a given answer state."
     ),
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def resolve_flow_endpoint(
+    request: Request,
     survey_id: str,
     payload: ResolveFlowRequest,
     current_user: User = Depends(get_current_user),
