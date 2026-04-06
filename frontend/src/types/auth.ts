@@ -38,3 +38,33 @@ export interface UserUpdateRequest {
   name?: string | null
   password?: string | null
 }
+
+// API Key types — field names match backend ApiKeyResponse / ApiKeyCreateResponse schemas exactly
+
+export interface ApiKeyResponse {
+  id: string
+  name: string
+  key_prefix: string
+  scopes: string[] | null
+  is_active: boolean
+  last_used_at: string | null
+  expires_at: string | null
+  created_at: string
+}
+
+export interface ApiKeyCreateResponse {
+  id: string
+  name: string
+  key: string // full key — returned ONLY on creation, never again
+  key_prefix: string
+  scopes: string[] | null
+  is_active: boolean
+  expires_at: string | null
+  created_at: string
+}
+
+export interface ApiKeyCreate {
+  name: string
+  scopes?: string[] | null
+  expires_at?: string | null
+}

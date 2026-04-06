@@ -331,6 +331,30 @@ export const mockAssessments = [
   },
 ]
 
+// Mock API key data
+export const mockApiKeys = [
+  {
+    id: 'key-00000000-0000-0000-0000-000000000001',
+    name: 'Production Key',
+    key_prefix: 'sk_prod_abc1',
+    scopes: null,
+    is_active: true,
+    last_used_at: '2024-01-15T10:00:00Z',
+    expires_at: null,
+    created_at: '2024-01-10T10:00:00Z',
+  },
+  {
+    id: 'key-00000000-0000-0000-0000-000000000002',
+    name: 'Staging Key',
+    key_prefix: 'sk_stag_xyz9',
+    scopes: null,
+    is_active: true,
+    last_used_at: null,
+    expires_at: null,
+    created_at: '2024-01-11T10:00:00Z',
+  },
+]
+
 // Mock webhook data
 export const mockWebhooks = [
   {
@@ -1434,6 +1458,57 @@ export const handlers = [
 
   // DELETE /api/v1/surveys/:surveyId/participants/:participantId
   http.delete(`${BASE}/surveys/:surveyId/participants/:participantId`, ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  // ---------------------------------------------------------------------------
+  // API Key endpoints
+  // ---------------------------------------------------------------------------
+
+  // GET /api/v1/auth/keys
+  http.get(`${BASE}/auth/keys`, ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    return HttpResponse.json(mockApiKeys, { status: 200 })
+  }),
+
+  // POST /api/v1/auth/keys
+  http.post(`${BASE}/auth/keys`, async ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const body = (await request.json()) as { name?: string; scopes?: string[] | null; expires_at?: string | null }
+    const newKey = {
+      id: `key-new-${Date.now()}`,
+      name: body.name ?? 'New Key',
+      key: 'sk_live_mock_full_api_key_abc123xyz456def789ghi0jkl',
+      key_prefix: 'sk_live_mo',
+      scopes: body.scopes ?? null,
+      is_active: true,
+      expires_at: body.expires_at ?? null,
+      created_at: new Date().toISOString(),
+    }
+    return HttpResponse.json(newKey, { status: 201 })
+  }),
+
+  // DELETE /api/v1/auth/keys/:keyId
+  http.delete(`${BASE}/auth/keys/:keyId`, ({ request }) => {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
