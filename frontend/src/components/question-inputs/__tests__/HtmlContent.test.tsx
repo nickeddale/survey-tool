@@ -21,6 +21,7 @@ vi.mock('dompurify', () => ({
     sanitize: vi.fn((html: string) => {
       // Simple mock: strip <script> tags and inline event handlers
       return html
+        // eslint-disable-next-line security/detect-unsafe-regex -- test mock pattern, not used in production
         .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
         .replace(/\s+on\w+="[^"]*"/gi, '')
         .replace(/\s+on\w+='[^']*'/gi, '')

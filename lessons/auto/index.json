@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-06T16:47:14.288Z",
+  "lastUpdated": "2026-04-06T16:54:40.460Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2778,6 +2778,27 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md",
+      "ticketId": "ISS-143",
+      "title": "INF-08: Add security scanning tools",
+      "date": "2026-04-06",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -2913,7 +2934,8 @@
       "2026-04-06-iss-138-inf-03-add-dockerignore-files.md",
       "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md",
       "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md",
-      "2026-04-06-iss-141-inf-06-externalize-db-credentials-from-docker-comp.md"
+      "2026-04-06-iss-141-inf-06-externalize-db-credentials-from-docker-comp.md",
+      "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3034,7 +3056,8 @@
       "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md",
       "2026-04-06-iss-136-inf-01-add-cicd-pipeline-with-github-actions.md",
       "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md",
-      "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md"
+      "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md",
+      "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3140,7 +3163,8 @@
       "2026-04-06-iss-136-inf-01-add-cicd-pipeline-with-github-actions.md",
       "2026-04-06-iss-138-inf-03-add-dockerignore-files.md",
       "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md",
-      "2026-04-06-iss-141-inf-06-externalize-db-credentials-from-docker-comp.md"
+      "2026-04-06-iss-141-inf-06-externalize-db-credentials-from-docker-comp.md",
+      "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3270,7 +3294,8 @@
       "2026-04-06-iss-138-inf-03-add-dockerignore-files.md",
       "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md",
       "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md",
-      "2026-04-06-iss-142-inf-07-fix-packagejson-name.md"
+      "2026-04-06-iss-142-inf-07-fix-packagejson-name.md",
+      "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3432,7 +3457,8 @@
       "2026-04-06-iss-136-inf-01-add-cicd-pipeline-with-github-actions.md",
       "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md",
       "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md",
-      "2026-04-06-iss-142-inf-07-fix-packagejson-name.md"
+      "2026-04-06-iss-142-inf-07-fix-packagejson-name.md",
+      "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3562,7 +3588,8 @@
       "2026-04-06-iss-138-inf-03-add-dockerignore-files.md",
       "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md",
       "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md",
-      "2026-04-06-iss-141-inf-06-externalize-db-credentials-from-docker-comp.md"
+      "2026-04-06-iss-141-inf-06-externalize-db-credentials-from-docker-comp.md",
+      "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3673,7 +3700,8 @@
       "2026-04-06-iss-138-inf-03-add-dockerignore-files.md",
       "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md",
       "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md",
-      "2026-04-06-iss-141-inf-06-externalize-db-credentials-from-docker-comp.md"
+      "2026-04-06-iss-141-inf-06-externalize-db-credentials-from-docker-comp.md",
+      "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3784,7 +3812,8 @@
       "2026-04-06-iss-138-inf-03-add-dockerignore-files.md",
       "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md",
       "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md",
-      "2026-04-06-iss-141-inf-06-externalize-db-credentials-from-docker-comp.md"
+      "2026-04-06-iss-141-inf-06-externalize-db-credentials-from-docker-comp.md",
+      "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3910,7 +3939,8 @@
       "2026-04-06-iss-138-inf-03-add-dockerignore-files.md",
       "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md",
       "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md",
-      "2026-04-06-iss-142-inf-07-fix-packagejson-name.md"
+      "2026-04-06-iss-142-inf-07-fix-packagejson-name.md",
+      "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -4008,7 +4038,8 @@
       "2026-04-06-iss-133-rel-04-add-idempotency-key-to-webhook-delivery.md",
       "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md",
       "2026-04-06-iss-136-inf-01-add-cicd-pipeline-with-github-actions.md",
-      "2026-04-06-iss-141-inf-06-externalize-db-credentials-from-docker-comp.md"
+      "2026-04-06-iss-141-inf-06-externalize-db-credentials-from-docker-comp.md",
+      "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
