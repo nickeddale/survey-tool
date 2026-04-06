@@ -22,7 +22,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.quota import Quota
 from app.models.response import Response
-from app.services.webhook_service import dispatch_webhook_event
+from app.services.event_dispatcher import get_dispatcher
 from app.utils.errors import ForbiddenError
 
 
@@ -259,7 +259,7 @@ async def _emit_quota_reached(
         response_id: The UUID of the response that triggered the limit.
         new_count: The new current_count value after increment.
     """
-    dispatch_webhook_event(
+    get_dispatcher()(
         event="quota.reached",
         survey_id=quota.survey_id,
         data={

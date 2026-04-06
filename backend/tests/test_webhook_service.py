@@ -835,7 +835,7 @@ async def test_response_started_event_dispatched(client: AsyncClient):
     def fake_dispatch(event, survey_id, data):
         dispatched_events.append({"event": event, "survey_id": survey_id})
 
-    with patch("app.services.response_service.dispatch_webhook_event", side_effect=fake_dispatch):
+    with patch("app.services.event_dispatcher._dispatcher", side_effect=fake_dispatch):
         resp = await client.post(
             f"{SURVEYS_URL}/{survey_id}/responses",
             json={},
@@ -857,7 +857,7 @@ async def test_response_completed_event_dispatched(client: AsyncClient):
     def fake_dispatch(event, survey_id, data):
         dispatched_events.append({"event": event, "survey_id": survey_id})
 
-    with patch("app.services.response_service.dispatch_webhook_event", side_effect=fake_dispatch):
+    with patch("app.services.event_dispatcher._dispatcher", side_effect=fake_dispatch):
         # Create response
         create_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
         assert create_resp.status_code == 201
@@ -902,7 +902,7 @@ async def test_survey_activated_event_dispatched(client: AsyncClient):
     def fake_dispatch(event, survey_id, data):
         dispatched_events.append({"event": event, "survey_id": survey_id})
 
-    with patch("app.services.survey_service.dispatch_webhook_event", side_effect=fake_dispatch):
+    with patch("app.services.event_dispatcher._dispatcher", side_effect=fake_dispatch):
         act_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/activate", headers=headers)
         assert act_resp.status_code == 200
 
@@ -921,7 +921,7 @@ async def test_survey_closed_event_dispatched(client: AsyncClient):
     def fake_dispatch(event, survey_id, data):
         dispatched_events.append({"event": event, "survey_id": survey_id})
 
-    with patch("app.services.survey_service.dispatch_webhook_event", side_effect=fake_dispatch):
+    with patch("app.services.event_dispatcher._dispatcher", side_effect=fake_dispatch):
         close_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/close", headers=headers)
         assert close_resp.status_code == 200
 
@@ -947,7 +947,7 @@ async def test_quota_reached_event_dispatched():
     def fake_dispatch(event, survey_id, data):
         dispatched.append({"event": event, "survey_id": survey_id, "data": data})
 
-    with patch("app.services.quota_service.dispatch_webhook_event", side_effect=fake_dispatch):
+    with patch("app.services.event_dispatcher._dispatcher", side_effect=fake_dispatch):
         await _emit_quota_reached(
             session=session_mock,
             quota=quota,

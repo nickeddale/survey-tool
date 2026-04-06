@@ -2,9 +2,9 @@
 
 Tests verify that the correct webhook events are dispatched when survey and
 response lifecycle actions occur. To avoid event-loop lifecycle issues with
-the fire-and-forget background task, all tests patch dispatch_webhook_event
-at the call-site module level (where the service module imports it), so the
-mock intercepts the call BEFORE it creates an asyncio background task.
+the fire-and-forget background task, all tests patch _dispatcher in the
+event_dispatcher module (the central dispatcher), so the mock intercepts
+the call BEFORE it creates an asyncio background task.
 
 Covers:
     - response.completed event dispatched on response completion
@@ -114,12 +114,12 @@ async def create_webhook(
 
 
 # ---------------------------------------------------------------------------
-# Helper: mock dispatch_webhook_event at the service call-site
+# Helper: mock dispatcher at the event_dispatcher module level
 # ---------------------------------------------------------------------------
 
 
 def make_dispatch_mock(captured: list[dict]):
-    """Return a mock for dispatch_webhook_event that captures calls to `captured`."""
+    """Return a mock for the event dispatcher that captures calls to `captured`."""
     def mock_dispatch(event: str, survey_id: uuid.UUID | None = None, data: dict | None = None) -> None:
         captured.append({
             "event": event,
@@ -145,7 +145,7 @@ async def test_webhook_dispatched_on_response_completed(client: AsyncClient):
 
     captured: list[dict] = []
 
-    with patch("app.services.response_service.dispatch_webhook_event",
+    with patch("app.services.event_dispatcher._dispatcher",
                side_effect=make_dispatch_mock(captured)):
         resp = await client.post(
             f"{SURVEYS_URL}/{survey_id}/responses",
@@ -180,7 +180,7 @@ async def test_webhook_dispatched_on_survey_activated(client: AsyncClient):
 
     captured: list[dict] = []
 
-    with patch("app.services.survey_service.dispatch_webhook_event",
+    with patch("app.services.event_dispatcher._dispatcher",
                side_effect=make_dispatch_mock(captured)):
         await activate_survey(client, headers, survey_id)
 
@@ -202,7 +202,7 @@ async def test_webhook_dispatched_on_response_started(client: AsyncClient):
 
     captured: list[dict] = []
 
-    with patch("app.services.response_service.dispatch_webhook_event",
+    with patch("app.services.event_dispatcher._dispatcher",
                side_effect=make_dispatch_mock(captured)):
         resp = await client.post(
             f"{SURVEYS_URL}/{survey_id}/responses",
@@ -249,7 +249,7 @@ async def test_webhook_payload_contains_required_fields(client: AsyncClient):
 
     captured: list[dict] = []
 
-    with patch("app.services.response_service.dispatch_webhook_event",
+    with patch("app.services.event_dispatcher._dispatcher",
                side_effect=make_dispatch_mock(captured)):
         resp = await client.post(
             f"{SURVEYS_URL}/{survey_id}/responses",
@@ -313,21 +313,19 @@ async def test_webhook_multiple_events_dispatched(client: AsyncClient):
 
     captured: list[dict] = []
 
-    with patch("app.services.response_service.dispatch_webhook_event",
+    with patch("app.services.event_dispatcher._dispatcher",
                side_effect=make_dispatch_mock(captured)):
-        with patch("app.services.survey_service.dispatch_webhook_event",
-                   side_effect=make_dispatch_mock(captured)):
-            await activate_survey(client, headers, survey_id)
+        await activate_survey(client, headers, survey_id)
 
-            resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
-            assert resp.status_code == 201
-            response_id = resp.json()["id"]
+        resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+        assert resp.status_code == 201
+        response_id = resp.json()["id"]
 
-            complete = await client.patch(
-                f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
-                json={"status": "complete"},
-            )
-            assert complete.status_code == 200
+        complete = await client.patch(
+            f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+            json={"status": "complete"},
+        )
+        assert complete.status_code == 200
 
     events_seen = {d["event"] for d in captured}
     assert "survey.activated" in events_seen, f"Expected survey.activated, got: {events_seen}"
@@ -353,7 +351,7 @@ async def test_webhook_global_scope_receives_all_surveys(client: AsyncClient):
 
     captured: list[dict] = []
 
-    with patch("app.services.response_service.dispatch_webhook_event",
+    with patch("app.services.event_dispatcher._dispatcher",
                side_effect=make_dispatch_mock(captured)):
         # Submit and complete on survey 1
         r1 = await client.post(f"{SURVEYS_URL}/{survey_id_1}/responses", json={})
@@ -420,7 +418,7 @@ async def test_quota_reached_webhook_event(client: AsyncClient):
 
     captured: list[dict] = []
 
-    with patch("app.services.quota_service.dispatch_webhook_event",
+    with patch("app.services.event_dispatcher._dispatcher",
                side_effect=make_dispatch_mock(captured)):
         # Submit response that fills the quota
         r = await client.post(
