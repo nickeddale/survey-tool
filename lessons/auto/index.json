@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-06T14:11:43.559Z",
+  "lastUpdated": "2026-04-06T14:20:16.687Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2536,6 +2536,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-06-iss-130-rel-01-add-errorboundary-component.md",
+      "ticketId": "ISS-130",
+      "title": "REL-01: Add ErrorBoundary component",
+      "date": "2026-04-06",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -2659,7 +2675,8 @@
       "2026-04-06-iss-126-cq-04-decouple-responseservice-from-webhookservice.md",
       "2026-04-06-iss-127-cq-05-add-precise-type-hints-in-validators.md",
       "2026-04-06-iss-128-cq-06-standardize-error-handling-rollback-exceptio.md",
-      "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md"
+      "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
+      "2026-04-06-iss-130-rel-01-add-errorboundary-component.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2772,7 +2789,8 @@
       "2026-04-06-iss-125-cq-03-consolidate-pagination-into-shared-dependenc.md",
       "2026-04-06-iss-126-cq-04-decouple-responseservice-from-webhookservice.md",
       "2026-04-06-iss-128-cq-06-standardize-error-handling-rollback-exceptio.md",
-      "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md"
+      "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
+      "2026-04-06-iss-130-rel-01-add-errorboundary-component.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2989,7 +3007,8 @@
       "2026-04-06-iss-126-cq-04-decouple-responseservice-from-webhookservice.md",
       "2026-04-06-iss-127-cq-05-add-precise-type-hints-in-validators.md",
       "2026-04-06-iss-128-cq-06-standardize-error-handling-rollback-exceptio.md",
-      "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md"
+      "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
+      "2026-04-06-iss-130-rel-01-add-errorboundary-component.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3139,7 +3158,8 @@
       "2026-04-06-iss-126-cq-04-decouple-responseservice-from-webhookservice.md",
       "2026-04-06-iss-127-cq-05-add-precise-type-hints-in-validators.md",
       "2026-04-06-iss-128-cq-06-standardize-error-handling-rollback-exceptio.md",
-      "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md"
+      "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
+      "2026-04-06-iss-130-rel-01-add-errorboundary-component.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3257,7 +3277,8 @@
       "2026-04-06-iss-126-cq-04-decouple-responseservice-from-webhookservice.md",
       "2026-04-06-iss-127-cq-05-add-precise-type-hints-in-validators.md",
       "2026-04-06-iss-128-cq-06-standardize-error-handling-rollback-exceptio.md",
-      "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md"
+      "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
+      "2026-04-06-iss-130-rel-01-add-errorboundary-component.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
