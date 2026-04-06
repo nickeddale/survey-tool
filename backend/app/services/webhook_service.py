@@ -11,6 +11,8 @@ Design notes:
 - All delivery failures are caught and logged; never propagated to the caller.
 - asyncio.create_task() schedules fire-and-forget delivery without blocking the request.
 - If a webhook has a secret, an HMAC-SHA256 X-Webhook-Signature header is included.
+- Each webhook delivery is assigned a stable UUID (delivery_id) shared across all retry
+  attempts, sent as X-Webhook-Delivery-Id header for idempotency/deduplication.
 """
 
 import asyncio
@@ -40,6 +42,7 @@ async def _deliver_webhook(
     payload: dict,
     secret: str,
     webhook_id: uuid.UUID,
+    delivery_id: uuid.UUID,
 ) -> None:
     """Deliver a single webhook payload via HTTP POST with retry logic.
 
@@ -59,12 +62,15 @@ async def _deliver_webhook(
         payload: The JSON-serializable payload dict.
         secret: The webhook secret for HMAC signing (may be empty string).
         webhook_id: The webhook UUID for logging context.
+        delivery_id: A stable UUID shared across all retry attempts for this delivery,
+            sent as X-Webhook-Delivery-Id header to allow receivers to deduplicate retries.
     """
     body = json.dumps(payload, default=str)
     body_bytes = body.encode("utf-8")
     headers = {
         "Content-Type": "application/json",
         "User-Agent": _USER_AGENT,
+        "X-Webhook-Delivery-Id": str(delivery_id),
     }
 
     if secret:
@@ -163,6 +169,172 @@ async def _deliver_webhook(
             return
 
 
+async def _deliver_and_log(
+    session_factory,
+    wh_id: uuid.UUID,
+    wh_url: str,
+    wh_secret: str,
+    payload: dict,
+    event: str,
+    delivery_id: uuid.UUID,
+) -> None:
+    """Deliver a webhook and persist a WebhookDeliveryLog row tracking the outcome.
+
+    Opens its own DB session to avoid DetachedInstanceError after the request completes.
+    Creates the log row as 'pending' before delivery, then updates to 'delivered' or 'failed'.
+
+    Args:
+        session_factory: An async_sessionmaker for opening DB sessions.
+        wh_id: The webhook UUID.
+        wh_url: The target URL.
+        wh_secret: The webhook secret for HMAC signing.
+        payload: The JSON payload dict.
+        event: The event name string.
+        delivery_id: Stable UUID for this delivery (shared across retries).
+    """
+    from app.models.webhook_delivery_log import WebhookDeliveryLog
+
+    # Insert log row as pending
+    log = WebhookDeliveryLog(
+        id=uuid.uuid4(),
+        webhook_id=wh_id,
+        delivery_id=delivery_id,
+        event=event,
+        payload=payload,
+        status="pending",
+        attempt_count=0,
+    )
+    async with session_factory() as session:
+        session.add(log)
+        await session.commit()
+
+    # Attempt delivery — _deliver_webhook never raises
+    last_error: str | None = None
+    attempt_count = 0
+    final_status = "failed"
+
+    # We wrap delivery to track attempts and capture errors
+    max_attempts = len(_RETRY_DELAYS) + 1
+    body = json.dumps(payload, default=str)
+    body_bytes = body.encode("utf-8")
+    headers = {
+        "Content-Type": "application/json",
+        "User-Agent": _USER_AGENT,
+        "X-Webhook-Delivery-Id": str(delivery_id),
+    }
+    if wh_secret:
+        signature = hmac.new(
+            wh_secret.encode("utf-8"),
+            body_bytes,
+            hashlib.sha256,
+        ).hexdigest()
+        headers["X-Webhook-Signature"] = f"sha256={signature}"
+
+    for attempt in range(max_attempts):
+        attempt_count = attempt + 1
+        try:
+            async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
+                response = await client.post(wh_url, content=body, headers=headers)
+
+            if response.status_code >= 500:
+                last_error = f"HTTP {response.status_code}"
+                if attempt < len(_RETRY_DELAYS):
+                    delay = _RETRY_DELAYS[attempt]
+                    logger.warning(
+                        "Webhook delivery attempt %d/%d failed (status=%d): "
+                        "webhook_id=%s url=%s — retrying in %ds",
+                        attempt + 1,
+                        max_attempts,
+                        response.status_code,
+                        wh_id,
+                        wh_url,
+                        delay,
+                    )
+                    await asyncio.sleep(delay)
+                    continue
+                else:
+                    logger.warning(
+                        "Webhook delivery failed after %d attempts (status=%d): "
+                        "webhook_id=%s url=%s",
+                        max_attempts,
+                        response.status_code,
+                        wh_id,
+                        wh_url,
+                    )
+                    break
+
+            if response.status_code >= 400:
+                last_error = f"HTTP {response.status_code}"
+                logger.warning(
+                    "Webhook delivery failed (status=%d, not retrying): "
+                    "webhook_id=%s url=%s",
+                    response.status_code,
+                    wh_id,
+                    wh_url,
+                )
+                break
+
+            logger.debug(
+                "Webhook delivered successfully (attempt=%d, status=%d): "
+                "webhook_id=%s url=%s",
+                attempt + 1,
+                response.status_code,
+                wh_id,
+                wh_url,
+            )
+            final_status = "delivered"
+            last_error = None
+            break
+
+        except (httpx.TimeoutException, httpx.ConnectError) as exc:
+            last_error = str(exc)
+            if attempt < len(_RETRY_DELAYS):
+                delay = _RETRY_DELAYS[attempt]
+                logger.warning(
+                    "Webhook delivery attempt %d/%d failed (%s): "
+                    "webhook_id=%s url=%s — retrying in %ds",
+                    attempt + 1,
+                    max_attempts,
+                    exc,
+                    wh_id,
+                    wh_url,
+                    delay,
+                )
+                await asyncio.sleep(delay)
+            else:
+                logger.warning(
+                    "Webhook delivery failed after %d attempts (%s): "
+                    "webhook_id=%s url=%s",
+                    max_attempts,
+                    exc,
+                    wh_id,
+                    wh_url,
+                )
+                break
+
+        except Exception as exc:  # noqa: BLE001
+            last_error = str(exc)
+            logger.warning(
+                "Webhook delivery error (unretriable): webhook_id=%s url=%s error=%s",
+                wh_id,
+                wh_url,
+                exc,
+            )
+            break
+
+    # Update log row with final outcome
+    async with session_factory() as session:
+        result = await session.execute(
+            select(WebhookDeliveryLog).where(WebhookDeliveryLog.delivery_id == delivery_id)
+        )
+        log_row = result.scalar_one_or_none()
+        if log_row is not None:
+            log_row.status = final_status
+            log_row.attempt_count = attempt_count
+            log_row.last_error = last_error
+            await session.commit()
+
+
 async def _dispatch_task(
     event: str,
     survey_id: uuid.UUID | None,
@@ -172,6 +344,9 @@ async def _dispatch_task(
 
     Opens its own DB session (not the request-scoped one) to avoid
     DetachedInstanceError after the request completes.
+
+    Generates a unique delivery_id UUID per webhook target. This delivery_id
+    is reused across all retry attempts for that target, enabling idempotency.
 
     Args:
         event: The event name (e.g. "response.started").
@@ -192,11 +367,14 @@ async def _dispatch_task(
             webhooks = await _query_matching_webhooks(session, event, survey_id)
 
         delivery_tasks = [
-            _deliver_webhook(
-                url=wh_url,
+            _deliver_and_log(
+                session_factory=async_session,
+                wh_id=wh_id,
+                wh_url=wh_url,
+                wh_secret=wh_secret,
                 payload=payload,
-                secret=wh_secret,
-                webhook_id=wh_id,
+                event=event,
+                delivery_id=uuid.uuid4(),
             )
             for wh_id, wh_url, wh_secret in webhooks
         ]
