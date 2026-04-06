@@ -5,6 +5,7 @@ max_length, custom_expression} rules dict stored in Question.validation.
 """
 
 import re
+from typing import Any
 
 from app.services.validators._types import QuestionValidationError
 
@@ -15,7 +16,7 @@ _ALLOWED_KEYS = frozenset(
 
 
 def validate_validation_rules(
-    validation: dict | None,
+    validation: dict[str, Any] | None,
     question_type: str,  # reserved for future per-type constraints
 ) -> list[QuestionValidationError]:
     """Validate the `validation` JSONB dict.

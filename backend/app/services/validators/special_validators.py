@@ -1,5 +1,7 @@
 """Validators for special question types: ranking, image_picker, file_upload (settings), expression, html."""
 
+from typing import Any
+
 from app.utils.errors import UnprocessableError
 
 
@@ -8,7 +10,7 @@ from app.utils.errors import UnprocessableError
 # ---------------------------------------------------------------------------
 
 
-def validate_ranking_settings(settings: dict | None, answer_options: list) -> None:
+def validate_ranking_settings(settings: dict[str, Any] | None, answer_options: list[Any]) -> None:
     """Validate settings for ranking questions.
 
     Requires at least one answer_option.
@@ -26,7 +28,7 @@ def validate_ranking_settings(settings: dict | None, answer_options: list) -> No
         raise UnprocessableError("settings.randomize_initial_order must be a boolean")
 
 
-def validate_ranking_answer(answer: dict, question, answer_options: list) -> None:
+def validate_ranking_answer(answer: dict[str, Any], question: Any, answer_options: list[Any]) -> None:
     """Validate a submitted answer for a ranking question.
 
     answer: {"values": [str, ...]}  — ordered list of all option codes exactly once.
@@ -89,7 +91,7 @@ def validate_ranking_answer(answer: dict, question, answer_options: list) -> Non
 _VALID_IMAGE_DIMENSIONS = (None,)  # image_width/height are optional positive ints
 
 
-def validate_image_picker_settings(settings: dict | None, answer_options: list) -> None:
+def validate_image_picker_settings(settings: dict[str, Any] | None, answer_options: list[Any]) -> None:
     """Validate settings for image_picker questions.
 
     Requires at least one answer_option.
@@ -138,7 +140,7 @@ def validate_image_picker_settings(settings: dict | None, answer_options: list) 
             raise UnprocessableError("settings.max_choices must be >= settings.min_choices")
 
 
-def validate_image_picker_answer(answer: dict, question, answer_options: list) -> None:
+def validate_image_picker_answer(answer: dict[str, Any], question: Any, answer_options: list[Any]) -> None:
     """Validate a submitted answer for an image_picker question.
 
     Single-select: answer {"value": str | None}
@@ -193,7 +195,7 @@ _VALID_FILE_TYPES = frozenset({
 })
 
 
-def validate_file_upload_settings(settings: dict | None) -> None:
+def validate_file_upload_settings(settings: dict[str, Any] | None) -> None:
     """Validate settings for file_upload questions.
 
     Optional fields:
@@ -236,7 +238,7 @@ def validate_file_upload_settings(settings: dict | None) -> None:
 # ---------------------------------------------------------------------------
 
 
-def validate_expression_settings(settings: dict | None) -> None:
+def validate_expression_settings(settings: dict[str, Any] | None) -> None:
     """Validate settings for expression (computed value) questions.
 
     Optional fields: expression (str), display_format (str).
@@ -257,7 +259,7 @@ def validate_expression_settings(settings: dict | None) -> None:
 # ---------------------------------------------------------------------------
 
 
-def validate_html_settings(settings: dict | None) -> None:
+def validate_html_settings(settings: dict[str, Any] | None) -> None:
     """Validate settings for html (static content block) questions.
 
     Optional fields: content (str — HTML markup).

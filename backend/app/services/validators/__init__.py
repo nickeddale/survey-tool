@@ -7,7 +7,7 @@ Provides:
 - VALIDATOR_REGISTRY: maps question_type -> (config_validator, answer_validator) callables
 """
 
-from typing import Callable
+from typing import Any, Callable
 
 from app.services.validators._types import QuestionValidationError
 from app.services.validators.choice_validators import (
@@ -98,7 +98,7 @@ _SPECIAL_CHOICE_TYPES = frozenset({"ranking", "image_picker"})
 # Matrix: (settings, answer_options, subquestions) -> None
 # Scalar: (settings) -> None
 # Text/Misc: no settings validator defined; skipped.
-_CONFIG_VALIDATORS: dict[str, Callable] = {
+_CONFIG_VALIDATORS: dict[str, Callable[..., None]] = {
     # choice
     "single_choice": validate_radio_settings,
     "dropdown": validate_dropdown_settings,
@@ -127,7 +127,7 @@ _CONFIG_VALIDATORS: dict[str, Callable] = {
 
 # Answer validators: keyed by type, value is the answer-validator callable.
 # Signatures vary per family — the dispatcher handles calling conventions.
-_ANSWER_VALIDATORS: dict[str, Callable] = {
+_ANSWER_VALIDATORS: dict[str, Callable[..., None]] = {
     # choice (signature: answer, question, answer_options)
     "single_choice": validate_radio_answer,
     "dropdown": validate_dropdown_answer,
@@ -169,10 +169,10 @@ _ANSWER_VALIDATORS: dict[str, Callable] = {
 
 def validate_question_config(
     question_type: str,
-    settings: dict | None,
-    validation: dict | None,
-    answer_options: list | None = None,
-    subquestions: list | None = None,
+    settings: dict[str, Any] | None,
+    validation: dict[str, Any] | None,
+    answer_options: list[Any] | None = None,
+    subquestions: list[Any] | None = None,
 ) -> list[QuestionValidationError]:
     """Validate question config (settings + validation JSONB) for any question type.
 
@@ -208,10 +208,10 @@ def validate_question_config(
 
 
 def validate_answer(
-    answer: dict,
-    question,
-    answer_options: list | None = None,
-    subquestions: list | None = None,
+    answer: dict[str, Any],
+    question: Any,
+    answer_options: list[Any] | None = None,
+    subquestions: list[Any] | None = None,
 ) -> list[QuestionValidationError]:
     """Validate a response answer against the question type, settings, and validation rules.
 

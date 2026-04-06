@@ -1,6 +1,7 @@
 """Validators for scalar question types: numeric, rating, boolean, date."""
 
 from datetime import datetime
+from typing import Any
 
 from app.utils.errors import UnprocessableError
 
@@ -10,7 +11,7 @@ from app.utils.errors import UnprocessableError
 # ---------------------------------------------------------------------------
 
 
-def validate_numeric_settings(settings: dict | None) -> None:
+def validate_numeric_settings(settings: dict[str, Any] | None) -> None:
     """Validate settings for numeric questions.
 
     Optional fields: min_value (number), max_value (number), step (number > 0),
@@ -47,7 +48,7 @@ def validate_numeric_settings(settings: dict | None) -> None:
         raise UnprocessableError("settings.placeholder must be a string")
 
 
-def validate_rating_settings(settings: dict | None) -> None:
+def validate_rating_settings(settings: dict[str, Any] | None) -> None:
     """Validate settings for rating questions.
 
     Optional fields: min_rating (int, default 1), max_rating (int, default 5),
@@ -82,7 +83,7 @@ def validate_rating_settings(settings: dict | None) -> None:
             )
 
 
-def validate_boolean_settings(settings: dict | None) -> None:
+def validate_boolean_settings(settings: dict[str, Any] | None) -> None:
     """Validate settings for boolean questions.
 
     Optional fields: label_true (str, default 'Yes'), label_false (str, default 'No'),
@@ -106,7 +107,7 @@ def validate_boolean_settings(settings: dict | None) -> None:
             )
 
 
-def validate_date_settings(settings: dict | None) -> None:
+def validate_date_settings(settings: dict[str, Any] | None) -> None:
     """Validate settings for date questions.
 
     Optional fields: min_date (str), max_date (str),
@@ -156,7 +157,7 @@ def validate_date_settings(settings: dict | None) -> None:
 # ---------------------------------------------------------------------------
 
 
-def validate_numeric_answer(answer: dict, question) -> None:
+def validate_numeric_answer(answer: dict[str, Any], question: Any) -> None:
     """Validate a submitted answer for a numeric question.
 
     answer: {"value": number | None}
@@ -198,7 +199,7 @@ def validate_numeric_answer(answer: dict, question) -> None:
             )
 
 
-def validate_rating_answer(answer: dict, question) -> None:
+def validate_rating_answer(answer: dict[str, Any], question: Any) -> None:
     """Validate a submitted answer for a rating question.
 
     answer: {"value": int | None}
@@ -230,7 +231,7 @@ def validate_rating_answer(answer: dict, question) -> None:
         )
 
 
-def validate_boolean_answer(answer: dict, question) -> None:
+def validate_boolean_answer(answer: dict[str, Any], question: Any) -> None:
     """Validate a submitted answer for a boolean question.
 
     answer: {"value": str | None}
@@ -248,7 +249,7 @@ def validate_boolean_answer(answer: dict, question) -> None:
         raise UnprocessableError("Answer value must be 'true' or 'false'")
 
 
-def validate_date_answer(answer: dict, question) -> None:
+def validate_date_answer(answer: dict[str, Any], question: Any) -> None:
     """Validate a submitted answer for a date question.
 
     answer: {"value": str | None}

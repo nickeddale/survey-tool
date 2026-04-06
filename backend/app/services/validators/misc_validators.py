@@ -10,6 +10,7 @@ Each validator:
 
 import re
 from datetime import datetime as dt
+from typing import Any
 
 from app.utils.errors import UnprocessableError
 
@@ -19,7 +20,7 @@ from app.utils.errors import UnprocessableError
 # ---------------------------------------------------------------------------
 
 
-def validate_scale_answer(answer: dict, question) -> None:
+def validate_scale_answer(answer: dict[str, Any], question: Any) -> None:
     """Validate a submitted answer for a scale question.
 
     answer: {"value": int | None}
@@ -59,7 +60,7 @@ def validate_scale_answer(answer: dict, question) -> None:
 # ---------------------------------------------------------------------------
 
 
-def validate_yes_no_answer(answer: dict, question) -> None:
+def validate_yes_no_answer(answer: dict[str, Any], question: Any) -> None:
     """Validate a submitted answer for a yes_no question.
 
     answer: {"value": str | None}
@@ -85,7 +86,7 @@ _TIME_FORMAT = "%H:%M"
 _TIME_FORMAT_WITH_SECONDS = "%H:%M:%S"
 
 
-def validate_time_answer(answer: dict, question) -> None:
+def validate_time_answer(answer: dict[str, Any], question: Any) -> None:
     """Validate a submitted answer for a time question.
 
     answer: {"value": str | None}
@@ -129,7 +130,7 @@ _DATETIME_FORMATS = (
 )
 
 
-def validate_datetime_answer(answer: dict, question) -> None:
+def validate_datetime_answer(answer: dict[str, Any], question: Any) -> None:
     """Validate a submitted answer for a datetime question.
 
     answer: {"value": str | None}
@@ -194,7 +195,7 @@ def validate_datetime_answer(answer: dict, question) -> None:
 # ---------------------------------------------------------------------------
 
 
-def validate_file_upload_answer(answer: dict, question) -> None:
+def validate_file_upload_answer(answer: dict[str, Any], question: Any) -> None:
     """Validate a submitted answer for a file_upload question.
 
     answer: {"value": str | None}  (file URL or identifier)
@@ -211,7 +212,7 @@ def validate_file_upload_answer(answer: dict, question) -> None:
 # ---------------------------------------------------------------------------
 
 
-def validate_number_answer(answer: dict, question) -> None:
+def validate_number_answer(answer: dict[str, Any], question: Any) -> None:
     """Validate a submitted answer for a number question.
 
     answer: {"value": int | float | None}

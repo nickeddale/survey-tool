@@ -1,5 +1,7 @@
 """Custom exception classes that produce standardized {detail: {code, message}} responses."""
 
+from typing import Any
+
 
 class AppError(Exception):
     status_code: int = 500
@@ -9,7 +11,7 @@ class AppError(Exception):
         super().__init__(message)
         self.message = message
 
-    def to_response(self) -> dict:
+    def to_response(self) -> dict[str, Any]:
         return {"detail": {"code": self.code, "message": self.message}}
 
 
@@ -58,11 +60,11 @@ class AnswerValidationError(AppError):
     status_code = 422
     code = "VALIDATION_ERROR"
 
-    def __init__(self, message: str, errors: list[dict]) -> None:
+    def __init__(self, message: str, errors: list[dict[str, Any]]) -> None:
         super().__init__(message)
         self.errors = errors
 
-    def to_response(self) -> dict:
+    def to_response(self) -> dict[str, Any]:
         return {
             "detail": {
                 "code": self.code,
