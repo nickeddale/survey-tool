@@ -215,7 +215,7 @@ describe('RatingInput — required validation', () => {
   it('does not show errors before blur (untouched)', () => {
     const question = makeQuestion({ is_required: true })
     render(<RatingInput value="" onChange={vi.fn()} question={question} />)
-    expect(screen.queryByTestId('rating-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('shows required error on blur when no rating selected', () => {
@@ -224,7 +224,7 @@ describe('RatingInput — required validation', () => {
 
     fireEvent.blur(screen.getByTestId('rating-icons-group'))
 
-    expect(screen.getByTestId('rating-errors')).toHaveTextContent('This field is required.')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('This field is required.')
   })
 
   it('does not show required error when not required', () => {
@@ -233,7 +233,7 @@ describe('RatingInput — required validation', () => {
 
     fireEvent.blur(screen.getByTestId('rating-icons-group'))
 
-    expect(screen.queryByTestId('rating-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('shows required error after clicking an icon and clearing (via click)', async () => {
@@ -248,7 +248,7 @@ describe('RatingInput — required validation', () => {
 
     fireEvent.blur(screen.getByTestId('rating-icons-group'))
     // value prop is still "" (controlled), so should show error
-    expect(screen.getByTestId('rating-errors')).toBeInTheDocument()
+    expect(screen.getByTestId('validation-errors')).toBeInTheDocument()
   })
 })
 
@@ -261,7 +261,7 @@ describe('RatingInput — external errors prop', () => {
     render(
       <RatingInput value="" onChange={vi.fn()} question={makeQuestion()} errors={['Server error']} />
     )
-    expect(screen.getByTestId('rating-errors')).toHaveTextContent('Server error')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error')
   })
 })
 
@@ -289,7 +289,7 @@ describe('RatingInput — accessibility', () => {
     )
     const group = screen.getByTestId('rating-icons-group')
     expect(group).toHaveAttribute('aria-describedby', 'question-q-test-error')
-    expect(screen.getByTestId('rating-errors')).toHaveAttribute('id', 'question-q-test-error')
+    expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')
   })
 
   it('sets aria-label on each icon button', () => {

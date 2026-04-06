@@ -13,6 +13,7 @@
 import { useState, useMemo } from 'react'
 import type { BuilderQuestion } from '../../store/builderStore'
 import type { MatrixSettings } from '../../types/questionSettings'
+import { ValidationErrors } from '../common/ValidationErrors'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -173,15 +174,7 @@ export function MatrixInput({ value, onChange, question, errors: externalErrors 
         </table>
       </div>
 
-      {hasErrors && (
-        <ul id={errorId} role="alert" aria-live="assertive" className="space-y-0.5" data-testid="matrix-errors">
-          {displayErrors.map((err, i) => (
-            <li key={i} className="text-xs text-destructive">
-              {err}
-            </li>
-          ))}
-        </ul>
-      )}
+      <ValidationErrors errors={displayErrors} id={errorId} />
     </div>
   )
 }

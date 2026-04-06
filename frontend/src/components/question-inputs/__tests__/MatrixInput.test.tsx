@@ -278,7 +278,7 @@ describe('MatrixInput — is_all_rows_required validation', () => {
       subquestions,
     })
     render(<MatrixInput value={{}} onChange={vi.fn()} question={question} />)
-    expect(screen.queryByTestId('matrix-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('shows error on blur when is_all_rows_required and rows unanswered', () => {
@@ -294,7 +294,7 @@ describe('MatrixInput — is_all_rows_required validation', () => {
 
     fireEvent.blur(screen.getByTestId('matrix-input-q-matrix-1'))
 
-    expect(screen.getByTestId('matrix-errors')).toHaveTextContent('Please answer all rows.')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('Please answer all rows.')
   })
 
   it('does not show error when all rows are answered', () => {
@@ -310,7 +310,7 @@ describe('MatrixInput — is_all_rows_required validation', () => {
 
     fireEvent.blur(screen.getByTestId('matrix-input-q-matrix-1'))
 
-    expect(screen.queryByTestId('matrix-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('does not show error when is_all_rows_required is false', () => {
@@ -323,7 +323,7 @@ describe('MatrixInput — is_all_rows_required validation', () => {
 
     fireEvent.blur(screen.getByTestId('matrix-input-q-matrix-1'))
 
-    expect(screen.queryByTestId('matrix-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 })
 
@@ -337,7 +337,7 @@ describe('MatrixInput — external errors prop', () => {
     render(
       <MatrixInput value={{}} onChange={vi.fn()} question={question} errors={['Server error occurred']} />
     )
-    expect(screen.getByTestId('matrix-errors')).toHaveTextContent('Server error occurred')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error occurred')
   })
 
   it('overrides internal errors with external errors', () => {
@@ -349,7 +349,7 @@ describe('MatrixInput — external errors prop', () => {
     render(
       <MatrixInput value={{}} onChange={vi.fn()} question={question} errors={['External error']} />
     )
-    expect(screen.getByTestId('matrix-errors')).toHaveTextContent('External error')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('External error')
     expect(screen.queryByText('Please answer all rows.')).not.toBeInTheDocument()
   })
 })
@@ -376,13 +376,13 @@ describe('MatrixInput — accessibility', () => {
     render(<MatrixInput value={{}} onChange={vi.fn()} question={question} errors={['Required']} />)
     const table = screen.getByRole('table')
     expect(table).toHaveAttribute('aria-describedby', 'question-q-test-error')
-    expect(screen.getByTestId('matrix-errors')).toHaveAttribute('id', 'question-q-test-error')
+    expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')
   })
 
   it('error list has role=alert and aria-live=assertive', () => {
     const question = makeQuestion()
     render(<MatrixInput value={{}} onChange={vi.fn()} question={question} errors={['Error']} />)
-    const errorList = screen.getByTestId('matrix-errors')
+    const errorList = screen.getByTestId('validation-errors')
     expect(errorList).toHaveAttribute('role', 'alert')
     expect(errorList).toHaveAttribute('aria-live', 'assertive')
   })

@@ -165,7 +165,7 @@ describe('LongTextInput — required validation', () => {
       await user.tab()
     })
 
-    const errors = await screen.findByTestId('long-text-errors')
+    const errors = await screen.findByTestId('validation-errors')
     expect(errors).toHaveTextContent('This field is required.')
   })
 
@@ -180,13 +180,13 @@ describe('LongTextInput — required validation', () => {
       await user.tab()
     })
 
-    expect(screen.queryByTestId('long-text-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('does not show error before blur', () => {
     const question = makeQuestion({ is_required: true, settings: makeSettings() })
     render(<LongTextInput value="" onChange={vi.fn()} question={question} />)
-    expect(screen.queryByTestId('long-text-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 })
 
@@ -206,7 +206,7 @@ describe('LongTextInput — max_length validation', () => {
       await user.tab()
     })
 
-    const errors = await screen.findByTestId('long-text-errors')
+    const errors = await screen.findByTestId('validation-errors')
     expect(errors).toHaveTextContent('10 characters')
   })
 })
@@ -221,7 +221,7 @@ describe('LongTextInput — external errors prop', () => {
     render(
       <LongTextInput value="" onChange={vi.fn()} question={question} errors={['Answer is required']} />
     )
-    expect(screen.getByTestId('long-text-errors')).toHaveTextContent('Answer is required')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('Answer is required')
   })
 })
 
@@ -251,6 +251,6 @@ describe('LongTextInput — accessibility', () => {
     )
     const textarea = screen.getByTestId('long-text-input')
     expect(textarea).toHaveAttribute('aria-describedby', 'question-q-long-abc-error')
-    expect(screen.getByTestId('long-text-errors')).toHaveAttribute('id', 'question-q-long-abc-error')
+    expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-long-abc-error')
   })
 })

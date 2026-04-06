@@ -8,6 +8,7 @@
 import { useState } from 'react'
 import type { BuilderQuestion } from '../../store/builderStore'
 import type { NumericSettings } from '../../types/questionSettings'
+import { ValidationErrors } from '../common/ValidationErrors'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -122,15 +123,7 @@ export function NumericInput({ value, onChange, question, errors: externalErrors
         )}
       </div>
 
-      {hasErrors && (
-        <ul id={errorId} role="alert" aria-live="assertive" className="space-y-0.5" data-testid="numeric-errors">
-          {displayErrors.map((err, i) => (
-            <li key={i} className="text-xs text-destructive">
-              {err}
-            </li>
-          ))}
-        </ul>
-      )}
+      <ValidationErrors errors={displayErrors} id={errorId} />
     </div>
   )
 }

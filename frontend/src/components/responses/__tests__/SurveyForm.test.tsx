@@ -353,8 +353,8 @@ describe('validation errors', () => {
     renderForm({ errors })
 
     // ShortTextInput renders errors when externalErrors prop is provided
-    expect(screen.getByTestId('short-text-errors')).toBeInTheDocument()
-    expect(screen.getByTestId('short-text-errors')).toHaveTextContent('This field is required.')
+    expect(screen.getByTestId('validation-errors')).toBeInTheDocument()
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('This field is required.')
   })
 })
 

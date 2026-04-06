@@ -263,7 +263,7 @@ describe('BooleanInput — required validation (toggle)', () => {
   it('does not show errors before blur (untouched)', () => {
     const question = makeQuestion({ is_required: true })
     render(<BooleanInput value="" onChange={vi.fn()} question={question} />)
-    expect(screen.queryByTestId('boolean-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('shows required error on blur when no value and required', () => {
@@ -272,7 +272,7 @@ describe('BooleanInput — required validation (toggle)', () => {
 
     fireEvent.blur(screen.getByTestId('boolean-toggle'))
 
-    expect(screen.getByTestId('boolean-errors')).toHaveTextContent('This field is required.')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('This field is required.')
   })
 
   it('does not show required error when not required', () => {
@@ -281,7 +281,7 @@ describe('BooleanInput — required validation (toggle)', () => {
 
     fireEvent.blur(screen.getByTestId('boolean-toggle'))
 
-    expect(screen.queryByTestId('boolean-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 })
 
@@ -295,7 +295,7 @@ describe('BooleanInput — required validation (radio)', () => {
 
     fireEvent.blur(screen.getByTestId('boolean-radio-group'))
 
-    expect(screen.getByTestId('boolean-errors')).toHaveTextContent('This field is required.')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('This field is required.')
   })
 })
 
@@ -308,7 +308,7 @@ describe('BooleanInput — external errors prop', () => {
     render(
       <BooleanInput value="" onChange={vi.fn()} question={makeQuestion()} errors={['Server error']} />
     )
-    expect(screen.getByTestId('boolean-errors')).toHaveTextContent('Server error')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error')
   })
 })
 
@@ -336,6 +336,6 @@ describe('BooleanInput — accessibility (toggle)', () => {
     )
     const toggle = screen.getByTestId('boolean-toggle')
     expect(toggle).toHaveAttribute('aria-describedby', 'question-q-test-error')
-    expect(screen.getByTestId('boolean-errors')).toHaveAttribute('id', 'question-q-test-error')
+    expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')
   })
 })

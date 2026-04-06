@@ -251,7 +251,7 @@ describe('HugeTextInput — required validation', () => {
       await user.tab()
     })
 
-    const errors = await screen.findByTestId('huge-text-errors')
+    const errors = await screen.findByTestId('validation-errors')
     expect(errors).toHaveTextContent('This field is required.')
   })
 
@@ -266,13 +266,13 @@ describe('HugeTextInput — required validation', () => {
       await user.tab()
     })
 
-    expect(screen.queryByTestId('huge-text-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('does not show error before blur', () => {
     const question = makeQuestion({ is_required: true, settings: makeSettings() })
     render(<HugeTextInput value="" onChange={vi.fn()} question={question} />)
-    expect(screen.queryByTestId('huge-text-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 })
 
@@ -292,7 +292,7 @@ describe('HugeTextInput — required validation in rich text mode', () => {
       await user.tab()
     })
 
-    const errors = await screen.findByTestId('huge-text-errors')
+    const errors = await screen.findByTestId('validation-errors')
     expect(errors).toHaveTextContent('This field is required.')
   })
 })
@@ -313,7 +313,7 @@ describe('HugeTextInput — max_length validation', () => {
       await user.tab()
     })
 
-    const errors = await screen.findByTestId('huge-text-errors')
+    const errors = await screen.findByTestId('validation-errors')
     expect(errors).toHaveTextContent('5 characters')
   })
 })
@@ -328,7 +328,7 @@ describe('HugeTextInput — external errors', () => {
     render(
       <HugeTextInput value="" onChange={vi.fn()} question={question} errors={['Server validation failed']} />
     )
-    expect(screen.getByTestId('huge-text-errors')).toHaveTextContent('Server validation failed')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server validation failed')
   })
 })
 
@@ -358,6 +358,6 @@ describe('HugeTextInput — accessibility', () => {
     )
     const textarea = screen.getByTestId('huge-text-textarea')
     expect(textarea).toHaveAttribute('aria-describedby', 'question-q-huge-abc-error')
-    expect(screen.getByTestId('huge-text-errors')).toHaveAttribute('id', 'question-q-huge-abc-error')
+    expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-huge-abc-error')
   })
 })

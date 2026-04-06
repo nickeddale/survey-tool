@@ -6,6 +6,7 @@ import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card'
+import { ValidationErrors } from '../components/common/ValidationErrors'
 
 interface FieldErrors {
   email?: string
@@ -89,11 +90,7 @@ function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
               />
-              {fieldErrors.email && (
-                <p className="text-sm text-destructive" role="alert">
-                  {fieldErrors.email}
-                </p>
-              )}
+              <ValidationErrors errors={fieldErrors.email ? [fieldErrors.email] : []} id="login-email-error" />
             </div>
             <div className="space-y-1">
               <Label htmlFor="password">Password</Label>
@@ -104,11 +101,7 @@ function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
               />
-              {fieldErrors.password && (
-                <p className="text-sm text-destructive" role="alert">
-                  {fieldErrors.password}
-                </p>
-              )}
+              <ValidationErrors errors={fieldErrors.password ? [fieldErrors.password] : []} id="login-password-error" />
             </div>
             <Button type="submit" disabled={isSubmitting} className="w-full">
               {isSubmitting ? 'Signing in...' : 'Sign In'}

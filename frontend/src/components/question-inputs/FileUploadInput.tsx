@@ -9,6 +9,7 @@
 import { useState, useRef, useEffect } from 'react'
 import type { BuilderQuestion } from '../../store/builderStore'
 import type { FileUploadSettings } from '../../types/questionSettings'
+import { ValidationErrors } from '../common/ValidationErrors'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -284,16 +285,7 @@ export function FileUploadInput({ value, onChange, question, errors: externalErr
         </div>
       )}
 
-      {/* Errors */}
-      {hasErrors && (
-        <ul id={errorId} role="alert" aria-live="assertive" className="space-y-0.5" data-testid="file-upload-errors">
-          {displayErrors.map((err, i) => (
-            <li key={i} className="text-xs text-destructive">
-              {err}
-            </li>
-          ))}
-        </ul>
-      )}
+      <ValidationErrors errors={displayErrors} id={errorId} />
     </div>
   )
 }

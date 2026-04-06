@@ -195,7 +195,7 @@ describe('RadioInput — required validation', () => {
   it('does not show errors before blur (untouched)', () => {
     const question = makeQuestion({ is_required: true })
     render(<RadioInput value="" onChange={vi.fn()} question={question} />)
-    expect(screen.queryByTestId('radio-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('shows required error on blur when no option selected', () => {
@@ -204,7 +204,7 @@ describe('RadioInput — required validation', () => {
 
     fireEvent.blur(screen.getByTestId('radio-options-grid'))
 
-    expect(screen.getByTestId('radio-errors')).toHaveTextContent('This field is required.')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('This field is required.')
   })
 
   it('does not show required error when not required', () => {
@@ -213,7 +213,7 @@ describe('RadioInput — required validation', () => {
 
     fireEvent.blur(screen.getByTestId('radio-options-grid'))
 
-    expect(screen.queryByTestId('radio-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('shows Other text required error when Other selected but no text', () => {
@@ -222,7 +222,7 @@ describe('RadioInput — required validation', () => {
 
     fireEvent.blur(screen.getByTestId('radio-options-grid'))
 
-    expect(screen.getByTestId('radio-errors')).toHaveTextContent('"Other"')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('"Other"')
   })
 })
 
@@ -277,7 +277,7 @@ describe('RadioInput — external errors prop', () => {
     render(
       <RadioInput value="" onChange={vi.fn()} question={question} errors={['Server error occurred']} />
     )
-    expect(screen.getByTestId('radio-errors')).toHaveTextContent('Server error occurred')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error occurred')
   })
 })
 
@@ -309,6 +309,6 @@ describe('RadioInput — accessibility', () => {
     render(<RadioInput value="" onChange={vi.fn()} question={question} errors={['Required']} />)
     const grid = screen.getByTestId('radio-options-grid')
     expect(grid).toHaveAttribute('aria-describedby', 'question-q-test-error')
-    expect(screen.getByTestId('radio-errors')).toHaveAttribute('id', 'question-q-test-error')
+    expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')
   })
 })
