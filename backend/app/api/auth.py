@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.database import get_db
-from app.limiter import limiter
+from app.limiter import RATE_LIMITS, limiter
 from app.dependencies import get_current_user
 from app.models.api_key import ApiKey
 from app.models.user import User
@@ -50,7 +50,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
     summary="Register a new user account",
     description="Create a new user account with email and password. Email must be unique.",
 )
-@limiter.limit("5/minute")
+@limiter.limit(RATE_LIMITS["auth_register"])
 async def register(
     request: Request,
     payload: UserCreate,
@@ -81,7 +81,7 @@ async def register(
     summary="Log in and receive access/refresh tokens",
     description="Authenticate with email and password. Returns a JWT access token and a refresh token.",
 )
-@limiter.limit("10/minute")
+@limiter.limit(RATE_LIMITS["auth_login"])
 async def login(
     request: Request,
     payload: LoginRequest,
@@ -111,7 +111,7 @@ async def login(
     summary="Refresh access token using a refresh token",
     description="Exchange a valid refresh token for a new access/refresh token pair. The old refresh token is revoked (rotation).",
 )
-@limiter.limit("10/minute")
+@limiter.limit(RATE_LIMITS["auth_refresh"])
 async def refresh(
     request: Request,
     payload: RefreshRequest,
@@ -148,7 +148,9 @@ async def refresh(
     summary="Revoke a refresh token",
     description="Revoke the provided refresh token. Subsequent refresh attempts with this token will be rejected.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def logout(
+    request: Request,
     payload: LogoutRequest,
     session: AsyncSession = Depends(get_db),
 ) -> None:
@@ -176,7 +178,9 @@ async def get_me(
     summary="Update current user profile",
     description="Update the display name or password of the currently authenticated user.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def update_me(
+    request: Request,
     payload: UserUpdateRequest,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
@@ -200,7 +204,9 @@ async def update_me(
     summary="Create an API key",
     description="Create a new API key for programmatic access. The raw key value is only returned once at creation time.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def create_key(
+    request: Request,
     payload: ApiKeyCreate,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
@@ -244,7 +250,9 @@ async def list_keys(
     summary="Revoke an API key",
     description="Permanently revoke an API key by ID. The key will no longer be accepted for authentication.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def delete_key(
+    request: Request,
     key_id: str,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),

@@ -1,10 +1,11 @@
 import uuid
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies import get_current_user
+from app.limiter import RATE_LIMITS, limiter
 from app.models.user import User
 from app.schemas.question_group import (
     QuestionGroupCreate,
@@ -41,7 +42,9 @@ def _parse_uuid(value: str, label: str = "resource") -> uuid.UUID:
     summary="Create a question group",
     description="Add a new question group (page/section) to a survey. Groups define the logical sections of a survey and can have relevance expressions.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def create(
+    request: Request,
     survey_id: str,
     payload: QuestionGroupCreate,
     current_user: User = Depends(get_current_user),
@@ -86,7 +89,9 @@ async def list_all(
     summary="Reorder question groups",
     description="Update the sort_order of multiple question groups in a single request.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def reorder(
+    request: Request,
     survey_id: str,
     payload: QuestionGroupReorderRequest,
     current_user: User = Depends(get_current_user),
@@ -136,7 +141,9 @@ async def get_one(
     summary="Update a question group",
     description="Partially update a question group's title, description, sort order, or relevance expression.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def patch(
+    request: Request,
     survey_id: str,
     group_id: str,
     payload: QuestionGroupUpdate,
@@ -164,7 +171,9 @@ async def patch(
     summary="Update question group translations for a language",
     description="Merge translation overrides for the specified language into the question group's translations store.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def update_translations(
+    request: Request,
     survey_id: str,
     group_id: str,
     payload: QuestionGroupTranslationsUpdate,
@@ -198,7 +207,9 @@ async def update_translations(
     summary="Delete a question group",
     description="Permanently delete a question group and all its questions and answer options.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def delete(
+    request: Request,
     survey_id: str,
     group_id: str,
     current_user: User = Depends(get_current_user),

@@ -4,13 +4,14 @@ import secrets
 import uuid
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Request, status
 from sqlalchemy import and_, func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies import get_current_user
+from app.limiter import RATE_LIMITS, limiter
 from app.models.participant import Participant
 from app.models.survey import Survey
 from app.models.user import User
@@ -98,7 +99,9 @@ def _build_participant(
     summary="Create a participant for a survey",
     description="Add a pre-registered participant to a survey. A unique access token is generated and returned only at creation time.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def create_participant(
+    request: Request,
     survey_id: str,
     payload: ParticipantCreate,
     current_user: User = Depends(get_current_user),
@@ -127,7 +130,9 @@ async def create_participant(
     summary="Batch-create participants for a survey",
     description="Create multiple participants in a single request. Each participant gets a unique token returned only at creation time.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def create_participants_batch(
+    request: Request,
     survey_id: str,
     payload: ParticipantBatchCreate,
     current_user: User = Depends(get_current_user),
@@ -273,7 +278,9 @@ async def get_participant(
     summary="Update a participant",
     description="Partially update a participant's email, attributes, usage limits, validity window, or completed status.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def update_participant(
+    request: Request,
     survey_id: str,
     participant_id: str,
     payload: ParticipantUpdate,
@@ -301,7 +308,9 @@ async def update_participant(
     summary="Delete a participant",
     description="Permanently delete a participant from a survey.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def delete_participant(
+    request: Request,
     survey_id: str,
     participant_id: str,
     current_user: User = Depends(get_current_user),
