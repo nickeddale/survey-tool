@@ -252,6 +252,43 @@ async def test_cors_header_present(plain_client):
 
 
 @pytest.mark.asyncio
+async def test_cors_preflight_returns_explicit_methods(plain_client):
+    """Preflight response lists only the explicitly allowed HTTP methods."""
+    resp = await plain_client.options(
+        "/health",
+        headers={
+            "Origin": "http://localhost:3000",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "Authorization",
+        },
+    )
+    assert resp.status_code == 200
+    allowed_methods = resp.headers.get("access-control-allow-methods", "")
+    for method in ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]:
+        assert method in allowed_methods, f"{method} missing from Allow-Methods"
+    assert "*" not in allowed_methods
+
+
+@pytest.mark.asyncio
+async def test_cors_preflight_returns_explicit_headers(plain_client):
+    """Preflight response lists only the explicitly allowed request headers."""
+    resp = await plain_client.options(
+        "/health",
+        headers={
+            "Origin": "http://localhost:3000",
+            "Access-Control-Request-Method": "GET",
+            "Access-Control-Request-Headers": "Authorization",
+        },
+    )
+    assert resp.status_code == 200
+    allowed_headers_raw = resp.headers.get("access-control-allow-headers", "")
+    allowed_headers = [h.strip().lower() for h in allowed_headers_raw.split(",")]
+    for header in ["authorization", "content-type", "x-api-key", "accept"]:
+        assert header in allowed_headers, f"{header} missing from Allow-Headers"
+    assert "*" not in allowed_headers_raw
+
+
+@pytest.mark.asyncio
 async def test_error_response_format_has_detail_code_message(plain_client):
     """All error responses must follow {detail: {code, message}} format."""
     resp = await plain_client.get("/test-errors/not-found")
