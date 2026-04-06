@@ -1,4 +1,5 @@
-import { Copy, Link, Pencil, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { AlertCircle, Copy, Link, Pencil, Trash2 } from 'lucide-react'
 import type { ParticipantResponse } from '../../types/survey'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
@@ -166,14 +167,36 @@ function ParticipantTable({
 
 // Separate copy-token button used in token-once display
 export function CopyButton({ text, label = 'Copy' }: { text: string; label?: string }) {
-  function handleCopy() {
-    navigator.clipboard.writeText(text).catch(() => {})
+  const [copyError, setCopyError] = useState<string | null>(null)
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopyError(null)
+    } catch {
+      setCopyError('Failed to copy to clipboard')
+      setTimeout(() => setCopyError(null), 3000)
+    }
   }
+
   return (
-    <Button variant="outline" size="sm" onClick={handleCopy} className="gap-1.5">
-      <Copy size={14} />
-      {label}
-    </Button>
+    <span className="inline-flex flex-col items-start gap-1">
+      <Button variant="outline" size="sm" onClick={handleCopy} className="gap-1.5">
+        <Copy size={14} />
+        {label}
+      </Button>
+      {copyError && (
+        <span
+          role="alert"
+          aria-live="assertive"
+          className="flex items-center gap-1 text-xs text-destructive"
+          data-testid="copy-button-error"
+        >
+          <AlertCircle size={12} />
+          {copyError}
+        </span>
+      )}
+    </span>
   )
 }
 

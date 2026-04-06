@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Plus, Upload, Search, Link } from 'lucide-react'
+import { AlertCircle, ArrowLeft, Plus, Upload, Search, Link } from 'lucide-react'
 import participantService from '../services/participantService'
 import type {
   ParticipantResponse,
@@ -169,6 +169,9 @@ function ParticipantsPage() {
   const [showCsvImport, setShowCsvImport] = useState(false)
   const [importResults, setImportResults] = useState<ParticipantCreateResponse[] | null>(null)
 
+  // Copy link error state
+  const [copyLinkError, setCopyLinkError] = useState<string | null>(null)
+
   // ---------------------------------------------------------------------------
   // Load participants
   // ---------------------------------------------------------------------------
@@ -304,16 +307,21 @@ function ParticipantsPage() {
   // Copy survey link
   // ---------------------------------------------------------------------------
 
-  function handleCopyLink(participant: ParticipantResponse) {
+  async function handleCopyLink(participant: ParticipantResponse) {
     // token is not available in list view — we can only generate a link if we
     // somehow had the token. Per the ticket spec, the link is generated from
     // the participant object. Since token is hidden after creation, this button
     // is informational only — we note this limitation.
     // For demo purposes we copy a link with a placeholder.
-    const link = `${window.location.origin}/s/${surveyId}?token=<token>`
-    navigator.clipboard.writeText(link).catch(() => {})
-    // Optionally show a toast — for now silently copy
     void participant
+    const link = `${window.location.origin}/s/${surveyId}?token=<token>`
+    try {
+      await navigator.clipboard.writeText(link)
+      setCopyLinkError(null)
+    } catch {
+      setCopyLinkError('Failed to copy link to clipboard')
+      setTimeout(() => setCopyLinkError(null), 3000)
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -432,6 +440,19 @@ function ParticipantsPage() {
       {error && (
         <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
           {error}
+        </div>
+      )}
+
+      {/* Copy link error */}
+      {copyLinkError && (
+        <div
+          className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md flex items-center gap-2"
+          role="alert"
+          aria-live="assertive"
+          data-testid="copy-link-error"
+        >
+          <AlertCircle size={14} />
+          {copyLinkError}
         </div>
       )}
 
