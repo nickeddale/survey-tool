@@ -223,7 +223,7 @@ class Evaluator:
             raise EvaluationError(
                 f"{name}(): wrong number of arguments — {exc}",
                 position=node.start,
-            )
+            ) from exc
 
     def _eval_array(self, node: ArrayLiteral) -> list:
         """Evaluate each element and return a Python list."""
@@ -428,11 +428,11 @@ def _run_with_thread_timeout(fn, timeout: float) -> Any:
         future = executor.submit(fn)
         try:
             return future.result(timeout=timeout)
-        except concurrent.futures.TimeoutError:
+        except concurrent.futures.TimeoutError as exc:
             raise EvaluationError(
                 f"Expression evaluation timed out (limit: {int(timeout * 1000)}ms)",
                 position=0,
-            )
+            ) from exc
         except EvaluationError:
             raise
         except Exception as exc:
