@@ -81,6 +81,12 @@ def _extract_metadata(request: Request) -> dict:
     "/{survey_id}/statistics",
     response_model=SurveyStatisticsResponse,
     status_code=status.HTTP_200_OK,
+    summary="Get aggregate statistics for a survey",
+    description=(
+        "Return aggregate statistics for a survey including total/complete/incomplete/"
+        "disqualified response counts, completion rate, average completion time, "
+        "and per-question summaries. Requires authentication."
+    ),
 )
 async def get_survey_statistics_endpoint(
     survey_id: str,
@@ -107,6 +113,8 @@ async def get_survey_statistics_endpoint(
     "/{survey_id}/responses",
     response_model=ResponseListResponse,
     status_code=status.HTTP_200_OK,
+    summary="List responses for a survey",
+    description="Return a paginated, filterable list of responses for a survey. Supports filtering by status, date range, and sorting. Requires authentication.",
 )
 async def list_survey_responses(
     survey_id: str,
@@ -156,6 +164,8 @@ async def list_survey_responses(
     "/{survey_id}/responses",
     response_model=ResponseResponse,
     status_code=status.HTTP_201_CREATED,
+    summary="Start a new survey response",
+    description="Create a new response for a survey. Public endpoint — no authentication required. Optionally supply a participant token and initial answers.",
 )
 @limiter.limit("30/minute")
 async def submit_response(
@@ -188,6 +198,8 @@ async def submit_response(
 @router.get(
     "/{survey_id}/responses/export",
     status_code=status.HTTP_200_OK,
+    summary="Export survey responses as CSV or JSON",
+    description="Download all responses for a survey as a CSV or JSON file. Supports column selection and date range filters. Requires authentication.",
 )
 async def export_survey_responses(
     survey_id: str,
@@ -267,6 +279,8 @@ async def export_survey_responses(
     "/{survey_id}/responses/{response_id}/detail",
     response_model=ResponseDetail,
     status_code=status.HTTP_200_OK,
+    summary="Get enriched response detail",
+    description="Return full response detail with answers enriched with question metadata. Requires authentication.",
 )
 async def get_response_detail_endpoint(
     survey_id: str,
@@ -298,6 +312,8 @@ async def get_response_detail_endpoint(
     "/{survey_id}/responses/{response_id}",
     response_model=ResponseResponse,
     status_code=status.HTTP_200_OK,
+    summary="Get a survey response",
+    description="Retrieve a response with its current answers. Public endpoint used for resume functionality.",
 )
 async def get_response(
     survey_id: str,
@@ -320,6 +336,12 @@ async def get_response(
     "/{survey_id}/responses/{response_id}",
     response_model=ResponseResponse,
     status_code=status.HTTP_200_OK,
+    summary="Update or complete a survey response",
+    description=(
+        "Update answer values or mark a response as complete. "
+        "Set status='complete' to trigger completion validation. "
+        "Omit status to perform a partial save without validation. Public endpoint."
+    ),
 )
 async def update_response(
     survey_id: str,
@@ -364,6 +386,8 @@ async def update_response(
     "/{survey_id}/responses/{response_id}/status",
     response_model=ResponseResponse,
     status_code=status.HTTP_200_OK,
+    summary="Update response status (admin)",
+    description="Admin endpoint to set a response status to 'disqualified'. Requires authentication.",
 )
 async def update_response_status(
     survey_id: str,

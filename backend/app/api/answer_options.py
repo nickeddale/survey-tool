@@ -43,6 +43,8 @@ def _parse_uuid(value: str, label: str = "resource") -> uuid.UUID:
     "",
     response_model=AnswerOptionResponse,
     status_code=status.HTTP_201_CREATED,
+    summary="Create an answer option",
+    description="Add a new answer option to a choice or matrix question.",
 )
 async def create(
     survey_id: str,
@@ -73,7 +75,12 @@ async def create(
     return AnswerOptionResponse.model_validate(option)
 
 
-@router.get("", response_model=AnswerOptionListResponse)
+@router.get(
+    "",
+    response_model=AnswerOptionListResponse,
+    summary="List answer options for a question",
+    description="Return a paginated list of answer options for a question, ordered by sort_order.",
+)
 async def list_all(
     survey_id: str,
     question_id: str,
@@ -107,7 +114,12 @@ async def list_all(
     )
 
 
-@router.post("/reorder", response_model=list[AnswerOptionResponse])
+@router.post(
+    "/reorder",
+    response_model=list[AnswerOptionResponse],
+    summary="Reorder answer options",
+    description="Update the sort_order of multiple answer options in a single request.",
+)
 async def reorder(
     survey_id: str,
     question_id: str,
@@ -135,7 +147,12 @@ async def reorder(
     return [AnswerOptionResponse.model_validate(o) for o in options]
 
 
-@router.get("/{option_id}", response_model=AnswerOptionResponse)
+@router.get(
+    "/{option_id}",
+    response_model=AnswerOptionResponse,
+    summary="Get an answer option",
+    description="Return a single answer option by ID.",
+)
 async def get_one(
     survey_id: str,
     question_id: str,
@@ -159,7 +176,12 @@ async def get_one(
     return AnswerOptionResponse.model_validate(option)
 
 
-@router.patch("/{option_id}", response_model=AnswerOptionResponse)
+@router.patch(
+    "/{option_id}",
+    response_model=AnswerOptionResponse,
+    summary="Update an answer option",
+    description="Partially update an answer option's title, code, sort order, or assessment value.",
+)
 async def patch(
     survey_id: str,
     question_id: str,
@@ -190,7 +212,12 @@ async def patch(
     return AnswerOptionResponse.model_validate(option)
 
 
-@router.patch("/{option_id}/translations", response_model=AnswerOptionResponse)
+@router.patch(
+    "/{option_id}/translations",
+    response_model=AnswerOptionResponse,
+    summary="Update answer option translations for a language",
+    description="Merge translation overrides for the specified language into the answer option's translations store.",
+)
 async def update_translations(
     survey_id: str,
     question_id: str,
@@ -223,7 +250,12 @@ async def update_translations(
     return AnswerOptionResponse.model_validate(option)
 
 
-@router.delete("/{option_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{option_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete an answer option",
+    description="Permanently delete an answer option from a question.",
+)
 async def delete(
     survey_id: str,
     question_id: str,

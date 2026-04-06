@@ -110,6 +110,8 @@ async def _validate_condition_question_ids(
     "/{survey_id}/quotas",
     response_model=QuotaResponse,
     status_code=status.HTTP_201_CREATED,
+    summary="Create a quota for a survey",
+    description="Define a response quota with conditions and an action taken when the limit is reached.",
 )
 async def create_quota(
     survey_id: str,
@@ -142,6 +144,8 @@ async def create_quota(
     "/{survey_id}/quotas",
     response_model=QuotaListResponse,
     status_code=status.HTTP_200_OK,
+    summary="List quotas for a survey",
+    description="Return a paginated list of quota rules for a survey.",
 )
 async def list_quotas(
     survey_id: str,
@@ -184,6 +188,8 @@ async def list_quotas(
     "/{survey_id}/quotas/{quota_id}",
     response_model=QuotaResponse,
     status_code=status.HTTP_200_OK,
+    summary="Get a quota",
+    description="Return a single quota rule by ID.",
 )
 async def get_quota(
     survey_id: str,
@@ -203,6 +209,8 @@ async def get_quota(
     "/{survey_id}/quotas/{quota_id}",
     response_model=QuotaResponse,
     status_code=status.HTTP_200_OK,
+    summary="Update a quota",
+    description="Partially update a quota's name, limit, action, conditions, or active status.",
 )
 async def update_quota(
     survey_id: str,
@@ -236,6 +244,8 @@ async def update_quota(
 @router.delete(
     "/{survey_id}/quotas/{quota_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a quota",
+    description="Permanently delete a quota rule from a survey.",
 )
 async def delete_quota(
     survey_id: str,

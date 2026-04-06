@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Any, Union
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 
 # ---------------------------------------------------------------------------
@@ -12,13 +12,13 @@ from pydantic import BaseModel, model_validator
 
 
 class AnswerInput(BaseModel):
-    question_id: uuid.UUID
-    value: Any = None
+    question_id: uuid.UUID = Field(description="UUID of the question being answered.", example="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
+    value: Any = Field(default=None, description="Answer value. Type depends on the question type (string, number, list, etc.).")
 
 
 class ResponseCreate(BaseModel):
-    answers: list[AnswerInput] = []
-    participant_token: str | None = None
+    answers: list[AnswerInput] = Field(default=[], description="Initial answers to submit with the response.")
+    participant_token: str | None = Field(default=None, description="Participant token required for token-restricted surveys.")
 
 
 class ResponseUpdate(BaseModel):

@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 VALID_EVENTS = Literal[
@@ -23,10 +23,10 @@ VALID_EVENT_VALUES = {
 
 
 class WebhookCreate(BaseModel):
-    url: str
-    events: list[VALID_EVENTS]
-    survey_id: uuid.UUID | None = None
-    is_active: bool = True
+    url: str = Field(description="HTTPS (or HTTP) endpoint URL that will receive webhook payloads.", example="https://example.com/hooks/survey")
+    events: list[VALID_EVENTS] = Field(description="List of event types to subscribe to.", example=["response.completed", "survey.activated"])
+    survey_id: uuid.UUID | None = Field(default=None, description="Optional survey UUID to scope events to a single survey. Null means all surveys.")
+    is_active: bool = Field(default=True, description="Whether this webhook is active and will receive deliveries.")
 
     @field_validator("url")
     @classmethod

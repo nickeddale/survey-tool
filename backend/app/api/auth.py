@@ -47,6 +47,8 @@ router = APIRouter(prefix="/auth", tags=["auth"])
     "/register",
     response_model=UserResponse,
     status_code=status.HTTP_201_CREATED,
+    summary="Register a new user account",
+    description="Create a new user account with email and password. Email must be unique.",
 )
 @limiter.limit("5/minute")
 async def register(
@@ -73,7 +75,12 @@ async def register(
     return UserResponse.model_validate(user)
 
 
-@router.post("/login", response_model=TokenResponse)
+@router.post(
+    "/login",
+    response_model=TokenResponse,
+    summary="Log in and receive access/refresh tokens",
+    description="Authenticate with email and password. Returns a JWT access token and a refresh token.",
+)
 @limiter.limit("10/minute")
 async def login(
     request: Request,
@@ -98,7 +105,12 @@ async def login(
     )
 
 
-@router.post("/refresh", response_model=TokenResponse)
+@router.post(
+    "/refresh",
+    response_model=TokenResponse,
+    summary="Refresh access token using a refresh token",
+    description="Exchange a valid refresh token for a new access/refresh token pair. The old refresh token is revoked (rotation).",
+)
 @limiter.limit("10/minute")
 async def refresh(
     request: Request,
@@ -130,7 +142,12 @@ async def refresh(
     )
 
 
-@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+@router.post(
+    "/logout",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Revoke a refresh token",
+    description="Revoke the provided refresh token. Subsequent refresh attempts with this token will be rejected.",
+)
 async def logout(
     payload: LogoutRequest,
     session: AsyncSession = Depends(get_db),
@@ -141,14 +158,24 @@ async def logout(
         await revoke_refresh_token(session, record)
 
 
-@router.get("/me", response_model=UserResponse)
+@router.get(
+    "/me",
+    response_model=UserResponse,
+    summary="Get current authenticated user",
+    description="Return the profile of the currently authenticated user.",
+)
 async def get_me(
     current_user: User = Depends(get_current_user),
 ) -> UserResponse:
     return UserResponse.model_validate(current_user)
 
 
-@router.patch("/me", response_model=UserResponse)
+@router.patch(
+    "/me",
+    response_model=UserResponse,
+    summary="Update current user profile",
+    description="Update the display name or password of the currently authenticated user.",
+)
 async def update_me(
     payload: UserUpdateRequest,
     current_user: User = Depends(get_current_user),
@@ -170,6 +197,8 @@ async def update_me(
     "/keys",
     response_model=ApiKeyCreateResponse,
     status_code=status.HTTP_201_CREATED,
+    summary="Create an API key",
+    description="Create a new API key for programmatic access. The raw key value is only returned once at creation time.",
 )
 async def create_key(
     payload: ApiKeyCreate,
@@ -195,7 +224,12 @@ async def create_key(
     )
 
 
-@router.get("/keys", response_model=list[ApiKeyResponse])
+@router.get(
+    "/keys",
+    response_model=list[ApiKeyResponse],
+    summary="List API keys for current user",
+    description="Return all API keys belonging to the currently authenticated user. Raw key values are never returned.",
+)
 async def list_keys(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
@@ -204,7 +238,12 @@ async def list_keys(
     return [ApiKeyResponse.model_validate(k) for k in keys]
 
 
-@router.delete("/keys/{key_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/keys/{key_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Revoke an API key",
+    description="Permanently revoke an API key by ID. The key will no longer be accepted for authentication.",
+)
 async def delete_key(
     key_id: str,
     current_user: User = Depends(get_current_user),

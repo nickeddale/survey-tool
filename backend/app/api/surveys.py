@@ -56,6 +56,8 @@ def _parse_survey_id(value: str) -> uuid.UUID:
     "",
     response_model=SurveyResponse,
     status_code=status.HTTP_201_CREATED,
+    summary="Create a new survey",
+    description="Create a new survey in draft status. The survey is owned by the authenticated user.",
 )
 async def create(
     payload: SurveyCreate,
@@ -76,7 +78,12 @@ async def create(
     return SurveyResponse.model_validate(survey)
 
 
-@router.get("", response_model=SurveyListResponse)
+@router.get(
+    "",
+    response_model=SurveyListResponse,
+    summary="List surveys",
+    description="Return a paginated list of surveys owned by the authenticated user. Supports filtering by status and keyword search.",
+)
 async def list_all(
     page: int = Query(1, ge=1),
     per_page: int = Query(20, ge=1, le=100),
@@ -101,7 +108,12 @@ async def list_all(
     )
 
 
-@router.get("/{survey_id}", response_model=SurveyFullResponse)
+@router.get(
+    "/{survey_id}",
+    response_model=SurveyFullResponse,
+    summary="Get a survey with all groups and questions",
+    description="Return the full survey including all question groups, questions, and answer options. Pass `lang` to receive translated content.",
+)
 async def get_one(
     survey_id: str,
     include: str | None = Query(None),
@@ -124,7 +136,12 @@ async def get_one(
     return validated
 
 
-@router.patch("/{survey_id}", response_model=SurveyResponse)
+@router.patch(
+    "/{survey_id}",
+    response_model=SurveyResponse,
+    summary="Update a survey",
+    description="Partially update survey metadata fields such as title, description, status, and settings.",
+)
 async def patch(
     survey_id: str,
     payload: SurveyUpdate,
@@ -141,7 +158,12 @@ async def patch(
     return SurveyResponse.model_validate(survey)
 
 
-@router.get("/{survey_id}/versions", response_model=SurveyVersionListResponse)
+@router.get(
+    "/{survey_id}/versions",
+    response_model=SurveyVersionListResponse,
+    summary="List survey version history",
+    description="Return a paginated list of historical snapshots for a survey. Each entry captures the full survey state at the time of a change.",
+)
 async def list_versions(
     survey_id: str,
     page: int = Query(1, ge=1),
@@ -163,7 +185,12 @@ async def list_versions(
     )
 
 
-@router.patch("/{survey_id}/translations", response_model=SurveyResponse)
+@router.patch(
+    "/{survey_id}/translations",
+    response_model=SurveyResponse,
+    summary="Update survey translations for a language",
+    description="Merge translation overrides for the specified language into the survey's translations store.",
+)
 async def update_translations(
     survey_id: str,
     payload: SurveyTranslationsUpdate,
@@ -185,7 +212,12 @@ async def update_translations(
     return SurveyResponse.model_validate(survey)
 
 
-@router.delete("/{survey_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{survey_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a survey",
+    description="Permanently delete a survey and all associated data (groups, questions, responses, etc.).",
+)
 async def delete(
     survey_id: str,
     current_user: User = Depends(get_current_user),
@@ -198,7 +230,12 @@ async def delete(
     await delete_survey(session, survey)
 
 
-@router.post("/{survey_id}/activate", response_model=SurveyResponse)
+@router.post(
+    "/{survey_id}/activate",
+    response_model=SurveyResponse,
+    summary="Activate a survey",
+    description="Transition a survey from draft to active status, making it available for respondents.",
+)
 async def activate(
     survey_id: str,
     current_user: User = Depends(get_current_user),
@@ -212,7 +249,12 @@ async def activate(
     return SurveyResponse.model_validate(survey)
 
 
-@router.post("/{survey_id}/close", response_model=SurveyResponse)
+@router.post(
+    "/{survey_id}/close",
+    response_model=SurveyResponse,
+    summary="Close a survey",
+    description="Transition a survey to closed status. Closed surveys no longer accept new responses.",
+)
 async def close(
     survey_id: str,
     current_user: User = Depends(get_current_user),
@@ -226,7 +268,12 @@ async def close(
     return SurveyResponse.model_validate(survey)
 
 
-@router.post("/{survey_id}/archive", response_model=SurveyResponse)
+@router.post(
+    "/{survey_id}/archive",
+    response_model=SurveyResponse,
+    summary="Archive a survey",
+    description="Transition a survey to archived status. Archived surveys are read-only and hidden from active listings.",
+)
 async def archive(
     survey_id: str,
     current_user: User = Depends(get_current_user),
@@ -244,6 +291,8 @@ async def archive(
     "/{survey_id}/clone",
     response_model=SurveyResponse,
     status_code=status.HTTP_201_CREATED,
+    summary="Clone a survey",
+    description="Create a deep copy of a survey including all groups, questions, and answer options. The clone starts in draft status.",
 )
 async def clone(
     survey_id: str,
@@ -256,7 +305,12 @@ async def clone(
     return SurveyResponse.model_validate(new_survey)
 
 
-@router.get("/{survey_id}/export", response_model=SurveyExportResponse)
+@router.get(
+    "/{survey_id}/export",
+    response_model=SurveyExportResponse,
+    summary="Export a survey as a portable JSON structure",
+    description="Return a portable JSON representation of the survey including all groups, questions, and answer options.",
+)
 async def export(
     survey_id: str,
     current_user: User = Depends(get_current_user),
@@ -271,6 +325,8 @@ async def export(
     "/import",
     response_model=SurveyResponse,
     status_code=status.HTTP_201_CREATED,
+    summary="Import a survey from an exported JSON structure",
+    description="Create a new survey from an exported JSON payload. Useful for migrating surveys between environments.",
 )
 async def import_survey_endpoint(
     payload: SurveyImportRequest,

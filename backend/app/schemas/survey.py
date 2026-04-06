@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.schemas.question_group import QuestionGroupResponse
 
@@ -25,13 +25,13 @@ class SurveyVersionListResponse(BaseModel):
 
 
 class SurveyCreate(BaseModel):
-    title: str
-    description: str | None = None
-    status: str = "draft"
-    welcome_message: str | None = None
-    end_message: str | None = None
-    default_language: str = "en"
-    settings: dict[str, Any] | None = None
+    title: str = Field(description="Survey title displayed to respondents.", example="Customer Satisfaction Survey")
+    description: str | None = Field(default=None, description="Optional survey description.", example="Help us improve our service.")
+    status: str = Field(default="draft", description="Initial status of the survey.", example="draft")
+    welcome_message: str | None = Field(default=None, description="Message shown before the first question.", example="Welcome! This survey takes about 5 minutes.")
+    end_message: str | None = Field(default=None, description="Message shown after the last question.", example="Thank you for your feedback!")
+    default_language: str = Field(default="en", description="BCP-47 language code for the survey's default language.", example="en")
+    settings: dict[str, Any] | None = Field(default=None, description="Optional survey-level settings as a JSON object.")
 
 
 class SurveyUpdate(BaseModel):

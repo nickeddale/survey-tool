@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 VALID_OPERATORS = Literal["eq", "neq", "gt", "lt", "gte", "lte", "in", "contains"]
@@ -16,11 +16,11 @@ class QuotaCondition(BaseModel):
 
 
 class QuotaCreate(BaseModel):
-    name: str
-    limit: int
-    action: VALID_ACTIONS
-    conditions: list[QuotaCondition]
-    is_active: bool = True
+    name: str = Field(description="Descriptive name for this quota rule.", example="Male respondents cap")
+    limit: int = Field(description="Maximum number of matching responses before the action is triggered.", example=100)
+    action: VALID_ACTIONS = Field(description="Action taken when the quota limit is reached. One of: terminate, hide_question.", example="terminate")
+    conditions: list[QuotaCondition] = Field(description="One or more conditions that must all match for this quota to count a response.")
+    is_active: bool = Field(default=True, description="Whether this quota is currently enforced.")
 
     @field_validator("conditions")
     @classmethod

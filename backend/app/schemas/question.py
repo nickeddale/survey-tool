@@ -2,23 +2,23 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 from app.models.question import VALID_QUESTION_TYPES
 from app.schemas.answer_option import AnswerOptionResponse
 
 
 class QuestionCreate(BaseModel):
-    question_type: str
-    title: str
-    code: str | None = None
-    description: str | None = None
-    is_required: bool = False
-    sort_order: int | None = None
-    relevance: str | None = None
-    validation: dict[str, Any] | None = None
-    settings: dict[str, Any] | None = None
-    parent_id: uuid.UUID | None = None
+    question_type: str = Field(description="Question type. One of: text, numeric, boolean, single_choice, multiple_choice, rating, date, matrix, ranking.", example="single_choice")
+    title: str = Field(description="Question text shown to respondents.", example="How satisfied are you with our service?")
+    code: str | None = Field(default=None, description="Short unique identifier used in expressions and exports.", example="Q1")
+    description: str | None = Field(default=None, description="Optional sub-text displayed below the question title.")
+    is_required: bool = Field(default=False, description="Whether the question must be answered before the response can be completed.")
+    sort_order: int | None = Field(default=None, description="Display order within the group. Auto-assigned if omitted.", example=1)
+    relevance: str | None = Field(default=None, description="Expression that must evaluate to true for this question to be shown.", example="Q1 == 'yes'")
+    validation: dict[str, Any] | None = Field(default=None, description="Optional validation rules as a JSON object.")
+    settings: dict[str, Any] | None = Field(default=None, description="Optional question-level display settings as a JSON object.")
+    parent_id: uuid.UUID | None = Field(default=None, description="Parent question ID for subquestions in matrix questions.")
 
     @field_validator("question_type")
     @classmethod

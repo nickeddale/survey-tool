@@ -128,6 +128,11 @@ def _parse_survey_uuid(value: str) -> uuid.UUID:
     "/{survey_id}/logic/validate-expression",
     response_model=ValidateExpressionResponse,
     status_code=status.HTTP_200_OK,
+    summary="Validate a relevance expression",
+    description=(
+        "Validate the syntax and semantics of an expression against a survey's question codes. "
+        "Always returns 200; validation failures are reported in the errors list, not as HTTP errors."
+    ),
 )
 async def validate_expression_endpoint(
     survey_id: str,
@@ -272,6 +277,11 @@ class ResolveFlowResponse(BaseModel):
     "/{survey_id}/logic/resolve-flow",
     response_model=ResolveFlowResponse,
     status_code=status.HTTP_200_OK,
+    summary="Resolve survey navigation flow",
+    description=(
+        "Compute visible/hidden questions and groups, the next question to display, "
+        "piped text substitutions, and per-question relevance validation for a given answer state."
+    ),
 )
 async def resolve_flow_endpoint(
     survey_id: str,

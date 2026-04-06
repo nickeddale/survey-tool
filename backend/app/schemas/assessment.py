@@ -3,19 +3,19 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 VALID_SCOPES = Literal["total", "group"]
 
 
 class AssessmentCreate(BaseModel):
-    name: str
-    scope: VALID_SCOPES
-    group_id: uuid.UUID | None = None
-    min_score: Decimal
-    max_score: Decimal
-    message: str
+    name: str = Field(description="Name of this assessment band.", example="High Risk")
+    scope: VALID_SCOPES = Field(description="Whether the score is computed across the whole survey ('total') or a single group ('group').", example="total")
+    group_id: uuid.UUID | None = Field(default=None, description="Question group ID. Required when scope is 'group'.")
+    min_score: Decimal = Field(description="Minimum score (inclusive) for this band to match.", example="0.00")
+    max_score: Decimal = Field(description="Maximum score (inclusive) for this band to match.", example="30.00")
+    message: str = Field(description="Feedback message shown when a response score falls in this band.", example="Your score indicates a high risk level. Please consult a specialist.")
 
 
 class AssessmentUpdate(BaseModel):
