@@ -2,14 +2,14 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class AnswerOptionCreate(BaseModel):
-    title: str
-    code: str | None = None
-    sort_order: int | None = None
-    assessment_value: int = 0
+    title: str = Field(description="Answer option label displayed to respondents.", example="Strongly Agree")
+    code: str | None = Field(default=None, description="Short identifier used in exports and expressions.", example="A1")
+    sort_order: int | None = Field(default=None, description="Display order within the question. Auto-assigned if omitted.", example=1)
+    assessment_value: int = Field(default=0, description="Numeric score value used for assessment calculations.", example=5)
 
 
 class AnswerOptionUpdate(BaseModel):

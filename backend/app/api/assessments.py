@@ -98,6 +98,8 @@ async def _get_response_or_404(
     "/{survey_id}/assessments",
     response_model=AssessmentResponse,
     status_code=status.HTTP_201_CREATED,
+    summary="Create an assessment rule",
+    description="Define a scoring band for a survey. When a response's score falls within the min/max range, the associated message is returned.",
 )
 async def create_assessment(
     survey_id: str,
@@ -129,6 +131,8 @@ async def create_assessment(
     "/{survey_id}/assessments",
     response_model=AssessmentListResponse,
     status_code=status.HTTP_200_OK,
+    summary="List assessment rules for a survey",
+    description="Return a paginated list of assessment scoring bands for a survey.",
 )
 async def list_assessments(
     survey_id: str,
@@ -173,6 +177,8 @@ async def list_assessments(
     "/{survey_id}/assessments/{assessment_id}",
     response_model=AssessmentResponse,
     status_code=status.HTTP_200_OK,
+    summary="Get an assessment rule",
+    description="Return a single assessment scoring band by ID.",
 )
 async def get_assessment(
     survey_id: str,
@@ -192,6 +198,8 @@ async def get_assessment(
     "/{survey_id}/assessments/{assessment_id}",
     response_model=AssessmentResponse,
     status_code=status.HTTP_200_OK,
+    summary="Update an assessment rule",
+    description="Partially update an assessment rule's name, scope, score range, or feedback message.",
 )
 async def update_assessment(
     survey_id: str,
@@ -218,6 +226,8 @@ async def update_assessment(
 @router.delete(
     "/{survey_id}/assessments/{assessment_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete an assessment rule",
+    description="Permanently delete an assessment scoring band from a survey.",
 )
 async def delete_assessment(
     survey_id: str,
@@ -238,6 +248,8 @@ async def delete_assessment(
     "/{survey_id}/responses/{response_id}/assessment",
     response_model=AssessmentScoreResponse,
     status_code=status.HTTP_200_OK,
+    summary="Compute assessment score for a response",
+    description="Calculate the total score for a response from answer option values and return all matching assessment bands.",
 )
 async def get_response_assessment(
     survey_id: str,

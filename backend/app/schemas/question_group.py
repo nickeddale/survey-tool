@@ -2,17 +2,17 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 if TYPE_CHECKING:
     from app.schemas.question import QuestionResponse
 
 
 class QuestionGroupCreate(BaseModel):
-    title: str
-    description: str | None = None
-    sort_order: int | None = None
-    relevance: str | None = None
+    title: str = Field(description="Group title displayed as a section heading.", example="Demographic Information")
+    description: str | None = Field(default=None, description="Optional sub-text displayed below the group title.")
+    sort_order: int | None = Field(default=None, description="Display order within the survey. Auto-assigned if omitted.", example=1)
+    relevance: str | None = Field(default=None, description="Expression that must evaluate to true for this group to be shown.", example="age >= 18")
 
 
 class QuestionGroupUpdate(BaseModel):

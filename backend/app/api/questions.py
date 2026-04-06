@@ -50,6 +50,8 @@ def _parse_uuid(value: str, label: str = "resource") -> uuid.UUID:
     "",
     response_model=QuestionResponse,
     status_code=status.HTTP_201_CREATED,
+    summary="Create a question",
+    description="Add a new question to a question group. Supports all question types: text, numeric, boolean, single_choice, multiple_choice, rating, date, matrix, and ranking.",
 )
 async def create(
     survey_id: str,
@@ -88,7 +90,12 @@ async def create(
     return QuestionResponse.model_validate(question)
 
 
-@router.get("", response_model=QuestionListResponse)
+@router.get(
+    "",
+    response_model=QuestionListResponse,
+    summary="List questions in a group",
+    description="Return a paginated list of questions in a question group, ordered by sort_order.",
+)
 async def list_all(
     survey_id: str,
     group_id: str,
@@ -122,7 +129,12 @@ async def list_all(
     )
 
 
-@router.post("/reorder", response_model=list[QuestionResponse])
+@router.post(
+    "/reorder",
+    response_model=list[QuestionResponse],
+    summary="Reorder questions",
+    description="Update the sort_order and optionally the group assignment of multiple questions in a single request.",
+)
 async def reorder(
     survey_id: str,
     group_id: str,
@@ -154,7 +166,12 @@ async def reorder(
     return [QuestionResponse.model_validate(q) for q in questions]
 
 
-@router.get("/{question_id}", response_model=QuestionResponse)
+@router.get(
+    "/{question_id}",
+    response_model=QuestionResponse,
+    summary="Get a question",
+    description="Return a single question by ID, including its answer options and subquestions.",
+)
 async def get_one(
     survey_id: str,
     group_id: str,
@@ -178,7 +195,12 @@ async def get_one(
     return QuestionResponse.model_validate(question)
 
 
-@router.patch("/{question_id}", response_model=QuestionResponse)
+@router.patch(
+    "/{question_id}",
+    response_model=QuestionResponse,
+    summary="Update a question",
+    description="Partially update a question's type, title, code, description, required flag, sort order, relevance, validation, or settings.",
+)
 async def patch(
     survey_id: str,
     group_id: str,
@@ -206,7 +228,12 @@ async def patch(
     return QuestionResponse.model_validate(question)
 
 
-@router.patch("/{question_id}/translations", response_model=QuestionResponse)
+@router.patch(
+    "/{question_id}/translations",
+    response_model=QuestionResponse,
+    summary="Update question translations for a language",
+    description="Merge translation overrides for the specified language into the question's translations store.",
+)
 async def update_translations(
     survey_id: str,
     group_id: str,
@@ -239,7 +266,12 @@ async def update_translations(
     return QuestionResponse.model_validate(question)
 
 
-@router.delete("/{question_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{question_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a question",
+    description="Permanently delete a question and all its answer options and subquestions.",
+)
 async def delete(
     survey_id: str,
     group_id: str,
@@ -267,6 +299,8 @@ async def delete(
     "",
     response_model=QuestionResponse,
     status_code=status.HTTP_201_CREATED,
+    summary="Create a subquestion for a matrix question",
+    description="Add a subquestion (row) to a matrix-type parent question. Returns the parent question with the updated subquestions list.",
 )
 async def create_subquestion_endpoint(
     survey_id: str,

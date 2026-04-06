@@ -95,6 +95,8 @@ def _build_participant(
     "/{survey_id}/participants",
     response_model=ParticipantCreateResponse,
     status_code=status.HTTP_201_CREATED,
+    summary="Create a participant for a survey",
+    description="Add a pre-registered participant to a survey. A unique access token is generated and returned only at creation time.",
 )
 async def create_participant(
     survey_id: str,
@@ -122,6 +124,8 @@ async def create_participant(
     "/{survey_id}/participants/batch",
     response_model=list[ParticipantCreateResponse],
     status_code=status.HTTP_201_CREATED,
+    summary="Batch-create participants for a survey",
+    description="Create multiple participants in a single request. Each participant gets a unique token returned only at creation time.",
 )
 async def create_participants_batch(
     survey_id: str,
@@ -156,6 +160,8 @@ async def create_participants_batch(
     "/{survey_id}/participants",
     response_model=ParticipantListResponse,
     status_code=status.HTTP_200_OK,
+    summary="List participants for a survey",
+    description="Return a paginated list of participants with optional filters for completion status, email, and current validity.",
 )
 async def list_participants(
     survey_id: str,
@@ -243,6 +249,8 @@ async def list_participants(
     "/{survey_id}/participants/{participant_id}",
     response_model=ParticipantResponse,
     status_code=status.HTTP_200_OK,
+    summary="Get a participant",
+    description="Return a participant by ID. The participant token is not included in this response.",
 )
 async def get_participant(
     survey_id: str,
@@ -262,6 +270,8 @@ async def get_participant(
     "/{survey_id}/participants/{participant_id}",
     response_model=ParticipantResponse,
     status_code=status.HTTP_200_OK,
+    summary="Update a participant",
+    description="Partially update a participant's email, attributes, usage limits, validity window, or completed status.",
 )
 async def update_participant(
     survey_id: str,
@@ -288,6 +298,8 @@ async def update_participant(
 @router.delete(
     "/{survey_id}/participants/{participant_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a participant",
+    description="Permanently delete a participant from a survey.",
 )
 async def delete_participant(
     survey_id: str,

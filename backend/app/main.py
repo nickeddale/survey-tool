@@ -53,9 +53,106 @@ _STATUS_CODE_MAP: dict[int, str] = {
 }
 
 
+_OPENAPI_TAGS = [
+    {
+        "name": "auth",
+        "description": (
+            "User registration, login, token refresh/logout, and API key management. "
+            "JWT bearer tokens are issued on login and must be included in the "
+            "Authorization header for protected endpoints."
+        ),
+    },
+    {
+        "name": "surveys",
+        "description": (
+            "Create and manage surveys. Supports full lifecycle operations: draft → active → "
+            "closed → archived. Includes clone, export/import, translation management, "
+            "and version history."
+        ),
+    },
+    {
+        "name": "question_groups",
+        "description": (
+            "Manage question groups (pages/sections) within a survey. Groups can have "
+            "relevance expressions to show or hide entire sections based on prior answers."
+        ),
+    },
+    {
+        "name": "questions",
+        "description": (
+            "Manage questions within a question group. Supports multiple question types "
+            "(text, numeric, choice, rating, matrix, etc.), relevance expressions, "
+            "validation rules, and subquestions for matrix-type questions."
+        ),
+    },
+    {
+        "name": "answer_options",
+        "description": (
+            "Manage answer options (choices) for choice-type and matrix questions. "
+            "Supports ordering, assessment scoring values, and per-option translations."
+        ),
+    },
+    {
+        "name": "responses",
+        "description": (
+            "Submit and manage survey responses. Public endpoints allow anonymous respondents "
+            "to start, save, and complete responses. Authenticated endpoints provide "
+            "listing, filtering, export (CSV/JSON), and detailed answer inspection."
+        ),
+    },
+    {
+        "name": "participants",
+        "description": (
+            "Manage pre-registered survey participants. When a survey has participants, "
+            "a valid participant token is required to submit a response. Supports "
+            "batch creation, filtering by validity, and token-based access control."
+        ),
+    },
+    {
+        "name": "quotas",
+        "description": (
+            "Define response quotas based on answer conditions. When a quota limit is "
+            "reached, incoming responses matching the conditions can be terminated or "
+            "have specific questions hidden."
+        ),
+    },
+    {
+        "name": "assessments",
+        "description": (
+            "Define scoring rules (assessment bands) for a survey. Each rule maps a "
+            "score range to a feedback message. The score endpoint computes the total "
+            "from answer option values and returns all matching assessment rules."
+        ),
+    },
+    {
+        "name": "webhooks",
+        "description": (
+            "Register HTTP endpoints to receive real-time event notifications. "
+            "Supported events include response.started, response.completed, "
+            "survey.activated, survey.closed, and quota.reached. "
+            "Each webhook is signed with an HMAC-SHA256 secret."
+        ),
+    },
+    {
+        "name": "logic",
+        "description": (
+            "Validate relevance/condition expressions and resolve survey navigation flow. "
+            "The validate-expression endpoint checks syntax and variable references. "
+            "The resolve-flow endpoint computes visible/hidden questions and next question "
+            "for a given answer state."
+        ),
+    },
+]
+
 app = FastAPI(
     title="Survey Tool API",
     version="0.1.0",
+    description=(
+        "A headless survey platform API for building, distributing, and analysing surveys. "
+        "Supports branching logic, multi-language translations, quota management, "
+        "webhook notifications, and assessment scoring."
+    ),
+    openapi_tags=_OPENAPI_TAGS,
     docs_url="/docs",
     redoc_url="/redoc",
 )

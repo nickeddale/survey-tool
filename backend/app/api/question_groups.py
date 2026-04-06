@@ -38,6 +38,8 @@ def _parse_uuid(value: str, label: str = "resource") -> uuid.UUID:
     "",
     response_model=QuestionGroupResponse,
     status_code=status.HTTP_201_CREATED,
+    summary="Create a question group",
+    description="Add a new question group (page/section) to a survey. Groups define the logical sections of a survey and can have relevance expressions.",
 )
 async def create(
     survey_id: str,
@@ -60,7 +62,12 @@ async def create(
     return QuestionGroupResponse.model_validate(group)
 
 
-@router.get("", response_model=list[QuestionGroupResponse])
+@router.get(
+    "",
+    response_model=list[QuestionGroupResponse],
+    summary="List question groups for a survey",
+    description="Return all question groups for a survey ordered by sort_order.",
+)
 async def list_all(
     survey_id: str,
     current_user: User = Depends(get_current_user),
@@ -73,7 +80,12 @@ async def list_all(
     return [QuestionGroupResponse.model_validate(g) for g in groups]
 
 
-@router.patch("/reorder", response_model=list[QuestionGroupResponse])
+@router.patch(
+    "/reorder",
+    response_model=list[QuestionGroupResponse],
+    summary="Reorder question groups",
+    description="Update the sort_order of multiple question groups in a single request.",
+)
 async def reorder(
     survey_id: str,
     payload: QuestionGroupReorderRequest,
@@ -93,7 +105,12 @@ async def reorder(
     return [QuestionGroupResponse.model_validate(g) for g in groups]
 
 
-@router.get("/{group_id}", response_model=QuestionGroupResponse)
+@router.get(
+    "/{group_id}",
+    response_model=QuestionGroupResponse,
+    summary="Get a question group",
+    description="Return a single question group by ID, including its questions.",
+)
 async def get_one(
     survey_id: str,
     group_id: str,
@@ -113,7 +130,12 @@ async def get_one(
     return QuestionGroupResponse.model_validate(group)
 
 
-@router.patch("/{group_id}", response_model=QuestionGroupResponse)
+@router.patch(
+    "/{group_id}",
+    response_model=QuestionGroupResponse,
+    summary="Update a question group",
+    description="Partially update a question group's title, description, sort order, or relevance expression.",
+)
 async def patch(
     survey_id: str,
     group_id: str,
@@ -136,7 +158,12 @@ async def patch(
     return QuestionGroupResponse.model_validate(group)
 
 
-@router.patch("/{group_id}/translations", response_model=QuestionGroupResponse)
+@router.patch(
+    "/{group_id}/translations",
+    response_model=QuestionGroupResponse,
+    summary="Update question group translations for a language",
+    description="Merge translation overrides for the specified language into the question group's translations store.",
+)
 async def update_translations(
     survey_id: str,
     group_id: str,
@@ -165,7 +192,12 @@ async def update_translations(
     return QuestionGroupResponse.model_validate(group)
 
 
-@router.delete("/{group_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{group_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a question group",
+    description="Permanently delete a question group and all its questions and answer options.",
+)
 async def delete(
     survey_id: str,
     group_id: str,

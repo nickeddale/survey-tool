@@ -49,6 +49,8 @@ async def _get_webhook_or_404(
     "",
     response_model=WebhookResponse,
     status_code=status.HTTP_201_CREATED,
+    summary="Create a webhook",
+    description="Register a new webhook endpoint to receive event notifications. A signing secret is generated automatically.",
 )
 async def create_webhook(
     payload: WebhookCreate,
@@ -75,6 +77,8 @@ async def create_webhook(
     "",
     response_model=WebhookListResponse,
     status_code=status.HTTP_200_OK,
+    summary="List webhooks",
+    description="Return a paginated list of webhooks belonging to the authenticated user.",
 )
 async def list_webhooks(
     page: int = Query(1, ge=1),
@@ -113,6 +117,8 @@ async def list_webhooks(
     "/{webhook_id}",
     response_model=WebhookResponse,
     status_code=status.HTTP_200_OK,
+    summary="Get a webhook",
+    description="Return a single webhook by ID.",
 )
 async def get_webhook(
     webhook_id: str,
@@ -129,6 +135,8 @@ async def get_webhook(
     "/{webhook_id}",
     response_model=WebhookResponse,
     status_code=status.HTTP_200_OK,
+    summary="Update a webhook",
+    description="Partially update a webhook's URL, subscribed events, survey scope, or active status.",
 )
 async def update_webhook(
     webhook_id: str,
@@ -156,6 +164,8 @@ async def update_webhook(
 @router.delete(
     "/{webhook_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a webhook",
+    description="Permanently delete a webhook. No further events will be delivered to the registered URL.",
 )
 async def delete_webhook(
     webhook_id: str,
