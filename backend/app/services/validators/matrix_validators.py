@@ -1,5 +1,7 @@
 """Validators for matrix question types: matrix, matrix_dropdown, matrix_dynamic."""
 
+from typing import Any
+
 from app.utils.errors import UnprocessableError
 
 
@@ -8,7 +10,7 @@ from app.utils.errors import UnprocessableError
 # ---------------------------------------------------------------------------
 
 
-def _validate_common_matrix_settings(settings: dict) -> None:
+def _validate_common_matrix_settings(settings: dict[str, Any]) -> None:
     """Validate settings shared by matrix and matrix_dropdown types."""
     if "alternate_rows" in settings and not isinstance(settings["alternate_rows"], bool):
         raise UnprocessableError("settings.alternate_rows must be a boolean")
@@ -23,9 +25,9 @@ def _validate_common_matrix_settings(settings: dict) -> None:
 
 
 def validate_matrix_settings(
-    settings: dict | None,
-    answer_options: list,
-    subquestions: list,
+    settings: dict[str, Any] | None,
+    answer_options: list[Any],
+    subquestions: list[Any],
 ) -> None:
     """Validate settings for matrix questions.
 
@@ -45,9 +47,9 @@ def validate_matrix_settings(
 
 
 def validate_matrix_dropdown_settings(
-    settings: dict | None,
-    answer_options: list,
-    subquestions: list,
+    settings: dict[str, Any] | None,
+    answer_options: list[Any],
+    subquestions: list[Any],
 ) -> None:
     """Validate settings for matrix_dropdown questions.
 
@@ -86,9 +88,9 @@ def validate_matrix_dropdown_settings(
 
 
 def validate_matrix_dynamic_settings(
-    settings: dict | None,
-    answer_options: list,
-    subquestions: list,
+    settings: dict[str, Any] | None,
+    answer_options: list[Any],
+    subquestions: list[Any],
 ) -> None:
     """Validate settings for matrix_dynamic questions.
 
@@ -151,7 +153,7 @@ def validate_matrix_dynamic_settings(
 # ---------------------------------------------------------------------------
 
 
-def validate_matrix_answer(answer: dict, question, answer_options: list, subquestions: list) -> None:
+def validate_matrix_answer(answer: dict[str, Any], question: Any, answer_options: list[Any], subquestions: list[Any]) -> None:
     """Validate a submitted answer for a matrix question.
 
     answer: {"value": {"SQ001": "A1", "SQ002": "A3"}}
@@ -188,7 +190,7 @@ def validate_matrix_answer(answer: dict, question, answer_options: list, subques
 
 
 def validate_matrix_dropdown_answer(
-    answer: dict, question, answer_options: list, subquestions: list
+    answer: dict[str, Any], question: Any, answer_options: list[Any], subquestions: list[Any]
 ) -> None:
     """Validate a submitted answer for a matrix_dropdown question.
 
@@ -227,7 +229,7 @@ def validate_matrix_dropdown_answer(
 
 
 def validate_matrix_dynamic_answer(
-    answer: dict, question, answer_options: list, subquestions: list
+    answer: dict[str, Any], question: Any, answer_options: list[Any], subquestions: list[Any]
 ) -> None:
     """Validate a submitted answer for a matrix_dynamic question.
 

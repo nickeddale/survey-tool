@@ -1,5 +1,7 @@
 """Validators for choice-based question types: single_choice (radio), dropdown, multiple_choice (checkbox)."""
 
+from typing import Any
+
 from app.utils.errors import UnprocessableError
 
 
@@ -8,7 +10,7 @@ from app.utils.errors import UnprocessableError
 # ---------------------------------------------------------------------------
 
 
-def validate_radio_settings(settings: dict | None, answer_options: list) -> None:
+def validate_radio_settings(settings: dict[str, Any] | None, answer_options: list[Any]) -> None:
     """Validate settings for single_choice (radio) questions.
 
     Requires at least one answer_option.
@@ -35,7 +37,7 @@ def validate_radio_settings(settings: dict | None, answer_options: list) -> None
             raise UnprocessableError("settings.columns must be an integer between 1 and 4")
 
 
-def validate_dropdown_settings(settings: dict | None, answer_options: list) -> None:
+def validate_dropdown_settings(settings: dict[str, Any] | None, answer_options: list[Any]) -> None:
     """Validate settings for dropdown questions.
 
     Requires at least one answer_option.
@@ -60,7 +62,7 @@ def validate_dropdown_settings(settings: dict | None, answer_options: list) -> N
         raise UnprocessableError("settings.other_text must be a string")
 
 
-def validate_checkbox_settings(settings: dict | None, answer_options: list) -> None:
+def validate_checkbox_settings(settings: dict[str, Any] | None, answer_options: list[Any]) -> None:
     """Validate settings for multiple_choice (checkbox) questions.
 
     Requires at least one answer_option.
@@ -119,7 +121,7 @@ def validate_checkbox_settings(settings: dict | None, answer_options: list) -> N
 # ---------------------------------------------------------------------------
 
 
-def validate_radio_answer(answer: dict, question, answer_options: list) -> None:
+def validate_radio_answer(answer: dict[str, Any], question: Any, answer_options: list[Any]) -> None:
     """Validate a submitted answer for a single_choice (radio) question.
 
     answer: dict with keys 'value' (str|None) and optionally 'other_value' (str).
@@ -146,7 +148,7 @@ def validate_radio_answer(answer: dict, question, answer_options: list) -> None:
         raise UnprocessableError(f"'{value}' is not a valid answer option code")
 
 
-def validate_dropdown_answer(answer: dict, question, answer_options: list) -> None:
+def validate_dropdown_answer(answer: dict[str, Any], question: Any, answer_options: list[Any]) -> None:
     """Validate a submitted answer for a dropdown question.
 
     Follows the same logic as validate_radio_answer.
@@ -154,7 +156,7 @@ def validate_dropdown_answer(answer: dict, question, answer_options: list) -> No
     validate_radio_answer(answer, question, answer_options)
 
 
-def validate_checkbox_answer(answer: dict, question, answer_options: list) -> None:
+def validate_checkbox_answer(answer: dict[str, Any], question: Any, answer_options: list[Any]) -> None:
     """Validate a submitted answer for a multiple_choice (checkbox) question.
 
     answer: dict with key 'values' (list of str) and optionally 'other_value' (str).

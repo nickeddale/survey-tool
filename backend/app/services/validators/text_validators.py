@@ -14,6 +14,7 @@ Each answer validator:
 """
 
 import re
+from typing import Any
 
 from app.utils.errors import UnprocessableError
 
@@ -23,7 +24,7 @@ from app.utils.errors import UnprocessableError
 # ---------------------------------------------------------------------------
 
 
-def _validate_text_value(answer: dict, question, label: str = "Answer") -> str | None:
+def _validate_text_value(answer: dict[str, Any], question: Any, label: str = "Answer") -> str | None:
     """Extract and type-check the text value from the answer dict.
 
     Returns the string value (possibly empty/None after required check).
@@ -43,7 +44,7 @@ def _validate_text_value(answer: dict, question, label: str = "Answer") -> str |
     return value
 
 
-def _apply_text_validation_rules(value: str, validation: dict | None) -> None:
+def _apply_text_validation_rules(value: str, validation: dict[str, Any] | None) -> None:
     """Apply min_length, max_length, and regex rules from the validation JSONB."""
     if validation is None:
         return
@@ -98,7 +99,7 @@ def _check_url_format(value: str) -> None:
 _VALID_INPUT_TYPES = frozenset({"text", "email", "url", "tel"})
 
 
-def validate_short_text_settings(settings: dict | None) -> None:
+def validate_short_text_settings(settings: dict[str, Any] | None) -> None:
     """Validate settings for short_text questions.
 
     Optional fields:
@@ -130,7 +131,7 @@ def validate_short_text_settings(settings: dict | None) -> None:
             )
 
 
-def validate_long_text_settings(settings: dict | None) -> None:
+def validate_long_text_settings(settings: dict[str, Any] | None) -> None:
     """Validate settings for long_text questions.
 
     Optional fields:
@@ -162,7 +163,7 @@ def validate_long_text_settings(settings: dict | None) -> None:
             raise UnprocessableError("settings.rows must be > 0")
 
 
-def validate_huge_text_settings(settings: dict | None) -> None:
+def validate_huge_text_settings(settings: dict[str, Any] | None) -> None:
     """Validate settings for huge_text questions.
 
     Optional fields:
@@ -204,7 +205,7 @@ def validate_huge_text_settings(settings: dict | None) -> None:
 # ---------------------------------------------------------------------------
 
 
-def validate_short_text_answer(answer: dict, question) -> None:
+def validate_short_text_answer(answer: dict[str, Any], question: Any) -> None:
     """Validate a submitted answer for a short_text question.
 
     answer: {"value": str | None}
@@ -232,7 +233,7 @@ def validate_short_text_answer(answer: dict, question) -> None:
     _apply_text_validation_rules(value, question.validation)
 
 
-def validate_long_text_answer(answer: dict, question) -> None:
+def validate_long_text_answer(answer: dict[str, Any], question: Any) -> None:
     """Validate a submitted answer for a long_text question.
 
     answer: {"value": str | None}
@@ -253,7 +254,7 @@ def validate_long_text_answer(answer: dict, question) -> None:
     _apply_text_validation_rules(value, question.validation)
 
 
-def validate_huge_text_answer(answer: dict, question) -> None:
+def validate_huge_text_answer(answer: dict[str, Any], question: Any) -> None:
     """Validate a submitted answer for a huge_text question.
 
     answer: {"value": str | None}
@@ -274,7 +275,7 @@ def validate_huge_text_answer(answer: dict, question) -> None:
     _apply_text_validation_rules(value, question.validation)
 
 
-def validate_email_answer(answer: dict, question) -> None:
+def validate_email_answer(answer: dict[str, Any], question: Any) -> None:
     """Validate a submitted answer for an email question.
 
     answer: {"value": str | None}
@@ -289,7 +290,7 @@ def validate_email_answer(answer: dict, question) -> None:
     _apply_text_validation_rules(value, question.validation)
 
 
-def validate_phone_answer(answer: dict, question) -> None:
+def validate_phone_answer(answer: dict[str, Any], question: Any) -> None:
     """Validate a submitted answer for a phone question.
 
     answer: {"value": str | None}
@@ -309,7 +310,7 @@ def validate_phone_answer(answer: dict, question) -> None:
     _apply_text_validation_rules(value, question.validation)
 
 
-def validate_url_answer(answer: dict, question) -> None:
+def validate_url_answer(answer: dict[str, Any], question: Any) -> None:
     """Validate a submitted answer for a url question.
 
     answer: {"value": str | None}
