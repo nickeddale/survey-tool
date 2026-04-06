@@ -7,6 +7,23 @@ from pydantic import BaseModel
 from app.schemas.question_group import QuestionGroupResponse
 
 
+class SurveyVersionResponse(BaseModel):
+    model_config = {"from_attributes": True}
+
+    id: uuid.UUID
+    survey_id: uuid.UUID
+    version: int
+    snapshot: dict[str, Any]
+    created_at: datetime
+
+
+class SurveyVersionListResponse(BaseModel):
+    items: list[SurveyVersionResponse]
+    total: int
+    page: int
+    per_page: int
+
+
 class SurveyCreate(BaseModel):
     title: str
     description: str | None = None
@@ -45,6 +62,7 @@ class SurveyResponse(BaseModel):
     default_language: str
     settings: dict[str, Any] | None
     translations: dict[str, Any] = {}
+    version: int
     created_at: datetime
     updated_at: datetime
 
