@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime, timezone
+from typing import Any
 
 from fastapi import HTTPException
 from sqlalchemy import func, select
@@ -8,7 +9,7 @@ from sqlalchemy.orm import selectinload
 
 from app.models.question import Question
 from app.models.question_group import QuestionGroup
-from app.models.survey import Survey
+from app.models.survey import Survey, SurveyVersion
 from app.services.webhook_service import dispatch_webhook_event
 
 
@@ -119,6 +120,25 @@ async def list_surveys(
     return items, total
 
 
+def _build_survey_snapshot(survey: Survey) -> dict[str, Any]:
+    """Build a JSON-serializable snapshot of the current survey state."""
+    return {
+        "id": str(survey.id),
+        "user_id": str(survey.user_id),
+        "title": survey.title,
+        "description": survey.description,
+        "status": survey.status,
+        "welcome_message": survey.welcome_message,
+        "end_message": survey.end_message,
+        "default_language": survey.default_language,
+        "settings": survey.settings,
+        "translations": survey.translations,
+        "version": survey.version,
+        "created_at": survey.created_at.isoformat() if survey.created_at else None,
+        "updated_at": survey.updated_at.isoformat() if survey.updated_at else None,
+    }
+
+
 async def update_survey(
     session: AsyncSession,
     survey: Survey,
@@ -126,15 +146,53 @@ async def update_survey(
 ) -> Survey:
     """Update only the provided fields of a survey. Raises 422 if survey is not in draft status."""
     check_survey_editable(survey)
+
+    # Save snapshot of current state before applying changes
+    snapshot = _build_survey_snapshot(survey)
+    survey_version = SurveyVersion(
+        id=uuid.uuid4(),
+        survey_id=survey.id,
+        version=survey.version,
+        snapshot=snapshot,
+    )
+    session.add(survey_version)
+
     for field, value in kwargs.items():
         if value is not None:
             setattr(survey, field, value)
 
+    survey.version = survey.version + 1
     survey.updated_at = datetime.now(timezone.utc)
     session.add(survey)
     await session.flush()
     await session.refresh(survey)
     return survey
+
+
+async def get_survey_versions(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+    page: int = 1,
+    per_page: int = 20,
+) -> tuple[list[SurveyVersion], int]:
+    """Return paginated version history for a survey, ordered by version desc."""
+    base_query = select(SurveyVersion).where(SurveyVersion.survey_id == survey_id)
+
+    count_query = select(func.count()).select_from(base_query.subquery())
+    count_result = await session.execute(count_query)
+    total = count_result.scalar_one()
+
+    offset = (page - 1) * per_page
+    items_query = (
+        base_query
+        .order_by(SurveyVersion.version.desc())
+        .offset(offset)
+        .limit(per_page)
+    )
+    items_result = await session.execute(items_query)
+    items = list(items_result.scalars().all())
+
+    return items, total
 
 
 def check_survey_editable(survey: Survey) -> None:

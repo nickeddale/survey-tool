@@ -405,3 +405,150 @@ async def test_delete_survey_requires_auth(client: AsyncClient):
     fake_id = "00000000-0000-0000-0000-000000000000"
     response = await client.delete(f"{SURVEYS_URL}/{fake_id}")
     assert response.status_code == 403
+
+
+# --------------------------------------------------------------------------- #
+# Survey versioning
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.asyncio
+async def test_create_survey_version_starts_at_1(client: AsyncClient):
+    headers = await auth_headers(client)
+    response = await client.post(SURVEYS_URL, json={"title": "Versioned Survey"}, headers=headers)
+    assert response.status_code == 201
+    assert response.json()["version"] == 1
+
+
+@pytest.mark.asyncio
+async def test_patch_survey_increments_version(client: AsyncClient):
+    headers = await auth_headers(client)
+    create_resp = await client.post(SURVEYS_URL, json={"title": "V1 Survey"}, headers=headers)
+    survey_id = create_resp.json()["id"]
+    assert create_resp.json()["version"] == 1
+
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}", json={"title": "V2 Survey"}, headers=headers
+    )
+    assert patch_resp.status_code == 200
+    assert patch_resp.json()["version"] == 2
+
+
+@pytest.mark.asyncio
+async def test_patch_survey_multiple_times_increments_version(client: AsyncClient):
+    headers = await auth_headers(client)
+    create_resp = await client.post(SURVEYS_URL, json={"title": "Survey"}, headers=headers)
+    survey_id = create_resp.json()["id"]
+
+    await client.patch(f"{SURVEYS_URL}/{survey_id}", json={"title": "Update 1"}, headers=headers)
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}", json={"title": "Update 2"}, headers=headers
+    )
+    assert patch_resp.json()["version"] == 3
+
+
+@pytest.mark.asyncio
+async def test_get_survey_versions_returns_history(client: AsyncClient):
+    headers = await auth_headers(client)
+    create_resp = await client.post(SURVEYS_URL, json={"title": "History Survey"}, headers=headers)
+    survey_id = create_resp.json()["id"]
+
+    # Perform two updates to generate two version snapshots
+    await client.patch(f"{SURVEYS_URL}/{survey_id}", json={"title": "Update 1"}, headers=headers)
+    await client.patch(f"{SURVEYS_URL}/{survey_id}", json={"title": "Update 2"}, headers=headers)
+
+    versions_resp = await client.get(f"{SURVEYS_URL}/{survey_id}/versions", headers=headers)
+    assert versions_resp.status_code == 200
+    body = versions_resp.json()
+    assert body["total"] == 2
+    assert len(body["items"]) == 2
+    # Ordered by version desc — most recent snapshot first (version 2 before version 1)
+    assert body["items"][0]["version"] == 2
+    assert body["items"][1]["version"] == 1
+
+
+@pytest.mark.asyncio
+async def test_get_survey_versions_snapshot_content(client: AsyncClient):
+    headers = await auth_headers(client)
+    create_resp = await client.post(SURVEYS_URL, json={"title": "Snapshot Survey"}, headers=headers)
+    survey_id = create_resp.json()["id"]
+
+    await client.patch(
+        f"{SURVEYS_URL}/{survey_id}", json={"title": "Updated Title"}, headers=headers
+    )
+
+    versions_resp = await client.get(f"{SURVEYS_URL}/{survey_id}/versions", headers=headers)
+    assert versions_resp.status_code == 200
+    items = versions_resp.json()["items"]
+    assert len(items) == 1
+    snapshot = items[0]["snapshot"]
+    # Snapshot should capture the ORIGINAL title before the update
+    assert snapshot["title"] == "Snapshot Survey"
+    assert snapshot["version"] == 1
+
+
+@pytest.mark.asyncio
+async def test_get_survey_versions_empty_before_updates(client: AsyncClient):
+    headers = await auth_headers(client)
+    create_resp = await client.post(SURVEYS_URL, json={"title": "No Update Survey"}, headers=headers)
+    survey_id = create_resp.json()["id"]
+
+    versions_resp = await client.get(f"{SURVEYS_URL}/{survey_id}/versions", headers=headers)
+    assert versions_resp.status_code == 200
+    body = versions_resp.json()
+    assert body["total"] == 0
+    assert body["items"] == []
+
+
+@pytest.mark.asyncio
+async def test_get_survey_versions_not_found(client: AsyncClient):
+    headers = await auth_headers(client)
+    fake_id = "00000000-0000-0000-0000-000000000000"
+    response = await client.get(f"{SURVEYS_URL}/{fake_id}/versions", headers=headers)
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_get_survey_versions_requires_auth(client: AsyncClient):
+    fake_id = "00000000-0000-0000-0000-000000000000"
+    response = await client.get(f"{SURVEYS_URL}/{fake_id}/versions")
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_get_survey_versions_user_isolation(client: AsyncClient):
+    headers_owner = await auth_headers(client, email="owner_versions@example.com")
+    headers_other = await auth_headers(client, email="other_versions@example.com")
+
+    create_resp = await client.post(
+        SURVEYS_URL, json={"title": "Owner Survey"}, headers=headers_owner
+    )
+    survey_id = create_resp.json()["id"]
+    await client.patch(
+        f"{SURVEYS_URL}/{survey_id}", json={"title": "Updated"}, headers=headers_owner
+    )
+
+    response = await client.get(f"{SURVEYS_URL}/{survey_id}/versions", headers=headers_other)
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_get_survey_versions_pagination(client: AsyncClient):
+    headers = await auth_headers(client)
+    create_resp = await client.post(SURVEYS_URL, json={"title": "Paged Survey"}, headers=headers)
+    survey_id = create_resp.json()["id"]
+
+    # Perform 3 updates to generate 3 version entries
+    for i in range(3):
+        await client.patch(
+            f"{SURVEYS_URL}/{survey_id}", json={"title": f"Update {i}"}, headers=headers
+        )
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/versions?page=1&per_page=2", headers=headers
+    )
+    body = resp.json()
+    assert body["total"] == 3
+    assert len(body["items"]) == 2
+    assert body["page"] == 1
+    assert body["per_page"] == 2

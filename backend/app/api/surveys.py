@@ -16,6 +16,8 @@ from app.schemas.survey import (
     SurveyResponse,
     SurveyTranslationsUpdate,
     SurveyUpdate,
+    SurveyVersionListResponse,
+    SurveyVersionResponse,
 )
 from app.services.export_service import (
     clone_survey,
@@ -30,6 +32,7 @@ from app.services.survey_service import (
     delete_survey,
     get_survey_by_id,
     get_survey_full_by_id,
+    get_survey_versions,
     list_surveys,
     update_survey,
 )
@@ -136,6 +139,28 @@ async def patch(
     update_fields = payload.model_dump(exclude_unset=True)
     survey = await update_survey(session, survey, **update_fields)
     return SurveyResponse.model_validate(survey)
+
+
+@router.get("/{survey_id}/versions", response_model=SurveyVersionListResponse)
+async def list_versions(
+    survey_id: str,
+    page: int = Query(1, ge=1),
+    per_page: int = Query(20, ge=1, le=100),
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> SurveyVersionListResponse:
+    parsed_id = _parse_survey_id(survey_id)
+    survey = await get_survey_by_id(session, parsed_id, current_user.id)
+    if survey is None:
+        raise NotFoundError("Survey not found")
+
+    items, total = await get_survey_versions(session, parsed_id, page=page, per_page=per_page)
+    return SurveyVersionListResponse(
+        items=[SurveyVersionResponse.model_validate(v) for v in items],
+        total=total,
+        page=page,
+        per_page=per_page,
+    )
 
 
 @router.patch("/{survey_id}/translations", response_model=SurveyResponse)
