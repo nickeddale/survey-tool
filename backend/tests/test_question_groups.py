@@ -149,7 +149,11 @@ async def test_list_groups_returns_empty_initially(client: AsyncClient):
     survey_id = await create_survey(client, headers)
     response = await client.get(groups_url(survey_id), headers=headers)
     assert response.status_code == 200
-    assert response.json() == []
+    body = response.json()
+    assert body["items"] == []
+    assert body["total"] == 0
+    assert body["page"] == 1
+    assert body["per_page"] == 20
 
 
 @pytest.mark.asyncio
@@ -163,7 +167,7 @@ async def test_list_groups_ordered_by_sort_order(client: AsyncClient):
 
     response = await client.get(groups_url(survey_id), headers=headers)
     assert response.status_code == 200
-    titles = [g["title"] for g in response.json()]
+    titles = [g["title"] for g in response.json()["items"]]
     assert titles == ["A", "B", "C"]
 
 
@@ -357,7 +361,7 @@ async def test_delete_group_removes_from_list(client: AsyncClient):
     await client.delete(f"{groups_url(survey_id)}/{group_id}", headers=headers)
 
     list_resp = await client.get(groups_url(survey_id), headers=headers)
-    assert list_resp.json() == []
+    assert list_resp.json()["items"] == []
 
 
 @pytest.mark.asyncio
@@ -497,3 +501,90 @@ async def test_reorder_groups_wrong_owner_returns_404(client: AsyncClient):
         f"{groups_url(survey_id)}/reorder", json=reorder_payload, headers=headers_b
     )
     assert response.status_code == 404
+
+
+# --------------------------------------------------------------------------- #
+# GET /surveys/{survey_id}/groups — pagination
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.asyncio
+async def test_list_groups_pagination_response_shape(client: AsyncClient):
+    headers = await auth_headers(client)
+    survey_id = await create_survey(client, headers)
+
+    for i in range(3):
+        await client.post(
+            groups_url(survey_id), json={"title": f"Group {i + 1}"}, headers=headers
+        )
+
+    response = await client.get(groups_url(survey_id), headers=headers)
+    assert response.status_code == 200
+    body = response.json()
+    assert "items" in body
+    assert "total" in body
+    assert "page" in body
+    assert "per_page" in body
+    assert body["total"] == 3
+    assert body["page"] == 1
+    assert body["per_page"] == 20
+    assert len(body["items"]) == 3
+
+
+@pytest.mark.asyncio
+async def test_list_groups_pagination_per_page(client: AsyncClient):
+    headers = await auth_headers(client)
+    survey_id = await create_survey(client, headers)
+
+    for i in range(5):
+        await client.post(
+            groups_url(survey_id), json={"title": f"Group {i + 1}"}, headers=headers
+        )
+
+    response = await client.get(
+        groups_url(survey_id), params={"page": 1, "per_page": 2}, headers=headers
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["total"] == 5
+    assert body["page"] == 1
+    assert body["per_page"] == 2
+    assert len(body["items"]) == 2
+
+
+@pytest.mark.asyncio
+async def test_list_groups_pagination_second_page(client: AsyncClient):
+    headers = await auth_headers(client)
+    survey_id = await create_survey(client, headers)
+
+    for i in range(5):
+        await client.post(
+            groups_url(survey_id), json={"title": f"Group {i + 1}"}, headers=headers
+        )
+
+    response = await client.get(
+        groups_url(survey_id), params={"page": 2, "per_page": 3}, headers=headers
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["total"] == 5
+    assert body["page"] == 2
+    assert body["per_page"] == 3
+    assert len(body["items"]) == 2  # only 2 remaining on page 2
+
+
+@pytest.mark.asyncio
+async def test_list_groups_pagination_out_of_range_returns_empty_items(client: AsyncClient):
+    headers = await auth_headers(client)
+    survey_id = await create_survey(client, headers)
+
+    await client.post(groups_url(survey_id), json={"title": "Only Group"}, headers=headers)
+
+    response = await client.get(
+        groups_url(survey_id), params={"page": 99, "per_page": 20}, headers=headers
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["total"] == 1
+    assert body["page"] == 99
+    assert body["items"] == []

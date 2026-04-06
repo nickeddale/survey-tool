@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-06T20:11:32.347Z",
+  "lastUpdated": "2026-04-06T20:16:19.601Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2934,6 +2934,23 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-06-iss-152-cq-03-gap-add-pagination-to-question-groups-list-e.md",
+      "ticketId": "ISS-152",
+      "title": "CQ-03 gap: Add pagination to question groups list endpoint",
+      "date": "2026-04-06",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "feature",
+        "performance",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -3077,7 +3094,8 @@
       "2026-04-06-iss-148-fe-05-use-validationerrors-component-consistently.md",
       "2026-04-06-iss-149-fe-06-extract-localstorage-helpers-to-shared-utils.md",
       "2026-04-06-iss-150-fe-07-break-up-surveyresponsepage.md",
-      "2026-04-06-iss-151-sec-05-gap-add-rate-limiting-to-logic-validation-e.md"
+      "2026-04-06-iss-151-sec-05-gap-add-rate-limiting-to-logic-validation-e.md",
+      "2026-04-06-iss-152-cq-03-gap-add-pagination-to-question-groups-list-e.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3205,7 +3223,8 @@
       "2026-04-06-iss-148-fe-05-use-validationerrors-component-consistently.md",
       "2026-04-06-iss-149-fe-06-extract-localstorage-helpers-to-shared-utils.md",
       "2026-04-06-iss-150-fe-07-break-up-surveyresponsepage.md",
-      "2026-04-06-iss-151-sec-05-gap-add-rate-limiting-to-logic-validation-e.md"
+      "2026-04-06-iss-151-sec-05-gap-add-rate-limiting-to-logic-validation-e.md",
+      "2026-04-06-iss-152-cq-03-gap-add-pagination-to-question-groups-list-e.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3315,7 +3334,8 @@
       "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md",
       "2026-04-06-iss-145-fe-02-break-up-logiceditor.md",
       "2026-04-06-iss-148-fe-05-use-validationerrors-component-consistently.md",
-      "2026-04-06-iss-151-sec-05-gap-add-rate-limiting-to-logic-validation-e.md"
+      "2026-04-06-iss-151-sec-05-gap-add-rate-limiting-to-logic-validation-e.md",
+      "2026-04-06-iss-152-cq-03-gap-add-pagination-to-question-groups-list-e.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3767,7 +3787,8 @@
       "2026-04-06-iss-148-fe-05-use-validationerrors-component-consistently.md",
       "2026-04-06-iss-149-fe-06-extract-localstorage-helpers-to-shared-utils.md",
       "2026-04-06-iss-150-fe-07-break-up-surveyresponsepage.md",
-      "2026-04-06-iss-151-sec-05-gap-add-rate-limiting-to-logic-validation-e.md"
+      "2026-04-06-iss-151-sec-05-gap-add-rate-limiting-to-logic-validation-e.md",
+      "2026-04-06-iss-152-cq-03-gap-add-pagination-to-question-groups-list-e.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3836,7 +3857,8 @@
       "2026-04-06-iss-138-inf-03-add-dockerignore-files.md",
       "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md",
       "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md",
-      "2026-04-06-iss-151-sec-05-gap-add-rate-limiting-to-logic-validation-e.md"
+      "2026-04-06-iss-151-sec-05-gap-add-rate-limiting-to-logic-validation-e.md",
+      "2026-04-06-iss-152-cq-03-gap-add-pagination-to-question-groups-list-e.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4132,7 +4154,8 @@
       "2026-04-06-iss-146-fe-03-break-up-surveydetailpage.md",
       "2026-04-06-iss-148-fe-05-use-validationerrors-component-consistently.md",
       "2026-04-06-iss-150-fe-07-break-up-surveyresponsepage.md",
-      "2026-04-06-iss-151-sec-05-gap-add-rate-limiting-to-logic-validation-e.md"
+      "2026-04-06-iss-151-sec-05-gap-add-rate-limiting-to-logic-validation-e.md",
+      "2026-04-06-iss-152-cq-03-gap-add-pagination-to-question-groups-list-e.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
