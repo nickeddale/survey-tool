@@ -203,7 +203,7 @@ describe('FileUploadInput — file type validation', () => {
         errors={['"document.exe" is not an allowed file type.']}
       />
     )
-    expect(screen.getByTestId('file-upload-errors')).toHaveTextContent('not an allowed file type')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('not an allowed file type')
   })
 
   it('shows error for oversized file via external errors', () => {
@@ -216,7 +216,7 @@ describe('FileUploadInput — file type validation', () => {
         errors={['"huge.pdf" exceeds the maximum size of 1 MB.']}
       />
     )
-    expect(screen.getByTestId('file-upload-errors')).toHaveTextContent('exceeds the maximum size')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('exceeds the maximum size')
   })
 
   it('accepts files with no allowed_types restriction', () => {
@@ -229,7 +229,7 @@ describe('FileUploadInput — file type validation', () => {
       />
     )
     // No errors should be shown
-    expect(screen.queryByTestId('file-upload-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 })
 
@@ -246,7 +246,7 @@ describe('FileUploadInput — required validation', () => {
         question={makeQuestion({ is_required: true })}
       />
     )
-    expect(screen.queryByTestId('file-upload-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('shows required error on blur when no file uploaded', () => {
@@ -258,7 +258,7 @@ describe('FileUploadInput — required validation', () => {
       />
     )
     fireEvent.blur(screen.getByTestId('file-upload-input-q-fu-1'))
-    expect(screen.getByTestId('file-upload-errors')).toHaveTextContent('This field is required.')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('This field is required.')
   })
 })
 
@@ -276,7 +276,7 @@ describe('FileUploadInput — external errors', () => {
         errors={['Upload failed on server']}
       />
     )
-    expect(screen.getByTestId('file-upload-errors')).toHaveTextContent('Upload failed on server')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('Upload failed on server')
   })
 })
 
@@ -378,7 +378,7 @@ describe('FileUploadInput — accessibility', () => {
       'aria-describedby',
       'question-q-test-error',
     )
-    expect(screen.getByTestId('file-upload-errors')).toHaveAttribute('id', 'question-q-test-error')
+    expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')
   })
 
   it('error list has role=alert', () => {
@@ -390,6 +390,6 @@ describe('FileUploadInput — accessibility', () => {
         errors={['Error']}
       />
     )
-    expect(screen.getByTestId('file-upload-errors')).toHaveAttribute('role', 'alert')
+    expect(screen.getByTestId('validation-errors')).toHaveAttribute('role', 'alert')
   })
 })

@@ -228,7 +228,7 @@ describe('DropdownInput — required validation', () => {
   it('does not show errors before blur (untouched)', () => {
     const question = makeQuestion({ is_required: true })
     render(<DropdownInput value="" onChange={vi.fn()} question={question} />)
-    expect(screen.queryByTestId('dropdown-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('shows required error on blur when nothing selected', () => {
@@ -237,7 +237,7 @@ describe('DropdownInput — required validation', () => {
 
     fireEvent.blur(screen.getByTestId('dropdown-select'))
 
-    expect(screen.getByTestId('dropdown-errors')).toHaveTextContent('This field is required.')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('This field is required.')
   })
 
   it('does not show required error when not required', () => {
@@ -246,7 +246,7 @@ describe('DropdownInput — required validation', () => {
 
     fireEvent.blur(screen.getByTestId('dropdown-select'))
 
-    expect(screen.queryByTestId('dropdown-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('shows Other text required error when Other selected but no text', () => {
@@ -255,7 +255,7 @@ describe('DropdownInput — required validation', () => {
 
     fireEvent.blur(screen.getByTestId('dropdown-select'))
 
-    expect(screen.getByTestId('dropdown-errors')).toHaveTextContent('"Other"')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('"Other"')
   })
 })
 
@@ -269,7 +269,7 @@ describe('DropdownInput — external errors prop', () => {
     render(
       <DropdownInput value="" onChange={vi.fn()} question={question} errors={['Server error occurred']} />
     )
-    expect(screen.getByTestId('dropdown-errors')).toHaveTextContent('Server error occurred')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error occurred')
   })
 })
 
@@ -295,6 +295,6 @@ describe('DropdownInput — accessibility', () => {
     render(<DropdownInput value="" onChange={vi.fn()} question={question} errors={['Required']} />)
     const select = screen.getByTestId('dropdown-select')
     expect(select).toHaveAttribute('aria-describedby', 'question-q-test-error')
-    expect(screen.getByTestId('dropdown-errors')).toHaveAttribute('id', 'question-q-test-error')
+    expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')
   })
 })

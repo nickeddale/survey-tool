@@ -117,7 +117,7 @@ describe('DateInput — required validation', () => {
   it('does not show errors before blur (untouched)', () => {
     const question = makeQuestion({ is_required: true })
     render(<DateInput value="" onChange={vi.fn()} question={question} />)
-    expect(screen.queryByTestId('date-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('shows required error on blur when empty and required', () => {
@@ -126,7 +126,7 @@ describe('DateInput — required validation', () => {
 
     fireEvent.blur(screen.getByTestId('date-input'))
 
-    expect(screen.getByTestId('date-errors')).toHaveTextContent('This field is required.')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('This field is required.')
   })
 
   it('does not show required error when not required', () => {
@@ -135,7 +135,7 @@ describe('DateInput — required validation', () => {
 
     fireEvent.blur(screen.getByTestId('date-input'))
 
-    expect(screen.queryByTestId('date-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('does not show error when value is set and required', () => {
@@ -144,7 +144,7 @@ describe('DateInput — required validation', () => {
 
     fireEvent.blur(screen.getByTestId('date-input'))
 
-    expect(screen.queryByTestId('date-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 })
 
@@ -159,7 +159,7 @@ describe('DateInput — date range validation', () => {
 
     fireEvent.blur(screen.getByTestId('date-input'))
 
-    expect(screen.getByTestId('date-errors')).toHaveTextContent('on or after 2024-06-01')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('on or after 2024-06-01')
   })
 
   it('shows error when date is after max_date', () => {
@@ -168,7 +168,7 @@ describe('DateInput — date range validation', () => {
 
     fireEvent.blur(screen.getByTestId('date-input'))
 
-    expect(screen.getByTestId('date-errors')).toHaveTextContent('on or before 2024-06-30')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('on or before 2024-06-30')
   })
 
   it('does not show error when date is within range', () => {
@@ -179,7 +179,7 @@ describe('DateInput — date range validation', () => {
 
     fireEvent.blur(screen.getByTestId('date-input'))
 
-    expect(screen.queryByTestId('date-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('does not show range error for empty value (unless required)', () => {
@@ -191,7 +191,7 @@ describe('DateInput — date range validation', () => {
 
     fireEvent.blur(screen.getByTestId('date-input'))
 
-    expect(screen.queryByTestId('date-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 })
 
@@ -204,7 +204,7 @@ describe('DateInput — external errors prop', () => {
     render(
       <DateInput value="" onChange={vi.fn()} question={makeQuestion()} errors={['Server error']} />
     )
-    expect(screen.getByTestId('date-errors')).toHaveTextContent('Server error')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error')
   })
 })
 
@@ -232,6 +232,6 @@ describe('DateInput — accessibility', () => {
     )
     const input = screen.getByTestId('date-input')
     expect(input).toHaveAttribute('aria-describedby', 'question-q-test-error')
-    expect(screen.getByTestId('date-errors')).toHaveAttribute('id', 'question-q-test-error')
+    expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')
   })
 })

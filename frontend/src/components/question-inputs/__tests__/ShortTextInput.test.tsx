@@ -168,7 +168,7 @@ describe('ShortTextInput — required validation', () => {
       await user.tab()
     })
 
-    const errors = await screen.findByTestId('short-text-errors')
+    const errors = await screen.findByTestId('validation-errors')
     expect(errors).toHaveTextContent('This field is required.')
   })
 
@@ -183,13 +183,13 @@ describe('ShortTextInput — required validation', () => {
       await user.tab()
     })
 
-    expect(screen.queryByTestId('short-text-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('does not show required error before blur (untouched)', () => {
     const question = makeQuestion({ is_required: true, settings: makeSettings() })
     render(<ShortTextInput value="" onChange={vi.fn()} question={question} />)
-    expect(screen.queryByTestId('short-text-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 })
 
@@ -209,7 +209,7 @@ describe('ShortTextInput — email validation', () => {
       await user.tab()
     })
 
-    const errors = await screen.findByTestId('short-text-errors')
+    const errors = await screen.findByTestId('validation-errors')
     expect(errors).toHaveTextContent('valid email address')
   })
 
@@ -224,7 +224,7 @@ describe('ShortTextInput — email validation', () => {
       await user.tab()
     })
 
-    expect(screen.queryByTestId('short-text-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 })
 
@@ -244,7 +244,7 @@ describe('ShortTextInput — URL validation', () => {
       await user.tab()
     })
 
-    const errors = await screen.findByTestId('short-text-errors')
+    const errors = await screen.findByTestId('validation-errors')
     expect(errors).toHaveTextContent('valid URL')
   })
 
@@ -259,7 +259,7 @@ describe('ShortTextInput — URL validation', () => {
       await user.tab()
     })
 
-    expect(screen.queryByTestId('short-text-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('does not show error for valid http URL', async () => {
@@ -273,7 +273,7 @@ describe('ShortTextInput — URL validation', () => {
       await user.tab()
     })
 
-    expect(screen.queryByTestId('short-text-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 })
 
@@ -293,7 +293,7 @@ describe('ShortTextInput — max_length validation', () => {
       await user.tab()
     })
 
-    const errors = await screen.findByTestId('short-text-errors')
+    const errors = await screen.findByTestId('validation-errors')
     expect(errors).toHaveTextContent('5 characters')
   })
 })
@@ -308,7 +308,7 @@ describe('ShortTextInput — external errors prop', () => {
     render(
       <ShortTextInput value="" onChange={vi.fn()} question={question} errors={['Server error occurred']} />
     )
-    expect(screen.getByTestId('short-text-errors')).toHaveTextContent('Server error occurred')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error occurred')
   })
 })
 
@@ -338,6 +338,6 @@ describe('ShortTextInput — accessibility', () => {
     )
     const input = screen.getByTestId('short-text-input')
     expect(input).toHaveAttribute('aria-describedby', 'question-q-test-error')
-    expect(screen.getByTestId('short-text-errors')).toHaveAttribute('id', 'question-q-test-error')
+    expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')
   })
 })

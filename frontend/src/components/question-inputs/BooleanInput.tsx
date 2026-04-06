@@ -8,6 +8,7 @@
 import { useState } from 'react'
 import type { BuilderQuestion } from '../../store/builderStore'
 import type { BooleanSettings } from '../../types/questionSettings'
+import { ValidationErrors } from '../common/ValidationErrors'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -97,15 +98,7 @@ export function BooleanInput({ value, onChange, question, errors: externalErrors
           </span>
         </label>
 
-        {hasErrors && (
-          <ul id={errorId} role="alert" aria-live="assertive" className="space-y-0.5" data-testid="boolean-errors">
-            {displayErrors.map((err, i) => (
-              <li key={i} className="text-xs text-destructive">
-                {err}
-              </li>
-            ))}
-          </ul>
-        )}
+        <ValidationErrors errors={displayErrors} id={errorId} />
       </div>
     )
   }
@@ -150,15 +143,7 @@ export function BooleanInput({ value, onChange, question, errors: externalErrors
           </label>
         </div>
 
-        {hasErrors && (
-          <ul id={errorId} role="alert" aria-live="assertive" className="space-y-0.5" data-testid="boolean-errors">
-            {displayErrors.map((err, i) => (
-              <li key={i} className="text-xs text-destructive">
-                {err}
-              </li>
-            ))}
-          </ul>
-        )}
+        <ValidationErrors errors={displayErrors} id={errorId} />
       </div>
     )
   }
@@ -183,15 +168,7 @@ export function BooleanInput({ value, onChange, question, errors: externalErrors
         {value === 'true' ? trueLabel : falseLabel}
       </label>
 
-      {hasErrors && (
-        <ul id={errorId} role="alert" aria-live="assertive" className="space-y-0.5" data-testid="boolean-errors">
-          {displayErrors.map((err, i) => (
-            <li key={i} className="text-xs text-destructive">
-              {err}
-            </li>
-          ))}
-        </ul>
-      )}
+      <ValidationErrors errors={displayErrors} id={errorId} />
     </div>
   )
 }

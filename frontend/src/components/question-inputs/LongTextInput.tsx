@@ -8,6 +8,7 @@
 import { useState } from 'react'
 import type { BuilderQuestion } from '../../store/builderStore'
 import type { LongTextSettings } from '../../types/questionSettings'
+import { ValidationErrors } from '../common/ValidationErrors'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -97,15 +98,7 @@ export function LongTextInput({ value, onChange, question, errors: externalError
         </p>
       )}
 
-      {hasErrors && (
-        <ul id={errorId} role="alert" aria-live="assertive" className="space-y-0.5" data-testid="long-text-errors">
-          {displayErrors.map((err, i) => (
-            <li key={i} className="text-xs text-destructive">
-              {err}
-            </li>
-          ))}
-        </ul>
-      )}
+      <ValidationErrors errors={displayErrors} id={errorId} />
     </div>
   )
 }

@@ -276,7 +276,7 @@ describe('MatrixDropdownInput — is_all_rows_required validation', () => {
       subquestions,
     })
     render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} />)
-    expect(screen.queryByTestId('matrix-dropdown-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('shows error on blur when is_all_rows_required and rows unanswered', () => {
@@ -292,7 +292,7 @@ describe('MatrixDropdownInput — is_all_rows_required validation', () => {
 
     fireEvent.blur(screen.getByTestId('matrix-dropdown-input-q-mdd-1'))
 
-    expect(screen.getByTestId('matrix-dropdown-errors')).toHaveTextContent('Please answer all rows.')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('Please answer all rows.')
   })
 
   it('does not show error when all rows are answered', () => {
@@ -308,7 +308,7 @@ describe('MatrixDropdownInput — is_all_rows_required validation', () => {
 
     fireEvent.blur(screen.getByTestId('matrix-dropdown-input-q-mdd-1'))
 
-    expect(screen.queryByTestId('matrix-dropdown-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 })
 
@@ -322,7 +322,7 @@ describe('MatrixDropdownInput — external errors prop', () => {
     render(
       <MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} errors={['Server error']} />
     )
-    expect(screen.getByTestId('matrix-dropdown-errors')).toHaveTextContent('Server error')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error')
   })
 })
 
@@ -348,13 +348,13 @@ describe('MatrixDropdownInput — accessibility', () => {
     render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} errors={['Required']} />)
     const table = screen.getByRole('table')
     expect(table).toHaveAttribute('aria-describedby', 'question-q-test-error')
-    expect(screen.getByTestId('matrix-dropdown-errors')).toHaveAttribute('id', 'question-q-test-error')
+    expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')
   })
 
   it('error list has role=alert and aria-live=assertive', () => {
     const question = makeQuestion()
     render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} errors={['Error']} />)
-    const errorList = screen.getByTestId('matrix-dropdown-errors')
+    const errorList = screen.getByTestId('validation-errors')
     expect(errorList).toHaveAttribute('role', 'alert')
     expect(errorList).toHaveAttribute('aria-live', 'assertive')
   })

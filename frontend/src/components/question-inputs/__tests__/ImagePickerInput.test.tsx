@@ -287,7 +287,7 @@ describe('ImagePickerInput — multi-select', () => {
       />
     )
     fireEvent.blur(screen.getByTestId('image-picker-input-q-ip-1'))
-    expect(screen.getByTestId('image-picker-errors')).toHaveTextContent('at least 2')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('at least 2')
   })
 
   it('shows max_choices error on blur when too many selected', () => {
@@ -307,7 +307,7 @@ describe('ImagePickerInput — multi-select', () => {
       />
     )
     fireEvent.blur(screen.getByTestId('image-picker-input-q-ip-1'))
-    expect(screen.getByTestId('image-picker-errors')).toHaveTextContent('at most 2')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('at most 2')
   })
 })
 
@@ -324,7 +324,7 @@ describe('ImagePickerInput — required validation', () => {
         question={makeQuestion({ is_required: true })}
       />
     )
-    expect(screen.queryByTestId('image-picker-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('shows required error on blur when nothing selected', () => {
@@ -336,7 +336,7 @@ describe('ImagePickerInput — required validation', () => {
       />
     )
     fireEvent.blur(screen.getByTestId('image-picker-input-q-ip-1'))
-    expect(screen.getByTestId('image-picker-errors')).toHaveTextContent('This field is required.')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('This field is required.')
   })
 })
 
@@ -354,7 +354,7 @@ describe('ImagePickerInput — external errors', () => {
         errors={['An error from server']}
       />
     )
-    expect(screen.getByTestId('image-picker-errors')).toHaveTextContent('An error from server')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('An error from server')
   })
 })
 
@@ -391,7 +391,7 @@ describe('ImagePickerInput — accessibility', () => {
     )
     const grid = screen.getByTestId('image-picker-grid')
     expect(grid).toHaveAttribute('aria-describedby', 'question-q-test-error')
-    expect(screen.getByTestId('image-picker-errors')).toHaveAttribute('id', 'question-q-test-error')
+    expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')
   })
 
   it('sets aria-checked=true on selected option', () => {

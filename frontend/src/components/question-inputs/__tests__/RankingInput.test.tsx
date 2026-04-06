@@ -162,7 +162,7 @@ describe('RankingInput — required validation', () => {
         question={makeQuestion({ is_required: true })}
       />
     )
-    expect(screen.queryByTestId('ranking-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('shows required error on blur when value is empty', () => {
@@ -174,7 +174,7 @@ describe('RankingInput — required validation', () => {
       />
     )
     fireEvent.blur(screen.getByTestId('ranking-input-q-rank-1'))
-    expect(screen.getByTestId('ranking-errors')).toHaveTextContent('This field is required.')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('This field is required.')
   })
 
   it('shows "rank all options" error when not all options are ranked', () => {
@@ -190,7 +190,7 @@ describe('RankingInput — required validation', () => {
       />
     )
     fireEvent.blur(screen.getByTestId('ranking-input-q-rank-1'))
-    expect(screen.getByTestId('ranking-errors')).toHaveTextContent('Please rank all options.')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('Please rank all options.')
   })
 
   it('does not show error when all options are ranked', () => {
@@ -206,7 +206,7 @@ describe('RankingInput — required validation', () => {
       />
     )
     fireEvent.blur(screen.getByTestId('ranking-input-q-rank-1'))
-    expect(screen.queryByTestId('ranking-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('does not show error when no options exist and no value (empty case)', () => {
@@ -218,7 +218,7 @@ describe('RankingInput — required validation', () => {
       />
     )
     fireEvent.blur(screen.getByTestId('ranking-input-q-rank-1'))
-    expect(screen.queryByTestId('ranking-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 })
 
@@ -236,7 +236,7 @@ describe('RankingInput — external errors', () => {
         errors={['Server validation failed']}
       />
     )
-    expect(screen.getByTestId('ranking-errors')).toHaveTextContent('Server validation failed')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server validation failed')
   })
 })
 
@@ -273,7 +273,7 @@ describe('RankingInput — accessibility', () => {
     )
     const list = screen.getByTestId('ranking-list')
     expect(list).toHaveAttribute('aria-describedby', 'question-q-test-error')
-    expect(screen.getByTestId('ranking-errors')).toHaveAttribute('id', 'question-q-test-error')
+    expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')
   })
 
   it('error list has role=alert and aria-live=assertive', () => {
@@ -285,7 +285,7 @@ describe('RankingInput — accessibility', () => {
         errors={['Error!']}
       />
     )
-    const errorList = screen.getByTestId('ranking-errors')
+    const errorList = screen.getByTestId('validation-errors')
     expect(errorList).toHaveAttribute('role', 'alert')
     expect(errorList).toHaveAttribute('aria-live', 'assertive')
   })

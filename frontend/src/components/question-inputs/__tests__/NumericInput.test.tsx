@@ -138,7 +138,7 @@ describe('NumericInput — required validation', () => {
   it('does not show errors before blur (untouched)', () => {
     const question = makeQuestion({ is_required: true })
     render(<NumericInput value="" onChange={vi.fn()} question={question} />)
-    expect(screen.queryByTestId('numeric-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('shows required error on blur when empty and required', () => {
@@ -147,7 +147,7 @@ describe('NumericInput — required validation', () => {
 
     fireEvent.blur(screen.getByTestId('numeric-input'))
 
-    expect(screen.getByTestId('numeric-errors')).toHaveTextContent('This field is required.')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('This field is required.')
   })
 
   it('does not show required error when not required', () => {
@@ -156,7 +156,7 @@ describe('NumericInput — required validation', () => {
 
     fireEvent.blur(screen.getByTestId('numeric-input'))
 
-    expect(screen.queryByTestId('numeric-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 })
 
@@ -171,7 +171,7 @@ describe('NumericInput — range validation', () => {
 
     fireEvent.blur(screen.getByTestId('numeric-input'))
 
-    expect(screen.getByTestId('numeric-errors')).toHaveTextContent('at least 10')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('at least 10')
   })
 
   it('shows max error when value exceeds max', () => {
@@ -180,7 +180,7 @@ describe('NumericInput — range validation', () => {
 
     fireEvent.blur(screen.getByTestId('numeric-input'))
 
-    expect(screen.getByTestId('numeric-errors')).toHaveTextContent('at most 100')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('at most 100')
   })
 
   it('does not show error when value is within range', () => {
@@ -189,7 +189,7 @@ describe('NumericInput — range validation', () => {
 
     fireEvent.blur(screen.getByTestId('numeric-input'))
 
-    expect(screen.queryByTestId('numeric-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 })
 
@@ -204,7 +204,7 @@ describe('NumericInput — decimal places validation', () => {
 
     fireEvent.blur(screen.getByTestId('numeric-input'))
 
-    expect(screen.getByTestId('numeric-errors')).toHaveTextContent('2 decimal places')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('2 decimal places')
   })
 
   it('does not show error when decimal places are within limit', () => {
@@ -213,7 +213,7 @@ describe('NumericInput — decimal places validation', () => {
 
     fireEvent.blur(screen.getByTestId('numeric-input'))
 
-    expect(screen.queryByTestId('numeric-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('shows error when integer setting but decimal value entered', () => {
@@ -222,7 +222,7 @@ describe('NumericInput — decimal places validation', () => {
 
     fireEvent.blur(screen.getByTestId('numeric-input'))
 
-    expect(screen.getByTestId('numeric-errors')).toHaveTextContent('0 decimal places')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('0 decimal places')
   })
 })
 
@@ -235,7 +235,7 @@ describe('NumericInput — external errors prop', () => {
     render(
       <NumericInput value="" onChange={vi.fn()} question={makeQuestion()} errors={['Server error']} />
     )
-    expect(screen.getByTestId('numeric-errors')).toHaveTextContent('Server error')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error')
   })
 })
 
@@ -263,6 +263,6 @@ describe('NumericInput — accessibility', () => {
     )
     const input = screen.getByTestId('numeric-input')
     expect(input).toHaveAttribute('aria-describedby', 'question-q-test-error')
-    expect(screen.getByTestId('numeric-errors')).toHaveAttribute('id', 'question-q-test-error')
+    expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')
   })
 })

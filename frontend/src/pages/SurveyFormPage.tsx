@@ -7,6 +7,7 @@ import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Card, CardContent } from '../components/ui/card'
+import { ValidationErrors } from '../components/common/ValidationErrors'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -305,11 +306,7 @@ function SurveyFormPage() {
                 placeholder="Enter survey title"
                 aria-required="true"
               />
-              {fieldErrors.title && (
-                <p className="text-sm text-destructive" role="alert">
-                  {fieldErrors.title}
-                </p>
-              )}
+              <ValidationErrors errors={fieldErrors.title ? [fieldErrors.title] : []} id="survey-form-title-error" />
             </div>
 
             {/* Description */}

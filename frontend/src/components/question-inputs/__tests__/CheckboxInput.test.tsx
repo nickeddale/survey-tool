@@ -350,7 +350,7 @@ describe('CheckboxInput — required validation', () => {
   it('does not show errors before blur (untouched)', () => {
     const question = makeQuestion({ is_required: true })
     render(<CheckboxInput value={[]} onChange={vi.fn()} question={question} />)
-    expect(screen.queryByTestId('checkbox-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('shows required error on blur when nothing selected', () => {
@@ -359,7 +359,7 @@ describe('CheckboxInput — required validation', () => {
 
     fireEvent.blur(screen.getByTestId('checkbox-input-q-cb-1'))
 
-    expect(screen.getByTestId('checkbox-errors')).toHaveTextContent('This field is required.')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('This field is required.')
   })
 
   it('does not show required error when not required', () => {
@@ -368,7 +368,7 @@ describe('CheckboxInput — required validation', () => {
 
     fireEvent.blur(screen.getByTestId('checkbox-input-q-cb-1'))
 
-    expect(screen.queryByTestId('checkbox-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('shows Other text required error when Other selected but no text', () => {
@@ -377,7 +377,7 @@ describe('CheckboxInput — required validation', () => {
 
     fireEvent.blur(screen.getByTestId('checkbox-input-q-cb-1'))
 
-    expect(screen.getByTestId('checkbox-errors')).toHaveTextContent('"Other"')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('"Other"')
   })
 })
 
@@ -400,7 +400,7 @@ describe('CheckboxInput — min/max_choices validation', () => {
 
     fireEvent.blur(screen.getByTestId('checkbox-input-q-cb-1'))
 
-    expect(screen.getByTestId('checkbox-errors')).toHaveTextContent('at least 2')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('at least 2')
   })
 
   it('shows error when more than max_choices selected on blur', () => {
@@ -417,7 +417,7 @@ describe('CheckboxInput — min/max_choices validation', () => {
 
     fireEvent.blur(screen.getByTestId('checkbox-input-q-cb-1'))
 
-    expect(screen.getByTestId('checkbox-errors')).toHaveTextContent('at most 2')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('at most 2')
   })
 
   it('does not show min_choices error when nothing selected yet', () => {
@@ -433,7 +433,7 @@ describe('CheckboxInput — min/max_choices validation', () => {
     fireEvent.blur(screen.getByTestId('checkbox-input-q-cb-1'))
 
     // No error since count is 0 (nothing selected, not required)
-    expect(screen.queryByTestId('checkbox-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 })
 
@@ -447,7 +447,7 @@ describe('CheckboxInput — external errors prop', () => {
     render(
       <CheckboxInput value={[]} onChange={vi.fn()} question={question} errors={['Server error occurred']} />
     )
-    expect(screen.getByTestId('checkbox-errors')).toHaveTextContent('Server error occurred')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error occurred')
   })
 })
 
@@ -473,6 +473,6 @@ describe('CheckboxInput — accessibility', () => {
     render(<CheckboxInput value={[]} onChange={vi.fn()} question={question} errors={['Required']} />)
     const grid = screen.getByTestId('checkbox-options-grid')
     expect(grid).toHaveAttribute('aria-describedby', 'question-q-test-error')
-    expect(screen.getByTestId('checkbox-errors')).toHaveAttribute('id', 'question-q-test-error')
+    expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')
   })
 })

@@ -26,6 +26,7 @@ import { CSS } from '@dnd-kit/utilities'
 import type { BuilderQuestion } from '../../store/builderStore'
 import type { RankingSettings } from '../../types/questionSettings'
 import type { AnswerOptionResponse } from '../../types/survey'
+import { ValidationErrors } from '../common/ValidationErrors'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -230,15 +231,7 @@ export function RankingInput({ value, onChange, question, errors: externalErrors
         </SortableContext>
       </DndContext>
 
-      {hasErrors && (
-        <ul id={errorId} role="alert" aria-live="assertive" className="space-y-0.5" data-testid="ranking-errors">
-          {displayErrors.map((err, i) => (
-            <li key={i} className="text-xs text-destructive">
-              {err}
-            </li>
-          ))}
-        </ul>
-      )}
+      <ValidationErrors errors={displayErrors} id={errorId} />
     </div>
   )
 }

@@ -9,6 +9,7 @@
 import { useState, useMemo } from 'react'
 import type { BuilderQuestion } from '../../store/builderStore'
 import type { CheckboxSettings } from '../../types/questionSettings'
+import { ValidationErrors } from '../common/ValidationErrors'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -243,15 +244,7 @@ export function CheckboxInput({ value, onChange, question, errors: externalError
         />
       )}
 
-      {hasErrors && (
-        <ul id={errorId} role="alert" aria-live="assertive" className="space-y-0.5" data-testid="checkbox-errors">
-          {displayErrors.map((err, i) => (
-            <li key={i} className="text-xs text-destructive">
-              {err}
-            </li>
-          ))}
-        </ul>
-      )}
+      <ValidationErrors errors={displayErrors} id={errorId} />
     </div>
   )
 }

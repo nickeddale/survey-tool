@@ -303,13 +303,13 @@ describe('MatrixDynamicInput — external errors prop', () => {
     render(
       <MatrixDynamicInput value={[]} onChange={vi.fn()} question={question} errors={['At least one row required']} />
     )
-    expect(screen.getByTestId('matrix-dynamic-errors')).toHaveTextContent('At least one row required')
+    expect(screen.getByTestId('validation-errors')).toHaveTextContent('At least one row required')
   })
 
   it('does not show error container when no errors', () => {
     const question = makeQuestion()
     render(<MatrixDynamicInput value={[]} onChange={vi.fn()} question={question} />)
-    expect(screen.queryByTestId('matrix-dynamic-errors')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 })
 
@@ -335,13 +335,13 @@ describe('MatrixDynamicInput — accessibility', () => {
     render(<MatrixDynamicInput value={[]} onChange={vi.fn()} question={question} errors={['Error']} />)
     const table = screen.getByRole('table')
     expect(table).toHaveAttribute('aria-describedby', 'question-q-test-error')
-    expect(screen.getByTestId('matrix-dynamic-errors')).toHaveAttribute('id', 'question-q-test-error')
+    expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')
   })
 
   it('error list has role=alert and aria-live=assertive', () => {
     const question = makeQuestion()
     render(<MatrixDynamicInput value={[]} onChange={vi.fn()} question={question} errors={['Error']} />)
-    const errorList = screen.getByTestId('matrix-dynamic-errors')
+    const errorList = screen.getByTestId('validation-errors')
     expect(errorList).toHaveAttribute('role', 'alert')
     expect(errorList).toHaveAttribute('aria-live', 'assertive')
   })
