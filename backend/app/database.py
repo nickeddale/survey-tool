@@ -16,6 +16,8 @@ engine = create_async_engine(
     settings.database_url,
     echo=False,
     pool_pre_ping=True,
+    pool_recycle=300,
+    isolation_level="READ COMMITTED",
 )
 
 async_session = async_sessionmaker(

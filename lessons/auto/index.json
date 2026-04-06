@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-06T14:23:44.848Z",
+  "lastUpdated": "2026-04-06T14:34:05.620Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2570,6 +2570,26 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-06-iss-132-rel-03-configure-database-poolrecycle-and-isolatio.md",
+      "ticketId": "ISS-132",
+      "title": "REL-03: Configure database pool_recycle and isolation level",
+      "date": "2026-04-06",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -2695,7 +2715,8 @@
       "2026-04-06-iss-128-cq-06-standardize-error-handling-rollback-exceptio.md",
       "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
       "2026-04-06-iss-130-rel-01-add-errorboundary-component.md",
-      "2026-04-06-iss-131-rel-02-fix-urlcreateobjecturl-memory-leak-in-fileu.md"
+      "2026-04-06-iss-131-rel-02-fix-urlcreateobjecturl-memory-leak-in-fileu.md",
+      "2026-04-06-iss-132-rel-03-configure-database-poolrecycle-and-isolatio.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2810,7 +2831,8 @@
       "2026-04-06-iss-128-cq-06-standardize-error-handling-rollback-exceptio.md",
       "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
       "2026-04-06-iss-130-rel-01-add-errorboundary-component.md",
-      "2026-04-06-iss-131-rel-02-fix-urlcreateobjecturl-memory-leak-in-fileu.md"
+      "2026-04-06-iss-131-rel-02-fix-urlcreateobjecturl-memory-leak-in-fileu.md",
+      "2026-04-06-iss-132-rel-03-configure-database-poolrecycle-and-isolatio.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2908,7 +2930,8 @@
       "2026-04-06-iss-125-cq-03-consolidate-pagination-into-shared-dependenc.md",
       "2026-04-06-iss-126-cq-04-decouple-responseservice-from-webhookservice.md",
       "2026-04-06-iss-128-cq-06-standardize-error-handling-rollback-exceptio.md",
-      "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md"
+      "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
+      "2026-04-06-iss-132-rel-03-configure-database-poolrecycle-and-isolatio.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3029,7 +3052,8 @@
       "2026-04-06-iss-128-cq-06-standardize-error-handling-rollback-exceptio.md",
       "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
       "2026-04-06-iss-130-rel-01-add-errorboundary-component.md",
-      "2026-04-06-iss-131-rel-02-fix-urlcreateobjecturl-memory-leak-in-fileu.md"
+      "2026-04-06-iss-131-rel-02-fix-urlcreateobjecturl-memory-leak-in-fileu.md",
+      "2026-04-06-iss-132-rel-03-configure-database-poolrecycle-and-isolatio.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3182,7 +3206,8 @@
       "2026-04-06-iss-128-cq-06-standardize-error-handling-rollback-exceptio.md",
       "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
       "2026-04-06-iss-130-rel-01-add-errorboundary-component.md",
-      "2026-04-06-iss-131-rel-02-fix-urlcreateobjecturl-memory-leak-in-fileu.md"
+      "2026-04-06-iss-131-rel-02-fix-urlcreateobjecturl-memory-leak-in-fileu.md",
+      "2026-04-06-iss-132-rel-03-configure-database-poolrecycle-and-isolatio.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3302,7 +3327,8 @@
       "2026-04-06-iss-128-cq-06-standardize-error-handling-rollback-exceptio.md",
       "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
       "2026-04-06-iss-130-rel-01-add-errorboundary-component.md",
-      "2026-04-06-iss-131-rel-02-fix-urlcreateobjecturl-memory-leak-in-fileu.md"
+      "2026-04-06-iss-131-rel-02-fix-urlcreateobjecturl-memory-leak-in-fileu.md",
+      "2026-04-06-iss-132-rel-03-configure-database-poolrecycle-and-isolatio.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3503,7 +3529,8 @@
       "2026-04-06-iss-125-cq-03-consolidate-pagination-into-shared-dependenc.md",
       "2026-04-06-iss-127-cq-05-add-precise-type-hints-in-validators.md",
       "2026-04-06-iss-128-cq-06-standardize-error-handling-rollback-exceptio.md",
-      "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md"
+      "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
+      "2026-04-06-iss-132-rel-03-configure-database-poolrecycle-and-isolatio.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3620,7 +3647,8 @@
       "2026-04-06-iss-126-cq-04-decouple-responseservice-from-webhookservice.md",
       "2026-04-06-iss-127-cq-05-add-precise-type-hints-in-validators.md",
       "2026-04-06-iss-128-cq-06-standardize-error-handling-rollback-exceptio.md",
-      "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md"
+      "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
+      "2026-04-06-iss-132-rel-03-configure-database-poolrecycle-and-isolatio.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -3713,7 +3741,8 @@
       "2026-04-06-iss-122-sec-08-move-refresh-token-from-localstorage-to-htt.md",
       "2026-04-06-iss-124-cq-02-split-exportservicepy-into-csvjson-exporters.md",
       "2026-04-06-iss-125-cq-03-consolidate-pagination-into-shared-dependenc.md",
-      "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md"
+      "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
+      "2026-04-06-iss-132-rel-03-configure-database-poolrecycle-and-isolatio.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
