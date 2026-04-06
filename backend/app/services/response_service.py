@@ -7,8 +7,9 @@ implemented in focused sub-modules:
   - response_query_service: listing, detail retrieval, statistics
 
 create_response and complete_response live here because they dispatch webhook
-events via dispatch_webhook_event, and test mocks patch this module's namespace
-(app.services.response_service.dispatch_webhook_event).
+events via the event dispatcher, and test mocks patch the dispatcher via
+app.services.event_dispatcher.set_dispatcher() or by patching
+app.services.event_dispatcher._dispatcher.
 """
 
 import uuid
@@ -22,7 +23,7 @@ from app.models.participant import Participant
 from app.models.response import Response
 from app.models.response_answer import ResponseAnswer
 from app.models.survey import Survey
-from app.services.webhook_service import dispatch_webhook_event
+from app.services.event_dispatcher import get_dispatcher
 from app.services.response_crud_service import (
     _check_survey_requires_participants,
     _validate_participant_token,
@@ -162,7 +163,7 @@ async def create_response(
 
     await session.refresh(response)
 
-    dispatch_webhook_event(
+    get_dispatcher()(
         event="response.started",
         survey_id=survey_id,
         data={
@@ -197,7 +198,7 @@ async def complete_response(
     """
     response = await _complete_response_core(session, survey_id, response_id)
 
-    dispatch_webhook_event(
+    get_dispatcher()(
         event="response.completed",
         survey_id=survey_id,
         data={
@@ -219,5 +220,4 @@ __all__ = [
     "list_responses",
     "get_response_detail",
     "get_survey_statistics",
-    "dispatch_webhook_event",
 ]

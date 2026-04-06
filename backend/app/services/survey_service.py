@@ -10,7 +10,7 @@ from sqlalchemy.orm import selectinload
 from app.models.question import Question
 from app.models.question_group import QuestionGroup
 from app.models.survey import Survey, SurveyVersion
-from app.services.webhook_service import dispatch_webhook_event
+from app.services.event_dispatcher import get_dispatcher
 
 
 async def create_survey(
@@ -237,7 +237,7 @@ async def activate_survey(
     await session.flush()
     await session.refresh(survey)
 
-    dispatch_webhook_event(
+    get_dispatcher()(
         event="survey.activated",
         survey_id=survey.id,
         data={
@@ -267,7 +267,7 @@ async def close_survey(
     await session.flush()
     await session.refresh(survey)
 
-    dispatch_webhook_event(
+    get_dispatcher()(
         event="survey.closed",
         survey_id=survey.id,
         data={
