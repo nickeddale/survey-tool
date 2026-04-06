@@ -15,15 +15,25 @@ elif not _env_url:
         "postgresql+asyncpg://postgres:postgres@test-postgres:5432/devtracker"
     )
 
+import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.config import settings
 from app.database import Base, get_db
+from app.limiter import limiter
 from app.main import app
 
 TEST_DATABASE_URL = settings.database_url
+
+
+@pytest.fixture(autouse=True)
+def reset_rate_limiter():
+    """Reset the slowapi in-memory limiter state before each test to prevent pollution."""
+    limiter.reset()
+    yield
+    limiter.reset()
 
 
 @pytest_asyncio.fixture(scope="function")
