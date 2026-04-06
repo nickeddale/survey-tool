@@ -2642,3 +2642,108 @@ async def test_quota_current_count_incremented_after_completion(client: AsyncCli
     )
     assert quota_check.status_code == 200
     assert quota_check.json()["current_count"] == 1
+
+
+# --------------------------------------------------------------------------- #
+# GET /surveys/{id}/responses/{rid}/detail — API key scope validation (SEC-07)
+# --------------------------------------------------------------------------- #
+
+KEYS_URL = "/api/v1/auth/keys"
+
+
+async def _create_api_key(client: AsyncClient, headers: dict, scopes: list | None) -> str:
+    """Create an API key with the given scopes; return the raw key string."""
+    payload: dict = {"name": "Test Key"}
+    if scopes is not None:
+        payload["scopes"] = scopes
+    resp = await client.post(KEYS_URL, json=payload, headers=headers)
+    assert resp.status_code == 201
+    return resp.json()["key"]
+
+
+async def _setup_survey_with_response(client: AsyncClient) -> tuple[str, str, dict]:
+    """Create an active survey, submit a response, return (survey_id, response_id, jwt_headers)."""
+    headers = await auth_headers(client, email="scope_test@example.com")
+    survey_id = await create_survey(client, headers, title="Scope Test Survey")
+    await add_group_and_question(client, headers, survey_id)
+    await activate_survey(client, headers, survey_id)
+
+    post = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post.status_code == 201
+    response_id = post.json()["id"]
+
+    return survey_id, response_id, headers
+
+
+@pytest.mark.asyncio
+async def test_response_detail_jwt_auth_returns_200(client: AsyncClient):
+    """JWT-authenticated requests to /detail are unaffected by scope validation."""
+    survey_id, response_id, headers = await _setup_survey_with_response(client)
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/detail",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_response_detail_api_key_with_scope_returns_200(client: AsyncClient):
+    """API key that includes responses:read scope can access /detail."""
+    survey_id, response_id, headers = await _setup_survey_with_response(client)
+    api_key = await _create_api_key(client, headers, scopes=["responses:read"])
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/detail",
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_response_detail_api_key_missing_scope_returns_403(client: AsyncClient):
+    """API key without responses:read scope gets HTTP 403."""
+    survey_id, response_id, headers = await _setup_survey_with_response(client)
+    api_key = await _create_api_key(client, headers, scopes=["surveys:read"])
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/detail",
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 403
+    body = resp.json()
+    assert body["detail"]["code"] == "FORBIDDEN"
+    assert "message" in body["detail"]
+
+
+@pytest.mark.asyncio
+async def test_response_detail_api_key_empty_scopes_returns_403(client: AsyncClient):
+    """API key with an empty scopes list gets HTTP 403."""
+    survey_id, response_id, headers = await _setup_survey_with_response(client)
+    api_key = await _create_api_key(client, headers, scopes=[])
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/detail",
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 403
+    body = resp.json()
+    assert body["detail"]["code"] == "FORBIDDEN"
+    assert "message" in body["detail"]
+
+
+@pytest.mark.asyncio
+async def test_response_detail_api_key_null_scopes_returns_403(client: AsyncClient):
+    """API key with null/no scopes gets HTTP 403."""
+    survey_id, response_id, headers = await _setup_survey_with_response(client)
+    # Creating a key without specifying scopes leaves them null/empty
+    api_key = await _create_api_key(client, headers, scopes=None)
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/detail",
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 403
+    body = resp.json()
+    assert body["detail"]["code"] == "FORBIDDEN"
+    assert "message" in body["detail"]

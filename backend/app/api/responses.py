@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, require_scope
 from app.limiter import RATE_LIMITS, limiter
 from app.models.user import User
 from app.schemas.response import (
@@ -289,6 +289,7 @@ async def get_response_detail_endpoint(
     survey_id: str,
     response_id: str,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("responses:read")),
     session: AsyncSession = Depends(get_db),
 ) -> ResponseDetail:
     """Retrieve full response detail with enriched answer data. Requires authentication.
@@ -296,8 +297,7 @@ async def get_response_detail_endpoint(
     Returns all answers enriched with question metadata (code, title, type).
     Choice questions include selected_option_title. Matrix answers include subquestion_label.
     Survey must be owned by the authenticated user; returns 404 otherwise (no ownership oracle).
-
-    Requires responses:read scope for API key authentication.
+    API key authentication requires the responses:read scope; JWT auth is unrestricted.
     """
     parsed_survey_id = _parse_survey_id(survey_id)
     parsed_response_id = _parse_response_id(response_id)
