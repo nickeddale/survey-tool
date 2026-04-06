@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, vi, afterEach } from 'vitest'
+import { render, screen, waitFor, act, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import ParticipantTable from '../ParticipantTable'
+import ParticipantTable, { CopyButton } from '../ParticipantTable'
 import type { ParticipantResponse } from '../../../types/survey'
 
 const mockParticipants: ParticipantResponse[] = [
@@ -210,5 +210,80 @@ describe('ParticipantTable', () => {
       />,
     )
     expect(screen.getByRole('cell', { name: '—' })).toBeInTheDocument()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// CopyButton
+// ---------------------------------------------------------------------------
+
+describe('CopyButton', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+    vi.useRealTimers()
+    // Reset clipboard mock
+    Object.defineProperty(window.navigator, 'clipboard', {
+      value: undefined,
+      writable: true,
+      configurable: true,
+    })
+  })
+
+  it('renders the button with default label', () => {
+    render(<CopyButton text="hello" />)
+    expect(screen.getByRole('button', { name: /copy/i })).toBeInTheDocument()
+  })
+
+  it('renders the button with custom label', () => {
+    render(<CopyButton text="hello" label="Copy Token" />)
+    expect(screen.getByRole('button', { name: /copy token/i })).toBeInTheDocument()
+  })
+
+  it('does not show error when clipboard succeeds', async () => {
+    Object.defineProperty(window.navigator, 'clipboard', {
+      value: { writeText: vi.fn().mockResolvedValue(undefined) },
+      writable: true,
+      configurable: true,
+    })
+    render(<CopyButton text="hello" />)
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /copy/i }))
+    })
+
+    expect(screen.queryByTestId('copy-button-error')).not.toBeInTheDocument()
+  })
+
+  it('shows error message when clipboard write rejects', async () => {
+    // JSDOM has no navigator.clipboard — TypeError triggers the catch block
+    render(<CopyButton text="hello" />)
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /copy/i }))
+    })
+
+    await waitFor(() => {
+      expect(screen.getByTestId('copy-button-error')).toBeInTheDocument()
+    })
+    expect(screen.getByRole('alert')).toBeInTheDocument()
+    expect(screen.getByText('Failed to copy to clipboard')).toBeInTheDocument()
+  })
+
+  it('auto-clears error after 3 seconds', async () => {
+    vi.useFakeTimers()
+    // JSDOM has no navigator.clipboard — TypeError triggers the catch block
+    render(<CopyButton text="hello" />)
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /copy/i }))
+    })
+
+    expect(screen.getByTestId('copy-button-error')).toBeInTheDocument()
+
+    await act(async () => {
+      vi.advanceTimersByTime(3000)
+    })
+
+    expect(screen.queryByTestId('copy-button-error')).not.toBeInTheDocument()
   })
 })

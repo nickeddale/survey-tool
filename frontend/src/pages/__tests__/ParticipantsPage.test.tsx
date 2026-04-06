@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { render, screen, waitFor, act } from '@testing-library/react'
+import { render, screen, waitFor, act, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { http, HttpResponse } from 'msw'
@@ -599,6 +599,95 @@ describe('ParticipantsPage', () => {
       })
 
       expect(screen.getByTestId('pagination-info').textContent).toMatch(/Page 1/)
+    })
+  })
+
+  // -------------------------------------------------------------------------
+  // Copy link clipboard errors
+  // -------------------------------------------------------------------------
+
+  describe('copy link clipboard errors', () => {
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    function mockClipboardAfterSetup(writeText: ReturnType<typeof vi.fn>) {
+      // Must be called AFTER userEvent.setup() since setup() installs its own clipboard
+      Object.defineProperty(window.navigator, 'clipboard', {
+        value: { writeText },
+        writable: true,
+        configurable: true,
+      })
+    }
+
+    it('shows error message when clipboard rejects on copy link', async () => {
+      const user = userEvent.setup()
+      // Mock after setup() so our mock takes precedence over userEvent's virtual clipboard
+      mockClipboardAfterSetup(vi.fn().mockRejectedValue(new Error('Permission denied')))
+
+      renderParticipants()
+
+      await waitFor(() => {
+        expect(screen.getByText('alice@example.com')).toBeInTheDocument()
+      })
+
+      const p1 = mockParticipants[0]
+      await act(async () => {
+        await user.click(screen.getByTestId(`participant-copy-link-${p1.id}`))
+      })
+
+      await waitFor(() => {
+        expect(screen.getByTestId('copy-link-error')).toBeInTheDocument()
+      })
+      expect(screen.getByTestId('copy-link-error')).toHaveTextContent(
+        'Failed to copy link to clipboard',
+      )
+    })
+
+    it('does not show error when clipboard succeeds on copy link', async () => {
+      const user = userEvent.setup()
+      mockClipboardAfterSetup(vi.fn().mockResolvedValue(undefined))
+
+      renderParticipants()
+
+      await waitFor(() => {
+        expect(screen.getByText('alice@example.com')).toBeInTheDocument()
+      })
+
+      const p1 = mockParticipants[0]
+      await act(async () => {
+        await user.click(screen.getByTestId(`participant-copy-link-${p1.id}`))
+      })
+
+      expect(screen.queryByTestId('copy-link-error')).not.toBeInTheDocument()
+    })
+
+    it('auto-clears copy link error after 3 seconds', async () => {
+      const user = userEvent.setup()
+      // Mock after setup() so our mock takes precedence over userEvent's virtual clipboard
+      mockClipboardAfterSetup(vi.fn().mockRejectedValue(new Error('Permission denied')))
+
+      renderParticipants()
+
+      await waitFor(() => {
+        expect(screen.getByText('alice@example.com')).toBeInTheDocument()
+      })
+
+      const p1 = mockParticipants[0]
+      await act(async () => {
+        await user.click(screen.getByTestId(`participant-copy-link-${p1.id}`))
+      })
+
+      await waitFor(() => {
+        expect(screen.getByTestId('copy-link-error')).toBeInTheDocument()
+      })
+
+      // Advance real timers to clear the error
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 3100))
+      })
+
+      expect(screen.queryByTestId('copy-link-error')).not.toBeInTheDocument()
     })
   })
 })
