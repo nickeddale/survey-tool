@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-06T17:02:42.925Z",
+  "lastUpdated": "2026-04-06T17:15:54.552Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2819,6 +2819,25 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-06-iss-145-fe-02-break-up-logiceditor.md",
+      "ticketId": "ISS-145",
+      "title": "FE-02: Break up LogicEditor",
+      "date": "2026-04-06",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "refactoring",
+        "bug-fix",
+        "feature",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -2956,7 +2975,8 @@
       "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md",
       "2026-04-06-iss-141-inf-06-externalize-db-credentials-from-docker-comp.md",
       "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md",
-      "2026-04-06-iss-144-fe-01-break-up-surveybuilderpage.md"
+      "2026-04-06-iss-144-fe-01-break-up-surveybuilderpage.md",
+      "2026-04-06-iss-145-fe-02-break-up-logiceditor.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3079,7 +3099,8 @@
       "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md",
       "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md",
       "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md",
-      "2026-04-06-iss-144-fe-01-break-up-surveybuilderpage.md"
+      "2026-04-06-iss-144-fe-01-break-up-surveybuilderpage.md",
+      "2026-04-06-iss-145-fe-02-break-up-logiceditor.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3186,7 +3207,8 @@
       "2026-04-06-iss-138-inf-03-add-dockerignore-files.md",
       "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md",
       "2026-04-06-iss-141-inf-06-externalize-db-credentials-from-docker-comp.md",
-      "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md"
+      "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md",
+      "2026-04-06-iss-145-fe-02-break-up-logiceditor.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3318,7 +3340,8 @@
       "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md",
       "2026-04-06-iss-142-inf-07-fix-packagejson-name.md",
       "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md",
-      "2026-04-06-iss-144-fe-01-break-up-surveybuilderpage.md"
+      "2026-04-06-iss-144-fe-01-break-up-surveybuilderpage.md",
+      "2026-04-06-iss-145-fe-02-break-up-logiceditor.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3356,7 +3379,8 @@
       "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
       "2026-04-06-iss-131-rel-02-fix-urlcreateobjecturl-memory-leak-in-fileu.md",
       "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md",
-      "2026-04-06-iss-144-fe-01-break-up-surveybuilderpage.md"
+      "2026-04-06-iss-144-fe-01-break-up-surveybuilderpage.md",
+      "2026-04-06-iss-145-fe-02-break-up-logiceditor.md"
     ],
     "bug-fix": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3483,7 +3507,8 @@
       "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md",
       "2026-04-06-iss-142-inf-07-fix-packagejson-name.md",
       "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md",
-      "2026-04-06-iss-144-fe-01-break-up-surveybuilderpage.md"
+      "2026-04-06-iss-144-fe-01-break-up-surveybuilderpage.md",
+      "2026-04-06-iss-145-fe-02-break-up-logiceditor.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3615,7 +3640,8 @@
       "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md",
       "2026-04-06-iss-141-inf-06-externalize-db-credentials-from-docker-comp.md",
       "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md",
-      "2026-04-06-iss-144-fe-01-break-up-surveybuilderpage.md"
+      "2026-04-06-iss-144-fe-01-break-up-surveybuilderpage.md",
+      "2026-04-06-iss-145-fe-02-break-up-logiceditor.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3969,7 +3995,8 @@
       "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md",
       "2026-04-06-iss-142-inf-07-fix-packagejson-name.md",
       "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md",
-      "2026-04-06-iss-144-fe-01-break-up-surveybuilderpage.md"
+      "2026-04-06-iss-144-fe-01-break-up-surveybuilderpage.md",
+      "2026-04-06-iss-145-fe-02-break-up-logiceditor.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
