@@ -19,6 +19,7 @@ import type { AnswerInput } from '../services/responseService'
 import type { SurveyFullResponse, QuestionGroupResponse, QuestionResponse } from '../types/survey'
 import type { BuilderQuestion } from '../store/builderStore'
 import type { QuestionAnswer } from '../utils/validation'
+import { localStorageKey, getStoredResponseId, storeResponseId, clearStoredResponseId } from '../utils/localStorage'
 import { useValidation, type AnswerMap } from '../hooks/useValidation'
 import { useFlowResolution } from '../hooks/useFlowResolution'
 import { ApiError } from '../types/api'
@@ -29,34 +30,6 @@ import { SurveyForm } from '../components/responses/SurveyForm'
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-function localStorageKey(surveyId: string): string {
-  return `survey_response_${surveyId}`
-}
-
-function getStoredResponseId(surveyId: string): string | null {
-  try {
-    return localStorage.getItem(localStorageKey(surveyId))
-  } catch {
-    return null
-  }
-}
-
-function storeResponseId(surveyId: string, responseId: string): void {
-  try {
-    localStorage.setItem(localStorageKey(surveyId), responseId)
-  } catch {
-    // Ignore localStorage errors (private browsing, storage full, etc.)
-  }
-}
-
-function clearStoredResponseId(surveyId: string): void {
-  try {
-    localStorage.removeItem(localStorageKey(surveyId))
-  } catch {
-    // Ignore
-  }
-}
 
 /** Convert answers map to the array format expected by the API. */
 function answersToInput(answers: AnswerMap): AnswerInput[] {
