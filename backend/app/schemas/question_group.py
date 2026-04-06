@@ -41,6 +41,13 @@ class QuestionGroupResponse(BaseModel):
     questions: list["QuestionResponse"] = []
 
 
+class QuestionGroupListResponse(BaseModel):
+    items: list[QuestionGroupResponse]
+    total: int
+    page: int
+    per_page: int
+
+
 class QuestionGroupReorderItem(BaseModel):
     id: uuid.UUID
     sort_order: int

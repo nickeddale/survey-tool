@@ -4,11 +4,13 @@ from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, pagination_params
+from app.utils.pagination import PaginationParams
 from app.limiter import RATE_LIMITS, limiter
 from app.models.user import User
 from app.schemas.question_group import (
     QuestionGroupCreate,
+    QuestionGroupListResponse,
     QuestionGroupReorderRequest,
     QuestionGroupResponse,
     QuestionGroupTranslationsUpdate,
@@ -67,20 +69,30 @@ async def create(
 
 @router.get(
     "",
-    response_model=list[QuestionGroupResponse],
+    response_model=QuestionGroupListResponse,
     summary="List question groups for a survey",
-    description="Return all question groups for a survey ordered by sort_order.",
+    description="Return a paginated list of question groups for a survey ordered by sort_order.",
 )
 async def list_all(
     survey_id: str,
+    pagination: PaginationParams = Depends(pagination_params),
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
-) -> list[QuestionGroupResponse]:
+) -> QuestionGroupListResponse:
     parsed_survey_id = _parse_uuid(survey_id, "Survey")
     groups = await list_groups(session, survey_id=parsed_survey_id, user_id=current_user.id)
     if groups is None:
         raise NotFoundError("Survey not found")
-    return [QuestionGroupResponse.model_validate(g) for g in groups]
+
+    total = len(groups)
+    page_items = groups[pagination.offset:pagination.offset + pagination.per_page]
+
+    return QuestionGroupListResponse(
+        items=[QuestionGroupResponse.model_validate(g) for g in page_items],
+        total=total,
+        page=pagination.page,
+        per_page=pagination.per_page,
+    )
 
 
 @router.patch(
