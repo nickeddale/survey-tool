@@ -143,8 +143,26 @@ async def test_me_endpoint_excludes_password_hash(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_refresh_token_rejected_as_bearer(client: AsyncClient):
     """Using a refresh token as Bearer token returns 401 with WWW-Authenticate header."""
-    tokens = await register_and_login(client, "e2e_refresh_reject@example.com")
-    refresh_token = tokens["refresh_token"]
+    from app.config import settings
+
+    # Register and login; refresh token is set as httpOnly cookie
+    await register_and_login(client, "e2e_refresh_reject@example.com")
+
+    # Extract raw refresh token from the Set-Cookie response header
+    login_response = await client.post(
+        LOGIN_URL,
+        json={"email": "e2e_refresh_reject@example.com", "password": "testpass123"},
+    )
+    cookie_header = login_response.headers.get("set-cookie", "")
+    cookie_name = settings.refresh_token_cookie_name
+    refresh_token = None
+    for part in cookie_header.split(";"):
+        part = part.strip()
+        if part.startswith(f"{cookie_name}="):
+            refresh_token = part.split("=", 1)[1]
+            break
+
+    assert refresh_token is not None, "No refresh token cookie in login response"
 
     resp = await client.get(
         ME_URL,

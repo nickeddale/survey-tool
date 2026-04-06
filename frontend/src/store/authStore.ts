@@ -1,16 +1,16 @@
 /**
  * Zustand auth store.
  *
- * Initialization guard: on mount, if a refresh token exists in localStorage,
- * attempt getCurrentUser(). If it fails (expired/invalid), clear tokens immediately
- * and set isAuthenticated=false. A failed init must NOT re-queue another refresh attempt.
+ * Initialization: on mount, optimistically attempt a token refresh using the httpOnly
+ * cookie (sent automatically by the browser). If successful, fetch the current user.
+ * If it fails (no cookie, expired, or revoked), treat as unauthenticated — no retry.
  *
  * Actions delegate to authService and update store state atomically.
  */
 
 import { create } from 'zustand'
 import authService from '../services/authService'
-import { clearTokens, getRefreshToken } from '../services/tokenService'
+import { clearTokens } from '../services/tokenService'
 import type { UserResponse, LoginRequest, UserCreate, UserUpdateRequest } from '../types/auth'
 
 interface AuthState {
@@ -33,24 +33,19 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   /**
    * Initialize auth state on app load.
-   * If a refresh token exists, fetch the current user (which will use/refresh the access token).
-   * On failure, clear tokens and mark as unauthenticated — do not retry.
+   * Optimistically attempt a token refresh using the httpOnly cookie (sent automatically).
+   * If successful, fetch the current user. On failure (no cookie, expired, revoked),
+   * clear access token and mark as unauthenticated — do not retry.
    */
   initialize: async () => {
-    if (!getRefreshToken()) {
-      // No refresh token — skip init entirely
-      set({ isLoading: false })
-      return
-    }
-
     set({ isLoading: true })
     try {
-      // Attempt to refresh then fetch the user
+      // Optimistic refresh — browser sends httpOnly cookie automatically
       await authService.refreshToken()
       const user = await authService.getCurrentUser()
       set({ user, isAuthenticated: true, isLoading: false })
     } catch {
-      // Refresh or user fetch failed — clear tokens and mark as logged out
+      // Refresh failed (no cookie or invalid) — unauthenticated state
       clearTokens()
       set({ user: null, isAuthenticated: false, isLoading: false })
     }

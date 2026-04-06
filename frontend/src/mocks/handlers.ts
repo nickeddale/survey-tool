@@ -290,7 +290,6 @@ export const mockTokens = {
   access_token:
     // JWT with payload {sub: "00000000-0000-0000-0000-000000000001", exp: 9999999999, iat: 1}
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDEiLCJleHAiOjk5OTk5OTk5OTksImlhdCI6MX0.dummy',
-  refresh_token: 'mock-refresh-token-abc123',
   token_type: 'bearer',
   expires_in: 1800,
 }
@@ -298,7 +297,6 @@ export const mockTokens = {
 export const mockNewTokens = {
   access_token:
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDEiLCJleHAiOjk5OTk5OTk5OTksImlhdCI6Mn0.dummy',
-  refresh_token: 'mock-refresh-token-new456',
   token_type: 'bearer',
   expires_in: 1800,
 }
@@ -467,16 +465,11 @@ export const handlers = [
     return HttpResponse.json(mockUser, { status: 201 })
   }),
 
-  // POST /api/v1/auth/refresh
-  http.post(`${BASE}/auth/refresh`, async ({ request }) => {
-    const body = (await request.json()) as { refresh_token?: string }
-    if (body.refresh_token === mockTokens.refresh_token || body.refresh_token === 'mock-refresh-token-new456') {
-      return HttpResponse.json(mockNewTokens, { status: 200 })
-    }
-    return HttpResponse.json(
-      { detail: { code: 'UNAUTHORIZED', message: 'Invalid or revoked refresh token' } },
-      { status: 401 },
-    )
+  // POST /api/v1/auth/refresh — reads refresh token from httpOnly cookie (not body)
+  http.post(`${BASE}/auth/refresh`, () => {
+    // In tests the httpOnly cookie cannot be inspected from JS; the handler
+    // always returns new tokens to simulate a valid cookie scenario.
+    return HttpResponse.json(mockNewTokens, { status: 200 })
   }),
 
   // POST /api/v1/auth/logout

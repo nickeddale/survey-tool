@@ -12,12 +12,14 @@
  *   - On refresh failure, rejects all queued requests and redirects to /login
  *
  * Token rotation: the backend revokes the old refresh token on /auth/refresh.
+ * The refresh token is stored in an httpOnly cookie — the browser sends it automatically
+ * with every request due to withCredentials: true.
  * A failed refresh means the refresh token is consumed — do not retry the refresh itself.
  */
 
 import axios, { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios'
 import { ApiError, ApiErrorResponse } from '../types/api'
-import { getAccessToken, getRefreshToken, setTokens, clearTokens } from './tokenService'
+import { getAccessToken, setTokens, clearTokens } from './tokenService'
 import { isTokenExpiringSoon } from '../utils/jwt'
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? '/api/v1'
@@ -42,6 +44,7 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,
 })
 
 // ---------------------------------------------------------------------------
@@ -79,21 +82,17 @@ function waitForRefresh(): Promise<string> {
 
 /**
  * Perform a token refresh call directly (not via apiClient to avoid interceptor loops).
+ * The refresh token httpOnly cookie is sent automatically by the browser.
  */
 async function performRefresh(): Promise<string> {
-  const refreshToken = getRefreshToken()
-  if (!refreshToken) {
-    throw new ApiError(401, { code: 'UNAUTHORIZED', message: 'No refresh token available' })
-  }
-
-  const response = await axios.post<{ access_token: string; refresh_token: string }>(
+  const response = await axios.post<{ access_token: string }>(
     `${BASE_URL}/auth/refresh`,
-    { refresh_token: refreshToken },
-    { headers: { 'Content-Type': 'application/json' } },
+    {},
+    { headers: { 'Content-Type': 'application/json' }, withCredentials: true },
   )
 
-  const { access_token, refresh_token } = response.data
-  setTokens(access_token, refresh_token)
+  const { access_token } = response.data
+  setTokens(access_token)
   return access_token
 }
 

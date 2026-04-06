@@ -5,12 +5,13 @@
  * Exception: refreshToken() uses the raw apiClient to avoid recursive refresh loops.
  *
  * Token rotation: the backend revokes the old refresh token on /auth/refresh.
- * On logout, the refresh token is sent to the backend for server-side revocation
- * before clearing local storage.
+ * The refresh token is stored in an httpOnly cookie — the browser sends it automatically.
+ * On logout, the backend revokes the cookie-based refresh token server-side and clears
+ * the cookie.
  */
 
 import apiClient from './apiClient'
-import { setTokens, clearTokens, getRefreshToken } from './tokenService'
+import { setTokens, clearTokens } from './tokenService'
 import type {
   UserResponse,
   UserCreate,
@@ -22,12 +23,13 @@ import type {
 class AuthService {
   /**
    * Authenticate with email and password.
-   * Stores the returned token pair (access in memory, refresh in localStorage).
+   * Stores the returned access token in memory. The refresh token is set as an
+   * httpOnly cookie by the backend — no localStorage usage.
    */
   async login(credentials: LoginRequest): Promise<TokenResponse> {
     const response = await apiClient.post<TokenResponse>('/auth/login', credentials)
     const tokens = response.data
-    setTokens(tokens.access_token, tokens.refresh_token)
+    setTokens(tokens.access_token)
     return tokens
   }
 
@@ -42,37 +44,28 @@ class AuthService {
 
   /**
    * Log out the current user.
-   * Sends the refresh token to the backend for server-side revocation (token rotation).
-   * Clears local token storage regardless of backend response.
+   * Calls the backend to revoke the refresh token cookie and clear it server-side.
+   * Clears local access token storage regardless of backend response.
    */
   async logout(): Promise<void> {
-    const refreshToken = getRefreshToken()
-    if (refreshToken) {
-      try {
-        await apiClient.post('/auth/logout', { refresh_token: refreshToken })
-      } catch {
-        // Ignore errors — token may already be invalid. Clear local state regardless.
-      }
+    try {
+      await apiClient.post('/auth/logout')
+    } catch {
+      // Ignore errors — token may already be invalid. Clear local state regardless.
     }
     clearTokens()
   }
 
   /**
-   * Refresh the access token using the stored refresh token.
-   * Updates the stored token pair on success.
-   * Clears tokens on failure (refresh token consumed by token rotation).
+   * Refresh the access token using the refresh token cookie.
+   * The browser sends the httpOnly cookie automatically — no manual token handling.
+   * Updates the stored access token on success.
+   * Clears access token on failure (refresh token consumed by rotation).
    */
   async refreshToken(): Promise<TokenResponse> {
-    const refreshToken = getRefreshToken()
-    if (!refreshToken) {
-      throw new Error('No refresh token available')
-    }
-
-    const response = await apiClient.post<TokenResponse>('/auth/refresh', {
-      refresh_token: refreshToken,
-    })
+    const response = await apiClient.post<TokenResponse>('/auth/refresh')
     const tokens = response.data
-    setTokens(tokens.access_token, tokens.refresh_token)
+    setTokens(tokens.access_token)
     return tokens
   }
 

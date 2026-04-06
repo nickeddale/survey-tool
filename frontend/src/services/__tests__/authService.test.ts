@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { http, HttpResponse } from 'msw'
 import { server } from '../../test/setup'
 import authService from '../authService'
-import { getAccessToken, getRefreshToken, clearTokens } from '../tokenService'
+import { getAccessToken, clearTokens } from '../tokenService'
 import { mockUser, mockTokens, mockNewTokens } from '../../mocks/handlers'
 
 const BASE = '/api/v1'
@@ -17,7 +17,11 @@ describe('authService', () => {
     it('returns token response on success', async () => {
       const tokens = await authService.login({ email: 'test@example.com', password: 'password123' })
       expect(tokens.access_token).toBe(mockTokens.access_token)
-      expect(tokens.refresh_token).toBe(mockTokens.refresh_token)
+    })
+
+    it('does not return refresh_token in response (it is in httpOnly cookie)', async () => {
+      const tokens = await authService.login({ email: 'test@example.com', password: 'password123' })
+      expect(tokens).not.toHaveProperty('refresh_token')
     })
 
     it('stores access token in memory after login', async () => {
@@ -25,9 +29,9 @@ describe('authService', () => {
       expect(getAccessToken()).toBe(mockTokens.access_token)
     })
 
-    it('stores refresh token in localStorage after login', async () => {
+    it('does NOT store refresh token in localStorage (httpOnly cookie only)', async () => {
       await authService.login({ email: 'test@example.com', password: 'password123' })
-      expect(getRefreshToken()).toBe(mockTokens.refresh_token)
+      expect(localStorage.length).toBe(0)
     })
 
     it('throws ApiError on invalid credentials', async () => {
@@ -63,16 +67,15 @@ describe('authService', () => {
   })
 
   describe('logout()', () => {
-    it('clears tokens after logout', async () => {
+    it('clears access token after logout', async () => {
       await authService.login({ email: 'test@example.com', password: 'password123' })
       expect(getAccessToken()).not.toBeNull()
 
       await authService.logout()
       expect(getAccessToken()).toBeNull()
-      expect(getRefreshToken()).toBeNull()
     })
 
-    it('clears tokens even if backend call fails', async () => {
+    it('clears access token even if backend call fails', async () => {
       server.use(
         http.post(`${BASE}/auth/logout`, () => {
           return HttpResponse.json({ detail: { code: 'INTERNAL_ERROR', message: 'Server error' } }, { status: 500 })
@@ -81,21 +84,44 @@ describe('authService', () => {
       await authService.login({ email: 'test@example.com', password: 'password123' })
       await authService.logout()
       expect(getAccessToken()).toBeNull()
-      expect(getRefreshToken()).toBeNull()
+    })
+
+    it('does not send refresh_token in request body (cookie is sent automatically)', async () => {
+      let capturedBody: Record<string, unknown> | null = null
+      server.use(
+        http.post(`${BASE}/auth/logout`, async ({ request }) => {
+          const text = await request.text()
+          capturedBody = text ? JSON.parse(text) : {}
+          return new HttpResponse(null, { status: 204 })
+        }),
+      )
+      await authService.login({ email: 'test@example.com', password: 'password123' })
+      await authService.logout()
+      // Body should be empty — no refresh_token field
+      expect(capturedBody).not.toHaveProperty('refresh_token')
     })
   })
 
   describe('refreshToken()', () => {
-    it('returns new tokens and updates storage', async () => {
+    it('returns new access token and updates memory', async () => {
       await authService.login({ email: 'test@example.com', password: 'password123' })
       const tokens = await authService.refreshToken()
       expect(tokens.access_token).toBe(mockNewTokens.access_token)
       expect(getAccessToken()).toBe(mockNewTokens.access_token)
-      expect(getRefreshToken()).toBe(mockNewTokens.refresh_token)
     })
 
-    it('throws when no refresh token is stored', async () => {
-      await expect(authService.refreshToken()).rejects.toThrow()
+    it('does not send refresh_token in request body (cookie is sent automatically)', async () => {
+      let capturedBody: Record<string, unknown> | null = null
+      server.use(
+        http.post(`${BASE}/auth/refresh`, async ({ request }) => {
+          const text = await request.text()
+          capturedBody = text ? JSON.parse(text) : {}
+          return HttpResponse.json(mockNewTokens, { status: 200 })
+        }),
+      )
+      await authService.login({ email: 'test@example.com', password: 'password123' })
+      await authService.refreshToken()
+      expect(capturedBody).not.toHaveProperty('refresh_token')
     })
   })
 
@@ -113,8 +139,17 @@ describe('authService', () => {
       expect(user).not.toHaveProperty('password_hash')
     })
 
-    it('throws ApiError 401 when no token is present', async () => {
-      await expect(authService.getCurrentUser()).rejects.toMatchObject({ status: 401 })
+    it('throws when no token and refresh cookie is absent', async () => {
+      // Simulate absent httpOnly cookie by making the refresh endpoint return 401
+      server.use(
+        http.post(`${BASE}/auth/refresh`, () => {
+          return HttpResponse.json(
+            { detail: { code: 'UNAUTHORIZED', message: 'No refresh token' } },
+            { status: 401 },
+          )
+        }),
+      )
+      await expect(authService.getCurrentUser()).rejects.toBeTruthy()
     })
   })
 

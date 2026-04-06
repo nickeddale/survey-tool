@@ -44,6 +44,11 @@ class Settings(BaseSettings):
     # CORS (comma-separated list of allowed origins)
     cors_origins: str = "http://localhost:3000"
 
+    # Refresh token cookie settings
+    refresh_token_cookie_name: str = "refresh_token"
+    cookie_secure: bool = True
+    cookie_samesite: str = "strict"
+
     # Logging
     log_level: str = "INFO"
 
