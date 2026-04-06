@@ -40,7 +40,7 @@ from app.services.survey_service import (
 )
 from app.services.translation_service import (
     apply_survey_translations,
-    merge_translations,
+    update_survey_translations,
 )
 from app.utils.errors import NotFoundError
 
@@ -207,16 +207,9 @@ async def update_translations(
 ) -> SurveyResponse:
     """Update translations for a specific language in a survey."""
     parsed_id = _parse_survey_id(survey_id)
-    survey = await get_survey_by_id(session, parsed_id, current_user.id)
-    if survey is None:
-        raise NotFoundError("Survey not found")
-
-    new_translations = merge_translations(
-        survey.translations or {},
-        payload.lang,
-        payload.translations,
+    survey = await update_survey_translations(
+        session, parsed_id, current_user.id, payload.lang, payload.translations
     )
-    survey = await update_survey(session, survey, translations=new_translations)
     return SurveyResponse.model_validate(survey)
 
 

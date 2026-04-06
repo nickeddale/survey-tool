@@ -4,8 +4,17 @@ Provides functions to:
 - apply_translation: overlay translated fields on an entity dict for a given language
 - get_supported_languages: enumerate languages present in a survey's translations
 - merge_translations: update or insert translation entries for a given language
+- update_survey_translations: fetch survey, merge translations, persist, return updated model
+- update_group_translations: fetch group, merge translations, persist, return updated model
+- update_question_translations: fetch question, merge translations, persist, return updated model
+- update_answer_option_translations: fetch option, merge translations, persist, return updated model
 """
+import uuid
 from typing import Any
+
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.utils.errors import NotFoundError
 
 
 # ---------------------------------------------------------------------------
@@ -195,3 +204,158 @@ def apply_survey_translations(
     result = dict(result)
     result["groups"] = translated_groups
     return result
+
+
+# ---------------------------------------------------------------------------
+# Orchestration service functions
+# ---------------------------------------------------------------------------
+
+
+async def update_survey_translations(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+    user_id: uuid.UUID,
+    lang: str,
+    field_values: dict[str, Any],
+) -> Any:
+    """Fetch survey, merge translations for lang, persist, and return updated survey.
+
+    Args:
+        session: Active async database session.
+        survey_id: UUID of the survey to update.
+        user_id: UUID of the authenticated user (ownership check).
+        lang: Language code to update (e.g. "fr").
+        field_values: Dict of field_name -> translated_string (or None to remove).
+
+    Returns:
+        Updated Survey ORM model.
+
+    Raises:
+        NotFoundError: If survey does not exist or is not owned by user.
+    """
+    from app.services.survey_service import get_survey_by_id, update_survey
+
+    survey = await get_survey_by_id(session, survey_id, user_id)
+    if survey is None:
+        raise NotFoundError("Survey not found")
+
+    new_translations = merge_translations(survey.translations or {}, lang, field_values)
+    return await update_survey(session, survey, translations=new_translations)
+
+
+async def update_group_translations(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+    group_id: uuid.UUID,
+    user_id: uuid.UUID,
+    lang: str,
+    field_values: dict[str, Any],
+) -> Any:
+    """Fetch group, merge translations for lang, persist, and return updated group.
+
+    Args:
+        session: Active async database session.
+        survey_id: UUID of the parent survey (ownership check).
+        group_id: UUID of the question group to update.
+        user_id: UUID of the authenticated user (ownership check).
+        lang: Language code to update (e.g. "fr").
+        field_values: Dict of field_name -> translated_string (or None to remove).
+
+    Returns:
+        Updated QuestionGroup ORM model.
+
+    Raises:
+        NotFoundError: If group does not exist or is not owned by user.
+    """
+    from app.services.question_group_service import get_group_by_id, update_group
+
+    group = await get_group_by_id(session, survey_id=survey_id, group_id=group_id, user_id=user_id)
+    if group is None:
+        raise NotFoundError("Group not found")
+
+    new_translations = merge_translations(group.translations or {}, lang, field_values)
+    return await update_group(session, group, translations=new_translations)
+
+
+async def update_question_translations(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+    group_id: uuid.UUID,
+    question_id: uuid.UUID,
+    user_id: uuid.UUID,
+    lang: str,
+    field_values: dict[str, Any],
+) -> Any:
+    """Fetch question, merge translations for lang, persist, and return updated question.
+
+    Args:
+        session: Active async database session.
+        survey_id: UUID of the parent survey (ownership check).
+        group_id: UUID of the parent group.
+        question_id: UUID of the question to update.
+        user_id: UUID of the authenticated user (ownership check).
+        lang: Language code to update (e.g. "fr").
+        field_values: Dict of field_name -> translated_string (or None to remove).
+
+    Returns:
+        Updated Question ORM model.
+
+    Raises:
+        NotFoundError: If question does not exist or is not owned by user.
+    """
+    from app.services.question_service import get_question_by_id, update_question
+
+    question = await get_question_by_id(
+        session,
+        survey_id=survey_id,
+        group_id=group_id,
+        question_id=question_id,
+        user_id=user_id,
+    )
+    if question is None:
+        raise NotFoundError("Question not found")
+
+    new_translations = merge_translations(question.translations or {}, lang, field_values)
+    return await update_question(session, question, translations=new_translations)
+
+
+async def update_answer_option_translations(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+    question_id: uuid.UUID,
+    option_id: uuid.UUID,
+    user_id: uuid.UUID,
+    lang: str,
+    field_values: dict[str, Any],
+) -> Any:
+    """Fetch answer option, merge translations for lang, persist, and return updated option.
+
+    Args:
+        session: Active async database session.
+        survey_id: UUID of the parent survey (ownership check).
+        question_id: UUID of the parent question.
+        option_id: UUID of the answer option to update.
+        user_id: UUID of the authenticated user (ownership check).
+        lang: Language code to update (e.g. "fr").
+        field_values: Dict of field_name -> translated_string (or None to remove).
+
+    Returns:
+        Updated AnswerOption ORM model.
+
+    Raises:
+        NotFoundError: If option does not exist or is not owned by user.
+    """
+    from app.services.answer_option_service import get_answer_option_by_id, update_answer_option
+
+    option = await get_answer_option_by_id(
+        session,
+        survey_id=survey_id,
+        question_id=question_id,
+        option_id=option_id,
+        user_id=user_id,
+    )
+    if option is None:
+        raise NotFoundError("Answer option not found")
+
+    new_translations = merge_translations(option.translations or {}, lang, field_values)
+    return await update_answer_option(session, option, translations=new_translations)

@@ -22,7 +22,7 @@ from app.services.question_group_service import (
     reorder_groups,
     update_group,
 )
-from app.services.translation_service import merge_translations
+from app.services.translation_service import update_group_translations
 from app.utils.errors import NotFoundError
 
 router = APIRouter(prefix="/surveys/{survey_id}/groups", tags=["question_groups"])
@@ -183,21 +183,9 @@ async def update_translations(
     """Update translations for a specific language in a question group."""
     parsed_survey_id = _parse_uuid(survey_id, "Survey")
     parsed_group_id = _parse_uuid(group_id, "Group")
-    group = await get_group_by_id(
-        session,
-        survey_id=parsed_survey_id,
-        group_id=parsed_group_id,
-        user_id=current_user.id,
+    group = await update_group_translations(
+        session, parsed_survey_id, parsed_group_id, current_user.id, payload.lang, payload.translations
     )
-    if group is None:
-        raise NotFoundError("Group not found")
-
-    new_translations = merge_translations(
-        group.translations or {},
-        payload.lang,
-        payload.translations,
-    )
-    group = await update_group(session, group, translations=new_translations)
     return QuestionGroupResponse.model_validate(group)
 
 

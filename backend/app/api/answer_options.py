@@ -25,7 +25,7 @@ from app.services.answer_option_service import (
     reorder_answer_options,
     update_answer_option,
 )
-from app.services.translation_service import merge_translations
+from app.services.translation_service import update_answer_option_translations
 from app.utils.errors import ConflictError, NotFoundError
 
 router = APIRouter(
@@ -238,22 +238,9 @@ async def update_translations(
     parsed_question_id = _parse_uuid(question_id, "Question")
     parsed_option_id = _parse_uuid(option_id, "Option")
 
-    option = await get_answer_option_by_id(
-        session,
-        survey_id=parsed_survey_id,
-        question_id=parsed_question_id,
-        option_id=parsed_option_id,
-        user_id=current_user.id,
+    option = await update_answer_option_translations(
+        session, parsed_survey_id, parsed_question_id, parsed_option_id, current_user.id, payload.lang, payload.translations
     )
-    if option is None:
-        raise NotFoundError("Answer option not found")
-
-    new_translations = merge_translations(
-        option.translations or {},
-        payload.lang,
-        payload.translations,
-    )
-    option = await update_answer_option(session, option, translations=new_translations)
     return AnswerOptionResponse.model_validate(option)
 
 
