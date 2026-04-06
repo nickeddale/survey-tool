@@ -285,7 +285,7 @@ def regex_match(string: Any, pattern: Any, position: int = 0) -> bool:
         raise _error(
             f"regex_match(): invalid regex pattern {pattern!r}: {exc}",
             position,
-        )
+        ) from exc
 
 
 # ---------------------------------------------------------------------------
