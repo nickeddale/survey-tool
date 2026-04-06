@@ -7,7 +7,7 @@ import { ApiError } from '../types/api'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Badge } from '../components/ui/badge'
-import { Skeleton } from '../components/ui/skeleton'
+import { SurveyListSkeleton } from '../components/common'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -44,18 +44,6 @@ function StatusBadge({ status }: { status: string }) {
     >
       {status}
     </Badge>
-  )
-}
-
-function LoadingSkeleton() {
-  return (
-    <div aria-label="Loading" aria-busy="true" data-testid="loading-skeleton">
-      <div className="space-y-3">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Skeleton key={i} className="h-14 rounded-lg" />
-        ))}
-      </div>
-    </div>
   )
 }
 
@@ -245,7 +233,7 @@ function SurveysPage() {
 
       {/* Content */}
       {isLoading ? (
-        <LoadingSkeleton />
+        <SurveyListSkeleton />
       ) : surveys.length === 0 ? (
         <div className="text-center py-16 bg-card border border-border rounded-lg" data-testid="empty-state">
           <p className="text-muted-foreground text-sm mb-4">
