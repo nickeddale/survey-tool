@@ -7,6 +7,9 @@ Unit tests cover:
     - _deliver_webhook: 4xx response is logged but not raised
     - _deliver_webhook: connection error is logged but not raised
     - _deliver_webhook: no signature header when secret is empty
+    - _deliver_webhook: includes X-Webhook-Delivery-Id header
+    - _deliver_webhook: same delivery_id reused across all retry attempts
+    - _deliver_webhook: X-Webhook-Delivery-Id value is a valid UUID
 
 Integration tests cover:
     - _query_matching_webhooks: matches webhook by survey_id
@@ -15,6 +18,8 @@ Integration tests cover:
     - _query_matching_webhooks: excludes inactive webhooks
     - _query_matching_webhooks: excludes webhooks for other surveys (no global)
     - _dispatch_task: end-to-end delivery with mocked httpx
+    - _deliver_and_log: creates WebhookDeliveryLog row with status=delivered on success
+    - _deliver_and_log: creates WebhookDeliveryLog row with status=failed after max retries
 
 Trigger integration tests:
     - response.started dispatched on create_response
@@ -35,7 +40,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient
-from sqlalchemy import text
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.database import Base
@@ -43,6 +48,7 @@ from app.models.survey import Survey
 from app.models.user import User
 from app.models.webhook import Webhook
 from app.services.webhook_service import (
+    _deliver_and_log,
     _deliver_webhook,
     _dispatch_task,
     _query_matching_webhooks,
@@ -161,6 +167,7 @@ async def test_deliver_webhook_sends_post_with_hmac_signature():
             payload=payload,
             secret=secret,
             webhook_id=wh_id,
+            delivery_id=uuid.uuid4(),
         )
 
     assert len(captured_requests) == 1
@@ -198,6 +205,7 @@ async def test_deliver_webhook_no_signature_when_empty_secret():
             payload={"event": "test"},
             secret="",
             webhook_id=uuid.uuid4(),
+            delivery_id=uuid.uuid4(),
         )
 
     assert len(captured_requests) == 1
@@ -225,6 +233,7 @@ async def test_deliver_webhook_4xx_does_not_raise():
             payload={"event": "test"},
             secret="",
             webhook_id=uuid.uuid4(),
+            delivery_id=uuid.uuid4(),
         )
 
 
@@ -243,6 +252,7 @@ async def test_deliver_webhook_connection_error_does_not_raise():
             payload={"event": "test"},
             secret="",
             webhook_id=uuid.uuid4(),
+            delivery_id=uuid.uuid4(),
         )
 
 
@@ -268,6 +278,7 @@ async def test_deliver_webhook_includes_user_agent_header():
             payload={"event": "test"},
             secret="",
             webhook_id=uuid.uuid4(),
+            delivery_id=uuid.uuid4(),
         )
 
     assert len(captured_headers) == 1
@@ -301,6 +312,7 @@ async def test_deliver_webhook_uses_correct_timeout():
             payload={"event": "test"},
             secret="",
             webhook_id=uuid.uuid4(),
+            delivery_id=uuid.uuid4(),
         )
 
     assert len(captured_timeout) == 1
@@ -331,6 +343,7 @@ async def test_deliver_webhook_no_sleep_on_first_attempt_success():
                 payload={"event": "test"},
                 secret="",
                 webhook_id=uuid.uuid4(),
+                delivery_id=uuid.uuid4(),
             )
 
     mock_sleep.assert_not_called()
@@ -360,6 +373,7 @@ async def test_deliver_webhook_retries_on_timeout_exception():
                 payload={"event": "test"},
                 secret="",
                 webhook_id=uuid.uuid4(),
+                delivery_id=uuid.uuid4(),
             )
 
     # Should have made 4 total attempts (1 initial + 3 retries)
@@ -394,6 +408,7 @@ async def test_deliver_webhook_retries_on_connect_error():
                 payload={"event": "test"},
                 secret="",
                 webhook_id=uuid.uuid4(),
+                delivery_id=uuid.uuid4(),
             )
 
     assert call_count == 4
@@ -426,6 +441,7 @@ async def test_deliver_webhook_retries_on_5xx_response():
                 payload={"event": "test"},
                 secret="",
                 webhook_id=uuid.uuid4(),
+                delivery_id=uuid.uuid4(),
             )
 
     assert call_count == 4
@@ -458,6 +474,7 @@ async def test_deliver_webhook_no_retry_on_4xx():
                 payload={"event": "test"},
                 secret="",
                 webhook_id=uuid.uuid4(),
+                delivery_id=uuid.uuid4(),
             )
 
     assert call_count == 1
@@ -492,6 +509,7 @@ async def test_deliver_webhook_success_after_two_failures():
                 payload={"event": "test"},
                 secret="",
                 webhook_id=uuid.uuid4(),
+                delivery_id=uuid.uuid4(),
             )
 
     assert call_count == 3
@@ -774,6 +792,321 @@ async def test_dispatch_task_skips_non_matching_webhooks(wh_engine):
             )
 
     assert posted == []
+
+
+# ---------------------------------------------------------------------------
+# Unit tests: X-Webhook-Delivery-Id header idempotency
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_deliver_webhook_includes_delivery_id_header():
+    """_deliver_webhook should include X-Webhook-Delivery-Id header on every request."""
+    delivery_id = uuid.uuid4()
+    captured_headers = []
+
+    async def mock_post(url, content, headers, **kwargs):
+        captured_headers.append(dict(headers))
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        return mock_response
+
+    mock_client = AsyncMock()
+    mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+    mock_client.__aexit__ = AsyncMock(return_value=False)
+    mock_client.post = mock_post
+
+    with patch("httpx.AsyncClient", return_value=mock_client):
+        await _deliver_webhook(
+            url="https://example.com/hook",
+            payload={"event": "test"},
+            secret="",
+            webhook_id=uuid.uuid4(),
+            delivery_id=delivery_id,
+        )
+
+    assert len(captured_headers) == 1
+    assert captured_headers[0].get("X-Webhook-Delivery-Id") == str(delivery_id)
+
+
+@pytest.mark.asyncio
+async def test_deliver_webhook_delivery_id_is_valid_uuid():
+    """X-Webhook-Delivery-Id header value should be a valid UUID string."""
+    import re
+
+    delivery_id = uuid.uuid4()
+    captured_headers = []
+
+    async def mock_post(url, content, headers, **kwargs):
+        captured_headers.append(dict(headers))
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        return mock_response
+
+    mock_client = AsyncMock()
+    mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+    mock_client.__aexit__ = AsyncMock(return_value=False)
+    mock_client.post = mock_post
+
+    with patch("httpx.AsyncClient", return_value=mock_client):
+        await _deliver_webhook(
+            url="https://example.com/hook",
+            payload={"event": "test"},
+            secret="",
+            webhook_id=uuid.uuid4(),
+            delivery_id=delivery_id,
+        )
+
+    assert len(captured_headers) == 1
+    header_value = captured_headers[0].get("X-Webhook-Delivery-Id", "")
+    uuid_pattern = re.compile(
+        r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        re.IGNORECASE,
+    )
+    assert uuid_pattern.match(header_value), f"Not a valid UUID: {header_value!r}"
+    # Confirm the value matches the exact delivery_id passed in
+    assert uuid.UUID(header_value) == delivery_id
+
+
+@pytest.mark.asyncio
+async def test_deliver_webhook_same_delivery_id_reused_on_retries():
+    """_deliver_webhook should send the same X-Webhook-Delivery-Id on all retry attempts."""
+    import httpx as _httpx
+
+    delivery_id = uuid.uuid4()
+    captured_delivery_ids = []
+    call_count = 0
+
+    async def mock_post(url, content, headers, **kwargs):
+        nonlocal call_count
+        call_count += 1
+        captured_delivery_ids.append(headers.get("X-Webhook-Delivery-Id"))
+        # Fail on first two attempts, succeed on third
+        if call_count <= 2:
+            raise _httpx.TimeoutException("timed out")
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        return mock_response
+
+    mock_client = AsyncMock()
+    mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+    mock_client.__aexit__ = AsyncMock(return_value=False)
+    mock_client.post = mock_post
+
+    with patch("httpx.AsyncClient", return_value=mock_client):
+        with patch("asyncio.sleep", new_callable=AsyncMock):
+            await _deliver_webhook(
+                url="https://example.com/hook",
+                payload={"event": "test"},
+                secret="",
+                webhook_id=uuid.uuid4(),
+                delivery_id=delivery_id,
+            )
+
+    assert call_count == 3
+    # Every attempt must use the same delivery_id
+    assert len(set(captured_delivery_ids)) == 1, (
+        f"Expected same delivery_id on all retries, got: {captured_delivery_ids}"
+    )
+    assert captured_delivery_ids[0] == str(delivery_id)
+
+
+# ---------------------------------------------------------------------------
+# Integration tests: _deliver_and_log (WebhookDeliveryLog persistence)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_deliver_and_log_creates_log_row_status_delivered(wh_engine):
+    """_deliver_and_log should create a WebhookDeliveryLog with status=delivered on success."""
+    from app.models.webhook_delivery_log import WebhookDeliveryLog
+
+    factory = async_sessionmaker(wh_engine, class_=AsyncSession, expire_on_commit=False)
+    delivery_id = uuid.uuid4()
+
+    # Create user, survey and webhook in DB
+    async with factory() as sess:
+        user = User(
+            id=uuid.uuid4(),
+            email=f"dal-ok-{uuid.uuid4()}@example.com",
+            password_hash="hashed",
+            name="DAL OK",
+        )
+        sess.add(user)
+        survey = Survey(
+            id=uuid.uuid4(),
+            user_id=user.id,
+            title="DAL Survey",
+            status="active",
+        )
+        sess.add(survey)
+        wh = Webhook(**make_webhook_row(
+            user_id=user.id,
+            survey_id=survey.id,
+            events=["response.completed"],
+            url="https://example.com/hook",
+            secret="",
+        ))
+        sess.add(wh)
+        await sess.commit()
+        wh_id = wh.id
+
+    async def mock_post(url, content, headers, **kwargs):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        return mock_response
+
+    mock_client = AsyncMock()
+    mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+    mock_client.__aexit__ = AsyncMock(return_value=False)
+    mock_client.post = mock_post
+
+    with patch("httpx.AsyncClient", return_value=mock_client):
+        await _deliver_and_log(
+            session_factory=factory,
+            wh_id=wh_id,
+            wh_url="https://example.com/hook",
+            wh_secret="",
+            payload={"event": "response.completed", "data": {}},
+            event="response.completed",
+            delivery_id=delivery_id,
+        )
+
+    async with factory() as sess:
+        result = await sess.execute(
+            select(WebhookDeliveryLog).where(WebhookDeliveryLog.delivery_id == delivery_id)
+        )
+        log = result.scalar_one_or_none()
+
+    assert log is not None
+    assert log.delivery_id == delivery_id
+    assert log.webhook_id == wh_id
+    assert log.event == "response.completed"
+    assert log.status == "delivered"
+    assert log.attempt_count == 1
+    assert log.last_error is None
+
+
+@pytest.mark.asyncio
+async def test_deliver_and_log_creates_log_row_status_failed_after_max_retries(wh_engine):
+    """_deliver_and_log should set status=failed after all retry attempts are exhausted."""
+    import httpx as _httpx
+    from app.models.webhook_delivery_log import WebhookDeliveryLog
+
+    factory = async_sessionmaker(wh_engine, class_=AsyncSession, expire_on_commit=False)
+    delivery_id = uuid.uuid4()
+
+    async with factory() as sess:
+        user = User(
+            id=uuid.uuid4(),
+            email=f"dal-fail-{uuid.uuid4()}@example.com",
+            password_hash="hashed",
+            name="DAL Fail",
+        )
+        sess.add(user)
+        survey = Survey(
+            id=uuid.uuid4(),
+            user_id=user.id,
+            title="DAL Fail Survey",
+            status="active",
+        )
+        sess.add(survey)
+        wh = Webhook(**make_webhook_row(
+            user_id=user.id,
+            survey_id=survey.id,
+            events=["response.completed"],
+            url="https://unreachable.example.com/hook",
+            secret="",
+        ))
+        sess.add(wh)
+        await sess.commit()
+        wh_id = wh.id
+
+    async def mock_post(url, content, headers, **kwargs):
+        raise _httpx.ConnectError("connection refused")
+
+    mock_client = AsyncMock()
+    mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+    mock_client.__aexit__ = AsyncMock(return_value=False)
+    mock_client.post = mock_post
+
+    with patch("httpx.AsyncClient", return_value=mock_client):
+        with patch("asyncio.sleep", new_callable=AsyncMock):
+            await _deliver_and_log(
+                session_factory=factory,
+                wh_id=wh_id,
+                wh_url="https://unreachable.example.com/hook",
+                wh_secret="",
+                payload={"event": "response.completed", "data": {}},
+                event="response.completed",
+                delivery_id=delivery_id,
+            )
+
+    async with factory() as sess:
+        result = await sess.execute(
+            select(WebhookDeliveryLog).where(WebhookDeliveryLog.delivery_id == delivery_id)
+        )
+        log = result.scalar_one_or_none()
+
+    assert log is not None
+    assert log.status == "failed"
+    assert log.attempt_count == 4  # 1 initial + 3 retries
+    assert log.last_error is not None
+
+
+@pytest.mark.asyncio
+async def test_dispatch_task_includes_delivery_id_header(wh_engine):
+    """_dispatch_task should include X-Webhook-Delivery-Id header when delivering."""
+    factory = async_sessionmaker(wh_engine, class_=AsyncSession, expire_on_commit=False)
+    survey_id = uuid.uuid4()
+
+    async with factory() as sess:
+        user = User(
+            id=uuid.uuid4(),
+            email=f"disp-hdr-{uuid.uuid4()}@example.com",
+            password_hash="hashed",
+            name="Dispatch Header Test",
+        )
+        sess.add(user)
+        survey = Survey(id=survey_id, user_id=user.id, title="Dispatch Header Survey", status="active")
+        sess.add(survey)
+        wh = Webhook(**make_webhook_row(
+            user_id=user.id,
+            survey_id=survey_id,
+            events=["response.completed"],
+            url="https://example.com/hook",
+            secret="",
+        ))
+        sess.add(wh)
+        await sess.commit()
+
+    captured_headers = []
+
+    async def mock_post(url, content, headers, **kwargs):
+        captured_headers.append(dict(headers))
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        return mock_response
+
+    mock_client = AsyncMock()
+    mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+    mock_client.__aexit__ = AsyncMock(return_value=False)
+    mock_client.post = mock_post
+
+    with patch("app.database.async_session", factory):
+        with patch("httpx.AsyncClient", return_value=mock_client):
+            await _dispatch_task(
+                event="response.completed",
+                survey_id=survey_id,
+                data={"response_id": "abc"},
+            )
+
+    assert len(captured_headers) == 1
+    delivery_id_header = captured_headers[0].get("X-Webhook-Delivery-Id")
+    assert delivery_id_header is not None
+    # Verify it's a valid UUID
+    parsed = uuid.UUID(delivery_id_header)
+    assert parsed.version == 4
 
 
 # ---------------------------------------------------------------------------
