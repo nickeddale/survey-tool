@@ -1,11 +1,12 @@
 import uuid
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies import get_current_user
+from app.limiter import RATE_LIMITS, limiter
 from app.models.user import User
 from app.schemas.question import (
     QuestionCreate,
@@ -53,7 +54,9 @@ def _parse_uuid(value: str, label: str = "resource") -> uuid.UUID:
     summary="Create a question",
     description="Add a new question to a question group. Supports all question types: text, numeric, boolean, single_choice, multiple_choice, rating, date, matrix, and ranking.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def create(
+    request: Request,
     survey_id: str,
     group_id: str,
     payload: QuestionCreate,
@@ -135,7 +138,9 @@ async def list_all(
     summary="Reorder questions",
     description="Update the sort_order and optionally the group assignment of multiple questions in a single request.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def reorder(
+    request: Request,
     survey_id: str,
     group_id: str,
     payload: QuestionReorderRequest,
@@ -201,7 +206,9 @@ async def get_one(
     summary="Update a question",
     description="Partially update a question's type, title, code, description, required flag, sort order, relevance, validation, or settings.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def patch(
+    request: Request,
     survey_id: str,
     group_id: str,
     question_id: str,
@@ -234,7 +241,9 @@ async def patch(
     summary="Update question translations for a language",
     description="Merge translation overrides for the specified language into the question's translations store.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def update_translations(
+    request: Request,
     survey_id: str,
     group_id: str,
     question_id: str,
@@ -272,7 +281,9 @@ async def update_translations(
     summary="Delete a question",
     description="Permanently delete a question and all its answer options and subquestions.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def delete(
+    request: Request,
     survey_id: str,
     group_id: str,
     question_id: str,
@@ -302,7 +313,9 @@ async def delete(
     summary="Create a subquestion for a matrix question",
     description="Add a subquestion (row) to a matrix-type parent question. Returns the parent question with the updated subquestions list.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def create_subquestion_endpoint(
+    request: Request,
     survey_id: str,
     question_id: str,
     payload: SubquestionCreate,

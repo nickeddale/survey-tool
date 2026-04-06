@@ -3,12 +3,13 @@
 import secrets
 import uuid
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Request, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies import get_current_user
+from app.limiter import RATE_LIMITS, limiter
 from app.models.user import User
 from app.models.webhook import Webhook
 from app.schemas.webhook import (
@@ -52,7 +53,9 @@ async def _get_webhook_or_404(
     summary="Create a webhook",
     description="Register a new webhook endpoint to receive event notifications. A signing secret is generated automatically.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def create_webhook(
+    request: Request,
     payload: WebhookCreate,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
@@ -138,7 +141,9 @@ async def get_webhook(
     summary="Update a webhook",
     description="Partially update a webhook's URL, subscribed events, survey scope, or active status.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def update_webhook(
+    request: Request,
     webhook_id: str,
     payload: WebhookUpdate,
     current_user: User = Depends(get_current_user),
@@ -167,7 +172,9 @@ async def update_webhook(
     summary="Delete a webhook",
     description="Permanently delete a webhook. No further events will be delivered to the registered URL.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def delete_webhook(
+    request: Request,
     webhook_id: str,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),

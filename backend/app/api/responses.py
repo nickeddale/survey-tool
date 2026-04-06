@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies import get_current_user
-from app.limiter import limiter
+from app.limiter import RATE_LIMITS, limiter
 from app.models.user import User
 from app.schemas.response import (
     ResponseCreate,
@@ -167,7 +167,7 @@ async def list_survey_responses(
     summary="Start a new survey response",
     description="Create a new response for a survey. Public endpoint — no authentication required. Optionally supply a participant token and initial answers.",
 )
-@limiter.limit("30/minute")
+@limiter.limit(RATE_LIMITS["response_submit"])
 async def submit_response(
     survey_id: str,
     payload: ResponseCreate,
@@ -346,7 +346,9 @@ async def get_response(
         "Omit status to perform a partial save without validation. Public endpoint."
     ),
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def update_response(
+    request: Request,
     survey_id: str,
     response_id: str,
     payload: ResponseUpdate,
@@ -392,7 +394,9 @@ async def update_response(
     summary="Update response status (admin)",
     description="Admin endpoint to set a response status to 'disqualified'. Requires authentication.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def update_response_status(
+    request: Request,
     survey_id: str,
     response_id: str,
     payload: ResponseStatusUpdate,

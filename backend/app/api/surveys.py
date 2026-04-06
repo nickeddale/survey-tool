@@ -1,10 +1,11 @@
 import uuid
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies import get_current_user
+from app.limiter import RATE_LIMITS, limiter
 from app.models.user import User
 from app.schemas.survey import (
     SurveyCloneRequest,
@@ -59,7 +60,9 @@ def _parse_survey_id(value: str) -> uuid.UUID:
     summary="Create a new survey",
     description="Create a new survey in draft status. The survey is owned by the authenticated user.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def create(
+    request: Request,
     payload: SurveyCreate,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
@@ -142,7 +145,9 @@ async def get_one(
     summary="Update a survey",
     description="Partially update survey metadata fields such as title, description, status, and settings.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def patch(
+    request: Request,
     survey_id: str,
     payload: SurveyUpdate,
     current_user: User = Depends(get_current_user),
@@ -191,7 +196,9 @@ async def list_versions(
     summary="Update survey translations for a language",
     description="Merge translation overrides for the specified language into the survey's translations store.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def update_translations(
+    request: Request,
     survey_id: str,
     payload: SurveyTranslationsUpdate,
     current_user: User = Depends(get_current_user),
@@ -218,7 +225,9 @@ async def update_translations(
     summary="Delete a survey",
     description="Permanently delete a survey and all associated data (groups, questions, responses, etc.).",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def delete(
+    request: Request,
     survey_id: str,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
@@ -236,7 +245,9 @@ async def delete(
     summary="Activate a survey",
     description="Transition a survey from draft to active status, making it available for respondents.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def activate(
+    request: Request,
     survey_id: str,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
@@ -255,7 +266,9 @@ async def activate(
     summary="Close a survey",
     description="Transition a survey to closed status. Closed surveys no longer accept new responses.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def close(
+    request: Request,
     survey_id: str,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
@@ -274,7 +287,9 @@ async def close(
     summary="Archive a survey",
     description="Transition a survey to archived status. Archived surveys are read-only and hidden from active listings.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def archive(
+    request: Request,
     survey_id: str,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
@@ -294,7 +309,9 @@ async def archive(
     summary="Clone a survey",
     description="Create a deep copy of a survey including all groups, questions, and answer options. The clone starts in draft status.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def clone(
+    request: Request,
     survey_id: str,
     payload: SurveyCloneRequest = SurveyCloneRequest(),
     current_user: User = Depends(get_current_user),
@@ -328,7 +345,9 @@ async def export(
     summary="Import a survey from an exported JSON structure",
     description="Create a new survey from an exported JSON payload. Useful for migrating surveys between environments.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def import_survey_endpoint(
+    request: Request,
     payload: SurveyImportRequest,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),

@@ -2,12 +2,13 @@
 
 import uuid
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Request, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies import get_current_user
+from app.limiter import RATE_LIMITS, limiter
 from app.models.question import Question
 from app.models.question_group import QuestionGroup
 from app.models.quota import Quota
@@ -113,7 +114,9 @@ async def _validate_condition_question_ids(
     summary="Create a quota for a survey",
     description="Define a response quota with conditions and an action taken when the limit is reached.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def create_quota(
+    request: Request,
     survey_id: str,
     payload: QuotaCreate,
     current_user: User = Depends(get_current_user),
@@ -212,7 +215,9 @@ async def get_quota(
     summary="Update a quota",
     description="Partially update a quota's name, limit, action, conditions, or active status.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def update_quota(
+    request: Request,
     survey_id: str,
     quota_id: str,
     payload: QuotaUpdate,
@@ -247,7 +252,9 @@ async def update_quota(
     summary="Delete a quota",
     description="Permanently delete a quota rule from a survey.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def delete_quota(
+    request: Request,
     survey_id: str,
     quota_id: str,
     current_user: User = Depends(get_current_user),

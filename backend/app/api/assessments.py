@@ -2,12 +2,13 @@
 
 import uuid
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Request, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies import get_current_user
+from app.limiter import RATE_LIMITS, limiter
 from app.models.assessment import Assessment
 from app.models.response import Response
 from app.models.survey import Survey
@@ -101,7 +102,9 @@ async def _get_response_or_404(
     summary="Create an assessment rule",
     description="Define a scoring band for a survey. When a response's score falls within the min/max range, the associated message is returned.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def create_assessment(
+    request: Request,
     survey_id: str,
     payload: AssessmentCreate,
     current_user: User = Depends(get_current_user),
@@ -201,7 +204,9 @@ async def get_assessment(
     summary="Update an assessment rule",
     description="Partially update an assessment rule's name, scope, score range, or feedback message.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def update_assessment(
+    request: Request,
     survey_id: str,
     assessment_id: str,
     payload: AssessmentUpdate,
@@ -229,7 +234,9 @@ async def update_assessment(
     summary="Delete an assessment rule",
     description="Permanently delete an assessment scoring band from a survey.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def delete_assessment(
+    request: Request,
     survey_id: str,
     assessment_id: str,
     current_user: User = Depends(get_current_user),

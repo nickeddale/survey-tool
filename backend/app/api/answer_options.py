@@ -1,11 +1,12 @@
 import uuid
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies import get_current_user
+from app.limiter import RATE_LIMITS, limiter
 from app.models.user import User
 from app.schemas.answer_option import (
     AnswerOptionCreate,
@@ -46,7 +47,9 @@ def _parse_uuid(value: str, label: str = "resource") -> uuid.UUID:
     summary="Create an answer option",
     description="Add a new answer option to a choice or matrix question.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def create(
+    request: Request,
     survey_id: str,
     question_id: str,
     payload: AnswerOptionCreate,
@@ -120,7 +123,9 @@ async def list_all(
     summary="Reorder answer options",
     description="Update the sort_order of multiple answer options in a single request.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def reorder(
+    request: Request,
     survey_id: str,
     question_id: str,
     payload: AnswerOptionReorderRequest,
@@ -182,7 +187,9 @@ async def get_one(
     summary="Update an answer option",
     description="Partially update an answer option's title, code, sort order, or assessment value.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def patch(
+    request: Request,
     survey_id: str,
     question_id: str,
     option_id: str,
@@ -218,7 +225,9 @@ async def patch(
     summary="Update answer option translations for a language",
     description="Merge translation overrides for the specified language into the answer option's translations store.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def update_translations(
+    request: Request,
     survey_id: str,
     question_id: str,
     option_id: str,
@@ -256,7 +265,9 @@ async def update_translations(
     summary="Delete an answer option",
     description="Permanently delete an answer option from a question.",
 )
+@limiter.limit(RATE_LIMITS["default_mutating"])
 async def delete(
+    request: Request,
     survey_id: str,
     question_id: str,
     option_id: str,
