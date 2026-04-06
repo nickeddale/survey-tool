@@ -2,7 +2,7 @@ import uuid
 from collections.abc import Callable
 from datetime import datetime, timezone
 
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import Depends, HTTPException, Query, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,11 +21,14 @@ from app.utils.pagination import PaginationParams
 bearer_scheme = HTTPBearer(auto_error=False)
 
 
-def pagination_params(page: int = 1, per_page: int = 20) -> PaginationParams:
+def pagination_params(
+    page: int = Query(default=1, ge=1),
+    per_page: int = Query(default=20, ge=1, le=100),
+) -> PaginationParams:
     """Reusable FastAPI dependency for pagination query parameters."""
     params = PaginationParams.__new__(PaginationParams)
-    params.page = max(1, page)
-    params.per_page = min(max(1, per_page), 100)
+    params.page = page
+    params.per_page = per_page
     return params
 
 _WWW_AUTH = "Bearer"

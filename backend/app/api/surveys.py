@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, pagination_params
+from app.utils.pagination import PaginationParams
 from app.limiter import RATE_LIMITS, limiter
 from app.models.user import User
 from app.schemas.survey import (
@@ -88,8 +89,7 @@ async def create(
     description="Return a paginated list of surveys owned by the authenticated user. Supports filtering by status and keyword search.",
 )
 async def list_all(
-    page: int = Query(1, ge=1),
-    per_page: int = Query(20, ge=1, le=100),
+    pagination: PaginationParams = Depends(pagination_params),
     status: str | None = Query(None),
     search: str | None = Query(None),
     current_user: User = Depends(get_current_user),
@@ -98,16 +98,16 @@ async def list_all(
     items, total = await list_surveys(
         session,
         user_id=current_user.id,
-        page=page,
-        per_page=per_page,
+        page=pagination.page,
+        per_page=pagination.per_page,
         status=status,
         search=search,
     )
     return SurveyListResponse(
         items=[SurveyResponse.model_validate(s) for s in items],
         total=total,
-        page=page,
-        per_page=per_page,
+        page=pagination.page,
+        per_page=pagination.per_page,
     )
 
 
@@ -171,8 +171,7 @@ async def patch(
 )
 async def list_versions(
     survey_id: str,
-    page: int = Query(1, ge=1),
-    per_page: int = Query(20, ge=1, le=100),
+    pagination: PaginationParams = Depends(pagination_params),
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> SurveyVersionListResponse:
@@ -181,12 +180,14 @@ async def list_versions(
     if survey is None:
         raise NotFoundError("Survey not found")
 
-    items, total = await get_survey_versions(session, parsed_id, page=page, per_page=per_page)
+    items, total = await get_survey_versions(
+        session, parsed_id, page=pagination.page, per_page=pagination.per_page
+    )
     return SurveyVersionListResponse(
         items=[SurveyVersionResponse.model_validate(v) for v in items],
         total=total,
-        page=page,
-        per_page=per_page,
+        page=pagination.page,
+        per_page=pagination.per_page,
     )
 
 

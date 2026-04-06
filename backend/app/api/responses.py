@@ -9,7 +9,8 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import get_current_user, require_scope
+from app.dependencies import get_current_user, pagination_params, require_scope
+from app.utils.pagination import PaginationParams
 from app.limiter import RATE_LIMITS, limiter
 from app.models.user import User
 from app.schemas.response import (
@@ -120,8 +121,7 @@ async def list_survey_responses(
     survey_id: str,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
-    page: int = Query(default=1, ge=1),
-    per_page: int = Query(default=20, ge=1, le=100),
+    pagination: PaginationParams = Depends(pagination_params),
     status_filter: str | None = Query(default=None, alias="status"),
     started_after: datetime | None = Query(default=None),
     started_before: datetime | None = Query(default=None),
@@ -144,18 +144,18 @@ async def list_survey_responses(
         completed_before=completed_before,
         sort_by=sort_by,
         sort_order=sort_order,
-        page=page,
-        per_page=per_page,
+        page=pagination.page,
+        per_page=pagination.per_page,
     )
 
     items = [ResponseSummary.model_validate(r) for r in responses]
-    pages = max(1, (total + per_page - 1) // per_page)
+    pages = max(1, (total + pagination.per_page - 1) // pagination.per_page)
 
     return ResponseListResponse(
         items=items,
         total=total,
-        page=page,
-        per_page=per_page,
+        page=pagination.page,
+        per_page=pagination.per_page,
         pages=pages,
     )
 

@@ -5,7 +5,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, pagination_params
+from app.utils.pagination import PaginationParams
 from app.limiter import RATE_LIMITS, limiter
 from app.models.user import User
 from app.schemas.answer_option import (
@@ -87,8 +88,7 @@ async def create(
 async def list_all(
     survey_id: str,
     question_id: str,
-    page: int = 1,
-    per_page: int = 50,
+    pagination: PaginationParams = Depends(pagination_params),
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> AnswerOptionListResponse:
@@ -105,15 +105,13 @@ async def list_all(
         raise NotFoundError("Survey or question not found")
 
     total = len(options)
-    start = (page - 1) * per_page
-    end = start + per_page
-    page_items = options[start:end]
+    page_items = options[pagination.offset:pagination.offset + pagination.per_page]
 
     return AnswerOptionListResponse(
         items=[AnswerOptionResponse.model_validate(o) for o in page_items],
         total=total,
-        page=page,
-        per_page=per_page,
+        page=pagination.page,
+        per_page=pagination.per_page,
     )
 
 

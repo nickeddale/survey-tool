@@ -2,12 +2,13 @@
 
 import uuid
 
-from fastapi import APIRouter, Depends, Query, Request, status
+from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, pagination_params
+from app.utils.pagination import PaginationParams
 from app.limiter import RATE_LIMITS, limiter
 from app.models.question import Question
 from app.models.question_group import QuestionGroup
@@ -152,8 +153,7 @@ async def create_quota(
 )
 async def list_quotas(
     survey_id: str,
-    page: int = Query(1, ge=1),
-    per_page: int = Query(20, ge=1, le=100),
+    pagination: PaginationParams = Depends(pagination_params),
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> QuotaListResponse:
@@ -166,23 +166,22 @@ async def list_quotas(
     )
     total = count_result.scalar_one()
 
-    offset = (page - 1) * per_page
     items_result = await session.execute(
         select(Quota)
         .where(Quota.survey_id == parsed_survey_id)
         .order_by(Quota.created_at.asc())
-        .offset(offset)
-        .limit(per_page)
+        .offset(pagination.offset)
+        .limit(pagination.per_page)
     )
     items = list(items_result.scalars().all())
 
-    pages = max(1, (total + per_page - 1) // per_page)
+    pages = max(1, (total + pagination.per_page - 1) // pagination.per_page)
 
     return QuotaListResponse(
         items=[QuotaResponse.model_validate(q) for q in items],
         total=total,
-        page=page,
-        per_page=per_page,
+        page=pagination.page,
+        per_page=pagination.per_page,
         pages=pages,
     )
 
