@@ -8,21 +8,30 @@ Tests cover:
 5. PATCH /surveys/{id}/translations updates translations JSONB
 6. PATCH group/question/option translations endpoints
 7. Export/import round-trips translations
+8. Service-layer orchestration: update_*_translations functions
 """
+
+import uuid
 
 import pytest
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.services.translation_service import (
     apply_translation,
     apply_survey_translations,
     get_supported_languages,
     merge_translations,
+    update_survey_translations,
+    update_group_translations,
+    update_question_translations,
+    update_answer_option_translations,
     SURVEY_TRANSLATABLE_FIELDS,
     GROUP_TRANSLATABLE_FIELDS,
     QUESTION_TRANSLATABLE_FIELDS,
     OPTION_TRANSLATABLE_FIELDS,
 )
+from app.utils.errors import NotFoundError
 
 REGISTER_URL = "/api/v1/auth/register"
 LOGIN_URL = "/api/v1/auth/login"
@@ -382,3 +391,74 @@ async def test_import_restores_translations(client: AsyncClient):
     assert body["translations"]["fr"]["title"] == "Enquête Importée"
     assert body["groups"][0]["translations"]["fr"]["title"] == "Groupe 1"
     assert body["groups"][0]["questions"][0]["translations"]["fr"]["title"] == "Question 1 FR"
+
+
+# ===========================================================================
+# Unit tests for orchestration service functions
+# ===========================================================================
+
+
+class TestUpdateSurveyTranslations:
+    @pytest.mark.asyncio
+    async def test_raises_not_found_for_missing_survey(self, session: AsyncSession):
+        fake_user_id = uuid.uuid4()
+        fake_survey_id = uuid.uuid4()
+        with pytest.raises(NotFoundError):
+            await update_survey_translations(
+                session, fake_survey_id, fake_user_id, "fr", {"title": "Bonjour"}
+            )
+
+    @pytest.mark.asyncio
+    async def test_raises_not_found_for_wrong_owner(self, client: AsyncClient, session: AsyncSession):
+        headers = await auth_headers(client)
+        survey = await create_survey(client, headers)
+        survey_id = uuid.UUID(survey["id"])
+
+        # Different user — should raise NotFoundError
+        other_user_id = uuid.uuid4()
+        with pytest.raises(NotFoundError):
+            await update_survey_translations(
+                session, survey_id, other_user_id, "fr", {"title": "Bonjour"}
+            )
+
+    @pytest.mark.asyncio
+    async def test_merges_translations_and_returns_survey(self, client: AsyncClient, session: AsyncSession):
+        headers = await auth_headers(client)
+        survey = await create_survey(client, headers, title="My Survey")
+        survey_id = uuid.UUID(survey["id"])
+        user_id = uuid.UUID(survey["user_id"])
+
+        updated = await update_survey_translations(
+            session, survey_id, user_id, "fr", {"title": "Mon Enquête"}
+        )
+        assert updated.translations["fr"]["title"] == "Mon Enquête"
+
+
+class TestUpdateGroupTranslations:
+    @pytest.mark.asyncio
+    async def test_raises_not_found_for_missing_group(self, session: AsyncSession):
+        fake_ids = [uuid.uuid4() for _ in range(3)]
+        with pytest.raises(NotFoundError):
+            await update_group_translations(
+                session, fake_ids[0], fake_ids[1], fake_ids[2], "fr", {"title": "Groupe"}
+            )
+
+
+class TestUpdateQuestionTranslations:
+    @pytest.mark.asyncio
+    async def test_raises_not_found_for_missing_question(self, session: AsyncSession):
+        fake_ids = [uuid.uuid4() for _ in range(4)]
+        with pytest.raises(NotFoundError):
+            await update_question_translations(
+                session, fake_ids[0], fake_ids[1], fake_ids[2], fake_ids[3], "fr", {"title": "Q"}
+            )
+
+
+class TestUpdateAnswerOptionTranslations:
+    @pytest.mark.asyncio
+    async def test_raises_not_found_for_missing_option(self, session: AsyncSession):
+        fake_ids = [uuid.uuid4() for _ in range(4)]
+        with pytest.raises(NotFoundError):
+            await update_answer_option_translations(
+                session, fake_ids[0], fake_ids[1], fake_ids[2], fake_ids[3], "fr", {"title": "Opt"}
+            )

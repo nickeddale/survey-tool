@@ -27,7 +27,7 @@ from app.services.question_service import (
     reorder_questions,
     update_question,
 )
-from app.services.translation_service import merge_translations
+from app.services.translation_service import update_question_translations
 from app.utils.errors import ConflictError, NotFoundError, UnprocessableError
 
 router = APIRouter(
@@ -254,22 +254,9 @@ async def update_translations(
     parsed_group_id = _parse_uuid(group_id, "Group")
     parsed_question_id = _parse_uuid(question_id, "Question")
 
-    question = await get_question_by_id(
-        session,
-        survey_id=parsed_survey_id,
-        group_id=parsed_group_id,
-        question_id=parsed_question_id,
-        user_id=current_user.id,
+    question = await update_question_translations(
+        session, parsed_survey_id, parsed_group_id, parsed_question_id, current_user.id, payload.lang, payload.translations
     )
-    if question is None:
-        raise NotFoundError("Question not found")
-
-    new_translations = merge_translations(
-        question.translations or {},
-        payload.lang,
-        payload.translations,
-    )
-    question = await update_question(session, question, translations=new_translations)
     return QuestionResponse.model_validate(question)
 
 
