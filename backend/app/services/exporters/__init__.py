@@ -1,10 +1,10 @@
-"""Backward-compatibility shim for export_service.
+"""Survey and response export submodules.
 
-The original 833-line module has been split into focused submodules under
-services/exporters/. This shim re-exports all public symbols so that existing
-callers (api/surveys.py, api/responses.py, tests/test_export.py) require no changes.
-
-Do not add new logic here — add it to the appropriate submodule instead.
+This package splits the original export_service.py into focused modules:
+- survey_export_service: clone/export/import survey logic
+- response_export_service: shared query layer for fetching responses
+- csv_exporter: CSV generation
+- json_exporter: JSON export
 """
 from app.services.exporters.survey_export_service import (
     clone_survey,
