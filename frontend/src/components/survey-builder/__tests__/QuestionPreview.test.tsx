@@ -541,4 +541,16 @@ describe('SpecialPreview', () => {
     render(<QuestionPreview question={question} />)
     expect(screen.getByText(/No answer options defined/i)).toBeInTheDocument()
   })
+
+  it('strips script tags from html_content via DOMPurify', () => {
+    const question = makeQuestion({
+      question_type: 'html',
+      settings: { html_content: '<p>Hello</p><script>alert(1)</script>' },
+    })
+    const { container } = render(<QuestionPreview question={question} />)
+    const preview = screen.getByTestId('preview-html')
+    expect(preview).toBeInTheDocument()
+    expect(preview).toHaveTextContent('Hello')
+    expect(container.querySelector('script')).toBeNull()
+  })
 })

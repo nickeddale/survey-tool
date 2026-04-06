@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-06T10:58:38.066Z",
+  "lastUpdated": "2026-04-06T11:00:58.960Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2260,6 +2260,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-06-iss-116-sec-02-sanitize-html-in-specialpreview-with-dompur.md",
+      "ticketId": "ISS-116",
+      "title": "SEC-02: Sanitize HTML in SpecialPreview with DOMPurify",
+      "date": "2026-04-06",
+      "categories": [
+        "testing",
+        "feature",
+        "documentation",
+        "ci-cd",
+        "ui"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -2370,7 +2386,8 @@
       "2026-04-06-iss-112-add-survey-versioning-version-field-history.md",
       "2026-04-06-iss-113-polish-openapi-spec-tag-descriptions-endpoint-summ.md",
       "2026-04-06-iss-114-create-settingspage-for-api-key-management-and-pro.md",
-      "2026-04-06-iss-115-sec-01-reject-default-jwt-secret-on-startup.md"
+      "2026-04-06-iss-115-sec-01-reject-default-jwt-secret-on-startup.md",
+      "2026-04-06-iss-116-sec-02-sanitize-html-in-specialpreview-with-dompur.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2667,7 +2684,8 @@
       "2026-04-06-iss-112-add-survey-versioning-version-field-history.md",
       "2026-04-06-iss-113-polish-openapi-spec-tag-descriptions-endpoint-summ.md",
       "2026-04-06-iss-114-create-settingspage-for-api-key-management-and-pro.md",
-      "2026-04-06-iss-115-sec-01-reject-default-jwt-secret-on-startup.md"
+      "2026-04-06-iss-115-sec-01-reject-default-jwt-secret-on-startup.md",
+      "2026-04-06-iss-116-sec-02-sanitize-html-in-specialpreview-with-dompur.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2905,7 +2923,8 @@
       "2026-04-06-iss-112-add-survey-versioning-version-field-history.md",
       "2026-04-06-iss-113-polish-openapi-spec-tag-descriptions-endpoint-summ.md",
       "2026-04-06-iss-114-create-settingspage-for-api-key-management-and-pro.md",
-      "2026-04-06-iss-115-sec-01-reject-default-jwt-secret-on-startup.md"
+      "2026-04-06-iss-115-sec-01-reject-default-jwt-secret-on-startup.md",
+      "2026-04-06-iss-116-sec-02-sanitize-html-in-specialpreview-with-dompur.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2992,7 +3011,8 @@
       "2026-04-03-iss-102-77-webhook-event-dispatching.md",
       "2026-04-03-iss-103-78-webhook-hmac-sha256-signing-and-retry-logic.md",
       "2026-04-06-iss-113-polish-openapi-spec-tag-descriptions-endpoint-summ.md",
-      "2026-04-06-iss-115-sec-01-reject-default-jwt-secret-on-startup.md"
+      "2026-04-06-iss-115-sec-01-reject-default-jwt-secret-on-startup.md",
+      "2026-04-06-iss-116-sec-02-sanitize-html-in-specialpreview-with-dompur.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3188,7 +3208,8 @@
       "2026-04-06-iss-112-add-survey-versioning-version-field-history.md",
       "2026-04-06-iss-113-polish-openapi-spec-tag-descriptions-endpoint-summ.md",
       "2026-04-06-iss-114-create-settingspage-for-api-key-management-and-pro.md",
-      "2026-04-06-iss-115-sec-01-reject-default-jwt-secret-on-startup.md"
+      "2026-04-06-iss-115-sec-01-reject-default-jwt-secret-on-startup.md",
+      "2026-04-06-iss-116-sec-02-sanitize-html-in-specialpreview-with-dompur.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
