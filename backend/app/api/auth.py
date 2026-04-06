@@ -1,13 +1,14 @@
 import uuid
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.database import get_db
+from app.limiter import limiter
 from app.dependencies import get_current_user
 from app.models.api_key import ApiKey
 from app.models.user import User
@@ -47,7 +48,9 @@ router = APIRouter(prefix="/auth", tags=["auth"])
     response_model=UserResponse,
     status_code=status.HTTP_201_CREATED,
 )
+@limiter.limit("5/minute")
 async def register(
+    request: Request,
     payload: UserCreate,
     session: AsyncSession = Depends(get_db),
 ) -> UserResponse:
@@ -71,7 +74,9 @@ async def register(
 
 
 @router.post("/login", response_model=TokenResponse)
+@limiter.limit("10/minute")
 async def login(
+    request: Request,
     payload: LoginRequest,
     session: AsyncSession = Depends(get_db),
 ) -> TokenResponse:
@@ -94,7 +99,9 @@ async def login(
 
 
 @router.post("/refresh", response_model=TokenResponse)
+@limiter.limit("10/minute")
 async def refresh(
+    request: Request,
     payload: RefreshRequest,
     session: AsyncSession = Depends(get_db),
 ) -> TokenResponse:

@@ -6,6 +6,8 @@ from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -22,6 +24,7 @@ from app.api.quotas import router as quotas_router
 from app.api.responses import router as responses_router
 from app.api.surveys import router as surveys_router
 from app.config import settings
+from app.limiter import limiter
 from app.utils.errors import (
     AppError,
     AnswerValidationError,
@@ -57,6 +60,8 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+app.state.limiter = limiter
+
 # CORS must be added before logging middleware so it is the outermost layer
 # (Starlette applies middleware in reverse registration order).
 app.add_middleware(
@@ -84,6 +89,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
 
 
 app.add_middleware(RequestLoggingMiddleware)
+app.add_middleware(SlowAPIMiddleware)
 
 
 # ---------------------------------------------------------------------------
@@ -147,6 +153,15 @@ async def unprocessable_error_handler(request: Request, exc: UnprocessableError)
 @app.exception_handler(RateLimitedError)
 async def rate_limited_error_handler(request: Request, exc: RateLimitedError) -> JSONResponse:
     return _make_error_response(exc.status_code, exc.code, exc.message)
+
+
+@app.exception_handler(RateLimitExceeded)
+async def slowapi_rate_limit_handler(request: Request, exc: RateLimitExceeded) -> JSONResponse:
+    return _make_error_response(
+        status.HTTP_429_TOO_MANY_REQUESTS,
+        "RATE_LIMITED",
+        "Too many requests. Please slow down.",
+    )
 
 
 @app.exception_handler(RequestValidationError)

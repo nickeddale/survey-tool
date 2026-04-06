@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies import get_current_user
+from app.limiter import limiter
 from app.models.user import User
 from app.schemas.response import (
     ResponseCreate,
@@ -156,6 +157,7 @@ async def list_survey_responses(
     response_model=ResponseResponse,
     status_code=status.HTTP_201_CREATED,
 )
+@limiter.limit("30/minute")
 async def submit_response(
     survey_id: str,
     payload: ResponseCreate,
