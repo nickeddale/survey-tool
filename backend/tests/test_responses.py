@@ -2144,6 +2144,18 @@ async def test_export_wrong_owner_returns_404(client: AsyncClient):
 
 
 @pytest.mark.asyncio
+async def test_export_invalid_format_returns_400(client: AsyncClient):
+    """GET /export?format=xml returns 400 Bad Request."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/export?format=xml",
+        headers=headers,
+    )
+    assert resp.status_code == 400
+
+
+@pytest.mark.asyncio
 async def test_export_route_not_captured_as_response_id(client: AsyncClient):
     """Accessing /export with auth must not be captured as a UUID response_id path param."""
     survey_id, _question_id, headers = await create_active_survey(client)
