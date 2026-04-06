@@ -40,6 +40,16 @@ from app.utils.errors import (
 logger = logging.getLogger("app")
 logging.basicConfig(level=settings.log_level.upper())
 
+# Configure the audit logger explicitly so it is not silenced by handler setup.
+# Audit entries are emitted as JSON strings via logger.info(json.dumps({...})).
+_audit_logger = logging.getLogger("audit")
+_audit_logger.setLevel(logging.INFO)
+if not _audit_logger.handlers:
+    _audit_handler = logging.StreamHandler()
+    _audit_handler.setLevel(logging.INFO)
+    _audit_logger.addHandler(_audit_handler)
+_audit_logger.propagate = True
+
 # Map HTTP status codes to standard error codes
 _STATUS_CODE_MAP: dict[int, str] = {
     400: "VALIDATION_ERROR",

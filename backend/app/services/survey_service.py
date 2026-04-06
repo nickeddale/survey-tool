@@ -10,6 +10,7 @@ from sqlalchemy.orm import selectinload
 from app.models.question import Question
 from app.models.question_group import QuestionGroup
 from app.models.survey import Survey, SurveyVersion
+from app.services import audit_service
 from app.services.event_dispatcher import get_dispatcher
 
 
@@ -207,6 +208,7 @@ def check_survey_editable(survey: Survey) -> None:
 async def activate_survey(
     session: AsyncSession,
     survey: Survey,
+    user_id: uuid.UUID | None = None,
 ) -> Survey:
     """Transition survey from draft -> active. Raises 422 if not draft or has no questions."""
     if survey.status != "draft":
@@ -231,11 +233,19 @@ async def activate_survey(
             detail="Survey cannot be activated: it has no questions",
         )
 
+    old_status = survey.status
     survey.status = "active"
     survey.updated_at = datetime.now(timezone.utc)
     session.add(survey)
     await session.flush()
     await session.refresh(survey)
+
+    audit_service.log_survey_transition(
+        user_id=user_id if user_id is not None else survey.user_id,
+        survey_id=survey.id,
+        old_status=old_status,
+        new_status=survey.status,
+    )
 
     get_dispatcher()(
         event="survey.activated",
@@ -253,6 +263,7 @@ async def activate_survey(
 async def close_survey(
     session: AsyncSession,
     survey: Survey,
+    user_id: uuid.UUID | None = None,
 ) -> Survey:
     """Transition survey from active -> closed. Raises 422 if not active."""
     if survey.status != "active":
@@ -261,11 +272,19 @@ async def close_survey(
             detail="Survey cannot be closed: it is not in active status",
         )
 
+    old_status = survey.status
     survey.status = "closed"
     survey.updated_at = datetime.now(timezone.utc)
     session.add(survey)
     await session.flush()
     await session.refresh(survey)
+
+    audit_service.log_survey_transition(
+        user_id=user_id if user_id is not None else survey.user_id,
+        survey_id=survey.id,
+        old_status=old_status,
+        new_status=survey.status,
+    )
 
     get_dispatcher()(
         event="survey.closed",
@@ -283,6 +302,7 @@ async def close_survey(
 async def archive_survey(
     session: AsyncSession,
     survey: Survey,
+    user_id: uuid.UUID | None = None,
 ) -> Survey:
     """Transition survey from closed -> archived. Raises 422 if not closed."""
     if survey.status != "closed":
@@ -291,11 +311,20 @@ async def archive_survey(
             detail="Survey cannot be archived: it is not in closed status",
         )
 
+    old_status = survey.status
     survey.status = "archived"
     survey.updated_at = datetime.now(timezone.utc)
     session.add(survey)
     await session.flush()
     await session.refresh(survey)
+
+    audit_service.log_survey_transition(
+        user_id=user_id if user_id is not None else survey.user_id,
+        survey_id=survey.id,
+        old_status=old_status,
+        new_status=survey.status,
+    )
+
     return survey
 
 

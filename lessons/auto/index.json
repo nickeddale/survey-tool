@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-06T15:05:48.212Z",
+  "lastUpdated": "2026-04-06T15:25:12.051Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2628,6 +2628,28 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md",
+      "ticketId": "ISS-135",
+      "title": "REL-06: Add audit logging for auth and survey transitions",
+      "date": "2026-04-06",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "refactoring",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -2756,7 +2778,8 @@
       "2026-04-06-iss-131-rel-02-fix-urlcreateobjecturl-memory-leak-in-fileu.md",
       "2026-04-06-iss-132-rel-03-configure-database-poolrecycle-and-isolatio.md",
       "2026-04-06-iss-133-rel-04-add-idempotency-key-to-webhook-delivery.md",
-      "2026-04-06-iss-134-rel-05-handle-clipboard-errors-in-participanttable.md"
+      "2026-04-06-iss-134-rel-05-handle-clipboard-errors-in-participanttable.md",
+      "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2873,7 +2896,8 @@
       "2026-04-06-iss-130-rel-01-add-errorboundary-component.md",
       "2026-04-06-iss-131-rel-02-fix-urlcreateobjecturl-memory-leak-in-fileu.md",
       "2026-04-06-iss-132-rel-03-configure-database-poolrecycle-and-isolatio.md",
-      "2026-04-06-iss-133-rel-04-add-idempotency-key-to-webhook-delivery.md"
+      "2026-04-06-iss-133-rel-04-add-idempotency-key-to-webhook-delivery.md",
+      "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2974,7 +2998,8 @@
       "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
       "2026-04-06-iss-132-rel-03-configure-database-poolrecycle-and-isolatio.md",
       "2026-04-06-iss-133-rel-04-add-idempotency-key-to-webhook-delivery.md",
-      "2026-04-06-iss-134-rel-05-handle-clipboard-errors-in-participanttable.md"
+      "2026-04-06-iss-134-rel-05-handle-clipboard-errors-in-participanttable.md",
+      "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3098,7 +3123,8 @@
       "2026-04-06-iss-131-rel-02-fix-urlcreateobjecturl-memory-leak-in-fileu.md",
       "2026-04-06-iss-132-rel-03-configure-database-poolrecycle-and-isolatio.md",
       "2026-04-06-iss-133-rel-04-add-idempotency-key-to-webhook-delivery.md",
-      "2026-04-06-iss-134-rel-05-handle-clipboard-errors-in-participanttable.md"
+      "2026-04-06-iss-134-rel-05-handle-clipboard-errors-in-participanttable.md",
+      "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3134,7 +3160,8 @@
       "2026-04-06-iss-125-cq-03-consolidate-pagination-into-shared-dependenc.md",
       "2026-04-06-iss-126-cq-04-decouple-responseservice-from-webhookservice.md",
       "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
-      "2026-04-06-iss-131-rel-02-fix-urlcreateobjecturl-memory-leak-in-fileu.md"
+      "2026-04-06-iss-131-rel-02-fix-urlcreateobjecturl-memory-leak-in-fileu.md",
+      "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md"
     ],
     "bug-fix": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3254,7 +3281,8 @@
       "2026-04-06-iss-131-rel-02-fix-urlcreateobjecturl-memory-leak-in-fileu.md",
       "2026-04-06-iss-132-rel-03-configure-database-poolrecycle-and-isolatio.md",
       "2026-04-06-iss-133-rel-04-add-idempotency-key-to-webhook-delivery.md",
-      "2026-04-06-iss-134-rel-05-handle-clipboard-errors-in-participanttable.md"
+      "2026-04-06-iss-134-rel-05-handle-clipboard-errors-in-participanttable.md",
+      "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3377,7 +3405,8 @@
       "2026-04-06-iss-131-rel-02-fix-urlcreateobjecturl-memory-leak-in-fileu.md",
       "2026-04-06-iss-132-rel-03-configure-database-poolrecycle-and-isolatio.md",
       "2026-04-06-iss-133-rel-04-add-idempotency-key-to-webhook-delivery.md",
-      "2026-04-06-iss-134-rel-05-handle-clipboard-errors-in-participanttable.md"
+      "2026-04-06-iss-134-rel-05-handle-clipboard-errors-in-participanttable.md",
+      "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3439,7 +3468,8 @@
       "2026-04-06-iss-125-cq-03-consolidate-pagination-into-shared-dependenc.md",
       "2026-04-06-iss-126-cq-04-decouple-responseservice-from-webhookservice.md",
       "2026-04-06-iss-131-rel-02-fix-urlcreateobjecturl-memory-leak-in-fileu.md",
-      "2026-04-06-iss-133-rel-04-add-idempotency-key-to-webhook-delivery.md"
+      "2026-04-06-iss-133-rel-04-add-idempotency-key-to-webhook-delivery.md",
+      "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3581,7 +3611,8 @@
       "2026-04-06-iss-128-cq-06-standardize-error-handling-rollback-exceptio.md",
       "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
       "2026-04-06-iss-132-rel-03-configure-database-poolrecycle-and-isolatio.md",
-      "2026-04-06-iss-133-rel-04-add-idempotency-key-to-webhook-delivery.md"
+      "2026-04-06-iss-133-rel-04-add-idempotency-key-to-webhook-delivery.md",
+      "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3701,7 +3732,8 @@
       "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
       "2026-04-06-iss-132-rel-03-configure-database-poolrecycle-and-isolatio.md",
       "2026-04-06-iss-133-rel-04-add-idempotency-key-to-webhook-delivery.md",
-      "2026-04-06-iss-134-rel-05-handle-clipboard-errors-in-participanttable.md"
+      "2026-04-06-iss-134-rel-05-handle-clipboard-errors-in-participanttable.md",
+      "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -3796,7 +3828,8 @@
       "2026-04-06-iss-125-cq-03-consolidate-pagination-into-shared-dependenc.md",
       "2026-04-06-iss-129-cq-07-move-translation-logic-from-router-to-servic.md",
       "2026-04-06-iss-132-rel-03-configure-database-poolrecycle-and-isolatio.md",
-      "2026-04-06-iss-133-rel-04-add-idempotency-key-to-webhook-delivery.md"
+      "2026-04-06-iss-133-rel-04-add-idempotency-key-to-webhook-delivery.md",
+      "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
