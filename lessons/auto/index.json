@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-06T11:27:44.555Z",
+  "lastUpdated": "2026-04-06T11:30:15.733Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2337,6 +2337,25 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-06-iss-120-sec-06-fix-broken-masktoken-call-in-participanttab.md",
+      "ticketId": "ISS-120",
+      "title": "SEC-06: Fix broken maskToken() call in ParticipantTable",
+      "date": "2026-04-06",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -2451,7 +2470,8 @@
       "2026-04-06-iss-116-sec-02-sanitize-html-in-specialpreview-with-dompur.md",
       "2026-04-06-iss-117-sec-03-validate-export-format-parameter.md",
       "2026-04-06-iss-118-sec-04-restrict-cors-allowmethods-and-allowheaders.md",
-      "2026-04-06-iss-119-sec-05-expand-rate-limiting-to-all-mutating-endpoi.md"
+      "2026-04-06-iss-119-sec-05-expand-rate-limiting-to-all-mutating-endpoi.md",
+      "2026-04-06-iss-120-sec-06-fix-broken-masktoken-call-in-participanttab.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2556,7 +2576,8 @@
       "2026-04-06-iss-114-create-settingspage-for-api-key-management-and-pro.md",
       "2026-04-06-iss-117-sec-03-validate-export-format-parameter.md",
       "2026-04-06-iss-118-sec-04-restrict-cors-allowmethods-and-allowheaders.md",
-      "2026-04-06-iss-119-sec-05-expand-rate-limiting-to-all-mutating-endpoi.md"
+      "2026-04-06-iss-119-sec-05-expand-rate-limiting-to-all-mutating-endpoi.md",
+      "2026-04-06-iss-120-sec-06-fix-broken-masktoken-call-in-participanttab.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2757,7 +2778,8 @@
       "2026-04-06-iss-116-sec-02-sanitize-html-in-specialpreview-with-dompur.md",
       "2026-04-06-iss-117-sec-03-validate-export-format-parameter.md",
       "2026-04-06-iss-118-sec-04-restrict-cors-allowmethods-and-allowheaders.md",
-      "2026-04-06-iss-119-sec-05-expand-rate-limiting-to-all-mutating-endpoi.md"
+      "2026-04-06-iss-119-sec-05-expand-rate-limiting-to-all-mutating-endpoi.md",
+      "2026-04-06-iss-120-sec-06-fix-broken-masktoken-call-in-participanttab.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2893,7 +2915,8 @@
       "2026-04-06-iss-114-create-settingspage-for-api-key-management-and-pro.md",
       "2026-04-06-iss-115-sec-01-reject-default-jwt-secret-on-startup.md",
       "2026-04-06-iss-117-sec-03-validate-export-format-parameter.md",
-      "2026-04-06-iss-119-sec-05-expand-rate-limiting-to-all-mutating-endpoi.md"
+      "2026-04-06-iss-119-sec-05-expand-rate-limiting-to-all-mutating-endpoi.md",
+      "2026-04-06-iss-120-sec-06-fix-broken-masktoken-call-in-participanttab.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3002,7 +3025,8 @@
       "2026-04-06-iss-116-sec-02-sanitize-html-in-specialpreview-with-dompur.md",
       "2026-04-06-iss-117-sec-03-validate-export-format-parameter.md",
       "2026-04-06-iss-118-sec-04-restrict-cors-allowmethods-and-allowheaders.md",
-      "2026-04-06-iss-119-sec-05-expand-rate-limiting-to-all-mutating-endpoi.md"
+      "2026-04-06-iss-119-sec-05-expand-rate-limiting-to-all-mutating-endpoi.md",
+      "2026-04-06-iss-120-sec-06-fix-broken-masktoken-call-in-participanttab.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3187,7 +3211,8 @@
       "2026-04-06-iss-114-create-settingspage-for-api-key-management-and-pro.md",
       "2026-04-06-iss-115-sec-01-reject-default-jwt-secret-on-startup.md",
       "2026-04-06-iss-118-sec-04-restrict-cors-allowmethods-and-allowheaders.md",
-      "2026-04-06-iss-119-sec-05-expand-rate-limiting-to-all-mutating-endpoi.md"
+      "2026-04-06-iss-119-sec-05-expand-rate-limiting-to-all-mutating-endpoi.md",
+      "2026-04-06-iss-120-sec-06-fix-broken-masktoken-call-in-participanttab.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3295,7 +3320,8 @@
       "2026-04-06-iss-116-sec-02-sanitize-html-in-specialpreview-with-dompur.md",
       "2026-04-06-iss-117-sec-03-validate-export-format-parameter.md",
       "2026-04-06-iss-118-sec-04-restrict-cors-allowmethods-and-allowheaders.md",
-      "2026-04-06-iss-119-sec-05-expand-rate-limiting-to-all-mutating-endpoi.md"
+      "2026-04-06-iss-119-sec-05-expand-rate-limiting-to-all-mutating-endpoi.md",
+      "2026-04-06-iss-120-sec-06-fix-broken-masktoken-call-in-participanttab.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -3382,7 +3408,8 @@
       "2026-04-06-iss-114-create-settingspage-for-api-key-management-and-pro.md",
       "2026-04-06-iss-117-sec-03-validate-export-format-parameter.md",
       "2026-04-06-iss-118-sec-04-restrict-cors-allowmethods-and-allowheaders.md",
-      "2026-04-06-iss-119-sec-05-expand-rate-limiting-to-all-mutating-endpoi.md"
+      "2026-04-06-iss-119-sec-05-expand-rate-limiting-to-all-mutating-endpoi.md",
+      "2026-04-06-iss-120-sec-06-fix-broken-masktoken-call-in-participanttab.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",

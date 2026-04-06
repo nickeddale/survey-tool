@@ -16,6 +16,7 @@ const mockParticipants: ParticipantResponse[] = [
     valid_until: null,
     completed: false,
     created_at: '2024-01-10T10:00:00Z',
+    token: 'abcd1234',
   },
   {
     id: 'p2',
@@ -69,7 +70,7 @@ describe('ParticipantTable', () => {
       />,
     )
     const tokenEl = screen.getByTestId('participant-token-p1')
-    expect(tokenEl.textContent).toMatch(/^••••/)
+    expect(tokenEl.textContent).toBe('••••1234')
   })
 
   it('shows ∞ for unlimited uses_remaining', () => {

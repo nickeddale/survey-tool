@@ -95,7 +95,7 @@ function ParticipantTable({
                   className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded"
                   data-testid={`participant-token-${p.id}`}
                 >
-                  {maskToken()}
+                  {maskToken(p.token)}
                 </code>
               </td>
               <td className="px-4 py-3 text-muted-foreground">

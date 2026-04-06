@@ -532,6 +532,7 @@ export interface ParticipantResponse {
   valid_until: string | null
   completed: boolean
   created_at: string
+  token?: string
 }
 
 export interface ParticipantCreateResponse extends ParticipantResponse {
