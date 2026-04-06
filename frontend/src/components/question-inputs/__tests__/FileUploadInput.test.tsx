@@ -6,7 +6,7 @@
  * accessibility attributes.
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FileUploadInput } from '../FileUploadInput'
@@ -103,8 +103,9 @@ describe('FileUploadInput — rendering', () => {
   })
 
   it('shows image preview for image files', () => {
-    // URL.createObjectURL is not available in jsdom — define it before use
+    // URL.createObjectURL/revokeObjectURL are not available in jsdom — define before use
     URL.createObjectURL = vi.fn().mockReturnValue('blob:mock-url')
+    URL.revokeObjectURL = vi.fn()
     const file = makeFile('photo.jpg', 'image/jpeg', 1024)
     render(<FileUploadInput value={[file]} onChange={vi.fn()} question={makeQuestion()} />)
     expect(screen.getByTestId(`file-preview-img-photo.jpg`)).toBeInTheDocument()
@@ -276,6 +277,64 @@ describe('FileUploadInput — external errors', () => {
       />
     )
     expect(screen.getByTestId('file-upload-errors')).toHaveTextContent('Upload failed on server')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Memory leak — URL.revokeObjectURL cleanup
+// ---------------------------------------------------------------------------
+
+describe('FileUploadInput — FilePreview URL memory leak', () => {
+  beforeEach(() => {
+    URL.createObjectURL = vi.fn().mockReturnValue('blob:mock-url')
+    URL.revokeObjectURL = vi.fn()
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('calls revokeObjectURL when an image preview is unmounted', () => {
+    const file = makeFile('photo.jpg', 'image/jpeg', 1024)
+    const { unmount } = render(
+      <FileUploadInput value={[file]} onChange={vi.fn()} question={makeQuestion()} />
+    )
+    expect(URL.createObjectURL).toHaveBeenCalledWith(file)
+    unmount()
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock-url')
+  })
+
+  it('revokes the previous URL when a new image file replaces it', () => {
+    const file1 = makeFile('photo1.jpg', 'image/jpeg', 1024)
+    const file2 = makeFile('photo2.jpg', 'image/jpeg', 1024)
+
+    URL.createObjectURL = vi.fn()
+      .mockReturnValueOnce('blob:mock-url-1')
+      .mockReturnValueOnce('blob:mock-url-2')
+
+    const { rerender } = render(
+      <FileUploadInput value={[file1]} onChange={vi.fn()} question={makeQuestion()} />
+    )
+    expect(URL.createObjectURL).toHaveBeenCalledWith(file1)
+
+    rerender(
+      <FileUploadInput value={[file2]} onChange={vi.fn()} question={makeQuestion()} />
+    )
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock-url-1')
+    expect(URL.createObjectURL).toHaveBeenCalledWith(file2)
+  })
+
+  it('does not call createObjectURL for non-image files', () => {
+    const file = makeFile('doc.pdf', 'application/pdf', 1024)
+    render(<FileUploadInput value={[file]} onChange={vi.fn()} question={makeQuestion()} />)
+    expect(URL.createObjectURL).not.toHaveBeenCalled()
+  })
+
+  it('image preview still renders with the created URL', () => {
+    const file = makeFile('photo.jpg', 'image/jpeg', 1024)
+    render(<FileUploadInput value={[file]} onChange={vi.fn()} question={makeQuestion()} />)
+    const img = screen.getByTestId('file-preview-img-photo.jpg')
+    expect(img).toHaveAttribute('src', 'blob:mock-url')
   })
 })
 
