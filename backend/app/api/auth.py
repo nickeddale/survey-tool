@@ -36,6 +36,7 @@ from app.services.auth_service import (
     revoke_refresh_token,
     verify_password,
 )
+from app.services import audit_service
 from app.utils.errors import ConflictError, NotFoundError, UnauthorizedError
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -112,10 +113,32 @@ async def login(
     payload: LoginRequest,
     session: AsyncSession = Depends(get_db),
 ) -> TokenResponse:
+    ip_address = (
+        request.headers.get("X-Forwarded-For", request.client.host)
+        if request.client
+        else request.headers.get("X-Forwarded-For")
+    )
+
     user = await get_user_by_email(session, payload.email)
     if user is None or not verify_password(payload.password, user.password_hash):
+        audit_service.log_auth_event(
+            event_type="login_failure",
+            email=payload.email,
+            success=False,
+            ip_address=ip_address,
+            user_id=user.id if user is not None else None,
+            detail="Invalid email or password",
+        )
         raise UnauthorizedError("Invalid email or password")
     if not user.is_active:
+        audit_service.log_auth_event(
+            event_type="login_failure",
+            email=payload.email,
+            success=False,
+            ip_address=ip_address,
+            user_id=user.id,
+            detail="User account is inactive",
+        )
         raise UnauthorizedError("User account is inactive")
 
     access_token = create_access_token({"sub": str(user.id)})
@@ -123,6 +146,14 @@ async def login(
     await create_refresh_token_record(session, user.id, refresh_token)
 
     _set_refresh_cookie(response, refresh_token)
+
+    audit_service.log_auth_event(
+        event_type="login_success",
+        email=user.email,
+        success=True,
+        ip_address=ip_address,
+        user_id=user.id,
+    )
 
     return TokenResponse(
         access_token=access_token,

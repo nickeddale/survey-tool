@@ -23,6 +23,7 @@ from app.models.participant import Participant
 from app.models.response import Response
 from app.models.response_answer import ResponseAnswer
 from app.models.survey import Survey
+from app.services import audit_service
 from app.services.event_dispatcher import get_dispatcher
 from app.services.response_crud_service import (
     _check_survey_requires_participants,
@@ -95,7 +96,8 @@ async def create_response(
         participant = await _validate_participant_token(session, survey_id, token)
 
         # Atomically decrement uses_remaining (only if it is not unlimited/None)
-        if participant.uses_remaining is not None:
+        uses_before = participant.uses_remaining
+        if uses_before is not None:
             stmt = (
                 update(Participant)
                 .where(
@@ -108,6 +110,15 @@ async def create_response(
             if result2.rowcount == 0:
                 # Race condition: another request consumed the last use
                 raise ForbiddenError("Participant token has no remaining uses")
+
+        # Log token usage: uses_remaining after decrement (or None for unlimited)
+        uses_after = (uses_before - 1) if uses_before is not None else None
+        audit_service.log_token_usage(
+            participant_id=participant.id,
+            survey_id=survey_id,
+            token_prefix=token[:8] if len(token) >= 8 else token,
+            uses_remaining=uses_after,
+        )
 
     # Validate all answers before persisting anything
     if answers:
