@@ -2,6 +2,7 @@
  * SpecialPreview — display-only previews for ranking, image_picker, file_upload, expression, and html types.
  */
 
+import DOMPurify from 'dompurify'
 import type { BuilderQuestion } from '../../../store/builderStore'
 import type { RankingSettings, ImagePickerSettings, FileUploadSettings, ExpressionSettings, HtmlSettings } from '../../../types/questionSettings'
 
@@ -151,12 +152,14 @@ export function SpecialPreview({ question }: QuestionPreviewProps) {
       )
     }
 
+    const sanitized = DOMPurify.sanitize(s.html_content, { USE_PROFILES: { html: true } })
+
     return (
       <div
         className="rounded-md border border-border p-3 bg-background pointer-events-none"
         data-testid="preview-html"
-        // HTML content is rendered as-is — in a real app, sanitize with DOMPurify
-        dangerouslySetInnerHTML={{ __html: s.html_content }}
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: sanitized }}
       />
     )
   }
