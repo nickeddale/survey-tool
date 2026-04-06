@@ -1,5 +1,8 @@
-from pydantic import field_validator
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_DEFAULT_JWT_SECRET = "change-me-in-production"
+_NON_PRODUCTION_ENVS = {"development", "test"}
 
 
 class Settings(BaseSettings):
@@ -21,9 +24,22 @@ class Settings(BaseSettings):
         return v
 
     # JWT
-    jwt_secret: str = "change-me-in-production"
+    jwt_secret: str = _DEFAULT_JWT_SECRET
     jwt_algorithm: str = "HS256"
     jwt_expiry_mins: int = 60
+
+    # Environment
+    environment: str = "production"
+
+    @model_validator(mode="after")
+    def reject_default_jwt_secret_in_production(self) -> "Settings":
+        if self.jwt_secret == _DEFAULT_JWT_SECRET and self.environment not in _NON_PRODUCTION_ENVS:
+            raise ValueError(
+                "JWT_SECRET is set to the insecure default 'change-me-in-production'. "
+                "Set a strong secret via the JWT_SECRET environment variable before starting "
+                "the application in production."
+            )
+        return self
 
     # CORS (comma-separated list of allowed origins)
     cors_origins: str = "http://localhost:3000"

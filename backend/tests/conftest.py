@@ -2,6 +2,10 @@
 
 import os
 
+# Set ENVIRONMENT=test before any app modules are imported so the Settings
+# model_validator does not reject the default JWT secret during test runs.
+os.environ.setdefault("ENVIRONMENT", "test")
+
 # Force the asyncpg scheme in DATABASE_URL before any app modules are imported.
 # The container environment sets the psycopg2 scheme by default which fails with
 # the async SQLAlchemy engine at module-import time (app/database.py validates).
