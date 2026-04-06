@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from typing import Literal
 
-from fastapi import APIRouter, Depends, Query, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import JSONResponse, StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -205,7 +205,7 @@ async def export_survey_responses(
     survey_id: str,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
-    format: str = Query(default="csv"),
+    format: Literal["csv", "json"] = Query(default="csv"),
     columns: str | None = Query(default=None),
     status_filter: str | None = Query(default=None, alias="status"),
     started_after: datetime | None = Query(default=None),
@@ -234,6 +234,9 @@ async def export_survey_responses(
     JSON format:
         - Array of response objects with 'answers' dict keyed by question code
     """
+    if format not in ("csv", "json"):
+        raise HTTPException(status_code=400, detail="Invalid format. Must be 'csv' or 'json'.")
+
     parsed_survey_id = _parse_survey_id(survey_id)
 
     # Parse columns filter
@@ -254,7 +257,7 @@ async def export_survey_responses(
 
     headers = build_csv_headers(responses, columns=column_list)
 
-    if format.lower() == "json":
+    if format == "json":
         data = build_json_export(responses, headers)
         filename = f"survey_{survey_id}_responses.json"
         return JSONResponse(
