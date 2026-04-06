@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useAuthStore } from '../store/authStore'
-import { getRefreshToken } from '../services/tokenService'
 import type { UserResponse, LoginRequest, UserCreate } from '../types/auth'
 
 export interface AuthContextValue {
@@ -27,10 +26,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const register = useAuthStore((state) => state.register)
   const logout = useAuthStore((state) => state.logout)
 
-  // Synchronously determine if we need to load: if a refresh token exists, we
-  // must attempt initialization before showing protected content. This avoids a
-  // flash of the unauthenticated view on the first render before useEffect fires.
-  const [pendingInit, setPendingInit] = useState(() => !!getRefreshToken())
+  // Always attempt initialization on mount — we must probe the refresh cookie to
+  // determine auth state (httpOnly cookies are not readable from JS).
+  // pendingInit stays true until initialize() resolves so we don't flash the
+  // unauthenticated view before the probe completes.
+  const [pendingInit, setPendingInit] = useState(true)
   const initStarted = useRef(false)
 
   useEffect(() => {

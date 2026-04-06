@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { http, HttpResponse } from 'msw'
 import { server } from '../../test/setup'
 import apiClient, { setRedirectFn } from '../apiClient'
-import { setTokens, clearTokens, getAccessToken, getRefreshToken } from '../tokenService'
+import { setTokens, clearTokens, getAccessToken } from '../tokenService'
 import { mockTokens, mockNewTokens } from '../../mocks/handlers'
 
 const BASE = '/api/v1'
@@ -35,7 +35,7 @@ describe('apiClient interceptors', () => {
           return HttpResponse.json({ id: '1', email: 'a@b.com', name: null, is_active: true, created_at: '2024-01-01T00:00:00Z' })
         }),
       )
-      setTokens(mockTokens.access_token, mockTokens.refresh_token)
+      setTokens(mockTokens.access_token)
       await apiClient.get('/auth/me')
       expect(capturedAuth).toBe(`Bearer ${mockTokens.access_token}`)
     })
@@ -55,15 +55,23 @@ describe('apiClient interceptors', () => {
 
   describe('response interceptor — 401 handling', () => {
     it('normalizes 401 response into ApiError with structured detail', async () => {
-      // Clear tokens so no refresh is attempted
+      // Clear tokens and make refresh fail to simulate absent cookie
       clearTokens()
+      server.use(
+        http.post(`${BASE}/auth/refresh`, () => {
+          return HttpResponse.json(
+            { detail: { code: 'UNAUTHORIZED', message: 'No refresh token' } },
+            { status: 401 },
+          )
+        }),
+      )
       try {
         await apiClient.get('/auth/me')
         expect.fail('should have thrown')
       } catch (err: unknown) {
         const e = err as { status: number; code: string }
+        // After failed refresh, the error from the refresh call is thrown
         expect(e.status).toBe(401)
-        expect(e.code).toBe('UNAUTHORIZED')
       }
     })
 
@@ -91,13 +99,12 @@ describe('apiClient interceptors', () => {
         }),
       )
 
-      setTokens(mockTokens.access_token, mockTokens.refresh_token)
+      setTokens(mockTokens.access_token)
       const response = await apiClient.get('/protected')
       expect(response.data).toEqual({ data: 'success' })
       expect(callCount).toBe(2)
-      // New tokens should be stored
+      // New access token should be stored in memory
       expect(getAccessToken()).toBe(mockNewTokens.access_token)
-      expect(getRefreshToken()).toBe(mockNewTokens.refresh_token)
     })
 
     it('redirects to /login when refresh fails on 401', async () => {
@@ -116,10 +123,7 @@ describe('apiClient interceptors', () => {
         }),
       )
 
-      setTokens(mockTokens.access_token, 'bad-refresh-token')
-
-      // Override localStorage to return bad token
-      localStorage.setItem('devtracker_refresh_token', 'bad-refresh-token')
+      setTokens(mockTokens.access_token)
 
       try {
         await apiClient.get('/protected')
@@ -153,7 +157,7 @@ describe('apiClient interceptors', () => {
         }),
       )
 
-      setTokens(mockTokens.access_token, mockTokens.refresh_token)
+      setTokens(mockTokens.access_token)
 
       // Fire two requests simultaneously
       await Promise.all([

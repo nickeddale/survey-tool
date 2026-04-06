@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, Request, Response, status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,8 +15,6 @@ from app.models.user import User
 from app.schemas.api_key import ApiKeyCreate, ApiKeyCreateResponse, ApiKeyResponse
 from app.schemas.user import (
     LoginRequest,
-    LogoutRequest,
-    RefreshRequest,
     TokenResponse,
     UserCreate,
     UserResponse,
@@ -41,6 +39,32 @@ from app.services.auth_service import (
 from app.utils.errors import ConflictError, NotFoundError, UnauthorizedError
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+_COOKIE_MAX_AGE = 60 * 60 * 24 * 30  # 30 days in seconds
+
+
+def _set_refresh_cookie(response: Response, refresh_token: str) -> None:
+    """Set the httpOnly refresh token cookie with security attributes."""
+    response.set_cookie(
+        key=settings.refresh_token_cookie_name,
+        value=refresh_token,
+        httponly=True,
+        secure=settings.cookie_secure,
+        samesite=settings.cookie_samesite,
+        max_age=_COOKIE_MAX_AGE,
+        path="/",
+    )
+
+
+def _clear_refresh_cookie(response: Response) -> None:
+    """Clear the refresh token cookie using identical attributes."""
+    response.delete_cookie(
+        key=settings.refresh_token_cookie_name,
+        httponly=True,
+        secure=settings.cookie_secure,
+        samesite=settings.cookie_samesite,
+        path="/",
+    )
 
 
 @router.post(
@@ -78,12 +102,13 @@ async def register(
 @router.post(
     "/login",
     response_model=TokenResponse,
-    summary="Log in and receive access/refresh tokens",
-    description="Authenticate with email and password. Returns a JWT access token and a refresh token.",
+    summary="Log in and receive access token",
+    description="Authenticate with email and password. Returns a JWT access token. The refresh token is set as an httpOnly cookie.",
 )
 @limiter.limit(RATE_LIMITS["auth_login"])
 async def login(
     request: Request,
+    response: Response,
     payload: LoginRequest,
     session: AsyncSession = Depends(get_db),
 ) -> TokenResponse:
@@ -97,9 +122,10 @@ async def login(
     refresh_token = generate_refresh_token()
     await create_refresh_token_record(session, user.id, refresh_token)
 
+    _set_refresh_cookie(response, refresh_token)
+
     return TokenResponse(
         access_token=access_token,
-        refresh_token=refresh_token,
         token_type="bearer",
         expires_in=settings.jwt_expiry_mins * 60,
     )
@@ -108,16 +134,20 @@ async def login(
 @router.post(
     "/refresh",
     response_model=TokenResponse,
-    summary="Refresh access token using a refresh token",
-    description="Exchange a valid refresh token for a new access/refresh token pair. The old refresh token is revoked (rotation).",
+    summary="Refresh access token using the refresh token cookie",
+    description="Exchange a valid refresh token cookie for a new access token. The old refresh token is revoked (rotation) and a new cookie is set.",
 )
 @limiter.limit(RATE_LIMITS["auth_refresh"])
 async def refresh(
     request: Request,
-    payload: RefreshRequest,
+    response: Response,
     session: AsyncSession = Depends(get_db),
 ) -> TokenResponse:
-    token_hash = hash_refresh_token(payload.refresh_token)
+    cookie_token = request.cookies.get(settings.refresh_token_cookie_name)
+    if not cookie_token:
+        raise UnauthorizedError("No refresh token provided")
+
+    token_hash = hash_refresh_token(cookie_token)
     record = await get_refresh_token_by_hash(session, token_hash)
 
     if record is None or record.revoked:
@@ -126,17 +156,17 @@ async def refresh(
     if record.expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
         raise UnauthorizedError("Refresh token has expired")
 
-    # Revoke the old token (rotation)
+    # Revoke the old token and issue new pair atomically
     await revoke_refresh_token(session, record)
 
-    # Issue new token pair
     access_token = create_access_token({"sub": str(record.user_id)})
     new_refresh_token = generate_refresh_token()
     await create_refresh_token_record(session, record.user_id, new_refresh_token)
 
+    _set_refresh_cookie(response, new_refresh_token)
+
     return TokenResponse(
         access_token=access_token,
-        refresh_token=new_refresh_token,
         token_type="bearer",
         expires_in=settings.jwt_expiry_mins * 60,
     )
@@ -145,19 +175,23 @@ async def refresh(
 @router.post(
     "/logout",
     status_code=status.HTTP_204_NO_CONTENT,
-    summary="Revoke a refresh token",
-    description="Revoke the provided refresh token. Subsequent refresh attempts with this token will be rejected.",
+    summary="Revoke the refresh token cookie",
+    description="Revoke the refresh token from the cookie. Subsequent refresh attempts will be rejected. The cookie is cleared.",
 )
 @limiter.limit(RATE_LIMITS["default_mutating"])
 async def logout(
     request: Request,
-    payload: LogoutRequest,
+    response: Response,
     session: AsyncSession = Depends(get_db),
 ) -> None:
-    token_hash = hash_refresh_token(payload.refresh_token)
-    record = await get_refresh_token_by_hash(session, token_hash)
-    if record is not None and not record.revoked:
-        await revoke_refresh_token(session, record)
+    cookie_token = request.cookies.get(settings.refresh_token_cookie_name)
+    if cookie_token:
+        token_hash = hash_refresh_token(cookie_token)
+        record = await get_refresh_token_by_hash(session, token_hash)
+        if record is not None and not record.revoked:
+            await revoke_refresh_token(session, record)
+
+    _clear_refresh_cookie(response)
 
 
 @router.get(

@@ -6,6 +6,10 @@ import os
 # model_validator does not reject the default JWT secret during test runs.
 os.environ.setdefault("ENVIRONMENT", "test")
 
+# Disable Secure flag on cookies in tests — httpx test transport uses http://test
+# (not HTTPS), so Secure cookies would be silently dropped and never forwarded.
+os.environ.setdefault("COOKIE_SECURE", "false")
+
 # Force the asyncpg scheme in DATABASE_URL before any app modules are imported.
 # The container environment sets the psycopg2 scheme by default which fails with
 # the async SQLAlchemy engine at module-import time (app/database.py validates).
