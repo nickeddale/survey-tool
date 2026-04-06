@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-06T15:39:25.662Z",
+  "lastUpdated": "2026-04-06T15:42:48.311Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2726,6 +2726,27 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md",
+      "ticketId": "ISS-140",
+      "title": "INF-05: Create nginx.conf for frontend production image",
+      "date": "2026-04-06",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -2859,7 +2880,8 @@
       "2026-04-06-iss-136-inf-01-add-cicd-pipeline-with-github-actions.md",
       "2026-04-06-iss-137-inf-02-expand-gitignore.md",
       "2026-04-06-iss-138-inf-03-add-dockerignore-files.md",
-      "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md"
+      "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md",
+      "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2979,7 +3001,8 @@
       "2026-04-06-iss-133-rel-04-add-idempotency-key-to-webhook-delivery.md",
       "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md",
       "2026-04-06-iss-136-inf-01-add-cicd-pipeline-with-github-actions.md",
-      "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md"
+      "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md",
+      "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3083,7 +3106,8 @@
       "2026-04-06-iss-134-rel-05-handle-clipboard-errors-in-participanttable.md",
       "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md",
       "2026-04-06-iss-136-inf-01-add-cicd-pipeline-with-github-actions.md",
-      "2026-04-06-iss-138-inf-03-add-dockerignore-files.md"
+      "2026-04-06-iss-138-inf-03-add-dockerignore-files.md",
+      "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3211,7 +3235,8 @@
       "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md",
       "2026-04-06-iss-136-inf-01-add-cicd-pipeline-with-github-actions.md",
       "2026-04-06-iss-138-inf-03-add-dockerignore-files.md",
-      "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md"
+      "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md",
+      "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3371,7 +3396,8 @@
       "2026-04-06-iss-134-rel-05-handle-clipboard-errors-in-participanttable.md",
       "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md",
       "2026-04-06-iss-136-inf-01-add-cicd-pipeline-with-github-actions.md",
-      "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md"
+      "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md",
+      "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3499,7 +3525,8 @@
       "2026-04-06-iss-136-inf-01-add-cicd-pipeline-with-github-actions.md",
       "2026-04-06-iss-137-inf-02-expand-gitignore.md",
       "2026-04-06-iss-138-inf-03-add-dockerignore-files.md",
-      "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md"
+      "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md",
+      "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3566,7 +3593,8 @@
       "2026-04-06-iss-136-inf-01-add-cicd-pipeline-with-github-actions.md",
       "2026-04-06-iss-137-inf-02-expand-gitignore.md",
       "2026-04-06-iss-138-inf-03-add-dockerignore-files.md",
-      "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md"
+      "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md",
+      "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3607,7 +3635,8 @@
       "2026-04-06-iss-125-cq-03-consolidate-pagination-into-shared-dependenc.md",
       "2026-04-06-iss-136-inf-01-add-cicd-pipeline-with-github-actions.md",
       "2026-04-06-iss-138-inf-03-add-dockerignore-files.md",
-      "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md"
+      "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md",
+      "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3716,7 +3745,8 @@
       "2026-04-06-iss-136-inf-01-add-cicd-pipeline-with-github-actions.md",
       "2026-04-06-iss-137-inf-02-expand-gitignore.md",
       "2026-04-06-iss-138-inf-03-add-dockerignore-files.md",
-      "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md"
+      "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md",
+      "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3840,7 +3870,8 @@
       "2026-04-06-iss-135-rel-06-add-audit-logging-for-auth-and-survey-trans.md",
       "2026-04-06-iss-136-inf-01-add-cicd-pipeline-with-github-actions.md",
       "2026-04-06-iss-138-inf-03-add-dockerignore-files.md",
-      "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md"
+      "2026-04-06-iss-139-inf-04-multi-stage-backend-dockerfile.md",
+      "2026-04-06-iss-140-inf-05-create-nginxconf-for-frontend-production-im.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
