@@ -230,7 +230,7 @@ export function LogicEditor({
         <textarea
           className={`w-full rounded-md border px-2 py-1.5 text-sm font-mono resize-none
             focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50
-            ${validationResult && !validationResult.valid ? 'border-destructive' : 'border-input'}
+            ${validationResult && validationResult.errors.length > 0 ? 'border-destructive' : 'border-input'}
             bg-background`}
           rows={2}
           value={rawValue}

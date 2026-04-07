@@ -75,34 +75,6 @@ export interface SurveyListResponse {
   total_pages?: number
 }
 
-export interface ApiKeyResponse {
-  id: string
-  name: string
-  key_prefix: string
-  scopes: string[] | null
-  is_active: boolean
-  last_used_at: string | null
-  expires_at: string | null
-  created_at: string
-}
-
-export interface ApiKeyCreateResponse {
-  id: string
-  name: string
-  key: string
-  key_prefix: string
-  scopes: string[] | null
-  is_active: boolean
-  expires_at: string | null
-  created_at: string
-}
-
-export interface ApiKeyCreate {
-  name: string
-  scopes?: string[] | null
-  expires_at?: string | null
-}
-
 export type SurveyStatus = 'draft' | 'active' | 'closed' | 'archived'
 
 // ---------------------------------------------------------------------------
