@@ -59,7 +59,7 @@ describe('AuthContext', () => {
 
   describe('initial state (with stored valid refresh token)', () => {
     it('sets user and isAuthenticated=true when refresh token is present and valid', async () => {
-      // Store a valid refresh token so initialize() will call refreshToken + getCurrentUser
+      // Set access token to simulate having a valid session (refresh will succeed)
       setTokens(mockTokens.access_token)
 
       const { result } = renderHook(() => useAuth(), { wrapper })
@@ -89,6 +89,10 @@ describe('AuthContext', () => {
     })
 
     it('throws ApiError on invalid credentials', async () => {
+      // Set a token so the 401-retry interceptor can refresh (returns new token) and retry.
+      // The retried login still fails (bad credentials) and is normalized to ApiError.
+      setTokens(mockTokens.access_token)
+
       const { result } = renderHook(() => useAuth(), { wrapper })
 
       await waitFor(() => expect(result.current.isLoading).toBe(false))
@@ -108,14 +112,13 @@ describe('AuthContext', () => {
 
   describe('logout()', () => {
     it('exposes logout action that clears auth state', async () => {
-      // Directly set store to authenticated state without triggering any API calls
-      // (avoids test contamination from the 401 retry/navigation path).
+      // Set access token so initialize() succeeds (refresh returns 200 when token is set)
+      setTokens(mockTokens.access_token)
       useAuthStore.setState({ user: mockUser, isAuthenticated: true, isLoading: false })
 
       const { result } = renderHook(() => useAuth(), { wrapper })
 
-      // AuthProvider initializes: no refresh token → isLoading stays false
-      // Store is pre-set with isAuthenticated=true → context exposes it
+      // AuthProvider initializes: valid cookie → refresh succeeds → stays authenticated
       await waitFor(() => expect(result.current.isAuthenticated).toBe(true))
 
       await act(async () => {
