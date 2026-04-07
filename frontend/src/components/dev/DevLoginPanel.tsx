@@ -6,8 +6,8 @@ interface DevLoginPanelProps {
 }
 
 const DEV_ACCOUNTS = [
-  { name: 'Dev Creator', email: 'creator@dev.local', password: 'password123' },
-  { name: 'Second Creator', email: 'creator2@dev.local', password: 'password123' },
+  { name: 'Dev Creator', email: 'creator@example.com', password: 'password123' },
+  { name: 'Second Creator', email: 'creator2@example.com', password: 'password123' },
 ]
 
 export function DevLoginPanel({ onLogin }: DevLoginPanelProps) {

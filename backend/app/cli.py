@@ -46,29 +46,29 @@ async def seed() -> None:
         print("Seeding users...")
         creator_id = make_id("user.creator")
         if await _exists(session, User, creator_id):
-            _report("creator@dev.local", skipped=True)
+            _report("creator@example.com", skipped=True)
         else:
             session.add(User(
                 id=creator_id,
-                email="creator@dev.local",
+                email="creator@example.com",
                 password_hash=hash_password("password123"),
                 name="Dev Creator",
                 is_active=True,
             ))
-            _report("creator@dev.local", skipped=False)
+            _report("creator@example.com", skipped=False)
 
         creator2_id = make_id("user.creator2")
         if await _exists(session, User, creator2_id):
-            _report("creator2@dev.local", skipped=True)
+            _report("creator2@example.com", skipped=True)
         else:
             session.add(User(
                 id=creator2_id,
-                email="creator2@dev.local",
+                email="creator2@example.com",
                 password_hash=hash_password("password123"),
                 name="Second Creator",
                 is_active=True,
             ))
-            _report("creator2@dev.local", skipped=False)
+            _report("creator2@example.com", skipped=False)
 
         await session.flush()
 

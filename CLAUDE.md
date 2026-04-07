@@ -17,7 +17,7 @@ docker run --rm --network host \
 
 # Seed dev data (creates users, surveys, responses)
 docker compose exec backend python -m app.cli seed
-# Dev logins: creator@dev.local / password123, creator2@dev.local / password123
+# Dev logins: creator@example.com / password123, creator2@example.com / password123
 
 # Frontend
 cd frontend && npm run build        # TypeScript check + production build
