@@ -45,12 +45,44 @@ function SurveyBuilderPage() {
     redoStack,
     isTranslationMode,
     setTranslationMode,
+    groups,
+    addQuestion,
   } = useBuilderStore()
 
   const readOnly = status !== '' && status !== 'draft'
   const [isPreviewMode, setIsPreviewMode] = useState(false)
   const undoRedoPendingRef = useRef(false)
   const hasUnsavedChanges = saveStatus === 'saving' || saveStatus === 'error'
+
+  const QUESTION_TYPE_LABELS: Record<string, string> = {
+    text: 'Short Text',
+    textarea: 'Long Text',
+    radio: 'Single Choice',
+    checkbox: 'Multiple Choice',
+    select: 'Dropdown',
+    number: 'Number',
+  }
+
+  async function handlePaletteAddQuestion(questionType: string) {
+    if (readOnly || !surveyId) return
+    const sortedGroups = [...groups].sort((a, b) => a.sort_order - b.sort_order)
+    const lastGroup = sortedGroups[sortedGroups.length - 1]
+    if (!lastGroup) return
+    const label = QUESTION_TYPE_LABELS[questionType] ?? 'New Question'
+    try {
+      const newQuestion = await surveyService.createQuestion(surveyId, lastGroup.id, {
+        question_type: questionType,
+        title: `New ${label}`,
+      })
+      addQuestion(lastGroup.id, {
+        ...newQuestion,
+        answer_options: newQuestion.answer_options ?? [],
+        subquestions: [],
+      })
+    } catch {
+      setSaveStatus('error', 'Failed to add question. Please try again.')
+    }
+  }
 
   // Undo/redo keyboard shortcuts: Ctrl+Z / Cmd+Z and Ctrl+Shift+Z / Cmd+Shift+Z
   useEffect(() => {
@@ -143,7 +175,7 @@ function SurveyBuilderPage() {
         undoRedoPendingRef={undoRedoPendingRef}
       />
       <div className="flex flex-1 overflow-hidden">
-        <QuestionPalette readOnly={readOnly} />
+        <QuestionPalette readOnly={readOnly} onAddQuestion={handlePaletteAddQuestion} />
         <SurveyCanvas
           surveyId={surveyId ?? ''}
           readOnly={readOnly}
