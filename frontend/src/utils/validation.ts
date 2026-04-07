@@ -133,7 +133,7 @@ function validateHugeText(
 
 function validateRadio(
   value: string,
-  s: Partial<RadioSettings>,
+  _s: Partial<RadioSettings>,
   isRequired: boolean,
   field: string,
 ): ValidationError[] {
@@ -149,7 +149,7 @@ function validateRadio(
 
 function validateDropdown(
   value: string,
-  s: Partial<DropdownSettings>,
+  _s: Partial<DropdownSettings>,
   isRequired: boolean,
   field: string,
 ): ValidationError[] {

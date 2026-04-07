@@ -319,7 +319,7 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
   // Empty state
   // -------------------------------------------------------------------------
 
-  if (!selectedQuestion) {
+  if (!selectedQuestion || !selectedGroup) {
     return (
       <div
         className="flex-1 flex items-center justify-center p-4"

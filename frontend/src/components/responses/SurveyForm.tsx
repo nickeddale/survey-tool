@@ -246,7 +246,7 @@ function QuestionInput({ question, value, errors, onChange }: QuestionInputProps
         />
       )
     case 'expression':
-      return <ExpressionDisplay question={question} />
+      return <ExpressionDisplay question={question} value={value as string | number | null ?? null} />
     case 'html':
       return <HtmlContent question={question} />
     default:
