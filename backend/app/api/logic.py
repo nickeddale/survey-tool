@@ -289,7 +289,6 @@ async def resolve_flow_endpoint(
     request: Request,
     survey_id: str,
     payload: ResolveFlowRequest,
-    current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
 ) -> ResolveFlowResponse:
     """Resolve the survey navigation flow for a given answer state.
@@ -304,20 +303,16 @@ async def resolve_flow_endpoint(
 
     Returns 422 if a circular relevance expression is detected.
     Returns 404 if from_question references an unknown question code, or if
-    the survey does not exist / is not owned by the current user.
+    the survey does not exist.
     """
     parsed_survey_id = _parse_survey_uuid(survey_id)
 
     # ------------------------------------------------------------------
     # Load survey with full eager-load chain in a single query.
-    # WHERE id = :id AND user_id = :user_id prevents existence leaking.
     # ------------------------------------------------------------------
     result = await session.execute(
         select(Survey)
-        .where(
-            Survey.id == parsed_survey_id,
-            Survey.user_id == current_user.id,
-        )
+        .where(Survey.id == parsed_survey_id)
         .options(
             selectinload(Survey.groups).selectinload(QuestionGroup.questions).selectinload(Question.answer_options)
         )
