@@ -101,7 +101,7 @@ describe('ValueInput', () => {
   it('renders a choice select when answer_options are present', () => {
     const onChange = vi.fn()
     const question = makeQuestion({
-      question_type: 'radio',
+      question_type: 'single_choice',
       answer_options: [
         { id: 'o1', code: 'opt1', title: 'Option 1', sort_order: 1, image_url: null },
         { id: 'o2', code: 'opt2', title: 'Option 2', sort_order: 2, image_url: null },
@@ -117,7 +117,7 @@ describe('ValueInput', () => {
     const onChange = vi.fn()
     render(
       <ValueInput
-        question={makeQuestion({ question_type: 'radio', answer_options: [] })}
+        question={makeQuestion({ question_type: 'single_choice', answer_options: [] })}
         value=""
         onChange={onChange}
       />,

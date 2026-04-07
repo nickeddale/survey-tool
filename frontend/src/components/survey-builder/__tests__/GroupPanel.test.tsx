@@ -56,7 +56,7 @@ const BASE_GROUP: BuilderGroup = {
       id: 'q2',
       group_id: 'g1',
       parent_id: null,
-      question_type: 'radio',
+      question_type: 'single_choice',
       code: 'Q2',
       title: 'How satisfied are you?',
       description: null,

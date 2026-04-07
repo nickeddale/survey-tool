@@ -74,12 +74,12 @@ const STATUS_STYLES: Record<string, string> = {
 }
 
 const QUESTION_TYPES = [
-  { type: 'text', label: 'Short Text', icon: Type },
-  { type: 'textarea', label: 'Long Text', icon: AlignLeft },
-  { type: 'radio', label: 'Single Choice', icon: ToggleLeft },
-  { type: 'checkbox', label: 'Multiple Choice', icon: CheckSquare },
-  { type: 'select', label: 'Dropdown', icon: List },
-  { type: 'number', label: 'Number', icon: Hash },
+  { type: 'short_text', label: 'Short Text', icon: Type },
+  { type: 'long_text', label: 'Long Text', icon: AlignLeft },
+  { type: 'single_choice', label: 'Single Choice', icon: ToggleLeft },
+  { type: 'multiple_choice', label: 'Multiple Choice', icon: CheckSquare },
+  { type: 'dropdown', label: 'Dropdown', icon: List },
+  { type: 'numeric', label: 'Number', icon: Hash },
 ]
 
 // ---------------------------------------------------------------------------

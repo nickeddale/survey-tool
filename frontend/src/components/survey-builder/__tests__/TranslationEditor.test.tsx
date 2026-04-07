@@ -242,7 +242,7 @@ describe('TranslationEditor', () => {
         id: 'question-1',
         group_id: 'group-1',
         parent_id: null,
-        question_type: 'radio',
+        question_type: 'single_choice',
         code: 'Q1',
         title: 'Question',
         description: null,

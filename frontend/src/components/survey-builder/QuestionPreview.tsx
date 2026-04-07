@@ -29,8 +29,8 @@ type QuestionType =
   | 'short_text'
   | 'long_text'
   | 'huge_text'
-  | 'radio'
-  | 'checkbox'
+  | 'single_choice'
+  | 'multiple_choice'
   | 'dropdown'
   | 'ranking'
   | 'image_picker'
@@ -55,8 +55,8 @@ const questionPreviewMap: Record<QuestionType, FC<QuestionPreviewProps>> = {
   long_text: TextPreview,
   huge_text: TextPreview,
   // Choice types
-  radio: ChoicePreview,
-  checkbox: ChoicePreview,
+  single_choice: ChoicePreview,
+  multiple_choice: ChoicePreview,
   dropdown: ChoicePreview,
   // Special choice types
   ranking: SpecialPreview,

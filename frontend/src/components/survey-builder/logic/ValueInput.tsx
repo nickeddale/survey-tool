@@ -19,7 +19,7 @@ export function ValueInput({ question, value, onChange, disabled }: ValueInputPr
     )
   }
 
-  if (['radio', 'dropdown', 'checkbox', 'ranking', 'image_picker'].includes(type)) {
+  if (['single_choice', 'dropdown', 'multiple_choice', 'ranking', 'image_picker'].includes(type)) {
     if (question.answer_options.length > 0) {
       return (
         <select

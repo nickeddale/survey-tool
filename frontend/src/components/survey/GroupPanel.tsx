@@ -33,12 +33,12 @@ import type { SelectedItem } from '../../store/builderStore'
 // ---------------------------------------------------------------------------
 
 const QUESTION_TYPES = [
-  { type: 'text', label: 'Short Text' },
-  { type: 'textarea', label: 'Long Text' },
-  { type: 'radio', label: 'Single Choice' },
-  { type: 'checkbox', label: 'Multiple Choice' },
-  { type: 'select', label: 'Dropdown' },
-  { type: 'number', label: 'Number' },
+  { type: 'short_text', label: 'Short Text' },
+  { type: 'long_text', label: 'Long Text' },
+  { type: 'single_choice', label: 'Single Choice' },
+  { type: 'multiple_choice', label: 'Multiple Choice' },
+  { type: 'dropdown', label: 'Dropdown' },
+  { type: 'numeric', label: 'Number' },
 ]
 
 // ---------------------------------------------------------------------------

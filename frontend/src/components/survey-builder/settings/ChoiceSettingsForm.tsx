@@ -61,7 +61,7 @@ const inputClass =
 // ---------------------------------------------------------------------------
 
 interface ChoiceSettingsFormProps {
-  type: 'radio' | 'dropdown' | 'checkbox'
+  type: 'single_choice' | 'dropdown' | 'multiple_choice'
   settings: RadioSettings | DropdownSettings | CheckboxSettings
   onChange: (updates: Partial<RadioSettings & DropdownSettings & CheckboxSettings>) => void
   readOnly?: boolean
@@ -128,8 +128,8 @@ export function ChoiceSettingsForm({ type, settings, onChange, readOnly = false 
         </FieldRow>
       )}
 
-      {/* randomize — radio and checkbox only */}
-      {(type === 'radio' || type === 'checkbox') && (
+      {/* randomize — single_choice and multiple_choice only */}
+      {(type === 'single_choice' || type === 'multiple_choice') && (
         <ToggleRow
           id="setting-randomize"
           label="Randomize option order"
@@ -140,8 +140,8 @@ export function ChoiceSettingsForm({ type, settings, onChange, readOnly = false 
         />
       )}
 
-      {/* columns — radio and checkbox only */}
-      {(type === 'radio' || type === 'checkbox') && (
+      {/* columns — single_choice and multiple_choice only */}
+      {(type === 'single_choice' || type === 'multiple_choice') && (
         <FieldRow label="Columns">
           <select
             className={inputClass}
@@ -158,8 +158,8 @@ export function ChoiceSettingsForm({ type, settings, onChange, readOnly = false 
         </FieldRow>
       )}
 
-      {/* min_choices / max_choices — checkbox only */}
-      {type === 'checkbox' && (
+      {/* min_choices / max_choices — multiple_choice only */}
+      {type === 'multiple_choice' && (
         <>
           <FieldRow label="Min Choices">
             <input
@@ -194,8 +194,8 @@ export function ChoiceSettingsForm({ type, settings, onChange, readOnly = false 
         </>
       )}
 
-      {/* select_all — checkbox only */}
-      {type === 'checkbox' && (
+      {/* select_all — multiple_choice only */}
+      {type === 'multiple_choice' && (
         <>
           <ToggleRow
             id="setting-select-all"

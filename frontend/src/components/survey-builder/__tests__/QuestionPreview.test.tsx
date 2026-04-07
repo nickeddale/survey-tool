@@ -59,8 +59,8 @@ describe('QuestionPreview registry completeness', () => {
     'short_text',
     'long_text',
     'huge_text',
-    'radio',
-    'checkbox',
+    'single_choice',
+    'multiple_choice',
     'dropdown',
     'ranking',
     'image_picker',
@@ -196,8 +196,8 @@ describe('TextPreview', () => {
 describe('ChoicePreview', () => {
   it('renders radio buttons for each answer option', () => {
     const question = makeQuestion({
-      question_type: 'radio',
-      settings: getDefaultSettings('radio'),
+      question_type: 'single_choice',
+      settings: getDefaultSettings('single_choice'),
       answer_options: [
         makeOption('o1', 'Option A'),
         makeOption('o2', 'Option B'),
@@ -214,9 +214,9 @@ describe('ChoicePreview', () => {
     expect(screen.getByText('Option B')).toBeInTheDocument()
   })
 
-  it('shows "Other" option when has_other is true for radio', () => {
+  it('shows "Other" option when has_other is true for single_choice', () => {
     const question = makeQuestion({
-      question_type: 'radio',
+      question_type: 'single_choice',
       settings: { has_other: true, other_text: 'Something else', randomize: false, columns: 1 },
       answer_options: [makeOption('o1', 'Option A')],
     })
@@ -224,9 +224,9 @@ describe('ChoicePreview', () => {
     expect(screen.getByText('Something else')).toBeInTheDocument()
   })
 
-  it('shows randomize note when randomize is true for radio', () => {
+  it('shows randomize note when randomize is true for single_choice', () => {
     const question = makeQuestion({
-      question_type: 'radio',
+      question_type: 'single_choice',
       settings: { has_other: false, other_text: 'Other', randomize: true, columns: 1 },
       answer_options: [makeOption('o1', 'Option A')],
     })
@@ -234,10 +234,10 @@ describe('ChoicePreview', () => {
     expect(screen.getByText(/randomized/i)).toBeInTheDocument()
   })
 
-  it('renders checkboxes for checkbox type', () => {
+  it('renders checkboxes for multiple_choice type', () => {
     const question = makeQuestion({
-      question_type: 'checkbox',
-      settings: getDefaultSettings('checkbox'),
+      question_type: 'multiple_choice',
+      settings: getDefaultSettings('multiple_choice'),
       answer_options: [
         makeOption('o1', 'Choice A'),
         makeOption('o2', 'Choice B'),
@@ -250,9 +250,9 @@ describe('ChoicePreview', () => {
     expect(checkboxes.length).toBeGreaterThanOrEqual(2)
   })
 
-  it('shows min/max hint for checkbox when set', () => {
+  it('shows min/max hint for multiple_choice when set', () => {
     const question = makeQuestion({
-      question_type: 'checkbox',
+      question_type: 'multiple_choice',
       settings: {
         min_choices: 1,
         max_choices: 3,
@@ -297,10 +297,10 @@ describe('ChoicePreview', () => {
     expect(screen.getByText(/Searchable/i)).toBeInTheDocument()
   })
 
-  it('shows no-options message when answer_options is empty for radio', () => {
+  it('shows no-options message when answer_options is empty for single_choice', () => {
     const question = makeQuestion({
-      question_type: 'radio',
-      settings: getDefaultSettings('radio'),
+      question_type: 'single_choice',
+      settings: getDefaultSettings('single_choice'),
       answer_options: [],
     })
     render(<QuestionPreview question={question} />)

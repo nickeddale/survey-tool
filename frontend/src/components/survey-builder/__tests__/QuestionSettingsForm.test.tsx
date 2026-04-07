@@ -49,7 +49,7 @@ afterEach(() => {
 describe('getDefaultSettings', () => {
   const allTypes = [
     'short_text', 'long_text', 'huge_text',
-    'radio', 'dropdown', 'checkbox', 'ranking', 'image_picker',
+    'single_choice', 'dropdown', 'multiple_choice', 'ranking', 'image_picker',
     'matrix', 'matrix_dropdown', 'matrix_dynamic',
     'numeric', 'rating', 'boolean', 'date',
     'file_upload', 'expression', 'html',
@@ -79,14 +79,14 @@ describe('getDefaultSettings', () => {
     expect(d.rich_text).toBe(false)
   })
 
-  it('radio defaults are correct', () => {
-    const d = getDefaultSettings('radio') as RadioSettings
+  it('single_choice defaults are correct', () => {
+    const d = getDefaultSettings('single_choice') as RadioSettings
     expect(d.has_other).toBe(false)
     expect(d.columns).toBe(1)
   })
 
-  it('checkbox defaults include select_all=false', () => {
-    const d = getDefaultSettings('checkbox') as CheckboxSettings
+  it('multiple_choice defaults include select_all=false', () => {
+    const d = getDefaultSettings('multiple_choice') as CheckboxSettings
     expect(d.select_all).toBe(false)
     expect(d.min_choices).toBeNull()
     expect(d.max_choices).toBeNull()
@@ -165,23 +165,23 @@ describe('getCompatibleSettings', () => {
 
   it('preserves has_other when switching between choice types', () => {
     const oldSettings = { has_other: true, other_text: 'Custom other', randomize: false, columns: 2 }
-    const result = getCompatibleSettings('radio', 'checkbox', oldSettings)
+    const result = getCompatibleSettings('single_choice', 'multiple_choice', oldSettings)
     expect(result.has_other).toBe(true)
     expect(result.other_text).toBe('Custom other')
   })
 
   it('preserves randomize and columns when switching radio -> checkbox', () => {
     const oldSettings = { has_other: false, other_text: 'Other', randomize: true, columns: 3 }
-    const result = getCompatibleSettings('radio', 'checkbox', oldSettings)
+    const result = getCompatibleSettings('single_choice', 'multiple_choice', oldSettings)
     expect(result.randomize).toBe(true)
     expect(result.columns).toBe(3)
   })
 
   it('discards incompatible settings when switching from text to choice', () => {
     const oldSettings = { placeholder: 'Test', max_length: 100, input_type: 'email' }
-    const result = getCompatibleSettings('short_text', 'radio', oldSettings)
+    const result = getCompatibleSettings('short_text', 'single_choice', oldSettings)
     // radio has no placeholder field
-    const radioDefaults = getDefaultSettings('radio')
+    const radioDefaults = getDefaultSettings('single_choice')
     expect(result).toEqual(radioDefaults)
   })
 
@@ -295,11 +295,11 @@ describe('TextSettingsForm', () => {
 // ---------------------------------------------------------------------------
 
 describe('ChoiceSettingsForm', () => {
-  it('renders has_other for radio', () => {
+  it('renders has_other for single_choice', () => {
     render(
       <ChoiceSettingsForm
-        type="radio"
-        settings={getDefaultSettings('radio') as RadioSettings}
+        type="single_choice"
+        settings={getDefaultSettings('single_choice') as RadioSettings}
         onChange={() => {}}
       />,
     )
@@ -324,11 +324,11 @@ describe('ChoiceSettingsForm', () => {
     expect(screen.queryByTestId('choice-setting-min-choices')).not.toBeInTheDocument()
   })
 
-  it('renders min_choices, max_choices, and select_all for checkbox', () => {
+  it('renders min_choices, max_choices, and select_all for multiple_choice', () => {
     render(
       <ChoiceSettingsForm
-        type="checkbox"
-        settings={getDefaultSettings('checkbox') as CheckboxSettings}
+        type="multiple_choice"
+        settings={getDefaultSettings('multiple_choice') as CheckboxSettings}
         onChange={() => {}}
       />,
     )
@@ -340,10 +340,10 @@ describe('ChoiceSettingsForm', () => {
 
   it('shows other_text field when has_other is enabled', async () => {
     const user = userEvent.setup()
-    const settings: CheckboxSettings = { ...getDefaultSettings('checkbox') as CheckboxSettings, has_other: false }
+    const settings: CheckboxSettings = { ...getDefaultSettings('multiple_choice') as CheckboxSettings, has_other: false }
     const onChange = vi.fn()
     const { rerender } = render(
-      <ChoiceSettingsForm type="checkbox" settings={settings} onChange={onChange} />,
+      <ChoiceSettingsForm type="multiple_choice" settings={settings} onChange={onChange} />,
     )
 
     // Initially no other_text input
@@ -359,7 +359,7 @@ describe('ChoiceSettingsForm', () => {
     // Re-render with updated settings
     rerender(
       <ChoiceSettingsForm
-        type="checkbox"
+        type="multiple_choice"
         settings={{ ...settings, has_other: true }}
         onChange={onChange}
       />,
@@ -370,10 +370,10 @@ describe('ChoiceSettingsForm', () => {
 
   it('shows select_all_text when select_all is enabled', async () => {
     const user = userEvent.setup()
-    const settings: CheckboxSettings = { ...getDefaultSettings('checkbox') as CheckboxSettings, select_all: false }
+    const settings: CheckboxSettings = { ...getDefaultSettings('multiple_choice') as CheckboxSettings, select_all: false }
     const onChange = vi.fn()
     const { rerender } = render(
-      <ChoiceSettingsForm type="checkbox" settings={settings} onChange={onChange} />,
+      <ChoiceSettingsForm type="multiple_choice" settings={settings} onChange={onChange} />,
     )
 
     expect(screen.queryByTestId('choice-setting-select-all-text')).not.toBeInTheDocument()
@@ -384,7 +384,7 @@ describe('ChoiceSettingsForm', () => {
 
     rerender(
       <ChoiceSettingsForm
-        type="checkbox"
+        type="multiple_choice"
         settings={{ ...settings, select_all: true }}
         onChange={onChange}
       />,
@@ -629,11 +629,11 @@ describe('QuestionSettingsForm', () => {
     expect(screen.getByTestId('text-settings-form')).toBeInTheDocument()
   })
 
-  it('renders choice settings form for radio', () => {
+  it('renders choice settings form for single_choice', () => {
     render(
       <QuestionSettingsForm
-        type="radio"
-        settings={getDefaultSettings('radio')}
+        type="single_choice"
+        settings={getDefaultSettings('single_choice')}
         onChange={() => {}}
       />,
     )
@@ -696,8 +696,8 @@ describe('QuestionSettingsForm', () => {
 
     rerender(
       <QuestionSettingsForm
-        type="radio"
-        settings={getDefaultSettings('radio')}
+        type="single_choice"
+        settings={getDefaultSettings('single_choice')}
         onChange={() => {}}
       />,
     )
