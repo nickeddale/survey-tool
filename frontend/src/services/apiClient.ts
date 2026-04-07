@@ -137,6 +137,15 @@ apiClient.interceptors.request.use(async (config: InternalAxiosRequestConfig) =>
   return config
 })
 
+// Auth endpoints that should never trigger the refresh/redirect flow.
+// A 401 from these endpoints means bad credentials — let the error propagate.
+const AUTH_PASSTHROUGH_PATHS = ['/auth/login', '/auth/register']
+
+function isAuthPassthrough(url: string | undefined): boolean {
+  if (!url) return false
+  return AUTH_PASSTHROUGH_PATHS.some((path) => url.includes(path))
+}
+
 // ---------------------------------------------------------------------------
 // Response interceptor — 401 retry after refresh
 // ---------------------------------------------------------------------------
@@ -147,6 +156,14 @@ apiClient.interceptors.response.use(
     const originalRequest = error.config as AxiosRequestConfig & { _retried?: boolean }
 
     if (error.response?.status === 401 && !originalRequest._retried) {
+      // Auth endpoints (login, register) should not trigger the refresh flow.
+      // A 401 here means bad credentials — propagate it so the UI can show an error.
+      if (isAuthPassthrough(originalRequest.url)) {
+        const { status, data } = error.response
+        const detail = data?.detail ?? { code: 'UNAUTHORIZED', message: error.message }
+        return Promise.reject(new ApiError(status, detail))
+      }
+
       originalRequest._retried = true
 
       if (isRefreshing) {
