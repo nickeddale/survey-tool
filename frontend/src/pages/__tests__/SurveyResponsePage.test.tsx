@@ -58,7 +58,7 @@ afterEach(() => {
 describe('loading state', () => {
   it('renders loading skeleton while survey is being fetched', async () => {
     server.use(
-      http.get(`${BASE}/surveys/${SURVEY_ID}`, () => new Promise<never>(() => {})),
+      http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () => new Promise<never>(() => {})),
     )
 
     renderPage()
@@ -81,7 +81,7 @@ describe('loading state', () => {
 describe('unavailable survey', () => {
   it('shows unavailable message for a closed survey', async () => {
     server.use(
-      http.get(`${BASE}/surveys/${SURVEY_ID}`, () =>
+      http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
         HttpResponse.json(
           { ...mockActiveSurveyFull, status: 'closed', groups: [], questions: [], options: [] },
           { status: 200 },
@@ -99,7 +99,7 @@ describe('unavailable survey', () => {
 
   it('shows unavailable message for a draft survey', async () => {
     server.use(
-      http.get(`${BASE}/surveys/${SURVEY_ID}`, () =>
+      http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
         HttpResponse.json(
           { ...mockActiveSurveyFull, status: 'draft', groups: [], questions: [], options: [] },
           { status: 200 },
@@ -116,7 +116,7 @@ describe('unavailable survey', () => {
 
   it('shows unavailable message for an archived survey', async () => {
     server.use(
-      http.get(`${BASE}/surveys/${SURVEY_ID}`, () =>
+      http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
         HttpResponse.json(
           { ...mockActiveSurveyFull, status: 'archived', groups: [], questions: [], options: [] },
           { status: 200 },
@@ -140,7 +140,7 @@ describe('unavailable survey', () => {
 describe('load error', () => {
   it('shows error message when survey fails to load', async () => {
     server.use(
-      http.get(`${BASE}/surveys/${SURVEY_ID}`, () =>
+      http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
         HttpResponse.json(
           { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
           { status: 404 },
@@ -502,7 +502,7 @@ describe('progress bar', () => {
 describe('single-page mode', () => {
   it('shows all groups on one page when one_page_per_group is false', async () => {
     server.use(
-      http.get(`${BASE}/surveys/${SURVEY_ID}`, () =>
+      http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
         HttpResponse.json(
           { ...mockActiveSurveyFull, settings: { one_page_per_group: false } },
           { status: 200 },
@@ -521,7 +521,7 @@ describe('single-page mode', () => {
 
   it('shows only Submit button (no Next) in single-page mode', async () => {
     server.use(
-      http.get(`${BASE}/surveys/${SURVEY_ID}`, () =>
+      http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
         HttpResponse.json(
           { ...mockActiveSurveyFull, settings: { one_page_per_group: false } },
           { status: 200 },
@@ -582,7 +582,7 @@ describe('submit error', () => {
 describe('error state', () => {
   it('shows error when survey ID is not found', async () => {
     server.use(
-      http.get(`${BASE}/surveys/nonexistent-id`, () =>
+      http.get(`${BASE}/surveys/nonexistent-id/public`, () =>
         HttpResponse.json(
           { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
           { status: 404 },
@@ -652,7 +652,7 @@ describe('flow resolution — conditional display', () => {
 
   it('hides a question returned in hidden_questions by resolve-flow', async () => {
     server.use(
-      http.get(`${BASE}/surveys/${SURVEY_ID}`, () =>
+      http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
         HttpResponse.json(surveyWithHiddenQ, { status: 200 }),
       ),
       http.post(`${BASE}/surveys/${SURVEY_ID}/logic/resolve-flow`, () =>
@@ -737,7 +737,7 @@ describe('flow resolution — conditional display', () => {
         ),
       ),
       // Serve a survey with a piped variable in question title
-      http.get(`${BASE}/surveys/${SURVEY_ID}`, () =>
+      http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
         HttpResponse.json(
           {
             ...mockActiveSurveyFull,
@@ -780,7 +780,7 @@ describe('flow resolution — conditional display', () => {
     let lastResolveBody: { answers: Array<{ question_id: string; value: unknown }> } | null = null
 
     server.use(
-      http.get(`${BASE}/surveys/${SURVEY_ID}`, () =>
+      http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
         HttpResponse.json(surveyWithHiddenQ, { status: 200 }),
       ),
       http.post(`${BASE}/surveys/${SURVEY_ID}/logic/resolve-flow`, async ({ request }) => {
@@ -870,7 +870,7 @@ describe('flow resolution — conditional display', () => {
     } as SurveyFullResponse
 
     server.use(
-      http.get(`${BASE}/surveys/${SURVEY_ID}`, () =>
+      http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
         HttpResponse.json(surveyWithThreeGroups, { status: 200 }),
       ),
       http.post(`${BASE}/surveys/${SURVEY_ID}/logic/resolve-flow`, () =>

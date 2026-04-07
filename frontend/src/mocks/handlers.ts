@@ -539,16 +539,19 @@ export const handlers = [
     )
   }),
 
-  // GET /api/v1/surveys/:id
-  // The public response page calls surveyService.getSurvey() unauthenticated.
-  // We allow unauthenticated access for mockActiveSurveyFull (public survey mock).
-  // All other survey reads require authentication.
-  http.get(`${BASE}/surveys/:id`, ({ request, params }) => {
-    // Allow unauthenticated access for the public active survey
+  // GET /api/v1/surveys/:id/public — no auth required, only active surveys
+  http.get(`${BASE}/surveys/:id/public`, ({ params }) => {
     if (params.id === mockActiveSurveyFull.id) {
       return HttpResponse.json(mockActiveSurveyFull, { status: 200 })
     }
+    return HttpResponse.json(
+      { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
+      { status: 404 },
+    )
+  }),
 
+  // GET /api/v1/surveys/:id
+  http.get(`${BASE}/surveys/:id`, ({ request, params }) => {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(

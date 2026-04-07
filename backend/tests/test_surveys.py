@@ -552,3 +552,121 @@ async def test_get_survey_versions_pagination(client: AsyncClient):
     assert len(body["items"]) == 2
     assert body["page"] == 1
     assert body["per_page"] == 2
+
+
+# --------------------------------------------------------------------------- #
+# GET /surveys/{id}/public
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.asyncio
+async def test_get_public_survey_returns_200_for_active_survey_without_auth(client: AsyncClient):
+    """Public endpoint returns 200 for active surveys without any auth header."""
+    headers = await auth_headers(client)
+    create_resp = await client.post(
+        SURVEYS_URL, json={"title": "Public Survey", "status": "active"}, headers=headers
+    )
+    assert create_resp.status_code == 201
+    survey_id = create_resp.json()["id"]
+
+    # No auth headers — public endpoint
+    response = await client.get(f"{SURVEYS_URL}/{survey_id}/public")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["id"] == survey_id
+    assert body["title"] == "Public Survey"
+    assert body["status"] == "active"
+
+
+@pytest.mark.asyncio
+async def test_get_public_survey_returns_groups_and_questions(client: AsyncClient):
+    """Public endpoint returns the full survey structure including groups/questions."""
+    headers = await auth_headers(client)
+    create_resp = await client.post(
+        SURVEYS_URL, json={"title": "Full Public Survey", "status": "active"}, headers=headers
+    )
+    survey_id = create_resp.json()["id"]
+
+    response = await client.get(f"{SURVEYS_URL}/{survey_id}/public")
+    assert response.status_code == 200
+    body = response.json()
+    assert "groups" in body
+    assert "questions" in body
+    assert "options" in body
+
+
+@pytest.mark.asyncio
+async def test_get_public_survey_returns_404_for_draft_survey(client: AsyncClient):
+    """Public endpoint returns 404 for draft surveys (not active)."""
+    headers = await auth_headers(client)
+    create_resp = await client.post(
+        SURVEYS_URL, json={"title": "Draft Survey"}, headers=headers
+    )
+    survey_id = create_resp.json()["id"]
+
+    response = await client.get(f"{SURVEYS_URL}/{survey_id}/public")
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_get_public_survey_returns_404_for_closed_survey(client: AsyncClient):
+    """Public endpoint returns 404 for closed surveys."""
+    headers = await auth_headers(client)
+    create_resp = await client.post(
+        SURVEYS_URL, json={"title": "Closed Survey", "status": "closed"}, headers=headers
+    )
+    survey_id = create_resp.json()["id"]
+
+    response = await client.get(f"{SURVEYS_URL}/{survey_id}/public")
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_get_public_survey_returns_404_for_archived_survey(client: AsyncClient):
+    """Public endpoint returns 404 for archived surveys."""
+    headers = await auth_headers(client)
+    create_resp = await client.post(
+        SURVEYS_URL, json={"title": "Archived Survey", "status": "archived"}, headers=headers
+    )
+    survey_id = create_resp.json()["id"]
+
+    response = await client.get(f"{SURVEYS_URL}/{survey_id}/public")
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_get_public_survey_returns_404_for_nonexistent_survey(client: AsyncClient):
+    """Public endpoint returns 404 for surveys that do not exist."""
+    fake_id = "00000000-0000-0000-0000-000000000000"
+    response = await client.get(f"{SURVEYS_URL}/{fake_id}/public")
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_get_public_survey_does_not_require_auth(client: AsyncClient):
+    """Public endpoint is accessible without any authentication token."""
+    headers = await auth_headers(client)
+    create_resp = await client.post(
+        SURVEYS_URL, json={"title": "Auth-Free Survey", "status": "active"}, headers=headers
+    )
+    survey_id = create_resp.json()["id"]
+
+    # Ensure no Authorization header is sent
+    response = await client.get(f"{SURVEYS_URL}/{survey_id}/public")
+    assert "Authorization" not in response.request.headers
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_get_public_survey_another_users_active_survey_is_accessible(client: AsyncClient):
+    """Public endpoint returns active surveys regardless of which user owns them."""
+    headers_creator = await auth_headers(client, email="creator_pub@example.com")
+    create_resp = await client.post(
+        SURVEYS_URL, json={"title": "Anyone's Survey", "status": "active"}, headers=headers_creator
+    )
+    survey_id = create_resp.json()["id"]
+
+    # Access without auth (as an anonymous respondent)
+    response = await client.get(f"{SURVEYS_URL}/{survey_id}/public")
+    assert response.status_code == 200
+    assert response.json()["title"] == "Anyone's Survey"

@@ -1,3 +1,4 @@
+import axios from 'axios'
 import apiClient from './apiClient'
 import type { SurveyResponse, SurveyFullResponse, SurveyListResponse, SurveyCreatePayload, SurveyUpdatePayload, AnswerOptionResponse, QuestionResponse, QuestionUpdatePayload, QuestionCreatePayload, QuestionGroupResponse, QuestionGroupCreatePayload, QuestionGroupUpdatePayload, GroupReorderPayload, ValidateExpressionResult } from '../types/survey'
 
@@ -56,6 +57,16 @@ class SurveyService {
   async getSurvey(id: string, lang?: string): Promise<SurveyFullResponse> {
     const params = lang ? { lang } : undefined
     const response = await apiClient.get<SurveyFullResponse>(`/surveys/${id}`, { params })
+    return response.data
+  }
+
+  async getPublicSurvey(id: string, lang?: string): Promise<SurveyFullResponse> {
+    const BASE_URL = import.meta.env.VITE_API_URL ?? '/api/v1'
+    const params = lang ? { lang } : undefined
+    const response = await axios.get<SurveyFullResponse>(`${BASE_URL}/surveys/${id}/public`, {
+      params,
+      headers: { 'Content-Type': 'application/json' },
+    })
     return response.data
   }
 
