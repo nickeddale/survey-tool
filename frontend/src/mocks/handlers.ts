@@ -6,6 +6,7 @@
  */
 
 import { http, HttpResponse } from 'msw'
+import { getAccessToken } from '../services/tokenService'
 
 const BASE = '/api/v1'
 
@@ -294,6 +295,7 @@ export const mockTokens = {
   expires_in: 1800,
 }
 
+
 export const mockNewTokens = {
   access_token:
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDEiLCJleHAiOjk5OTk5OTk5OTksImlhdCI6Mn0.dummy',
@@ -467,8 +469,15 @@ export const handlers = [
 
   // POST /api/v1/auth/refresh — reads refresh token from httpOnly cookie (not body)
   http.post(`${BASE}/auth/refresh`, () => {
-    // In tests the httpOnly cookie cannot be inspected from JS; the handler
-    // always returns new tokens to simulate a valid cookie scenario.
+    // Simulate httpOnly cookie presence by checking the in-memory access token.
+    // In tests, setTokens(access_token) is the convention for "user has a valid session".
+    // If no access token is set, simulate a missing/expired refresh cookie (401).
+    if (!getAccessToken()) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'No valid refresh token' } },
+        { status: 401 },
+      )
+    }
     return HttpResponse.json(mockNewTokens, { status: 200 })
   }),
 

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { http, HttpResponse } from 'msw'
 import { server } from '../../test/setup'
 import authService from '../authService'
-import { getAccessToken, clearTokens } from '../tokenService'
+import { getAccessToken, setTokens, clearTokens } from '../tokenService'
 import { mockUser, mockTokens, mockNewTokens } from '../../mocks/handlers'
 
 const BASE = '/api/v1'
@@ -35,6 +35,9 @@ describe('authService', () => {
     })
 
     it('throws ApiError on invalid credentials', async () => {
+      // Set a token so the 401-retry interceptor can refresh (returns new token) and retry.
+      // The retried login still fails (bad credentials) and is normalized to ApiError.
+      setTokens(mockTokens.access_token)
       await expect(
         authService.login({ email: 'bad@example.com', password: 'wrong' }),
       ).rejects.toMatchObject({ status: 401, code: 'UNAUTHORIZED' })
