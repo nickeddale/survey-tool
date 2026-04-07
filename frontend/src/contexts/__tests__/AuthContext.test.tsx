@@ -60,7 +60,7 @@ describe('AuthContext', () => {
   describe('initial state (with stored valid refresh token)', () => {
     it('sets user and isAuthenticated=true when refresh token is present and valid', async () => {
       // Store a valid refresh token so initialize() will call refreshToken + getCurrentUser
-      setTokens(mockTokens.access_token, mockTokens.refresh_token)
+      setTokens(mockTokens.access_token)
 
       const { result } = renderHook(() => useAuth(), { wrapper })
 

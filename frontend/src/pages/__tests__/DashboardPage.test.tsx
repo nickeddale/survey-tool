@@ -7,7 +7,7 @@ import { server } from '../../test/setup'
 import { AuthProvider } from '../../contexts/AuthContext'
 import { useAuthStore } from '../../store/authStore'
 import { clearTokens, setTokens } from '../../services/tokenService'
-import { mockTokens, mockSurveys } from '../../mocks/handlers'
+import { mockTokens } from '../../mocks/handlers'
 import DashboardPage from '../DashboardPage'
 
 // ---------------------------------------------------------------------------
@@ -48,7 +48,7 @@ describe('DashboardPage', () => {
     // Provide access token (in memory) without storing refresh token in localStorage.
     // This prevents AuthProvider from calling initialize() on mount, which would
     // trigger async state updates outside act().
-    setTokens(mockTokens.access_token, mockTokens.refresh_token)
+    setTokens(mockTokens.access_token)
     localStorage.removeItem('devtracker_refresh_token')
   })
 

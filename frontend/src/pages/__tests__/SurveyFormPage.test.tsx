@@ -55,7 +55,7 @@ describe('SurveyFormPage', () => {
     // Set access token (in memory) without storing refresh token in localStorage.
     // This prevents AuthProvider from calling initialize() on mount, which would
     // trigger async state updates (setPendingInit, setUser) outside act().
-    setTokens(mockTokens.access_token, mockTokens.refresh_token)
+    setTokens(mockTokens.access_token)
     localStorage.removeItem('devtracker_refresh_token')
     // Pre-populate auth store so authenticated API calls work correctly.
     useAuthStore.setState({ user: mockUser, isAuthenticated: true, isLoading: false })

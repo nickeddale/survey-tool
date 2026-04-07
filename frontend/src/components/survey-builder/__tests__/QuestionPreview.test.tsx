@@ -82,12 +82,12 @@ describe('QuestionPreview registry completeness', () => {
       settings: getDefaultSettings(type),
     })
 
-    expect(() => render(<QuestionPreview question={question} />)).not.toThrow()
+    const { unmount } = render(<QuestionPreview question={question} />)
     // Each type renders the main preview wrapper
     expect(screen.getByTestId(`question-preview-${question.id}`)).toBeInTheDocument()
 
     // Clean up for the next iteration
-    screen.unmount?.()
+    unmount()
   })
 })
 

@@ -5,7 +5,7 @@
  * not interactive, aria-readonly, format variants.
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { ExpressionDisplay } from '../ExpressionDisplay'
 import type { BuilderQuestion } from '../../../store/builderStore'

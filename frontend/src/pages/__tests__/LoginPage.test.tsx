@@ -182,7 +182,7 @@ describe('LoginPage', () => {
       const user = userEvent.setup()
       renderLoginPage()
       // Set tokens after render so AuthProvider's synchronous useState init doesn't see it
-      setTokens(mockTokens.access_token, mockTokens.refresh_token)
+      setTokens(mockTokens.access_token)
       await act(async () => {
         await user.type(screen.getByLabelText(/email/i), 'wrong@example.com')
         await user.type(screen.getByLabelText(/password/i), 'wrongpassword')

@@ -12,7 +12,7 @@ describe('participantService', () => {
   beforeEach(() => {
     clearTokens()
     localStorage.clear()
-    setTokens(mockTokens.access_token, mockTokens.refresh_token)
+    setTokens(mockTokens.access_token)
   })
 
   // -------------------------------------------------------------------------

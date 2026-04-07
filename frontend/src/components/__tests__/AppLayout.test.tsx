@@ -53,7 +53,7 @@ describe('AppLayout', () => {
 
   describe('nav bar', () => {
     it('renders the app name', async () => {
-      setTokens(mockTokens.access_token, mockTokens.refresh_token)
+      setTokens(mockTokens.access_token)
       renderAppLayout()
 
       await waitFor(() => {
@@ -62,7 +62,7 @@ describe('AppLayout', () => {
     })
 
     it('shows the user email in the nav bar', async () => {
-      setTokens(mockTokens.access_token, mockTokens.refresh_token)
+      setTokens(mockTokens.access_token)
       renderAppLayout()
 
       await waitFor(() => {
@@ -71,7 +71,7 @@ describe('AppLayout', () => {
     })
 
     it('renders a logout button', async () => {
-      setTokens(mockTokens.access_token, mockTokens.refresh_token)
+      setTokens(mockTokens.access_token)
       renderAppLayout()
 
       await waitFor(() => {
@@ -82,7 +82,7 @@ describe('AppLayout', () => {
 
   describe('logout', () => {
     it('calls logout and redirects to /login when logout button is clicked', async () => {
-      setTokens(mockTokens.access_token, mockTokens.refresh_token)
+      setTokens(mockTokens.access_token)
       renderAppLayout()
 
       // Wait for authenticated layout to render
@@ -100,7 +100,7 @@ describe('AppLayout', () => {
 
   describe('sidebar navigation', () => {
     it('renders Dashboard and Surveys nav links', async () => {
-      setTokens(mockTokens.access_token, mockTokens.refresh_token)
+      setTokens(mockTokens.access_token)
       renderAppLayout()
 
       await waitFor(() => {
@@ -110,7 +110,7 @@ describe('AppLayout', () => {
     })
 
     it('highlights the active Dashboard link when on /dashboard', async () => {
-      setTokens(mockTokens.access_token, mockTokens.refresh_token)
+      setTokens(mockTokens.access_token)
       renderAppLayout('/dashboard')
 
       await waitFor(() => {
@@ -120,7 +120,7 @@ describe('AppLayout', () => {
     })
 
     it('highlights the active Surveys link when on /surveys', async () => {
-      setTokens(mockTokens.access_token, mockTokens.refresh_token)
+      setTokens(mockTokens.access_token)
       renderAppLayout('/surveys')
 
       await waitFor(() => {
@@ -130,7 +130,7 @@ describe('AppLayout', () => {
     })
 
     it('renders child route content via Outlet', async () => {
-      setTokens(mockTokens.access_token, mockTokens.refresh_token)
+      setTokens(mockTokens.access_token)
       renderAppLayout('/dashboard')
 
       await waitFor(() => {
@@ -141,7 +141,7 @@ describe('AppLayout', () => {
 
   describe('mobile hamburger menu', () => {
     it('renders a hamburger menu button', async () => {
-      setTokens(mockTokens.access_token, mockTokens.refresh_token)
+      setTokens(mockTokens.access_token)
       renderAppLayout()
 
       await waitFor(() => {
@@ -150,7 +150,7 @@ describe('AppLayout', () => {
     })
 
     it('toggles sidebar open when hamburger is clicked', async () => {
-      setTokens(mockTokens.access_token, mockTokens.refresh_token)
+      setTokens(mockTokens.access_token)
       renderAppLayout()
 
       await waitFor(() => {
@@ -170,7 +170,7 @@ describe('AppLayout', () => {
     })
 
     it('closes sidebar when close button is clicked', async () => {
-      setTokens(mockTokens.access_token, mockTokens.refresh_token)
+      setTokens(mockTokens.access_token)
       renderAppLayout()
 
       await waitFor(() => {
@@ -193,7 +193,7 @@ describe('AppLayout', () => {
     })
 
     it('closes sidebar when backdrop is clicked', async () => {
-      setTokens(mockTokens.access_token, mockTokens.refresh_token)
+      setTokens(mockTokens.access_token)
       renderAppLayout()
 
       await waitFor(() => {
@@ -222,7 +222,7 @@ describe('AppLayout', () => {
   describe('loading state', () => {
     it('does not render nav content while auth is initializing', async () => {
       // Make refresh hang so isLoading stays true
-      setTokens(mockTokens.access_token, mockTokens.refresh_token)
+      setTokens(mockTokens.access_token)
       server.use(
         http.post('/api/v1/auth/refresh', () => new Promise<never>(() => {})),
       )

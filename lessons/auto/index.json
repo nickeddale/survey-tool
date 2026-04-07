@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-07T18:45:11.913Z",
+  "lastUpdated": "2026-04-07T18:55:20.541Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -2990,6 +2990,25 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-07-iss-154-fix-223-ts-errors-in-question-input-component-test.md",
+      "ticketId": "ISS-154",
+      "title": "Fix 223 TS errors in question input component tests",
+      "date": "2026-04-07",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -3136,7 +3155,8 @@
       "2026-04-06-iss-151-sec-05-gap-add-rate-limiting-to-logic-validation-e.md",
       "2026-04-06-iss-152-cq-03-gap-add-pagination-to-question-groups-list-e.md",
       "2026-04-06-iss-147-fe-04-extract-shared-loading-skeleton-component.md",
-      "2026-04-07-iss-153-fix-9-typescript-errors-in-production-source-files.md"
+      "2026-04-07-iss-153-fix-9-typescript-errors-in-production-source-files.md",
+      "2026-04-07-iss-154-fix-223-ts-errors-in-question-input-component-test.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3267,7 +3287,8 @@
       "2026-04-06-iss-151-sec-05-gap-add-rate-limiting-to-logic-validation-e.md",
       "2026-04-06-iss-152-cq-03-gap-add-pagination-to-question-groups-list-e.md",
       "2026-04-06-iss-147-fe-04-extract-shared-loading-skeleton-component.md",
-      "2026-04-07-iss-153-fix-9-typescript-errors-in-production-source-files.md"
+      "2026-04-07-iss-153-fix-9-typescript-errors-in-production-source-files.md",
+      "2026-04-07-iss-154-fix-223-ts-errors-in-question-input-component-test.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3518,7 +3539,8 @@
       "2026-04-06-iss-150-fe-07-break-up-surveyresponsepage.md",
       "2026-04-06-iss-151-sec-05-gap-add-rate-limiting-to-logic-validation-e.md",
       "2026-04-06-iss-147-fe-04-extract-shared-loading-skeleton-component.md",
-      "2026-04-07-iss-153-fix-9-typescript-errors-in-production-source-files.md"
+      "2026-04-07-iss-153-fix-9-typescript-errors-in-production-source-files.md",
+      "2026-04-07-iss-154-fix-223-ts-errors-in-question-input-component-test.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3698,7 +3720,8 @@
       "2026-04-06-iss-150-fe-07-break-up-surveyresponsepage.md",
       "2026-04-06-iss-151-sec-05-gap-add-rate-limiting-to-logic-validation-e.md",
       "2026-04-06-iss-147-fe-04-extract-shared-loading-skeleton-component.md",
-      "2026-04-07-iss-153-fix-9-typescript-errors-in-production-source-files.md"
+      "2026-04-07-iss-153-fix-9-typescript-errors-in-production-source-files.md",
+      "2026-04-07-iss-154-fix-223-ts-errors-in-question-input-component-test.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3839,7 +3862,8 @@
       "2026-04-06-iss-151-sec-05-gap-add-rate-limiting-to-logic-validation-e.md",
       "2026-04-06-iss-152-cq-03-gap-add-pagination-to-question-groups-list-e.md",
       "2026-04-06-iss-147-fe-04-extract-shared-loading-skeleton-component.md",
-      "2026-04-07-iss-153-fix-9-typescript-errors-in-production-source-files.md"
+      "2026-04-07-iss-153-fix-9-typescript-errors-in-production-source-files.md",
+      "2026-04-07-iss-154-fix-223-ts-errors-in-question-input-component-test.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4074,7 +4098,8 @@
       "2026-04-06-iss-146-fe-03-break-up-surveydetailpage.md",
       "2026-04-06-iss-151-sec-05-gap-add-rate-limiting-to-logic-validation-e.md",
       "2026-04-06-iss-147-fe-04-extract-shared-loading-skeleton-component.md",
-      "2026-04-07-iss-153-fix-9-typescript-errors-in-production-source-files.md"
+      "2026-04-07-iss-153-fix-9-typescript-errors-in-production-source-files.md",
+      "2026-04-07-iss-154-fix-223-ts-errors-in-question-input-component-test.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4210,7 +4235,8 @@
       "2026-04-06-iss-151-sec-05-gap-add-rate-limiting-to-logic-validation-e.md",
       "2026-04-06-iss-152-cq-03-gap-add-pagination-to-question-groups-list-e.md",
       "2026-04-06-iss-147-fe-04-extract-shared-loading-skeleton-component.md",
-      "2026-04-07-iss-153-fix-9-typescript-errors-in-production-source-files.md"
+      "2026-04-07-iss-153-fix-9-typescript-errors-in-production-source-files.md",
+      "2026-04-07-iss-154-fix-223-ts-errors-in-question-input-component-test.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -4311,7 +4337,8 @@
       "2026-04-06-iss-141-inf-06-externalize-db-credentials-from-docker-comp.md",
       "2026-04-06-iss-143-inf-08-add-security-scanning-tools.md",
       "2026-04-06-iss-149-fe-06-extract-localstorage-helpers-to-shared-utils.md",
-      "2026-04-07-iss-153-fix-9-typescript-errors-in-production-source-files.md"
+      "2026-04-07-iss-153-fix-9-typescript-errors-in-production-source-files.md",
+      "2026-04-07-iss-154-fix-223-ts-errors-in-question-input-component-test.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",

@@ -52,7 +52,7 @@ describe('ProtectedRoute', () => {
 
   it('shows loading spinner while isLoading is true', async () => {
     // Make refresh endpoint hang so initialize() sets isLoading=true and stays there
-    setTokens(mockTokens.access_token, mockTokens.refresh_token)
+    setTokens(mockTokens.access_token)
     server.use(
       http.post('/api/v1/auth/refresh', () => new Promise<never>(() => {})),
     )
@@ -81,7 +81,7 @@ describe('ProtectedRoute', () => {
   })
 
   it('renders children when user is authenticated', async () => {
-    setTokens(mockTokens.access_token, mockTokens.refresh_token)
+    setTokens(mockTokens.access_token)
     renderProtectedRoute('/dashboard')
 
     await waitFor(() => {
