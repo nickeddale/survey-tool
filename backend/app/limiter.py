@@ -11,4 +11,5 @@ RATE_LIMITS = {
     "auth_refresh": "10/minute",
     "response_submit": "30/minute",
     "default_mutating": "60/minute",
+    "default_read": "120/minute",
 }

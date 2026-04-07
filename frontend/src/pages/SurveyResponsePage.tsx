@@ -71,7 +71,7 @@ function SurveyResponsePage() {
       setIsLoading(true)
       setLoadError(null)
       try {
-        const data = await surveyService.getSurvey(survey_id!, activeLang)
+        const data = await surveyService.getPublicSurvey(survey_id!, activeLang)
         if (!cancelled) setSurvey(data)
       } catch (err) {
         if (!cancelled) {

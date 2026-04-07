@@ -34,6 +34,7 @@ from app.services.survey_service import (
     delete_survey,
     get_survey_by_id,
     get_survey_full_by_id,
+    get_survey_full_public,
     get_survey_versions,
     list_surveys,
     update_survey,
@@ -126,6 +127,34 @@ async def get_one(
 ) -> SurveyFullResponse:
     parsed_id = _parse_survey_id(survey_id)
     survey = await get_survey_full_by_id(session, parsed_id, current_user.id)
+    if survey is None:
+        raise NotFoundError("Survey not found")
+
+    validated = SurveyFullResponse.model_validate(survey)
+
+    if lang and lang != survey.default_language:
+        survey_dict = validated.model_dump()
+        translated_dict = apply_survey_translations(survey_dict, lang)
+        return SurveyFullResponse.model_validate(translated_dict)
+
+    return validated
+
+
+@router.get(
+    "/{survey_id}/public",
+    response_model=SurveyFullResponse,
+    summary="Get a public active survey",
+    description="Return the full survey including all question groups, questions, and answer options for active surveys. No authentication required.",
+)
+@limiter.limit(RATE_LIMITS["default_read"])
+async def get_public(
+    request: Request,
+    survey_id: str,
+    lang: str | None = Query(None, description="Language code for translated content (e.g. 'fr')"),
+    session: AsyncSession = Depends(get_db),
+) -> SurveyFullResponse:
+    parsed_id = _parse_survey_id(survey_id)
+    survey = await get_survey_full_public(session, parsed_id)
     if survey is None:
         raise NotFoundError("Survey not found")
 
