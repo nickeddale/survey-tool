@@ -1,8 +1,8 @@
 """Tests for POST /api/v1/surveys/{id}/logic/resolve-flow.
 
 Covers:
-- Unauthenticated request → 403
-- Survey not found (missing or wrong owner) → 404
+- Unauthenticated request → 200 (public endpoint, no auth required)
+- Survey not found → 404
 - Invalid survey_id format → 404
 - from_question referencing unknown question code → 404
 - Circular relevance expression → 422
@@ -118,13 +118,25 @@ def resolve_url(survey_id: str) -> str:
 
 
 @pytest.mark.asyncio
-async def test_unauthenticated_request_returns_403(client: AsyncClient):
-    """No auth token → 403."""
+async def test_unauthenticated_request_returns_200(client: AsyncClient):
+    """No auth token → 200 with valid flow response (public endpoint)."""
+    # Create a survey as an authenticated user to get a real survey_id
+    headers = await auth_headers(client)
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+    await create_question(client, headers, survey_id, group_id, code="Q1", sort_order=1)
+
+    # Call without any auth headers
     response = await client.post(
-        resolve_url("00000000-0000-0000-0000-000000000001"),
+        resolve_url(survey_id),
         json={"answers": {}},
     )
-    assert response.status_code == 403
+    assert response.status_code == 200
+    body = response.json()
+    assert "next_question" in body
+    assert "visible_questions" in body
+    assert "hidden_questions" in body
+    assert body["next_question"] == "Q1"
 
 
 @pytest.mark.asyncio
@@ -140,8 +152,8 @@ async def test_survey_not_found_returns_404(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_survey_owned_by_other_user_returns_404(client: AsyncClient):
-    """Survey owned by a different user → 404 (no existence leak)."""
+async def test_survey_owned_by_other_user_returns_200(client: AsyncClient):
+    """Survey owned by a different user → 200 (public endpoint, no ownership check)."""
     headers_owner = await auth_headers(client, email=_unique_email("owner"))
     survey_id = await create_survey(client, headers_owner)
 
@@ -151,7 +163,9 @@ async def test_survey_owned_by_other_user_returns_404(client: AsyncClient):
         json={"answers": {}},
         headers=headers_other,
     )
-    assert response.status_code == 404
+    assert response.status_code == 200
+    body = response.json()
+    assert "next_question" in body
 
 
 @pytest.mark.asyncio
