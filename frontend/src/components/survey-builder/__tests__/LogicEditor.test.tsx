@@ -72,7 +72,7 @@ function renderEditor(
 // ---------------------------------------------------------------------------
 
 beforeEach(() => {
-  setTokens(mockTokens.access_token, mockTokens.refresh_token)
+  setTokens(mockTokens.access_token)
   URL.createObjectURL = vi.fn().mockReturnValue('blob:mock-url')
 })
 

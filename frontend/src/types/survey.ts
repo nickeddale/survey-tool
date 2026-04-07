@@ -1,5 +1,7 @@
 // Survey-related TypeScript types matching backend schemas
 
+import type { QuestionSettings } from './questionSettings'
+
 /** Translations map: { "fr": { "title": "...", "description": "..." }, "es": {...} } */
 export type TranslationsMap = Record<string, Record<string, string>>
 
@@ -27,7 +29,7 @@ export interface QuestionResponse {
   sort_order: number
   relevance: string | null
   validation: Record<string, unknown> | null
-  settings: Record<string, unknown> | null
+  settings: QuestionSettings | null
   translations?: TranslationsMap
   created_at: string
   subquestions: QuestionResponse[]

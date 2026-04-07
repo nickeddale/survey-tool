@@ -131,7 +131,7 @@ beforeEach(() => {
   useBuilderStore.getState().reset()
 
   // Pre-populate auth state without triggering AuthProvider.initialize()
-  setTokens(mockTokens.access_token, mockTokens.refresh_token)
+  setTokens(mockTokens.access_token)
   localStorage.removeItem('devtracker_refresh_token')
   useAuthStore.setState({ user: mockUser, isAuthenticated: true, isLoading: false })
 

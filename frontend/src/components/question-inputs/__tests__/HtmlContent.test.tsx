@@ -5,7 +5,7 @@
  * renders plain text safely, uses html_content from settings, falls back to description.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { HtmlContent } from '../HtmlContent'
 import type { BuilderQuestion } from '../../../store/builderStore'

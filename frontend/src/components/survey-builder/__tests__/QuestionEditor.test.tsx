@@ -58,7 +58,7 @@ beforeEach(() => {
   useBuilderStore.getState().reset()
 
   // Pre-populate auth state without triggering AuthProvider.initialize()
-  setTokens(mockTokens.access_token, mockTokens.refresh_token)
+  setTokens(mockTokens.access_token)
   localStorage.removeItem('devtracker_refresh_token')
   useAuthStore.setState({ user: mockUser, isAuthenticated: true, isLoading: false })
 
@@ -225,8 +225,7 @@ describe('code field auto-generate toggle', () => {
     expect(screen.getByText(/auto-generated from title/i)).toBeInTheDocument()
   })
 
-  it('shows "Reset to auto" after clicking Customize', async () => {
-    const user = userEvent.setup()
+  it('shows "Reset to auto" after clicking Customize', () => {
     useBuilderStore.getState().setSelectedItem({ type: 'question', id: Q1.id })
     renderEditor()
 

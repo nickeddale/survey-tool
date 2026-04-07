@@ -56,7 +56,7 @@ describe('SurveyDetailPage', () => {
     // localStorage. This prevents AuthProvider from calling initialize() on mount,
     // which would trigger async state updates (setPendingInit, set user) outside act().
     // The mock JWT has exp=9999999999, so no proactive refresh occurs either.
-    setTokens(mockTokens.access_token, mockTokens.refresh_token)
+    setTokens(mockTokens.access_token)
     localStorage.removeItem('devtracker_refresh_token')
     // Pre-populate the auth store so components that check isAuthenticated work correctly
     useAuthStore.setState({ user: mockUser, isAuthenticated: true, isLoading: false })

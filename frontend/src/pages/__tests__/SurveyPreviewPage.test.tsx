@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { render, screen, waitFor, act, fireEvent } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { http, HttpResponse } from 'msw'
@@ -53,7 +53,7 @@ beforeEach(() => {
   localStorage.clear()
   useAuthStore.setState({ user: null, isAuthenticated: false, isLoading: false })
 
-  setTokens(mockTokens.access_token, mockTokens.refresh_token)
+  setTokens(mockTokens.access_token)
   localStorage.removeItem('devtracker_refresh_token')
   useAuthStore.setState({ user: mockUser, isAuthenticated: true, isLoading: false })
 })

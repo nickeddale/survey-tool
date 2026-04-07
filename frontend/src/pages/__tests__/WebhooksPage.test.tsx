@@ -48,7 +48,7 @@ describe('WebhooksPage', () => {
     clearTokens()
     localStorage.clear()
     resetAuthStore()
-    setTokens(mockTokens.access_token, mockTokens.refresh_token)
+    setTokens(mockTokens.access_token)
     localStorage.removeItem('devtracker_refresh_token')
     useAuthStore.setState({ user: mockUser, isAuthenticated: true, isLoading: false })
   })

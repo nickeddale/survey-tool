@@ -258,7 +258,7 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
 
     updateQuestion(selectedGroup.id, selectedQuestion.id, {
       question_type: newType,
-      settings: compatibleSettings,
+      settings: compatibleSettings as unknown as QuestionSettings,
     })
     schedulePatch(selectedGroup.id, selectedQuestion.id, {
       question_type: newType,
@@ -311,7 +311,7 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
 
     const newSettings = { ...(settingsJson as unknown as Record<string, unknown>), ...updates } as unknown as QuestionSettings
     setSettingsJson(newSettings)
-    updateQuestion(selectedGroup.id, selectedQuestion.id, { settings: newSettings as unknown as Record<string, unknown> })
+    updateQuestion(selectedGroup.id, selectedQuestion.id, { settings: newSettings })
     schedulePatch(selectedGroup.id, selectedQuestion.id, { settings: newSettings })
   }
 
