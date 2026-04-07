@@ -37,7 +37,7 @@ import type { AnswerOptionResponse } from '../../types/survey'
 // Constants
 // ---------------------------------------------------------------------------
 
-const CHOICE_TYPES = new Set(['radio', 'dropdown', 'checkbox', 'ranking', 'image_picker'])
+const CHOICE_TYPES = new Set(['single_choice', 'dropdown', 'multiple_choice', 'ranking', 'image_picker'])
 
 // ---------------------------------------------------------------------------
 // Types

@@ -29,9 +29,9 @@ const QUESTION_TYPE_OPTIONS = [
   { value: 'long_text', label: 'Long Text' },
   { value: 'huge_text', label: 'Huge Text' },
   // Choice types
-  { value: 'radio', label: 'Single Choice (Radio)' },
+  { value: 'single_choice', label: 'Single Choice (Radio)' },
   { value: 'dropdown', label: 'Dropdown' },
-  { value: 'checkbox', label: 'Multiple Choice (Checkbox)' },
+  { value: 'multiple_choice', label: 'Multiple Choice (Checkbox)' },
   { value: 'ranking', label: 'Ranking' },
   { value: 'image_picker', label: 'Image Picker' },
   // Matrix types
@@ -50,7 +50,7 @@ const QUESTION_TYPE_OPTIONS = [
 ]
 
 // Types that have answer options — changing away from these loses options data
-const CHOICE_TYPES = new Set(['radio', 'checkbox', 'dropdown', 'ranking', 'image_picker'])
+const CHOICE_TYPES = new Set(['single_choice', 'multiple_choice', 'dropdown', 'ranking', 'image_picker'])
 
 function isIncompatibleTypeChange(from: string, to: string): boolean {
   return CHOICE_TYPES.has(from) !== CHOICE_TYPES.has(to)

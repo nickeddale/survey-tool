@@ -186,11 +186,11 @@ export function getDefaultSettings(type: string): QuestionSettings {
       return { placeholder: null, max_length: 5000, rows: 4 } satisfies LongTextSettings
     case 'huge_text':
       return { placeholder: null, max_length: 50000, rows: 10, rich_text: false } satisfies HugeTextSettings
-    case 'radio':
+    case 'single_choice':
       return { has_other: false, other_text: 'Other', randomize: false, columns: 1 } satisfies RadioSettings
     case 'dropdown':
       return { placeholder: 'Select an option', searchable: false, has_other: false, other_text: 'Other' } satisfies DropdownSettings
-    case 'checkbox':
+    case 'multiple_choice':
       return {
         min_choices: null,
         max_choices: null,
@@ -303,15 +303,15 @@ export function getCompatibleSettings(
     merged['placeholder'] = oldSettings['placeholder']
   }
 
-  // has_other / other_text shared across radio, dropdown, checkbox
-  const otherTypes = new Set(['radio', 'dropdown', 'checkbox'])
+  // has_other / other_text shared across single_choice, dropdown, multiple_choice
+  const otherTypes = new Set(['single_choice', 'dropdown', 'multiple_choice'])
   if (otherTypes.has(oldType) && otherTypes.has(newType)) {
     if ('has_other' in oldSettings) merged['has_other'] = oldSettings['has_other']
     if ('other_text' in oldSettings) merged['other_text'] = oldSettings['other_text']
   }
 
-  // randomize shared across radio and checkbox
-  const randomizeTypes = new Set(['radio', 'checkbox'])
+  // randomize shared across single_choice and multiple_choice
+  const randomizeTypes = new Set(['single_choice', 'multiple_choice'])
   if (randomizeTypes.has(oldType) && randomizeTypes.has(newType)) {
     if ('randomize' in oldSettings) merged['randomize'] = oldSettings['randomize']
     if ('columns' in oldSettings) merged['columns'] = oldSettings['columns']

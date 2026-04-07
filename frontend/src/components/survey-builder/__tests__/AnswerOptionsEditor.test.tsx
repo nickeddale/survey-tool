@@ -119,8 +119,8 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 
 describe('show/hide based on question type', () => {
-  const choiceTypes = ['radio', 'dropdown', 'checkbox', 'ranking', 'image_picker']
-  const nonChoiceTypes = ['text', 'textarea', 'number', 'rating', 'date']
+  const choiceTypes = ['single_choice', 'dropdown', 'multiple_choice', 'ranking', 'image_picker']
+  const nonChoiceTypes = ['short_text', 'long_text', 'numeric', 'rating', 'date']
 
   choiceTypes.forEach((type) => {
     it(`renders for question type: ${type}`, () => {
@@ -162,7 +162,7 @@ describe('option rendering', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={options}
       />,
     )
@@ -176,7 +176,7 @@ describe('option rendering', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={options}
       />,
     )
@@ -189,7 +189,7 @@ describe('option rendering', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={options}
       />,
     )
@@ -202,7 +202,7 @@ describe('option rendering', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={options}
       />,
     )
@@ -214,7 +214,7 @@ describe('option rendering', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={[]}
       />,
     )
@@ -226,7 +226,7 @@ describe('option rendering', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={[]}
         readOnly
       />,
@@ -246,7 +246,7 @@ describe('drag handles', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={options}
       />,
     )
@@ -259,7 +259,7 @@ describe('drag handles', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={options}
         readOnly
       />,
@@ -278,7 +278,7 @@ describe('add option', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={[]}
       />,
     )
@@ -290,7 +290,7 @@ describe('add option', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={[]}
         readOnly
       />,
@@ -319,7 +319,7 @@ describe('add option', () => {
               id: 'q1',
               group_id: 'g1',
               parent_id: null,
-              question_type: 'radio',
+              question_type: 'single_choice',
               code: 'Q1',
               title: 'Question',
               description: null,
@@ -340,7 +340,7 @@ describe('add option', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={[]}
       />,
     )
@@ -380,7 +380,7 @@ describe('add option', () => {
               id: 'q1',
               group_id: 'g1',
               parent_id: null,
-              question_type: 'radio',
+              question_type: 'single_choice',
               code: 'Q1',
               title: 'Question',
               description: null,
@@ -401,7 +401,7 @@ describe('add option', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={existingOptions}
       />,
     )
@@ -440,7 +440,7 @@ describe('add option', () => {
               id: 'q1',
               group_id: 'g1',
               parent_id: null,
-              question_type: 'radio',
+              question_type: 'single_choice',
               code: 'Q1',
               title: 'Q',
               description: null,
@@ -461,7 +461,7 @@ describe('add option', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={[]}
       />,
     )
@@ -492,7 +492,7 @@ describe('inline title edit', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={options}
       />,
     )
@@ -520,7 +520,7 @@ describe('inline title edit', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={options}
         readOnly
       />,
@@ -542,7 +542,7 @@ describe('assessment value edit', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={options}
       />,
     )
@@ -570,7 +570,7 @@ describe('assessment value edit', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={options}
         readOnly
       />,
@@ -590,7 +590,7 @@ describe('delete option', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={options}
       />,
     )
@@ -603,7 +603,7 @@ describe('delete option', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={options}
         readOnly
       />,
@@ -619,7 +619,7 @@ describe('delete option', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={options}
       />,
     )
@@ -650,7 +650,7 @@ describe('delete option', () => {
               id: 'q1',
               group_id: 'g1',
               parent_id: null,
-              question_type: 'radio',
+              question_type: 'single_choice',
               code: 'Q1',
               title: 'Q',
               description: null,
@@ -672,7 +672,7 @@ describe('delete option', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={options}
       />,
     )
@@ -697,7 +697,7 @@ describe('delete option', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={options}
       />,
     )
@@ -737,7 +737,7 @@ describe('delete option', () => {
               id: 'q1',
               group_id: 'g1',
               parent_id: null,
-              question_type: 'radio',
+              question_type: 'single_choice',
               code: 'Q1',
               title: 'Q',
               description: null,
@@ -759,7 +759,7 @@ describe('delete option', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={options}
       />,
     )
@@ -805,7 +805,7 @@ describe('image_picker question type', () => {
     render(
       <AnswerOptionsEditor
         {...defaultProps}
-        questionType="radio"
+        questionType="single_choice"
         options={options}
       />,
     )

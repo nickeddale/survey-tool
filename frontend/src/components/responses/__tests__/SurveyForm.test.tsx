@@ -70,7 +70,7 @@ const mockSurvey: SurveyFullResponse = {
           id: 'q2',
           group_id: 'g2',
           parent_id: null,
-          question_type: 'radio',
+          question_type: 'single_choice',
           code: 'Q2',
           title: 'How do you rate us?',
           description: null,

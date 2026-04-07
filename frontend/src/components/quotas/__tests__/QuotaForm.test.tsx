@@ -30,7 +30,7 @@ const mockQuestions: QuestionResponse[] = [
     id: 'q2',
     group_id: 'g1',
     parent_id: null,
-    question_type: 'radio',
+    question_type: 'single_choice',
     code: 'Q2',
     title: 'What is your gender?',
     description: null,

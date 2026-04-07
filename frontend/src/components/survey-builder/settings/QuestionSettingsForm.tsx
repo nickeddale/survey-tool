@@ -39,7 +39,7 @@ export function QuestionSettingsForm({ type, settings, onChange, readOnly = fals
   }
 
   // Choice types
-  if (type === 'radio' || type === 'dropdown' || type === 'checkbox') {
+  if (type === 'single_choice' || type === 'dropdown' || type === 'multiple_choice') {
     return (
       <ChoiceSettingsForm
         type={type}

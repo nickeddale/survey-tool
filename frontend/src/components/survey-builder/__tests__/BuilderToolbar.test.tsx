@@ -122,7 +122,7 @@ describe('Add Question dropdown', () => {
 
     // Dropdown content should be visible with question type items
     await waitFor(() => {
-      expect(screen.getByTestId('add-question-type-text')).toBeInTheDocument()
+      expect(screen.getByTestId('add-question-type-short_text')).toBeInTheDocument()
     })
   })
 
@@ -134,12 +134,12 @@ describe('Add Question dropdown', () => {
     })
 
     await waitFor(() => {
-      expect(screen.getByTestId('add-question-type-text')).toBeInTheDocument()
-      expect(screen.getByTestId('add-question-type-textarea')).toBeInTheDocument()
-      expect(screen.getByTestId('add-question-type-radio')).toBeInTheDocument()
-      expect(screen.getByTestId('add-question-type-checkbox')).toBeInTheDocument()
-      expect(screen.getByTestId('add-question-type-select')).toBeInTheDocument()
-      expect(screen.getByTestId('add-question-type-number')).toBeInTheDocument()
+      expect(screen.getByTestId('add-question-type-short_text')).toBeInTheDocument()
+      expect(screen.getByTestId('add-question-type-long_text')).toBeInTheDocument()
+      expect(screen.getByTestId('add-question-type-single_choice')).toBeInTheDocument()
+      expect(screen.getByTestId('add-question-type-multiple_choice')).toBeInTheDocument()
+      expect(screen.getByTestId('add-question-type-dropdown')).toBeInTheDocument()
+      expect(screen.getByTestId('add-question-type-numeric')).toBeInTheDocument()
     })
   })
 
@@ -149,7 +149,7 @@ describe('Add Question dropdown', () => {
       id: 'new-q',
       group_id: 'g1',
       parent_id: null,
-      question_type: 'text',
+      question_type: 'short_text',
       code: 'Q3',
       title: 'New Short Text',
       description: null,
@@ -171,18 +171,18 @@ describe('Add Question dropdown', () => {
     })
 
     await waitFor(() => {
-      expect(screen.getByTestId('add-question-type-text')).toBeInTheDocument()
+      expect(screen.getByTestId('add-question-type-short_text')).toBeInTheDocument()
     })
 
     await act(async () => {
-      await userEvent.click(screen.getByTestId('add-question-type-text'))
+      await userEvent.click(screen.getByTestId('add-question-type-short_text'))
     })
 
     await waitFor(() => {
       expect(surveyService.createQuestion).toHaveBeenCalledWith(
         SURVEY_ID,
         'g1',
-        expect.objectContaining({ question_type: 'text' }),
+        expect.objectContaining({ question_type: 'short_text' }),
       )
     })
   })
@@ -193,7 +193,7 @@ describe('Add Question dropdown', () => {
       id: 'new-q',
       group_id: 'g1',
       parent_id: null,
-      question_type: 'radio',
+      question_type: 'single_choice',
       code: 'Q3',
       title: 'New Single Choice',
       description: null,
@@ -214,11 +214,11 @@ describe('Add Question dropdown', () => {
     })
 
     await waitFor(() => {
-      expect(screen.getByTestId('add-question-type-radio')).toBeInTheDocument()
+      expect(screen.getByTestId('add-question-type-single_choice')).toBeInTheDocument()
     })
 
     await act(async () => {
-      await userEvent.click(screen.getByTestId('add-question-type-radio'))
+      await userEvent.click(screen.getByTestId('add-question-type-single_choice'))
     })
 
     // Navigate should only be called if user explicitly clicks back button, not for question add

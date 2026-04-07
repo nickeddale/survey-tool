@@ -128,7 +128,7 @@ function QuestionInput({ question, value, errors, onChange }: QuestionInputProps
           errors={errors}
         />
       )
-    case 'radio':
+    case 'single_choice':
       return (
         <RadioInput
           question={question}
@@ -146,7 +146,7 @@ function QuestionInput({ question, value, errors, onChange }: QuestionInputProps
           errors={errors}
         />
       )
-    case 'checkbox':
+    case 'multiple_choice':
       return (
         <CheckboxInput
           question={question}

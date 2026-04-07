@@ -323,25 +323,25 @@ describe('question type dropdown', () => {
     // Type should not have changed
     const { groups } = useBuilderStore.getState()
     const q = groups.flatMap((g) => g.questions).find((q) => q.id === Q2.id)
-    expect(q?.question_type).toBe('radio')
+    expect(q?.question_type).toBe('single_choice')
   })
 
   it('does NOT show warning when switching between compatible types', async () => {
     const user = userEvent.setup()
-    // Q2 is 'radio'. Switching to 'checkbox' is compatible (both choice types).
+    // Q2 is 'single_choice'. Switching to 'multiple_choice' is compatible (both choice types).
     useBuilderStore.getState().setSelectedItem({ type: 'question', id: Q2.id })
     renderEditor()
 
     const typeSelect = screen.getByTestId('property-question-type')
     await act(async () => {
-      await user.selectOptions(typeSelect, 'checkbox')
+      await user.selectOptions(typeSelect, 'multiple_choice')
     })
 
     expect(screen.queryByTestId('type-change-warning')).not.toBeInTheDocument()
     await waitFor(() => {
       const { groups } = useBuilderStore.getState()
       const q = groups.flatMap((g) => g.questions).find((q) => q.id === Q2.id)
-      expect(q?.question_type).toBe('checkbox')
+      expect(q?.question_type).toBe('multiple_choice')
     })
   })
 })
