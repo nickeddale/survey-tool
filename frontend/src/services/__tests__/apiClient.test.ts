@@ -170,6 +170,73 @@ describe('apiClient interceptors', () => {
     })
   })
 
+  describe('auth endpoint 401 passthrough', () => {
+    it('does not call redirectToLogin when /auth/login returns 401', async () => {
+      server.use(
+        http.post(`${BASE}/auth/login`, () => {
+          return HttpResponse.json(
+            { detail: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' } },
+            { status: 401 },
+          )
+        }),
+      )
+
+      try {
+        await apiClient.post('/auth/login', { email: 'a@b.com', password: 'wrong' })
+        expect.fail('should have thrown')
+      } catch (err: unknown) {
+        const e = err as { status: number; code: string; message: string }
+        expect(e.status).toBe(401)
+        expect(e.code).toBe('INVALID_CREDENTIALS')
+        expect(e.message).toBe('Invalid email or password')
+        expect(mockRedirect).not.toHaveBeenCalled()
+      }
+    })
+
+    it('does not call redirectToLogin when /auth/register returns 401', async () => {
+      server.use(
+        http.post(`${BASE}/auth/register`, () => {
+          return HttpResponse.json(
+            { detail: { code: 'UNAUTHORIZED', message: 'Unauthorized' } },
+            { status: 401 },
+          )
+        }),
+      )
+
+      try {
+        await apiClient.post('/auth/register', { email: 'a@b.com', password: 'password123' })
+        expect.fail('should have thrown')
+      } catch (err: unknown) {
+        const e = err as { status: number; code: string; message: string }
+        expect(e.status).toBe(401)
+        expect(mockRedirect).not.toHaveBeenCalled()
+      }
+    })
+
+    it('still triggers refresh flow for 401 on a protected endpoint', async () => {
+      server.use(
+        http.get(`${BASE}/surveys`, ({ request }) => {
+          const auth = request.headers.get('Authorization')
+          if (auth?.includes(mockNewTokens.access_token)) {
+            return HttpResponse.json({ items: [] })
+          }
+          return HttpResponse.json(
+            { detail: { code: 'UNAUTHORIZED', message: 'Token expired' } },
+            { status: 401 },
+          )
+        }),
+        http.post(`${BASE}/auth/refresh`, () => {
+          return HttpResponse.json(mockNewTokens)
+        }),
+      )
+
+      setTokens(mockTokens.access_token)
+      const response = await apiClient.get('/surveys')
+      expect(response.data).toEqual({ items: [] })
+      expect(mockRedirect).not.toHaveBeenCalled()
+    })
+  })
+
   describe('error normalization', () => {
     it('wraps structured error response into ApiError', async () => {
       server.use(
