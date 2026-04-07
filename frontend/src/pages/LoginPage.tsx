@@ -7,6 +7,7 @@ import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card'
 import { ValidationErrors } from '../components/common/ValidationErrors'
+import { DevLoginPanel } from '../components/dev/DevLoginPanel'
 
 interface FieldErrors {
   email?: string
@@ -113,6 +114,24 @@ function LoginPage() {
               Register
             </Link>
           </p>
+          {import.meta.env.DEV && (
+            <DevLoginPanel
+              onLogin={async (credentials) => {
+                setError(null)
+                try {
+                  await login(credentials)
+                  const returnTo = searchParams.get('returnTo')
+                  navigate(returnTo ? decodeURIComponent(returnTo) : '/dashboard')
+                } catch (err) {
+                  if (err instanceof ApiError) {
+                    setError(err.message)
+                  } else {
+                    setError('Login failed. Please try again.')
+                  }
+                }
+              }}
+            />
+          )}
         </CardContent>
       </Card>
     </div>
