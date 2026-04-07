@@ -378,23 +378,19 @@ export function BuilderToolbar({
         {/* Add Question dropdown — hidden on small screens */}
         {!readOnly && groups.length > 0 && (
           <DropdownMenu>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="hidden md:flex h-8 gap-1 shrink-0"
-                    disabled={isAddingQuestion}
-                    data-testid="toolbar-add-question-button"
-                  >
-                    <Plus size={14} />
-                    Add Question
-                  </Button>
-                </DropdownMenuTrigger>
-              </TooltipTrigger>
-              <TooltipContent>Add a question to the last group</TooltipContent>
-            </Tooltip>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="hidden md:flex h-8 gap-1 shrink-0"
+                disabled={isAddingQuestion}
+                data-testid="toolbar-add-question-button"
+              >
+                <Plus size={14} />
+                Add Question
+              </Button>
+            </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Question Type</DropdownMenuLabel>
               <DropdownMenuSeparator />

@@ -58,9 +58,19 @@ export interface SurveyCanvasProps {
 // Component
 // ---------------------------------------------------------------------------
 
+const QUESTION_TYPE_LABELS: Record<string, string> = {
+  text: 'Short Text',
+  textarea: 'Long Text',
+  radio: 'Single Choice',
+  checkbox: 'Multiple Choice',
+  select: 'Dropdown',
+  number: 'Number',
+}
+
 export function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem, isPreviewMode }: SurveyCanvasProps) {
   const groups = useBuilderStore((s) => s.groups)
   const addGroup = useBuilderStore((s) => s.addGroup)
+  const addQuestion = useBuilderStore((s) => s.addQuestion)
   const reorderGroups = useBuilderStore((s) => s.reorderGroups)
   const reorderQuestions = useBuilderStore((s) => s.reorderQuestions)
   const moveQuestion = useBuilderStore((s) => s.moveQuestion)
@@ -103,6 +113,24 @@ export function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem, i
       setIsAddingGroup(false)
     }
   }, [readOnly, isAddingGroup, surveyId, groups.length, addGroup])
+
+  const handleAddQuestion = useCallback(async (groupId: string, questionType: string) => {
+    if (readOnly) return
+    const label = QUESTION_TYPE_LABELS[questionType] ?? 'New Question'
+    try {
+      const newQuestion = await surveyService.createQuestion(surveyId, groupId, {
+        question_type: questionType,
+        title: `New ${label}`,
+      })
+      addQuestion(groupId, {
+        ...newQuestion,
+        answer_options: newQuestion.answer_options ?? [],
+        subquestions: [],
+      })
+    } catch {
+      setSaveStatus('error', 'Failed to add question. Please try again.')
+    }
+  }, [readOnly, surveyId, addQuestion, setSaveStatus])
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const { active } = event
@@ -308,6 +336,7 @@ export function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem, i
                 selectedItem={selectedItem}
                 onSelectItem={onSelectItem}
                 isPreviewMode={isPreviewMode}
+                onAddQuestion={handleAddQuestion}
               />
             ))}
           </SortableContext>

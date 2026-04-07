@@ -28,13 +28,15 @@ export const QUESTION_TYPES = [
 
 export interface QuestionPaletteProps {
   readOnly: boolean
+  /** Called when user clicks a question type button to add it to the survey */
+  onAddQuestion?: (questionType: string) => void
 }
 
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
-export function QuestionPalette({ readOnly }: QuestionPaletteProps) {
+export function QuestionPalette({ readOnly, onAddQuestion }: QuestionPaletteProps) {
   return (
     <aside
       className="w-56 border-r border-border bg-muted/30 flex flex-col overflow-y-auto"
@@ -47,6 +49,7 @@ export function QuestionPalette({ readOnly }: QuestionPaletteProps) {
         {QUESTION_TYPES.map(({ type, label, icon: Icon }) => (
           <button
             key={type}
+            type="button"
             className={`w-full flex items-center gap-2 px-2 py-2 rounded-md text-sm text-left transition-colors
               ${readOnly
                 ? 'text-muted-foreground cursor-not-allowed opacity-50'
@@ -55,6 +58,8 @@ export function QuestionPalette({ readOnly }: QuestionPaletteProps) {
             disabled={readOnly}
             aria-label={`Add ${label} question`}
             data-question-type={type}
+            data-testid={`palette-question-type-${type}`}
+            onClick={() => !readOnly && onAddQuestion?.(type)}
           >
             <Icon size={14} className="shrink-0" />
             {label}

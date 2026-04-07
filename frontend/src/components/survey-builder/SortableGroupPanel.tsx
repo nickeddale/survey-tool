@@ -21,6 +21,8 @@ export interface SortableGroupPanelProps {
   selectedItem: SelectedItem
   onSelectItem: (item: SelectedItem) => void
   isPreviewMode: boolean
+  /** Called when user clicks '+' in the group header to add a question */
+  onAddQuestion?: (groupId: string, questionType: string) => void
 }
 
 // ---------------------------------------------------------------------------
@@ -33,6 +35,7 @@ export function SortableGroupPanel({
   selectedItem,
   onSelectItem,
   isPreviewMode,
+  onAddQuestion,
 }: SortableGroupPanelProps) {
   const {
     attributes,
@@ -59,6 +62,7 @@ export function SortableGroupPanel({
         dragListeners={listeners}
         dragAttributes={attributes}
         isPreviewMode={isPreviewMode}
+        onAddQuestion={onAddQuestion}
       />
     </div>
   )

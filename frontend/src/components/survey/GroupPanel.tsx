@@ -15,10 +15,31 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { GripVertical, Plus } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu'
 import { QuestionCard } from './QuestionCard'
 import { QuestionPreview } from '../survey-builder/QuestionPreview'
 import type { BuilderGroup } from '../../store/builderStore'
 import type { SelectedItem } from '../../store/builderStore'
+
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+const QUESTION_TYPES = [
+  { type: 'text', label: 'Short Text' },
+  { type: 'textarea', label: 'Long Text' },
+  { type: 'radio', label: 'Single Choice' },
+  { type: 'checkbox', label: 'Multiple Choice' },
+  { type: 'select', label: 'Dropdown' },
+  { type: 'number', label: 'Number' },
+]
 
 // ---------------------------------------------------------------------------
 // Types
@@ -37,6 +58,8 @@ export interface GroupPanelProps {
   dragAttributes?: React.HTMLAttributes<HTMLElement>
   /** When true, renders QuestionPreview instead of QuestionCard for each question */
   isPreviewMode?: boolean
+  /** Called when the user clicks the '+' button to add a question to this group */
+  onAddQuestion?: (groupId: string, questionType: string) => void
 }
 
 // ---------------------------------------------------------------------------
@@ -52,6 +75,7 @@ export function GroupPanel({
   dragListeners,
   dragAttributes,
   isPreviewMode = false,
+  onAddQuestion,
 }: GroupPanelProps) {
   const isGroupSelected = selectedItem?.type === 'group' && selectedItem.id === group.id
 
@@ -98,19 +122,51 @@ export function GroupPanel({
                 {group.questions.length} question{group.questions.length !== 1 ? 's' : ''}
               </span>
               {!readOnly && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-6 px-2 text-xs"
-                  disabled={readOnly}
-                  data-testid={`add-question-button-${group.id}`}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                  }}
-                >
-                  <Plus size={12} />
-                  Question
-                </Button>
+                onAddQuestion ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        className="h-6 px-2 text-xs"
+                        data-testid={`add-question-button-${group.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Plus size={12} />
+                        Question
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenuLabel>Question Type</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {QUESTION_TYPES.map(({ type, label }) => (
+                        <DropdownMenuItem
+                          key={type}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onAddQuestion(group.id, type)
+                          }}
+                          data-testid={`group-add-question-type-${group.id}-${type}`}
+                        >
+                          {label}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    className="h-6 px-2 text-xs"
+                    data-testid={`add-question-button-${group.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Plus size={12} />
+                    Question
+                  </Button>
+                )
               )}
             </div>
           </div>
