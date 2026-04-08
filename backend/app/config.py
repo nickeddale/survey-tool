@@ -41,6 +41,18 @@ class Settings(BaseSettings):
             )
         return self
 
+    @model_validator(mode="after")
+    def default_cookie_secure_off_in_non_production(self) -> "Settings":
+        """Set cookie_secure=False in development/test unless explicitly overridden.
+
+        Browsers silently reject Secure cookies over plain HTTP (localhost:3000),
+        so the default of True would break token refresh in local development.
+        An explicit COOKIE_SECURE env var always takes precedence.
+        """
+        if self.environment in _NON_PRODUCTION_ENVS and "cookie_secure" not in self.model_fields_set:
+            self.cookie_secure = False
+        return self
+
     # CORS (comma-separated list of allowed origins)
     cors_origins: str = "http://localhost:3000"
 
