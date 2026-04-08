@@ -538,6 +538,56 @@ describe('single-page mode', () => {
     await waitFor(() => expect(screen.getByTestId('form-submit-button')).toBeInTheDocument())
     expect(screen.queryByTestId('form-next-button')).not.toBeInTheDocument()
   })
+
+  it('calls saveProgress before completeResponse on submit for single-group survey (ISS-166)', async () => {
+    // Regression test: single-page survey submit must save answers before completing
+    // so the backend completion endpoint validates against stored (not empty) answers.
+    const singleGroupSurvey = {
+      ...mockActiveSurveyFull,
+      groups: [mockActiveSurveyFull.groups[0]], // one group only
+    }
+
+    server.use(
+      http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
+        HttpResponse.json(singleGroupSurvey, { status: 200 }),
+      ),
+    )
+
+    const callOrder: string[] = []
+    server.use(
+      http.patch(`${BASE}/surveys/${SURVEY_ID}/responses/:responseId`, async ({ request }) => {
+        const body = (await request.json()) as { status?: string }
+        if (body.status === 'complete') {
+          callOrder.push('completeResponse')
+        } else {
+          callOrder.push('saveProgress')
+        }
+        return HttpResponse.json(
+          { ...mockResponseCreated, status: body.status === 'complete' ? 'complete' : 'incomplete', updated_at: new Date().toISOString() },
+          { status: 200 },
+        )
+      }),
+    )
+
+    const user = userEvent.setup()
+    renderPage()
+
+    await waitFor(() => expect(screen.getByTestId('start-survey-button')).toBeInTheDocument())
+    await user.click(screen.getByTestId('start-survey-button'))
+
+    // Fill in the required question
+    await waitFor(() => expect(screen.getByTestId('survey-form')).toBeInTheDocument())
+    await user.type(screen.getByTestId('short-text-input'), 'Test Answer')
+
+    // Click Submit (single-group survey shows Submit immediately)
+    await waitFor(() => expect(screen.getByTestId('form-submit-button')).toBeInTheDocument())
+    await user.click(screen.getByTestId('form-submit-button'))
+
+    // Verify saveProgress was called before completeResponse
+    await waitFor(() => expect(callOrder).toContain('completeResponse'))
+    expect(callOrder).toContain('saveProgress')
+    expect(callOrder.indexOf('saveProgress')).toBeLessThan(callOrder.indexOf('completeResponse'))
+  })
 })
 
 // ---------------------------------------------------------------------------

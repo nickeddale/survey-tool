@@ -174,6 +174,7 @@ function SurveyResponsePage() {
     setIsSubmitting(true)
     setSubmitError(null)
     try {
+      await responseService.saveProgress(survey_id, responseId, answersToInput(answers))
       await responseService.completeResponse(survey_id, responseId, answersToInput(answers))
       clearStoredResponseId(survey_id)
       setScreen('end')

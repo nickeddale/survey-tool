@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-08T00:17:09.633Z",
+  "lastUpdated": "2026-04-08T00:25:03.951Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3212,6 +3212,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-08-iss-166-single-page-survey-submit-fails-with-422-validatio.md",
+      "ticketId": "ISS-166",
+      "title": "Single-page survey submit fails with 422 validation error",
+      "date": "2026-04-08",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -3369,7 +3385,8 @@
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
       "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
       "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
-      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md"
+      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md",
+      "2026-04-08-iss-166-single-page-survey-submit-fails-with-422-validatio.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3511,7 +3528,8 @@
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
       "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
       "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
-      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md"
+      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md",
+      "2026-04-08-iss-166-single-page-survey-submit-fails-with-422-validatio.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3779,7 +3797,8 @@
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
       "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
       "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
-      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md"
+      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md",
+      "2026-04-08-iss-166-single-page-survey-submit-fails-with-422-validatio.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3976,7 +3995,8 @@
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
       "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
       "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
-      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md"
+      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md",
+      "2026-04-08-iss-166-single-page-survey-submit-fails-with-422-validatio.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4128,7 +4148,8 @@
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
       "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
       "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
-      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md"
+      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md",
+      "2026-04-08-iss-166-single-page-survey-submit-fails-with-422-validatio.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",

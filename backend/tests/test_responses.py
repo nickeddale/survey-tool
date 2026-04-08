@@ -1057,6 +1057,40 @@ async def test_complete_after_partial_save_validates_correctly(client: AsyncClie
     assert body["completed_at"] is not None
 
 
+@pytest.mark.asyncio
+async def test_complete_with_answers_in_body_no_prior_save(client: AsyncClient):
+    """PATCH status=complete with answers in body succeeds without a prior partial save.
+
+    Regression test for ISS-166: single-page survey submit fails with 422 because
+    the completion endpoint previously ignored answers in the request body, validating
+    only previously-stored (empty) answers.
+    """
+    headers = await auth_headers(client, email="single_page_complete@example.com")
+    survey_id = await create_survey(client, headers, title="Single Page Survey")
+    q_id = await add_required_short_text_question(
+        client, headers, survey_id, code="SPQ"
+    )
+    await activate_survey(client, headers, survey_id)
+
+    # Create an empty response (no answers saved yet — simulates single-page survey start)
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # Complete with answers in the body — no prior partial save
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={
+            "status": "complete",
+            "answers": [{"question_id": q_id, "value": "My answer"}],
+        },
+    )
+    assert patch_resp.status_code == 200
+    body = patch_resp.json()
+    assert body["status"] == "complete"
+    assert body["completed_at"] is not None
+
+
 # --------------------------------------------------------------------------- #
 # GET /surveys/{id}/responses/{rid} — resume (ISS-087)
 # --------------------------------------------------------------------------- #
