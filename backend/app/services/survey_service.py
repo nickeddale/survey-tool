@@ -86,10 +86,11 @@ async def get_survey_full_public(
     session: AsyncSession,
     survey_id: uuid.UUID,
 ) -> Survey | None:
-    """Get an active survey with eagerly-loaded groups and questions. No user ownership check.
+    """Get a survey with eagerly-loaded groups and questions. No user ownership check.
 
-    Returns None if the survey does not exist or is not in active status.
+    Returns None only if the survey does not exist.
     Used by the public survey response endpoint — no authentication required.
+    The caller is responsible for checking survey.status and returning an appropriate response.
     """
     result = await session.execute(
         select(Survey)
@@ -101,10 +102,7 @@ async def get_survey_full_public(
             .selectinload(QuestionGroup.questions)
             .selectinload(Question.answer_options),
         )
-        .where(
-            Survey.id == survey_id,
-            Survey.status == "active",
-        )
+        .where(Survey.id == survey_id)
     )
     return result.scalar_one_or_none()
 

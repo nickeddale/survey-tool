@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-08T09:22:46.303Z",
+  "lastUpdated": "2026-04-08T09:28:59.368Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3428,6 +3428,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-08-iss-177-closed-survey-shows-generic-404-instead-of-unavail.md",
+      "ticketId": "ISS-177",
+      "title": "Closed survey shows generic 404 instead of UnavailableScreen",
+      "date": "2026-04-08",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -3597,7 +3613,8 @@
       "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
       "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md",
       "2026-04-08-iss-173-clone-dialog-stays-open-after-successful-clone-nav.md",
-      "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md"
+      "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md",
+      "2026-04-08-iss-177-closed-survey-shows-generic-404-instead-of-unavail.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3748,7 +3765,8 @@
       "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md",
       "2026-04-08-iss-172-dashboard-survey-cards-are-not-clickablenavigable.md",
       "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
-      "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md"
+      "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md",
+      "2026-04-08-iss-177-closed-survey-shows-generic-404-instead-of-unavail.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4031,7 +4049,8 @@
       "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
       "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md",
       "2026-04-08-iss-173-clone-dialog-stays-open-after-successful-clone-nav.md",
-      "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md"
+      "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md",
+      "2026-04-08-iss-177-closed-survey-shows-generic-404-instead-of-unavail.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4240,7 +4259,8 @@
       "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
       "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md",
       "2026-04-08-iss-173-clone-dialog-stays-open-after-successful-clone-nav.md",
-      "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md"
+      "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md",
+      "2026-04-08-iss-177-closed-survey-shows-generic-404-instead-of-unavail.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4404,7 +4424,8 @@
       "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
       "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md",
       "2026-04-08-iss-173-clone-dialog-stays-open-after-successful-clone-nav.md",
-      "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md"
+      "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md",
+      "2026-04-08-iss-177-closed-survey-shows-generic-404-instead-of-unavail.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
