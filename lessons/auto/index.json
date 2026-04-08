@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-08T01:02:23.828Z",
+  "lastUpdated": "2026-04-08T08:55:01.851Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3312,10 +3312,30 @@
       "title": "Surveys list table clips columns at mobile viewport widths",
       "date": "2026-04-08",
       "categories": [
+        "responsive-design",
+        "tailwind-css",
+        "tables"
+      ],
+      "filesModified": [
+        "frontend/src/pages/SurveysPage.tsx"
+      ],
+      "outcome": "success",
+      "complexity": "low"
+    },
+    {
+      "file": "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md",
+      "ticketId": "ISS-171",
+      "title": "ISS-158 regression: PublicRoute unmounts LoginPage during loading, losing error state",
+      "date": "2026-04-08",
+      "categories": [
         "testing",
+        "api",
         "ui",
+        "refactoring",
         "bug-fix",
         "feature",
+        "performance",
+        "security",
         "ci-cd"
       ],
       "filesModified": [],
@@ -3484,7 +3504,8 @@
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
       "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
       "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
-      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md"
+      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md",
+      "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3631,7 +3652,8 @@
       "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md",
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
       "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
-      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md"
+      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
+      "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3908,7 +3930,8 @@
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
       "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
       "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
-      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md"
+      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md",
+      "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3959,7 +3982,8 @@
       "2026-04-07-iss-161-builder-add-question-dropdown-causes-navigation-aw.md",
       "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
       "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
-      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md"
+      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md",
+      "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md"
     ],
     "bug-fix": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4111,7 +4135,8 @@
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
       "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
       "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
-      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md"
+      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md",
+      "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4269,7 +4294,8 @@
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
       "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
       "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
-      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md"
+      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md",
+      "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4346,7 +4372,8 @@
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
       "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
-      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md"
+      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
+      "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4677,7 +4704,8 @@
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
       "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
       "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
-      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md"
+      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md",
+      "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -4786,7 +4814,8 @@
       "2026-04-07-iss-163-public-survey-page-requires-authentication-cannot.md",
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
       "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md",
-      "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md"
+      "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
+      "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
@@ -4898,7 +4927,23 @@
     ],
     "webhook-testing": [
       "2026-04-06-iss-123-cq-01-split-responseservicepy-into-focused-modules.md"
+    ],
+    "responsive-design": [
+      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md"
+    ],
+    "tailwind-css": [
+      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md"
+    ],
+    "tables": [
+      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md"
     ]
   },
-  "fileIndex": {}
+  "fileIndex": {
+    "frontend/src/pages/SurveysPage.tsx": [
+      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md"
+    ],
+    "frontend/src/pages": [
+      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md"
+    ]
+  }
 }

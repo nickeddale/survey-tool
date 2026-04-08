@@ -36,7 +36,7 @@ function renderWebhooks() {
 }
 
 function resetAuthStore() {
-  useAuthStore.setState({ user: null, isAuthenticated: false, isLoading: false })
+  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
 }
 
 // ---------------------------------------------------------------------------
@@ -50,7 +50,7 @@ describe('WebhooksPage', () => {
     resetAuthStore()
     setTokens(mockTokens.access_token)
     localStorage.removeItem('devtracker_refresh_token')
-    useAuthStore.setState({ user: mockUser, isAuthenticated: true, isLoading: false })
+    useAuthStore.setState({ user: mockUser, isAuthenticated: true, isInitializing: false, isLoading: false })
   })
 
   afterEach(() => {

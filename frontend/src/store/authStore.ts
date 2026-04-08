@@ -16,7 +16,8 @@ import type { UserResponse, LoginRequest, UserCreate, UserUpdateRequest } from '
 interface AuthState {
   user: UserResponse | null
   isAuthenticated: boolean
-  isLoading: boolean
+  isInitializing: boolean  // true only during cold-start token check; set false once, never again
+  isLoading: boolean       // true during any in-flight auth action (login, logout, register, update)
 
   // Actions
   initialize: () => Promise<void>
@@ -29,6 +30,7 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
+  isInitializing: true,  // starts true — blocks route guards until initialize() completes
   isLoading: false,
 
   /**
@@ -36,18 +38,19 @@ export const useAuthStore = create<AuthState>((set) => ({
    * Optimistically attempt a token refresh using the httpOnly cookie (sent automatically).
    * If successful, fetch the current user. On failure (no cookie, expired, revoked),
    * clear access token and mark as unauthenticated — do not retry.
+   *
+   * Sets isInitializing=false exactly once when complete — never sets it back to true.
    */
   initialize: async () => {
-    set({ isLoading: true })
     try {
       // Optimistic refresh — browser sends httpOnly cookie automatically
       await authService.refreshToken()
       const user = await authService.getCurrentUser()
-      set({ user, isAuthenticated: true, isLoading: false })
+      set({ user, isAuthenticated: true, isInitializing: false })
     } catch {
       // Refresh failed (no cookie or invalid) — unauthenticated state
       clearTokens()
-      set({ user: null, isAuthenticated: false, isLoading: false })
+      set({ user: null, isAuthenticated: false, isInitializing: false })
     }
   },
 

@@ -30,7 +30,7 @@ function renderSettings() {
 }
 
 function resetAuthStore() {
-  useAuthStore.setState({ user: null, isAuthenticated: false, isLoading: false })
+  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
 }
 
 // ---------------------------------------------------------------------------
@@ -43,7 +43,7 @@ describe('SettingsPage', () => {
     localStorage.clear()
     resetAuthStore()
     setTokens(mockTokens.access_token)
-    useAuthStore.setState({ user: mockUser, isAuthenticated: true, isLoading: false })
+    useAuthStore.setState({ user: mockUser, isAuthenticated: true, isInitializing: false, isLoading: false })
   })
 
   afterEach(() => {

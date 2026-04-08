@@ -47,18 +47,19 @@ describe('ProtectedRoute', () => {
   beforeEach(() => {
     clearTokens()
     localStorage.clear()
-    useAuthStore.setState({ user: null, isAuthenticated: false, isLoading: false })
+    // Reset store but keep isInitializing: true so AuthProvider.initialize() drives the state
+    useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: true, isLoading: false })
   })
 
-  it('shows loading spinner while isLoading is true', async () => {
-    // Make refresh endpoint hang so initialize() sets isLoading=true and stays there
+  it('shows loading spinner while isInitializing is true', async () => {
+    // Make refresh endpoint hang so initialize() keeps isInitializing=true
     setTokens(mockTokens.access_token)
     server.use(
       http.post('/api/v1/auth/refresh', () => new Promise<never>(() => {})),
     )
 
     renderProtectedRoute('/dashboard')
-    // isLoading should be true immediately while the hung refresh is pending
+    // isInitializing should be true immediately while the hung refresh is pending
     await waitFor(() => {
       expect(screen.getByRole('status')).toBeInTheDocument()
     })

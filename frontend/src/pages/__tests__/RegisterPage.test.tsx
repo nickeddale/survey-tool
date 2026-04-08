@@ -33,7 +33,7 @@ function renderRegisterPage() {
 }
 
 function resetAuthStore() {
-  useAuthStore.setState({ user: null, isAuthenticated: false, isLoading: false })
+  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
 }
 
 async function fillForm(user: ReturnType<typeof userEvent.setup>, name: string, email: string, password: string, confirmPassword: string) {

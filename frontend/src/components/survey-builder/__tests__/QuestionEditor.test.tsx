@@ -54,13 +54,13 @@ function renderEditor(surveyId = SURVEY_ID, readOnly = false) {
 beforeEach(() => {
   clearTokens()
   localStorage.clear()
-  useAuthStore.setState({ user: null, isAuthenticated: false, isLoading: false })
+  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
   useBuilderStore.getState().reset()
 
   // Pre-populate auth state without triggering AuthProvider.initialize()
   setTokens(mockTokens.access_token)
   localStorage.removeItem('devtracker_refresh_token')
-  useAuthStore.setState({ user: mockUser, isAuthenticated: true, isLoading: false })
+  useAuthStore.setState({ user: mockUser, isAuthenticated: true, isInitializing: false, isLoading: false })
 
   // Load survey into builder store
   useBuilderStore.getState().loadSurvey(mockSurveyFull)

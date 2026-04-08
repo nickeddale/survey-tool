@@ -1,11 +1,12 @@
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useRef, type ReactNode } from 'react'
 import { useAuthStore } from '../store/authStore'
 import type { UserResponse, LoginRequest, UserCreate } from '../types/auth'
 
 export interface AuthContextValue {
   user: UserResponse | null
   isAuthenticated: boolean
-  isLoading: boolean
+  isInitializing: boolean  // true only during cold-start token check
+  isLoading: boolean       // true during any in-flight auth action
   login: (credentials: LoginRequest) => Promise<void>
   register: (data: UserCreate) => Promise<UserResponse>
   logout: () => Promise<void>
@@ -20,7 +21,8 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const user = useAuthStore((state) => state.user)
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
-  const storeIsLoading = useAuthStore((state) => state.isLoading)
+  const isInitializing = useAuthStore((state) => state.isInitializing)
+  const isLoading = useAuthStore((state) => state.isLoading)
   const initialize = useAuthStore((state) => state.initialize)
   const login = useAuthStore((state) => state.login)
   const register = useAuthStore((state) => state.register)
@@ -28,23 +30,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Always attempt initialization on mount — we must probe the refresh cookie to
   // determine auth state (httpOnly cookies are not readable from JS).
-  // pendingInit stays true until initialize() resolves so we don't flash the
-  // unauthenticated view before the probe completes.
-  const [pendingInit, setPendingInit] = useState(true)
+  // isInitializing in the store stays true until initialize() resolves, preventing
+  // route guards from flashing the unauthenticated view before the probe completes.
   const initStarted = useRef(false)
 
   useEffect(() => {
     if (initStarted.current) return
     initStarted.current = true
-    initialize().finally(() => setPendingInit(false))
+    initialize()
   }, [initialize])
 
-  // Show loading while: the store says so OR we're about to start initialization
-  // (pendingInit is true until initialize() resolves).
-  const isLoading = storeIsLoading || pendingInit
-
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isInitializing, isLoading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   )

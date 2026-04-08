@@ -3,10 +3,10 @@ import { useAuth } from '../contexts/AuthContext'
 import LoadingSpinner from './LoadingSpinner'
 
 function ProtectedRoute() {
-  const { isAuthenticated, isLoading } = useAuth()
+  const { isAuthenticated, isInitializing } = useAuth()
   const location = useLocation()
 
-  if (isLoading) {
+  if (isInitializing) {
     return <LoadingSpinner />
   }
 

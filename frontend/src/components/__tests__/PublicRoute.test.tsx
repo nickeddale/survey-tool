@@ -47,20 +47,31 @@ describe('PublicRoute', () => {
   beforeEach(() => {
     clearTokens()
     localStorage.clear()
-    useAuthStore.setState({ user: null, isAuthenticated: false, isLoading: false })
+    // Reset store but keep isInitializing: true so AuthProvider.initialize() drives the state
+    useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: true, isLoading: false })
   })
 
-  it('shows loading spinner while isLoading is true', async () => {
-    // Make refresh endpoint hang so initialize() sets isLoading=true and stays there
+  it('shows loading spinner while isInitializing is true', async () => {
+    // Make refresh endpoint hang so initialize() keeps isInitializing=true
     setTokens(mockTokens.access_token)
     server.use(
       http.post('/api/v1/auth/refresh', () => new Promise<never>(() => {})),
     )
 
     renderPublicRoute('/login')
-    // isLoading should be true immediately while the hung refresh is pending
+    // isInitializing should be true immediately while the hung refresh is pending
     await waitFor(() => {
       expect(screen.getByRole('status')).toBeInTheDocument()
+    })
+  })
+
+  it('renders children when isLoading is true (login in progress) but not isInitializing', async () => {
+    // Simulate a login attempt in progress: isInitializing=false, isLoading=true
+    // PublicRoute should NOT replace Outlet with a spinner in this case
+    useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: true })
+    renderPublicRoute('/login')
+    await waitFor(() => {
+      expect(screen.getByText('Login Content')).toBeInTheDocument()
     })
   })
 
