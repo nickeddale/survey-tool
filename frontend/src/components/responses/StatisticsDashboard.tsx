@@ -322,7 +322,7 @@ function StatisticsDashboard({ surveyId }: StatisticsDashboardProps) {
             />
             <MetricCard
               label="Completion Rate"
-              value={formatPercent(stats.completion_rate)}
+              value={formatPercent(stats.completion_rate * 100)}
               subtitle={`${stats.complete_responses} of ${stats.total_responses} complete`}
               testId="metric-completion-rate"
             />
