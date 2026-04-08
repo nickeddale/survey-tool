@@ -275,7 +275,9 @@ def evaluate_relevance(
     # ------------------------------------------------------------------
     # Cache lookup
     # ------------------------------------------------------------------
-    cache_key = (survey.id, frozenset(answers.items()))
+    cache_key = (survey.id, frozenset(
+        (k, tuple(v) if isinstance(v, list) else v) for k, v in answers.items()
+    ))
     if cache_key in _CACHE:
         return _CACHE[cache_key]
 

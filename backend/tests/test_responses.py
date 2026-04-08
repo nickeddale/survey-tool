@@ -1091,6 +1091,53 @@ async def test_complete_with_answers_in_body_no_prior_save(client: AsyncClient):
     assert body["completed_at"] is not None
 
 
+@pytest.mark.asyncio
+async def test_patch_complete_with_multiple_choice_answer_returns_200(client: AsyncClient):
+    """PATCH status=complete with a multiple_choice answer does not crash with 500.
+
+    Regression test for ISS-180: evaluate_relevance() builds a frozenset cache key
+    from answers.items(), but multiple_choice answers are stored as Python lists which
+    are not hashable — causing an unhashable type: 'list' crash. The survey must have
+    a relevance expression so evaluate_relevance() is actually called on completion.
+    """
+    headers = await auth_headers(client, email="mc_complete_180@example.com")
+    survey_id = await create_survey(client, headers, title="MC Complete Survey")
+
+    # Add a multiple_choice question (MC1) — its answer will be a list
+    mc_q_id = await add_multiple_choice_question(client, headers, survey_id, code="MC1")
+
+    # Add a short_text question with a relevance expression referencing MC1 so that
+    # evaluate_relevance() is invoked on completion, exercising the frozenset cache path
+    await add_question_with_relevance(
+        client, headers, survey_id, code="Q2",
+        relevance="{MC1} == 'opt_a'", is_required=False,
+    )
+
+    await activate_survey(client, headers, survey_id)
+
+    # Create a response and partial-save a list answer for the multiple_choice question
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    patch_partial = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"answers": [{"question_id": mc_q_id, "value": ["opt_a", "opt_b"]}]},
+    )
+    assert patch_partial.status_code == 200
+
+    # Complete — previously crashed with 500 due to frozenset(answers.items()) failing
+    # on the list value stored for MC1
+    patch_complete = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"status": "complete"},
+    )
+    assert patch_complete.status_code == 200
+    body = patch_complete.json()
+    assert body["status"] == "complete"
+    assert body["completed_at"] is not None
+
+
 # --------------------------------------------------------------------------- #
 # GET /surveys/{id}/responses/{rid} — resume (ISS-087)
 # --------------------------------------------------------------------------- #
