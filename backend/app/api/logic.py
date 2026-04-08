@@ -230,19 +230,32 @@ async def validate_expression_endpoint(
 # ---------------------------------------------------------------------------
 
 
+class AnswerInput(BaseModel):
+    """A single answer value sent by the frontend.
+
+    Attributes:
+        question_id: UUID of the question (as a string).
+        value:       The answer value for that question.
+    """
+
+    question_id: str
+    value: Any = None
+
+
 class ResolveFlowRequest(BaseModel):
     """Request body for the resolve-flow endpoint.
 
     Attributes:
-        answers:       Flat dict of question code → current answer value.
-        from_question: Optional code of the question the user is currently on.
-                       When None, the response navigates to the first visible
-                       question.
-        direction:     Navigation direction — 'forward' (default) or 'backward'.
+        answers:             List of {question_id, value} answer objects sent
+                             by the frontend, keyed by question UUID.
+        current_question_id: Optional UUID of the question the user is currently
+                             on. When None, the response navigates to the first
+                             visible question.
+        direction:           Navigation direction — 'forward' (default) or 'backward'.
     """
 
-    answers: Dict[str, Any] = {}
-    from_question: Optional[str] = None
+    answers: List[AnswerInput] = []
+    current_question_id: Optional[str] = None
     direction: Literal["forward", "backward"] = "forward"
 
 
@@ -250,17 +263,17 @@ class ResolveFlowResponse(BaseModel):
     """Response body for the resolve-flow endpoint.
 
     Attributes:
-        next_question:      Code of the next question to display, or null when
+        next_question_id:   UUID of the next question to display, or null when
                             at the end (forward) or beginning (backward) of survey.
-        visible_questions:  Codes of all currently visible questions.
-        hidden_questions:   Codes of all currently hidden questions.
+        visible_questions:  UUIDs of all currently visible questions.
+        hidden_questions:   UUIDs of all currently hidden questions.
         visible_groups:     UUIDs (as strings) of currently visible groups.
         hidden_groups:      UUIDs (as strings) of currently hidden groups.
         piped_texts:        Dict of piped text entries for all questions/options.
         validation_results: Per-question relevance expression validation output.
     """
 
-    next_question: Optional[str]
+    next_question_id: Optional[str]
     visible_questions: List[str]
     hidden_questions: List[str]
     visible_groups: List[str]
@@ -295,14 +308,14 @@ async def resolve_flow_endpoint(
 
     Computes:
       - Which questions and groups are currently visible or hidden (relevance).
-      - The next question to display (based on direction and from_question).
+      - The next question to display (based on direction and current_question_id).
       - Piped texts for all question titles, descriptions, and answer option labels.
       - Per-question relevance expression validation results.
 
     This endpoint performs no database writes.
 
     Returns 422 if a circular relevance expression is detected.
-    Returns 404 if from_question references an unknown question code, or if
+    Returns 404 if current_question_id references an unknown question UUID, or if
     the survey does not exist.
     """
     parsed_survey_id = _parse_survey_uuid(survey_id)
@@ -322,10 +335,34 @@ async def resolve_flow_endpoint(
         raise NotFoundError("Survey not found")
 
     # ------------------------------------------------------------------
-    # Use the flat answers dict from the payload as the expression context.
-    # evaluate_relevance() accepts this directly.
+    # Build id <-> code maps from the survey for answer conversion and
+    # navigation lookups.
     # ------------------------------------------------------------------
-    answers: Dict[str, Any] = dict(payload.answers)
+    question_id_to_code: Dict[uuid.UUID, str] = {}
+    question_code_to_id: Dict[str, uuid.UUID] = {}
+    question_code_to_group_id: Dict[str, uuid.UUID] = {}
+
+    for group in survey.groups:
+        for question in group.questions:
+            if question.parent_id is None:  # top-level only
+                question_id_to_code[question.id] = question.code
+                question_code_to_id[question.code] = question.id
+                question_code_to_group_id[question.code] = group.id
+
+    # ------------------------------------------------------------------
+    # Convert the incoming list of {question_id (UUID), value} answer
+    # objects into the code-keyed dict that the expression engine expects.
+    # Answers for unknown question IDs are silently skipped.
+    # ------------------------------------------------------------------
+    answers: Dict[str, Any] = {}
+    for answer_input in payload.answers:
+        try:
+            qid = uuid.UUID(answer_input.question_id)
+        except ValueError:
+            continue
+        code = question_id_to_code.get(qid)
+        if code is not None:
+            answers[code] = answer_input.value
 
     # ------------------------------------------------------------------
     # Evaluate relevance to determine visible/hidden sets.
@@ -339,42 +376,34 @@ async def resolve_flow_endpoint(
         ) from exc
 
     # ------------------------------------------------------------------
-    # Build code maps from the survey for navigation lookups.
-    # ------------------------------------------------------------------
-    # id -> code maps for questions and groups
-    question_id_to_code: Dict[uuid.UUID, str] = {}
-    question_code_to_id: Dict[str, uuid.UUID] = {}
-    question_code_to_group_id: Dict[str, uuid.UUID] = {}
-
-    for group in survey.groups:
-        for question in group.questions:
-            if question.parent_id is None:  # top-level only
-                question_id_to_code[question.id] = question.code
-                question_code_to_id[question.code] = question.id
-                question_code_to_group_id[question.code] = group.id
-
-    # ------------------------------------------------------------------
     # Resolve navigation position.
     # ------------------------------------------------------------------
-    next_question_code: Optional[str] = None
+    next_question_id_str: Optional[str] = None
 
-    if payload.from_question is None:
+    if payload.current_question_id is None:
         # Start at the first visible question.
         pos = get_first_visible_question(survey, answers=answers)
         if pos is not None:
-            next_question_code = question_id_to_code.get(pos.question_id)
+            next_question_id_str = str(pos.question_id)
     else:
-        # Validate the from_question code.
-        if payload.from_question not in question_code_to_id:
+        # Validate current_question_id — accept UUID string.
+        try:
+            current_qid = uuid.UUID(payload.current_question_id)
+        except ValueError:
             raise NotFoundError(
-                f"Question with code '{payload.from_question}' not found in this survey"
+                f"Question with id '{payload.current_question_id}' not found in this survey"
             )
 
-        current_group_id = question_code_to_group_id[payload.from_question]
-        current_question_id = question_code_to_id[payload.from_question]
+        if current_qid not in question_id_to_code:
+            raise NotFoundError(
+                f"Question with id '{payload.current_question_id}' not found in this survey"
+            )
+
+        current_code = question_id_to_code[current_qid]
+        current_group_id = question_code_to_group_id[current_code]
         current_pos = NavigationPosition(
             group_id=current_group_id,
-            question_id=current_question_id,
+            question_id=current_qid,
         )
 
         if payload.direction == "forward":
@@ -383,18 +412,18 @@ async def resolve_flow_endpoint(
             next_pos = get_previous_question(survey, current_pos, answers=answers)
 
         if next_pos is not None:
-            next_question_code = question_id_to_code.get(next_pos.question_id)
+            next_question_id_str = str(next_pos.question_id)
 
     # ------------------------------------------------------------------
-    # Collect visible/hidden question codes and group UUID strings.
+    # Collect visible/hidden question UUIDs and group UUID strings.
     # ------------------------------------------------------------------
     visible_questions = [
-        question_id_to_code[qid]
+        str(qid)
         for qid in relevance_result.visible_question_ids
         if qid in question_id_to_code
     ]
     hidden_questions = [
-        question_id_to_code[qid]
+        str(qid)
         for qid in relevance_result.hidden_question_ids
         if qid in question_id_to_code
     ]
@@ -428,7 +457,7 @@ async def resolve_flow_endpoint(
             if question.parent_id is not None:
                 continue
             if question.relevance is None:
-                validation_results[question.code] = {
+                validation_results[str(question.id)] = {
                     "parsed_variables": [],
                     "errors": [],
                     "warnings": [],
@@ -441,7 +470,7 @@ async def resolve_flow_endpoint(
                     question_sort_orders=all_sort_orders,
                     current_sort_order=all_sort_orders.get(question.code),
                 )
-                validation_results[question.code] = {
+                validation_results[str(question.id)] = {
                     "parsed_variables": vr.parsed_variables,
                     "errors": [
                         {"message": e.message, "position": e.position, "code": e.code}
@@ -453,14 +482,14 @@ async def resolve_flow_endpoint(
                     ],
                 }
             except Exception as exc:
-                validation_results[question.code] = {
+                validation_results[str(question.id)] = {
                     "parsed_variables": [],
                     "errors": [{"message": str(exc), "position": 0, "code": "EVALUATION_ERROR"}],
                     "warnings": [],
                 }
 
     return ResolveFlowResponse(
-        next_question=next_question_code,
+        next_question_id=next_question_id_str,
         visible_questions=visible_questions,
         hidden_questions=hidden_questions,
         visible_groups=visible_groups,
