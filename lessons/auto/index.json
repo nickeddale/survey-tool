@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-08T18:48:23.003Z",
+  "lastUpdated": "2026-04-08T19:01:00.373Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3522,6 +3522,28 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
+      "ticketId": "ISS-183",
+      "title": "ISS-178 regression: builder page still redirects away after ~30 seconds",
+      "date": "2026-04-08",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -3696,7 +3718,8 @@
       "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md",
       "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
-      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md"
+      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md",
+      "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3852,7 +3875,8 @@
       "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md",
       "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
-      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md"
+      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md",
+      "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3974,7 +3998,8 @@
       "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
       "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md",
-      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md"
+      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
+      "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4142,7 +4167,8 @@
       "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md",
       "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
-      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md"
+      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md",
+      "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4357,7 +4383,8 @@
       "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md",
       "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
-      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md"
+      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md",
+      "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4526,7 +4553,8 @@
       "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md",
       "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
-      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md"
+      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md",
+      "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4607,7 +4635,8 @@
       "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md",
       "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md",
-      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md"
+      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
+      "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4663,7 +4692,8 @@
       "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
       "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md",
-      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md"
+      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
+      "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4790,7 +4820,8 @@
       "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md",
       "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
       "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
-      "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md"
+      "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
+      "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4952,7 +4983,8 @@
       "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md",
       "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
-      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md"
+      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md",
+      "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -5067,7 +5099,8 @@
       "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md",
       "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
       "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
-      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md"
+      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md",
+      "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",

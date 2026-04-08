@@ -3,7 +3,10 @@
  *
  * Request interceptor:
  *   - Attaches Authorization: Bearer <access_token> from in-memory token store
- *   - Proactively refreshes if token is within 60 seconds of expiry
+ *   - Proactively refreshes if token is within 30 seconds of expiry
+ *   - After a failed proactive refresh, sets a 30-second cooldown to avoid hammering /auth/refresh
+ *   - On proactive refresh failure: clears tokens silently, does NOT redirect (prevents builder
+ *     page redirect regression — the response interceptor's 401 handler is the sole redirect point)
  *
  * Response interceptor (401/429 handler):
  *   - On 401, queues the failed request and attempts a token refresh
@@ -66,6 +69,20 @@ interface QueueItem {
 
 let refreshQueue: QueueItem[] = []
 
+// ---------------------------------------------------------------------------
+// Proactive refresh cooldown — module-level timestamp (NOT in storage)
+// After a proactive refresh failure, skip proactive refresh for 30 seconds.
+// This prevents hammering /auth/refresh when the backend is rate-limiting.
+// ---------------------------------------------------------------------------
+let proactiveRefreshCooldownUntil = 0
+
+const PROACTIVE_REFRESH_COOLDOWN_MS = 30_000
+
+/** Reset the proactive refresh cooldown (useful in tests). */
+export function resetProactiveRefreshCooldown(): void {
+  proactiveRefreshCooldownUntil = 0
+}
+
 function drainQueue(newToken: string): void {
   refreshQueue.forEach(({ resolve }) => resolve(newToken))
   refreshQueue = []
@@ -110,7 +127,8 @@ apiClient.interceptors.request.use(async (config: InternalAxiosRequestConfig) =>
   const token = getAccessToken()
 
   if (token) {
-    if (isTokenExpiringSoon(token)) {
+    const withinCooldown = Date.now() < proactiveRefreshCooldownUntil
+    if (!withinCooldown && isTokenExpiringSoon(token)) {
       // Proactive refresh before the request goes out
       if (!isRefreshing) {
         isRefreshing = true
@@ -123,7 +141,11 @@ apiClient.interceptors.request.use(async (config: InternalAxiosRequestConfig) =>
           isRefreshing = false
           rejectQueue(err)
           clearTokens()
-          if (!isPublicRoute()) redirectToLogin()
+          // Set cooldown so we don't immediately hammer /auth/refresh again.
+          // Do NOT call redirectToLogin() here — the response interceptor's 401 handler
+          // is the single authoritative redirect point. Calling it here caused the
+          // builder page to spontaneously navigate away (ISS-183 regression).
+          proactiveRefreshCooldownUntil = Date.now() + PROACTIVE_REFRESH_COOLDOWN_MS
           return Promise.reject(err)
         }
       } else {
