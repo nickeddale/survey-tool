@@ -67,7 +67,13 @@ const QUESTION_TYPE_LABELS: Record<string, string> = {
   number: 'Number',
 }
 
-export function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem, isPreviewMode }: SurveyCanvasProps) {
+export function SurveyCanvas({
+  surveyId,
+  readOnly,
+  selectedItem,
+  onSelectItem,
+  isPreviewMode,
+}: SurveyCanvasProps) {
   const groups = useBuilderStore((s) => s.groups)
   const addGroup = useBuilderStore((s) => s.addGroup)
   const addQuestion = useBuilderStore((s) => s.addQuestion)
@@ -95,7 +101,7 @@ export function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem, i
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    }),
+    })
   )
 
   const handleAddGroup = useCallback(async () => {
@@ -114,23 +120,26 @@ export function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem, i
     }
   }, [readOnly, isAddingGroup, surveyId, groups.length, addGroup])
 
-  const handleAddQuestion = useCallback(async (groupId: string, questionType: string) => {
-    if (readOnly) return
-    const label = QUESTION_TYPE_LABELS[questionType] ?? 'New Question'
-    try {
-      const newQuestion = await surveyService.createQuestion(surveyId, groupId, {
-        question_type: questionType,
-        title: `New ${label}`,
-      })
-      addQuestion(groupId, {
-        ...newQuestion,
-        answer_options: newQuestion.answer_options ?? [],
-        subquestions: [],
-      })
-    } catch {
-      setSaveStatus('error', 'Failed to add question. Please try again.')
-    }
-  }, [readOnly, surveyId, addQuestion, setSaveStatus])
+  const handleAddQuestion = useCallback(
+    async (groupId: string, questionType: string) => {
+      if (readOnly) return
+      const label = QUESTION_TYPE_LABELS[questionType] ?? 'New Question'
+      try {
+        const newQuestion = await surveyService.createQuestion(surveyId, groupId, {
+          question_type: questionType,
+          title: `New ${label}`,
+        })
+        addQuestion(groupId, {
+          ...newQuestion,
+          answer_options: newQuestion.answer_options ?? [],
+          subquestions: [],
+        })
+      } catch {
+        setSaveStatus('error', 'Failed to add question. Please try again.')
+      }
+    },
+    [readOnly, surveyId, addQuestion, setSaveStatus]
+  )
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const { active } = event
@@ -143,9 +152,7 @@ export function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem, i
       setActiveGroup(group ?? null)
     } else {
       // Dragging a question — set activeQuestion for DragOverlay
-      const question = groupsRef.current
-        .flatMap((g) => g.questions)
-        .find((q) => q.id === activeId)
+      const question = groupsRef.current.flatMap((g) => g.questions).find((q) => q.id === activeId)
       setActiveQuestion(question ?? null)
     }
   }, [])
@@ -177,7 +184,7 @@ export function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem, i
         const newOrder = arrayMove(
           sortedGroups.map((g) => g.id),
           oldIndex,
-          newIndex,
+          newIndex
         )
 
         // Optimistic update
@@ -199,15 +206,11 @@ export function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem, i
       // --- Question reorder / move ---
 
       // Find the group that contains the dragged question
-      const fromGroup = currentGroups.find((g) =>
-        g.questions.some((q) => q.id === activeId),
-      )
+      const fromGroup = currentGroups.find((g) => g.questions.some((q) => q.id === activeId))
       if (!fromGroup) return
 
       // Determine if we dropped onto a question or a group
-      const isOverQuestion = currentGroups.some((g) =>
-        g.questions.some((q) => q.id === overId),
-      )
+      const isOverQuestion = currentGroups.some((g) => g.questions.some((q) => q.id === overId))
       const isOverGroup = currentGroups.some((g) => `group:${g.id}` === overId || g.id === overId)
 
       // Find the target group
@@ -230,7 +233,7 @@ export function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem, i
         const newOrder = arrayMove(
           fromGroup.questions.map((q) => q.id),
           oldIndex,
-          newIndex,
+          newIndex
         )
 
         // Optimistic update
@@ -275,7 +278,7 @@ export function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem, i
             await surveyService.reorderQuestions(
               surveyId,
               toGroup.id,
-              finalTargetGroup.questions.map((q) => q.id),
+              finalTargetGroup.questions.map((q) => q.id)
             )
           }
           setSaveStatus('saved')
@@ -285,16 +288,13 @@ export function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem, i
         }
       }
     },
-    [surveyId, reorderGroups, reorderQuestions, moveQuestion, undo, setSaveStatus],
+    [surveyId, reorderGroups, reorderQuestions, moveQuestion, undo, setSaveStatus]
   )
 
   const sortedGroups = [...groups].sort((a, b) => a.sort_order - b.sort_order)
 
   return (
-    <main
-      className="flex-1 overflow-y-auto p-4 bg-background"
-      data-testid="survey-canvas"
-    >
+    <main className="flex-1 overflow-y-auto p-4 bg-background" data-testid="survey-canvas">
       <div className="max-w-2xl mx-auto space-y-4">
         {groups.length === 0 && (
           <Card data-testid="canvas-empty-state">
@@ -331,6 +331,7 @@ export function SurveyCanvas({ surveyId, readOnly, selectedItem, onSelectItem, i
             {sortedGroups.map((group) => (
               <SortableGroupPanel
                 key={group.id}
+                surveyId={surveyId}
                 group={group}
                 readOnly={readOnly}
                 selectedItem={selectedItem}

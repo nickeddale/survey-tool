@@ -7,13 +7,17 @@
  * - Inline title editing (click to edit, Enter/blur to save via PATCH)
  * - Question count badge
  * - Delete with confirmation dialog (warns about cascading question deletion)
- * - Empty group placeholder
+ * - Empty group placeholder (droppable zone via useDroppable)
+ * - Sortable questions list via SortableContext + QuestionCard
+ * - Add Question dropdown (question type selection)
  * - Read-only mode disables all editing
  */
 
 import React, { useState, useRef, useCallback } from 'react'
 import type { DraggableSyntheticListeners } from '@dnd-kit/core'
-import { GripVertical, ChevronDown, ChevronRight, Trash2, Pencil } from 'lucide-react'
+import { useDroppable } from '@dnd-kit/core'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { GripVertical, ChevronDown, ChevronRight, Trash2, Pencil, Plus } from 'lucide-react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
@@ -26,9 +30,32 @@ import {
   DialogFooter,
   DialogClose,
 } from '../ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu'
+import { QuestionCard } from '../survey/QuestionCard'
+import { QuestionPreview } from './QuestionPreview'
 import surveyService from '../../services/surveyService'
 import { useBuilderStore } from '../../store/builderStore'
-import type { BuilderGroup } from '../../store/builderStore'
+import type { BuilderGroup, SelectedItem } from '../../store/builderStore'
+
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+const QUESTION_TYPES = [
+  { type: 'short_text', label: 'Short Text' },
+  { type: 'long_text', label: 'Long Text' },
+  { type: 'single_choice', label: 'Single Choice' },
+  { type: 'multiple_choice', label: 'Multiple Choice' },
+  { type: 'dropdown', label: 'Dropdown' },
+  { type: 'numeric', label: 'Number' },
+]
 
 // ---------------------------------------------------------------------------
 // Props
@@ -49,6 +76,16 @@ export interface GroupPanelProps {
   dragAttributes?: React.HTMLAttributes<HTMLElement>
   /** Whether this group is currently being dragged */
   isDragging?: boolean
+  /** True while a question is being dragged over this group */
+  isOver?: boolean
+  /** When true, renders QuestionPreview instead of QuestionCard for each question */
+  isPreviewMode?: boolean
+  /** Called when the user selects a question type from the Add Question dropdown */
+  onAddQuestion?: (groupId: string, questionType: string) => void
+  /** selectedItem — passed through to QuestionCard for selection highlight */
+  selectedItem?: SelectedItem
+  /** onSelectItem — passed through to QuestionCard */
+  onSelectItem?: (item: SelectedItem) => void
 }
 
 // ---------------------------------------------------------------------------
@@ -65,8 +102,18 @@ export function GroupPanel({
   dragListeners,
   dragAttributes,
   isDragging = false,
+  isOver = false,
+  isPreviewMode = false,
+  onAddQuestion,
+  selectedItem,
+  onSelectItem,
 }: GroupPanelProps) {
   const { updateGroup, removeGroup } = useBuilderStore()
+
+  // Make the group card a droppable container so questions can be dropped into it
+  const { setNodeRef: setDroppableRef } = useDroppable({ id: group.id })
+
+  const questionIds = group.questions.map((q) => q.id)
 
   // ---- Collapsible state ---------------------------------------------------
   const [isOpen, setIsOpen] = useState(true)
@@ -112,7 +159,7 @@ export function GroupPanel({
         setEditTitle(group.title)
       }
     },
-    [saveTitle, group.title],
+    [saveTitle, group.title]
   )
 
   // ---- Delete confirmation -------------------------------------------------
@@ -136,17 +183,15 @@ export function GroupPanel({
 
   return (
     <>
-      <Collapsible
-        open={isOpen}
-        onOpenChange={setIsOpen}
-        data-testid={`group-panel-${group.id}`}
-      >
+      <Collapsible open={isOpen} onOpenChange={setIsOpen} data-testid={`group-panel-${group.id}`}>
         {/* Panel header */}
         <div
+          ref={setDroppableRef}
           className={`flex items-center gap-2 px-3 py-2 rounded-t-lg border border-border bg-muted/40
             ${isSelected ? 'ring-2 ring-primary ring-offset-1' : ''}
             ${!isOpen ? 'rounded-b-lg' : ''}
-            ${isDragging ? 'opacity-50' : ''}`}
+            ${isDragging ? 'opacity-50' : ''}
+            ${isOver && !readOnly ? 'ring-2 ring-primary/40 bg-primary/5' : ''}`}
           onClick={() => onSelect?.(group.id)}
           role="button"
           tabIndex={0}
@@ -223,10 +268,42 @@ export function GroupPanel({
 
           {/* Action buttons */}
           {!readOnly && (
-            <div
-              className="flex items-center gap-1 shrink-0"
-              onClick={(e) => e.stopPropagation()}
-            >
+            <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+              {/* Add Question dropdown */}
+              {onAddQuestion && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2 text-xs"
+                      data-testid={`add-question-button-${group.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Plus size={12} />
+                      Question
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                    <DropdownMenuLabel>Question Type</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {QUESTION_TYPES.map(({ type, label }) => (
+                      <DropdownMenuItem
+                        key={type}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onAddQuestion(group.id, type)
+                        }}
+                        data-testid={`group-add-question-type-${group.id}-${type}`}
+                      >
+                        {label}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
               <Button
                 size="sm"
                 variant="ghost"
@@ -260,50 +337,81 @@ export function GroupPanel({
         {/* Collapsible content — questions list */}
         <CollapsibleContent>
           <div
-            className="border border-t-0 border-border rounded-b-lg bg-background px-3 py-2 space-y-1 min-h-[2rem]"
+            className={`border border-t-0 border-border rounded-b-lg bg-background px-3 py-2 space-y-1 min-h-[2rem]
+              ${isOver && !readOnly ? 'ring-2 ring-primary/40 bg-primary/5' : ''}`}
             data-testid={`group-content-${group.id}`}
           >
-            {group.questions.length === 0 ? (
-              <p
-                className="text-xs text-muted-foreground italic py-2 text-center"
-                data-testid={`group-empty-placeholder-${group.id}`}
-              >
-                Add questions here
-              </p>
-            ) : (
-              group.questions
-                .slice()
-                .sort((a, b) => a.sort_order - b.sort_order)
-                .map((question) => (
-                  <div
-                    key={question.id}
-                    className="flex items-start gap-2 p-2 rounded-md border border-border
-                      hover:bg-muted/50 cursor-pointer transition-colors"
-                    data-testid={`group-question-item-${question.id}`}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => onSelectQuestion?.(question.id)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') onSelectQuestion?.(question.id)
-                    }}
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-xs font-mono text-muted-foreground bg-muted px-1 py-0.5 rounded">
-                          {question.code}
-                        </span>
-                        <span className="text-sm font-medium truncate">{question.title}</span>
-                        <span className="text-xs text-muted-foreground bg-muted/60 px-1 py-0.5 rounded">
-                          {question.question_type}
-                        </span>
-                        {question.is_required && (
-                          <span className="text-xs text-destructive" aria-label="Required">*</span>
+            <SortableContext items={questionIds} strategy={verticalListSortingStrategy}>
+              {group.questions.length === 0 ? (
+                <p
+                  className={`text-xs italic py-2 text-center ${
+                    isOver && !readOnly ? 'text-primary' : 'text-muted-foreground'
+                  }`}
+                  data-testid={`group-empty-placeholder-${group.id}`}
+                >
+                  {isOver && !readOnly ? 'Drop question here' : 'Add questions here'}
+                </p>
+              ) : (
+                group.questions
+                  .slice()
+                  .sort((a, b) => a.sort_order - b.sort_order)
+                  .map((question) =>
+                    isPreviewMode ? (
+                      <QuestionPreview key={question.id} question={question} />
+                    ) : (
+                      <div
+                        key={question.id}
+                        data-testid={`group-question-item-${question.id}`}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onSelectQuestion?.(question.id)
+                        }}
+                      >
+                        {selectedItem !== undefined && onSelectItem ? (
+                          <QuestionCard
+                            question={question}
+                            selectedItem={selectedItem}
+                            onSelectItem={onSelectItem}
+                            readOnly={readOnly}
+                          />
+                        ) : (
+                          <div
+                            className="flex items-start gap-2 p-2 rounded-md border border-border
+                              hover:bg-muted/50 cursor-pointer transition-colors"
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.stopPropagation()
+                                onSelectQuestion?.(question.id)
+                              }
+                            }}
+                          >
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="text-xs font-mono text-muted-foreground bg-muted px-1 py-0.5 rounded">
+                                  {question.code}
+                                </span>
+                                <span className="text-sm font-medium truncate">
+                                  {question.title}
+                                </span>
+                                <span className="text-xs text-muted-foreground bg-muted/60 px-1 py-0.5 rounded">
+                                  {question.question_type}
+                                </span>
+                                {question.is_required && (
+                                  <span className="text-xs text-destructive" aria-label="Required">
+                                    *
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
                         )}
                       </div>
-                    </div>
-                  </div>
-                ))
-            )}
+                    )
+                  )
+              )}
+            </SortableContext>
           </div>
         </CollapsibleContent>
       </Collapsible>
@@ -320,11 +428,7 @@ export function GroupPanel({
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
-              <Button
-                variant="outline"
-                disabled={isDeleting}
-                data-testid="delete-group-cancel"
-              >
+              <Button variant="outline" disabled={isDeleting} data-testid="delete-group-cancel">
                 Cancel
               </Button>
             </DialogClose>
