@@ -35,7 +35,7 @@ function renderForm(initialUrl: string) {
 }
 
 function resetAuthStore() {
-  useAuthStore.setState({ user: null, isAuthenticated: false, isLoading: false })
+  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
 }
 
 // A draft survey from mock data
@@ -58,7 +58,7 @@ describe('SurveyFormPage', () => {
     setTokens(mockTokens.access_token)
     localStorage.removeItem('devtracker_refresh_token')
     // Pre-populate auth store so authenticated API calls work correctly.
-    useAuthStore.setState({ user: mockUser, isAuthenticated: true, isLoading: false })
+    useAuthStore.setState({ user: mockUser, isAuthenticated: true, isInitializing: false, isLoading: false })
   })
 
   afterEach(() => {

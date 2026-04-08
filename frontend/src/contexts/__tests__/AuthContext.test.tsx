@@ -19,7 +19,7 @@ function wrapper({ children }: { children: ReactNode }) {
 // ---------------------------------------------------------------------------
 
 function resetAuthStore() {
-  useAuthStore.setState({ user: null, isAuthenticated: false, isLoading: false })
+  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: true, isLoading: false })
 }
 
 // ---------------------------------------------------------------------------
@@ -45,15 +45,16 @@ describe('AuthContext', () => {
   })
 
   describe('initial state (no stored tokens)', () => {
-    it('exposes user=null, isAuthenticated=false, isLoading=false after init', async () => {
+    it('exposes user=null, isAuthenticated=false, isInitializing=false after init', async () => {
       const { result } = renderHook(() => useAuth(), { wrapper })
 
       await waitFor(() => {
-        expect(result.current.isLoading).toBe(false)
+        expect(result.current.isInitializing).toBe(false)
       })
 
       expect(result.current.user).toBeNull()
       expect(result.current.isAuthenticated).toBe(false)
+      expect(result.current.isLoading).toBe(false)
     })
   })
 
@@ -65,7 +66,7 @@ describe('AuthContext', () => {
       const { result } = renderHook(() => useAuth(), { wrapper })
 
       await waitFor(() => {
-        expect(result.current.isLoading).toBe(false)
+        expect(result.current.isInitializing).toBe(false)
       })
 
       expect(result.current.user).not.toBeNull()
@@ -78,7 +79,7 @@ describe('AuthContext', () => {
     it('sets isAuthenticated=true and user after successful login', async () => {
       const { result } = renderHook(() => useAuth(), { wrapper })
 
-      await waitFor(() => expect(result.current.isLoading).toBe(false))
+      await waitFor(() => expect(result.current.isInitializing).toBe(false))
 
       await act(async () => {
         await result.current.login({ email: 'test@example.com', password: 'password123' })
@@ -95,7 +96,7 @@ describe('AuthContext', () => {
 
       const { result } = renderHook(() => useAuth(), { wrapper })
 
-      await waitFor(() => expect(result.current.isLoading).toBe(false))
+      await waitFor(() => expect(result.current.isInitializing).toBe(false))
 
       let caughtError: unknown
       await act(async () => {
@@ -114,7 +115,7 @@ describe('AuthContext', () => {
     it('exposes logout action that clears auth state', async () => {
       // Set access token so initialize() succeeds (refresh returns 200 when token is set)
       setTokens(mockTokens.access_token)
-      useAuthStore.setState({ user: mockUser, isAuthenticated: true, isLoading: false })
+      useAuthStore.setState({ user: mockUser, isAuthenticated: true, isInitializing: false, isLoading: false })
 
       const { result } = renderHook(() => useAuth(), { wrapper })
 
@@ -134,7 +135,7 @@ describe('AuthContext', () => {
     it('returns UserResponse on successful registration', async () => {
       const { result } = renderHook(() => useAuth(), { wrapper })
 
-      await waitFor(() => expect(result.current.isLoading).toBe(false))
+      await waitFor(() => expect(result.current.isInitializing).toBe(false))
 
       let registeredUser: Awaited<ReturnType<typeof result.current.register>> | undefined
       await act(async () => {
@@ -150,7 +151,7 @@ describe('AuthContext', () => {
     it('throws ApiError on duplicate email', async () => {
       const { result } = renderHook(() => useAuth(), { wrapper })
 
-      await waitFor(() => expect(result.current.isLoading).toBe(false))
+      await waitFor(() => expect(result.current.isInitializing).toBe(false))
 
       await expect(
         act(async () => {

@@ -51,11 +51,11 @@ function renderPreview(surveyId = SURVEY_ID) {
 beforeEach(() => {
   clearTokens()
   localStorage.clear()
-  useAuthStore.setState({ user: null, isAuthenticated: false, isLoading: false })
+  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
 
   setTokens(mockTokens.access_token)
   localStorage.removeItem('devtracker_refresh_token')
-  useAuthStore.setState({ user: mockUser, isAuthenticated: true, isLoading: false })
+  useAuthStore.setState({ user: mockUser, isAuthenticated: true, isInitializing: false, isLoading: false })
 })
 
 afterEach(() => {

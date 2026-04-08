@@ -35,7 +35,7 @@ function renderLoginPage(initialEntry = '/login') {
 }
 
 function resetAuthStore() {
-  useAuthStore.setState({ user: null, isAuthenticated: false, isLoading: false })
+  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
 }
 
 // ---------------------------------------------------------------------------

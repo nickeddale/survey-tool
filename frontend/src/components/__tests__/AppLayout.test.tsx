@@ -47,7 +47,7 @@ describe('AppLayout', () => {
   beforeEach(() => {
     clearTokens()
     localStorage.clear()
-    useAuthStore.setState({ user: null, isAuthenticated: false, isLoading: false })
+    useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
     vi.restoreAllMocks()
   })
 
