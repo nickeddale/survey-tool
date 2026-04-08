@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi, beforeAll, afterAll } from 'vitest'
 import { http, HttpResponse } from 'msw'
 import { server } from '../../test/setup'
 import apiClient, { setRedirectFn } from '../apiClient'
@@ -311,6 +311,86 @@ describe('apiClient interceptors', () => {
         expect.fail('should have thrown')
       } catch {
         expect(mockRedirect).toHaveBeenCalledOnce()
+      }
+    })
+  })
+
+  describe('429 rate limiting on /auth/refresh', () => {
+    beforeAll(() => {
+      vi.useFakeTimers()
+    })
+
+    afterAll(() => {
+      vi.useRealTimers()
+    })
+
+    it('waits Retry-After seconds then retries when /auth/refresh returns 429', async () => {
+      let refreshCallCount = 0
+      server.use(
+        http.post(`${BASE}/auth/refresh`, () => {
+          refreshCallCount++
+          if (refreshCallCount === 1) {
+            return HttpResponse.json(
+              { detail: { code: 'RATE_LIMITED', message: 'Too many requests' } },
+              { status: 429, headers: { 'Retry-After': '2' } },
+            )
+          }
+          return HttpResponse.json(mockNewTokens)
+        }),
+      )
+
+      setTokens(mockTokens.access_token)
+
+      // Start the refresh attempt — it will hit 429 and schedule a retry after 2s
+      const refreshPromise = apiClient.post('/auth/refresh')
+      // Advance timers past the retry delay
+      await vi.runAllTimersAsync()
+      const result = await refreshPromise
+      expect(refreshCallCount).toBe(2)
+      // The result should be the new access token string returned by performRefresh
+      expect(result).toBe(mockNewTokens.access_token)
+    })
+
+    it('does not redirect when /auth/refresh 429 retry also returns 429', async () => {
+      server.use(
+        http.post(`${BASE}/auth/refresh`, () => {
+          return HttpResponse.json(
+            { detail: { code: 'RATE_LIMITED', message: 'Too many requests' } },
+            { status: 429, headers: { 'Retry-After': '1' } },
+          )
+        }),
+      )
+
+      setTokens(mockTokens.access_token)
+
+      const refreshPromise = apiClient.post('/auth/refresh').catch((e) => e)
+      await vi.runAllTimersAsync()
+      const err = await refreshPromise
+
+      expect(err.status).toBe(429)
+      expect(mockRedirect).not.toHaveBeenCalled()
+    })
+
+    it('propagates 429 on non-refresh endpoints without special handling', async () => {
+      server.use(
+        http.get(`${BASE}/surveys`, () => {
+          return HttpResponse.json(
+            { detail: { code: 'RATE_LIMITED', message: 'Too many requests' } },
+            { status: 429, headers: { 'Retry-After': '10' } },
+          )
+        }),
+      )
+
+      setTokens(mockTokens.access_token)
+
+      try {
+        await apiClient.get('/surveys')
+        expect.fail('should have thrown')
+      } catch (err: unknown) {
+        const e = err as { status: number; code: string }
+        expect(e.status).toBe(429)
+        expect(e.code).toBe('RATE_LIMITED')
+        expect(mockRedirect).not.toHaveBeenCalled()
       }
     })
   })
