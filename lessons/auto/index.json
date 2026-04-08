@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-08T00:57:46.671Z",
+  "lastUpdated": "2026-04-08T01:02:23.828Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3305,6 +3305,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md",
+      "ticketId": "ISS-170",
+      "title": "Surveys list table clips columns at mobile viewport widths",
+      "date": "2026-04-08",
+      "categories": [
+        "testing",
+        "ui",
+        "bug-fix",
+        "feature",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -3467,7 +3483,8 @@
       "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md",
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
       "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
-      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md"
+      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
+      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3890,7 +3907,8 @@
       "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md",
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
       "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
-      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md"
+      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
+      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4092,7 +4110,8 @@
       "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md",
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
       "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
-      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md"
+      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
+      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4249,7 +4268,8 @@
       "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md",
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
       "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
-      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md"
+      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
+      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4656,7 +4676,8 @@
       "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md",
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
       "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
-      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md"
+      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
+      "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
