@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-07T23:35:14.582Z",
+  "lastUpdated": "2026-04-08T00:10:02.442Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3174,6 +3174,24 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
+      "ticketId": "ISS-162",
+      "title": "Builder: Spurious navigation to public survey URL during interactions",
+      "date": "2026-04-08",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature",
+        "ci-cd",
+        "refactoring"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -3329,7 +3347,8 @@
       "2026-04-07-iss-163-public-survey-page-requires-authentication-cannot.md",
       "2026-04-07-iss-161-builder-add-question-dropdown-causes-navigation-aw.md",
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
-      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md"
+      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
+      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3469,7 +3488,8 @@
       "2026-04-07-iss-163-public-survey-page-requires-authentication-cannot.md",
       "2026-04-07-iss-161-builder-add-question-dropdown-causes-navigation-aw.md",
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
-      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md"
+      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
+      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3735,7 +3755,8 @@
       "2026-04-07-iss-163-public-survey-page-requires-authentication-cannot.md",
       "2026-04-07-iss-161-builder-add-question-dropdown-causes-navigation-aw.md",
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
-      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md"
+      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
+      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3784,7 +3805,8 @@
       "2026-04-07-iss-156-fix-85-ts-errors-in-auth-page-and-service-tests.md",
       "2026-04-07-iss-155-fix-validation-util-type-mismatch-39-ts-errors.md",
       "2026-04-07-iss-161-builder-add-question-dropdown-causes-navigation-aw.md",
-      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md"
+      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
+      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md"
     ],
     "bug-fix": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3928,7 +3950,8 @@
       "2026-04-07-iss-163-public-survey-page-requires-authentication-cannot.md",
       "2026-04-07-iss-161-builder-add-question-dropdown-causes-navigation-aw.md",
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
-      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md"
+      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
+      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4078,7 +4101,8 @@
       "2026-04-07-iss-163-public-survey-page-requires-authentication-cannot.md",
       "2026-04-07-iss-161-builder-add-question-dropdown-causes-navigation-aw.md",
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
-      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md"
+      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
+      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4473,7 +4497,8 @@
       "2026-04-07-iss-163-public-survey-page-requires-authentication-cannot.md",
       "2026-04-07-iss-161-builder-add-question-dropdown-causes-navigation-aw.md",
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
-      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md"
+      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
+      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",

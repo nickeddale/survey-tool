@@ -44,7 +44,7 @@ function renderBuilder(surveyId = DRAFT_SURVEY_ID) {
           <Route path="/surveys" element={<div data-testid="surveys-page" />} />
         </Routes>
       </AuthProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
@@ -78,9 +78,7 @@ afterEach(() => {
 
 describe('loading state', () => {
   it('renders loading skeleton while survey is being fetched', async () => {
-    server.use(
-      http.get(`/api/v1/surveys/${DRAFT_SURVEY_ID}`, () => new Promise<never>(() => {})),
-    )
+    server.use(http.get(`/api/v1/surveys/${DRAFT_SURVEY_ID}`, () => new Promise<never>(() => {})))
 
     renderBuilder()
 
@@ -143,7 +141,7 @@ describe('draft survey', () => {
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
     // mockSurveyFull has one group 'g1' with 2 questions
-    expect(screen.getByTestId('canvas-group-g1')).toBeInTheDocument()
+    expect(screen.getByTestId('group-panel-g1')).toBeInTheDocument()
     expect(screen.getByTestId('canvas-question-q1')).toBeInTheDocument()
     expect(screen.getByTestId('canvas-question-q2')).toBeInTheDocument()
   })
@@ -308,9 +306,7 @@ describe('QuestionEditor integration', () => {
 
     await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
-    expect(screen.getByTestId('property-editor')).toHaveTextContent(
-      /select a group or question/i,
-    )
+    expect(screen.getByTestId('property-editor')).toHaveTextContent(/select a group or question/i)
     expect(screen.queryByTestId('question-properties')).not.toBeInTheDocument()
   })
 })
@@ -342,9 +338,9 @@ describe('Add Group flow', () => {
             relevance: null,
             created_at: '2024-01-10T10:00:00Z',
           },
-          { status: 201 },
+          { status: 201 }
         )
-      }),
+      })
     )
 
     renderBuilder()
@@ -359,7 +355,7 @@ describe('Add Group flow', () => {
       expect(capturedRequests[0].body).toMatchObject({ title: 'Group 2' })
     })
 
-    await waitFor(() => expect(screen.getByTestId('canvas-group-g-new')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByTestId('group-panel-g-new')).toBeInTheDocument())
     expect(useBuilderStore.getState().groups.find((g) => g.id === 'g-new')).toBeDefined()
   })
 })
@@ -387,7 +383,7 @@ describe('Group reorder — store action', () => {
       })
     })
 
-    await waitFor(() => expect(screen.getByTestId('canvas-group-g2')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByTestId('group-panel-g2')).toBeInTheDocument())
 
     // Reorder: move g2 before g1
     act(() => {
@@ -408,12 +404,12 @@ describe('Group reorder — store action', () => {
         const body = (await request.json()) as Record<string, unknown>
         capturedRequests.push({ body })
         return HttpResponse.json([], { status: 200 })
-      }),
+      })
     )
 
     await act(async () => {
       await import('../../services/surveyService').then(({ default: svc }) =>
-        svc.reorderGroups(DRAFT_SURVEY_ID, { group_ids: ['g1', 'g2'] }),
+        svc.reorderGroups(DRAFT_SURVEY_ID, { group_ids: ['g1', 'g2'] })
       )
     })
 
@@ -454,9 +450,9 @@ describe('error state', () => {
       http.get(`/api/v1/surveys/${DRAFT_SURVEY_ID}`, () =>
         HttpResponse.json(
           { detail: { code: 'INTERNAL_ERROR', message: 'Server error' } },
-          { status: 500 },
-        ),
-      ),
+          { status: 500 }
+        )
+      )
     )
 
     renderBuilder()

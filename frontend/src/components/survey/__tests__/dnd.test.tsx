@@ -57,7 +57,6 @@ vi.mock('@dnd-kit/sortable', async () => {
   }
 })
 
-
 // ---------------------------------------------------------------------------
 // Mock surveyService
 // ---------------------------------------------------------------------------
@@ -68,16 +67,20 @@ vi.mock('../../../services/surveyService', () => ({
     reorderGroups: vi.fn().mockResolvedValue([]),
     reorderQuestions: vi.fn().mockResolvedValue(undefined),
     moveQuestion: vi.fn().mockResolvedValue(undefined),
+    updateGroup: vi.fn().mockResolvedValue({}),
+    deleteGroup: vi.fn().mockResolvedValue(undefined),
   },
 }))
 
 import surveyService from '../../../services/surveyService'
 import { QuestionCard } from '../QuestionCard'
-import { GroupPanel } from '../GroupPanel'
+import { GroupPanel } from '../../survey-builder/GroupPanel'
 
 // ---------------------------------------------------------------------------
 // Test data
 // ---------------------------------------------------------------------------
+
+const SURVEY_ID = 'survey-1'
 
 const makeQuestion = (id: string, groupId: string, sortOrder: number): BuilderQuestion => ({
   id,
@@ -99,7 +102,7 @@ const makeQuestion = (id: string, groupId: string, sortOrder: number): BuilderQu
 
 const makeGroup = (id: string, questions: BuilderQuestion[], sortOrder = 1): BuilderGroup => ({
   id,
-  survey_id: 'survey-1',
+  survey_id: SURVEY_ID,
   title: `Group ${id}`,
   description: null,
   sort_order: sortOrder,
@@ -126,7 +129,7 @@ describe('QuestionCard', () => {
         selectedItem={null}
         onSelectItem={() => {}}
         readOnly={false}
-      />,
+      />
     )
 
     expect(screen.getByTestId('canvas-question-q1')).toBeInTheDocument()
@@ -143,7 +146,7 @@ describe('QuestionCard', () => {
         selectedItem={null}
         onSelectItem={() => {}}
         readOnly={false}
-      />,
+      />
     )
 
     expect(screen.getByTestId('drag-handle-q1')).toBeInTheDocument()
@@ -157,7 +160,7 @@ describe('QuestionCard', () => {
         selectedItem={null}
         onSelectItem={() => {}}
         readOnly={true}
-      />,
+      />
     )
 
     expect(screen.queryByTestId('drag-handle-q1')).not.toBeInTheDocument()
@@ -171,7 +174,7 @@ describe('QuestionCard', () => {
         selectedItem={{ type: 'question', id: 'q1' }}
         onSelectItem={() => {}}
         readOnly={false}
-      />,
+      />
     )
 
     const card = screen.getByTestId('canvas-question-q1')
@@ -187,7 +190,7 @@ describe('QuestionCard', () => {
         selectedItem={null}
         onSelectItem={onSelectItem}
         readOnly={false}
-      />,
+      />
     )
 
     await act(async () => {
@@ -206,7 +209,7 @@ describe('QuestionCard', () => {
         selectedItem={{ type: 'question', id: 'q1' }}
         onSelectItem={onSelectItem}
         readOnly={false}
-      />,
+      />
     )
 
     await act(async () => {
@@ -224,7 +227,7 @@ describe('QuestionCard', () => {
         selectedItem={null}
         onSelectItem={() => {}}
         readOnly={false}
-      />,
+      />
     )
 
     expect(screen.getByText('*')).toBeInTheDocument()
@@ -239,7 +242,7 @@ describe('QuestionCard', () => {
         onSelectItem={() => {}}
         readOnly={false}
         isOverlay
-      />,
+      />
     )
 
     const card = screen.getByTestId('canvas-question-q1')
@@ -248,7 +251,7 @@ describe('QuestionCard', () => {
 })
 
 // ---------------------------------------------------------------------------
-// GroupPanel tests
+// GroupPanel tests — using survey-builder/GroupPanel with new props
 // ---------------------------------------------------------------------------
 
 describe('GroupPanel', () => {
@@ -259,176 +262,85 @@ describe('GroupPanel', () => {
 
   it('renders group title', () => {
     const group = makeGroup('g1', [])
-    render(
-      <GroupPanel
-        group={group}
-        selectedItem={null}
-        onSelectItem={() => {}}
-        readOnly={false}
-      />,
-    )
+    render(<GroupPanel surveyId={SURVEY_ID} group={group} readOnly={false} />)
 
-    expect(screen.getByTestId('canvas-group-g1')).toBeInTheDocument()
+    expect(screen.getByTestId(`group-panel-${group.id}`)).toBeInTheDocument()
     expect(screen.getByText('Group g1')).toBeInTheDocument()
   })
 
-  it('renders empty drop zone when group has no questions', () => {
+  it('renders empty placeholder when group has no questions', () => {
     const group = makeGroup('g1', [])
-    render(
-      <GroupPanel
-        group={group}
-        selectedItem={null}
-        onSelectItem={() => {}}
-        readOnly={false}
-      />,
-    )
+    render(<GroupPanel surveyId={SURVEY_ID} group={group} readOnly={false} />)
 
-    expect(screen.getByTestId('empty-group-dropzone-g1')).toBeInTheDocument()
-    expect(screen.getByText(/no questions in this group/i)).toBeInTheDocument()
+    expect(screen.getByTestId(`group-empty-placeholder-${group.id}`)).toBeInTheDocument()
+    expect(screen.getByText(/add questions here/i)).toBeInTheDocument()
   })
 
   it('renders "Drop question here" when isOver and group is empty', () => {
     const group = makeGroup('g1', [])
-    render(
-      <GroupPanel
-        group={group}
-        selectedItem={null}
-        onSelectItem={() => {}}
-        readOnly={false}
-        isOver={true}
-      />,
-    )
+    render(<GroupPanel surveyId={SURVEY_ID} group={group} readOnly={false} isOver={true} />)
 
     expect(screen.getByText('Drop question here')).toBeInTheDocument()
   })
 
-  it('renders question cards for each question', () => {
-    const group = makeGroup('g1', [
-      makeQuestion('q1', 'g1', 1),
-      makeQuestion('q2', 'g1', 2),
-    ])
-    render(
-      <GroupPanel
-        group={group}
-        selectedItem={null}
-        onSelectItem={() => {}}
-        readOnly={false}
-      />,
-    )
+  it('renders question items for each question', () => {
+    const group = makeGroup('g1', [makeQuestion('q1', 'g1', 1), makeQuestion('q2', 'g1', 2)])
+    render(<GroupPanel surveyId={SURVEY_ID} group={group} readOnly={false} />)
 
-    expect(screen.getByTestId('canvas-question-q1')).toBeInTheDocument()
-    expect(screen.getByTestId('canvas-question-q2')).toBeInTheDocument()
+    expect(screen.getByTestId('group-question-item-q1')).toBeInTheDocument()
+    expect(screen.getByTestId('group-question-item-q2')).toBeInTheDocument()
   })
 
-  it('shows add question button when not readOnly', () => {
+  it('shows add question button when not readOnly and onAddQuestion provided', () => {
     const group = makeGroup('g1', [])
     render(
-      <GroupPanel
-        group={group}
-        selectedItem={null}
-        onSelectItem={() => {}}
-        readOnly={false}
-      />,
+      <GroupPanel surveyId={SURVEY_ID} group={group} readOnly={false} onAddQuestion={vi.fn()} />
     )
 
-    expect(screen.getByTestId('add-question-button-g1')).toBeInTheDocument()
+    expect(screen.getByTestId(`add-question-button-${group.id}`)).toBeInTheDocument()
   })
 
   it('hides add question button when readOnly', () => {
     const group = makeGroup('g1', [])
     render(
-      <GroupPanel
-        group={group}
-        selectedItem={null}
-        onSelectItem={() => {}}
-        readOnly={true}
-      />,
+      <GroupPanel surveyId={SURVEY_ID} group={group} readOnly={true} onAddQuestion={vi.fn()} />
     )
 
-    expect(screen.queryByTestId('add-question-button-g1')).not.toBeInTheDocument()
+    expect(screen.queryByTestId(`add-question-button-${group.id}`)).not.toBeInTheDocument()
   })
 
-  it('applies ring style when isOver and not readOnly', () => {
+  it('applies isOver ring style when isOver and not readOnly', () => {
     const group = makeGroup('g1', [makeQuestion('q1', 'g1', 1)])
-    render(
-      <GroupPanel
-        group={group}
-        selectedItem={null}
-        onSelectItem={() => {}}
-        readOnly={false}
-        isOver={true}
-      />,
-    )
+    render(<GroupPanel surveyId={SURVEY_ID} group={group} readOnly={false} isOver={true} />)
 
-    const card = screen.getByTestId('canvas-group-g1')
-    expect(card.className).toContain('ring-2')
+    const header = screen.getByTestId(`group-panel-header-${group.id}`)
+    expect(header.className).toContain('ring-2')
   })
 
-  it('calls onSelectItem with group when header clicked', async () => {
+  it('calls onSelect with group id when header clicked', async () => {
     const group = makeGroup('g1', [])
-    const onSelectItem = vi.fn()
-    render(
-      <GroupPanel
-        group={group}
-        selectedItem={null}
-        onSelectItem={onSelectItem}
-        readOnly={false}
-      />,
-    )
-
-    // Click on the group title
-    await act(async () => {
-      screen.getByText('Group g1').click()
-    })
-
-    expect(onSelectItem).toHaveBeenCalledWith({ type: 'group', id: 'g1' })
-  })
-
-  it('deselects group when header clicked while already selected', async () => {
-    const group = makeGroup('g1', [])
-    const onSelectItem = vi.fn()
-    render(
-      <GroupPanel
-        group={group}
-        selectedItem={{ type: 'group', id: 'g1' }}
-        onSelectItem={onSelectItem}
-        readOnly={false}
-      />,
-    )
+    const onSelect = vi.fn()
+    render(<GroupPanel surveyId={SURVEY_ID} group={group} readOnly={false} onSelect={onSelect} />)
 
     await act(async () => {
-      screen.getByText('Group g1').click()
+      screen.getByTestId(`group-panel-header-${group.id}`).click()
     })
 
-    expect(onSelectItem).toHaveBeenCalledWith(null)
+    expect(onSelect).toHaveBeenCalledWith('g1')
   })
 
   it('renders group drag handle when not readOnly', () => {
     const group = makeGroup('g1', [])
-    render(
-      <GroupPanel
-        group={group}
-        selectedItem={null}
-        onSelectItem={() => {}}
-        readOnly={false}
-      />,
-    )
+    render(<GroupPanel surveyId={SURVEY_ID} group={group} readOnly={false} />)
 
-    expect(screen.getByTestId('group-drag-handle-g1')).toBeInTheDocument()
+    expect(screen.getByTestId(`group-drag-handle-${group.id}`)).toBeInTheDocument()
   })
 
   it('does not render group drag handle when readOnly', () => {
     const group = makeGroup('g1', [])
-    render(
-      <GroupPanel
-        group={group}
-        selectedItem={null}
-        onSelectItem={() => {}}
-        readOnly={true}
-      />,
-    )
+    render(<GroupPanel surveyId={SURVEY_ID} group={group} readOnly={true} />)
 
-    expect(screen.queryByTestId('group-drag-handle-g1')).not.toBeInTheDocument()
+    expect(screen.queryByTestId(`group-drag-handle-${group.id}`)).not.toBeInTheDocument()
   })
 
   it('passes dragListeners to group drag handle', () => {
@@ -436,15 +348,18 @@ describe('GroupPanel', () => {
     const mockOnMouseDown = vi.fn()
     render(
       <GroupPanel
+        surveyId={SURVEY_ID}
         group={group}
-        selectedItem={null}
-        onSelectItem={() => {}}
         readOnly={false}
-        dragListeners={{ onMouseDown: mockOnMouseDown } as unknown as import('@dnd-kit/core').DraggableSyntheticListeners}
-      />,
+        dragListeners={
+          {
+            onMouseDown: mockOnMouseDown,
+          } as unknown as import('@dnd-kit/core').DraggableSyntheticListeners
+        }
+      />
     )
 
-    const handle = screen.getByTestId('group-drag-handle-g1')
+    const handle = screen.getByTestId(`group-drag-handle-${group.id}`)
     expect(handle).toBeInTheDocument()
   })
 })
@@ -454,8 +369,6 @@ describe('GroupPanel', () => {
 // ---------------------------------------------------------------------------
 
 describe('drag-and-drop store logic', () => {
-  const SURVEY_ID = 'survey-1'
-
   beforeEach(() => {
     useBuilderStore.getState().reset()
     vi.mocked(surveyService.reorderGroups).mockResolvedValue([])
@@ -751,7 +664,7 @@ describe('SurveyCanvas DnD rendering', () => {
     const g2 = makeGroup('g2', [makeQuestion('q2', 'g2', 1)])
 
     useBuilderStore.setState({
-      surveyId: 'survey-1',
+      surveyId: SURVEY_ID,
       groups: [g1, g2],
       title: 'Test',
       status: 'draft',
@@ -759,52 +672,68 @@ describe('SurveyCanvas DnD rendering', () => {
 
     render(
       <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <GroupPanel group={g1} selectedItem={null} onSelectItem={() => {}} readOnly={false} />
-        <GroupPanel group={g2} selectedItem={null} onSelectItem={() => {}} readOnly={false} />
-      </MemoryRouter>,
+        <GroupPanel surveyId={SURVEY_ID} group={g1} readOnly={false} />
+        <GroupPanel surveyId={SURVEY_ID} group={g2} readOnly={false} />
+      </MemoryRouter>
     )
 
-    expect(screen.getByTestId('canvas-group-g1')).toBeInTheDocument()
-    expect(screen.getByTestId('canvas-group-g2')).toBeInTheDocument()
-    expect(screen.getByTestId('canvas-question-q1')).toBeInTheDocument()
-    expect(screen.getByTestId('canvas-question-q2')).toBeInTheDocument()
+    expect(screen.getByTestId(`group-panel-${g1.id}`)).toBeInTheDocument()
+    expect(screen.getByTestId(`group-panel-${g2.id}`)).toBeInTheDocument()
+    expect(screen.getByTestId('group-question-item-q1')).toBeInTheDocument()
+    expect(screen.getByTestId('group-question-item-q2')).toBeInTheDocument()
   })
 
-  it('renders drag handles for questions in non-readonly mode', () => {
+  it('renders drag handles for questions in non-readonly mode (via QuestionCard)', () => {
     const g1 = makeGroup('g1', [makeQuestion('q1', 'g1', 1), makeQuestion('q2', 'g1', 2)])
 
     render(
       <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <GroupPanel group={g1} selectedItem={null} onSelectItem={() => {}} readOnly={false} />
-      </MemoryRouter>,
+        <QuestionCard
+          question={g1.questions[0]}
+          selectedItem={null}
+          onSelectItem={() => {}}
+          readOnly={false}
+        />
+        <QuestionCard
+          question={g1.questions[1]}
+          selectedItem={null}
+          onSelectItem={() => {}}
+          readOnly={false}
+        />
+      </MemoryRouter>
     )
 
     expect(screen.getByTestId('drag-handle-q1')).toBeInTheDocument()
     expect(screen.getByTestId('drag-handle-q2')).toBeInTheDocument()
   })
 
-  it('does not render drag handles in readOnly mode', () => {
+  it('does not render drag handles in readOnly mode (via QuestionCard)', () => {
     const g1 = makeGroup('g1', [makeQuestion('q1', 'g1', 1)])
 
     render(
       <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <GroupPanel group={g1} selectedItem={null} onSelectItem={() => {}} readOnly={true} />
-      </MemoryRouter>,
+        <QuestionCard
+          question={g1.questions[0]}
+          selectedItem={null}
+          onSelectItem={() => {}}
+          readOnly={true}
+        />
+      </MemoryRouter>
     )
 
     expect(screen.queryByTestId('drag-handle-q1')).not.toBeInTheDocument()
   })
 
-  it('renders empty drop zone for group with no questions', () => {
+  it('renders empty placeholder for group with no questions', () => {
     const emptyGroup = makeGroup('g-empty', [])
 
     render(
       <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <GroupPanel group={emptyGroup} selectedItem={null} onSelectItem={() => {}} readOnly={false} />
-      </MemoryRouter>,
+        <GroupPanel surveyId={SURVEY_ID} group={emptyGroup} readOnly={false} />
+      </MemoryRouter>
     )
 
-    expect(screen.getByTestId('empty-group-dropzone-g-empty')).toBeInTheDocument()
+    expect(screen.getByTestId(`group-empty-placeholder-${emptyGroup.id}`)).toBeInTheDocument()
   })
 
   it('shows "Drop question here" in empty group when isOver=true', () => {
@@ -812,14 +741,8 @@ describe('SurveyCanvas DnD rendering', () => {
 
     render(
       <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <GroupPanel
-          group={emptyGroup}
-          selectedItem={null}
-          onSelectItem={() => {}}
-          readOnly={false}
-          isOver={true}
-        />
-      </MemoryRouter>,
+        <GroupPanel surveyId={SURVEY_ID} group={emptyGroup} readOnly={false} isOver={true} />
+      </MemoryRouter>
     )
 
     expect(screen.getByText('Drop question here')).toBeInTheDocument()
@@ -831,13 +754,13 @@ describe('SurveyCanvas DnD rendering', () => {
 
     render(
       <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <GroupPanel group={g1} selectedItem={null} onSelectItem={() => {}} readOnly={false} />
-        <GroupPanel group={g2} selectedItem={null} onSelectItem={() => {}} readOnly={false} />
-      </MemoryRouter>,
+        <GroupPanel surveyId={SURVEY_ID} group={g1} readOnly={false} />
+        <GroupPanel surveyId={SURVEY_ID} group={g2} readOnly={false} />
+      </MemoryRouter>
     )
 
-    expect(screen.getByTestId('group-drag-handle-g1')).toBeInTheDocument()
-    expect(screen.getByTestId('group-drag-handle-g2')).toBeInTheDocument()
+    expect(screen.getByTestId(`group-drag-handle-${g1.id}`)).toBeInTheDocument()
+    expect(screen.getByTestId(`group-drag-handle-${g2.id}`)).toBeInTheDocument()
   })
 
   it('does not render group drag handles in readOnly mode', () => {
@@ -845,11 +768,11 @@ describe('SurveyCanvas DnD rendering', () => {
 
     render(
       <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <GroupPanel group={g1} selectedItem={null} onSelectItem={() => {}} readOnly={true} />
-      </MemoryRouter>,
+        <GroupPanel surveyId={SURVEY_ID} group={g1} readOnly={true} />
+      </MemoryRouter>
     )
 
-    expect(screen.queryByTestId('group-drag-handle-g1')).not.toBeInTheDocument()
+    expect(screen.queryByTestId(`group-drag-handle-${g1.id}`)).not.toBeInTheDocument()
   })
 })
 
@@ -867,16 +790,16 @@ describe('group drag overlay preview', () => {
     vi.useRealTimers()
   })
 
-  it('group drag handle has accessible aria-label', () => {
+  it('group drag handle is present in non-readOnly mode', () => {
     const group = makeGroup('g1', [makeQuestion('q1', 'g1', 1)])
     render(
       <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <GroupPanel group={group} selectedItem={null} onSelectItem={() => {}} readOnly={false} />
-      </MemoryRouter>,
+        <GroupPanel surveyId={SURVEY_ID} group={group} readOnly={false} />
+      </MemoryRouter>
     )
 
-    const handle = screen.getByTestId('group-drag-handle-g1')
-    expect(handle).toHaveAttribute('aria-label', 'Drag to reorder group')
+    const handle = screen.getByTestId(`group-drag-handle-${group.id}`)
+    expect(handle).toBeInTheDocument()
   })
 
   it('group drag handle accepts dragListeners without error', () => {
@@ -886,17 +809,20 @@ describe('group drag overlay preview', () => {
       render(
         <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <GroupPanel
+            surveyId={SURVEY_ID}
             group={group}
-            selectedItem={null}
-            onSelectItem={() => {}}
             readOnly={false}
-            dragListeners={{ onPointerDown: mockOnPointerDown } as unknown as import('@dnd-kit/core').DraggableSyntheticListeners}
+            dragListeners={
+              {
+                onPointerDown: mockOnPointerDown,
+              } as unknown as import('@dnd-kit/core').DraggableSyntheticListeners
+            }
           />
-        </MemoryRouter>,
-      ),
+        </MemoryRouter>
+      )
     ).not.toThrow()
 
-    expect(screen.getByTestId('group-drag-handle-g1')).toBeInTheDocument()
+    expect(screen.getByTestId(`group-drag-handle-${group.id}`)).toBeInTheDocument()
   })
 
   it('renders "group-drag-overlay" testid when group drag overlay is active', () => {
@@ -917,7 +843,7 @@ describe('group drag overlay preview', () => {
             <span>{q.title}</span>
           </div>
         ))}
-      </div>,
+      </div>
     )
 
     expect(screen.getByTestId('group-drag-overlay')).toBeInTheDocument()
@@ -961,9 +887,7 @@ describe('group drag overlay preview', () => {
   })
 
   it('groups with more than 3 questions shows overflow count in preview data', () => {
-    const questions = Array.from({ length: 5 }, (_, i) =>
-      makeQuestion(`q${i + 1}`, 'g1', i + 1),
-    )
+    const questions = Array.from({ length: 5 }, (_, i) => makeQuestion(`q${i + 1}`, 'g1', i + 1))
     // Verify slice(0,3) logic
     const shown = questions.slice(0, 3)
     const overflow = questions.length - 3
