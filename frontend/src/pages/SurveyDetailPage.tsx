@@ -109,6 +109,7 @@ function SurveyDetailPage() {
     setModalLoading(true); setModalError(null)
     try {
       const cloned = await surveyService.cloneSurvey(survey.id)
+      closeModal()
       navigate(`/surveys/${cloned.id}`)
     } catch (err) {
       setModalError(err instanceof ApiError ? err.message : 'Failed to clone survey. Please try again.')
