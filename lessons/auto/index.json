@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-08T21:03:36.684Z",
+  "lastUpdated": "2026-04-08T21:08:50.358Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3645,6 +3645,28 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md",
+      "ticketId": "ISS-189",
+      "title": "ISS-185 not fixed: alembic upgrade head still fails with quota_action enum conflict",
+      "date": "2026-04-08",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -3825,7 +3847,8 @@
       "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
       "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
       "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md",
-      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md"
+      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
+      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3987,7 +4010,8 @@
       "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
       "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
       "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md",
-      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md"
+      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
+      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4113,7 +4137,8 @@
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
       "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
       "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md",
-      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md"
+      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
+      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4287,7 +4312,8 @@
       "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
       "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
       "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md",
-      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md"
+      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
+      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4509,7 +4535,8 @@
       "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
       "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
       "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md",
-      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md"
+      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
+      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4684,7 +4711,8 @@
       "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
       "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
       "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md",
-      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md"
+      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
+      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4769,7 +4797,8 @@
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
       "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
       "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md",
-      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md"
+      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
+      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4829,7 +4858,8 @@
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
       "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
       "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md",
-      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md"
+      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
+      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4960,7 +4990,8 @@
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
       "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
       "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
-      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md"
+      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
+      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5128,7 +5159,8 @@
       "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
       "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
       "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md",
-      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md"
+      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
+      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -5247,7 +5279,8 @@
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
       "2026-04-08-iss-184-responseservice-uses-apiclient-with-auth-intercept.md",
       "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
-      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md"
+      "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
+      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
