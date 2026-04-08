@@ -26,6 +26,7 @@ function renderDashboard() {
         <Routes>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/surveys/new" element={<LocationDisplay />} />
+          <Route path="/surveys/:id" element={<LocationDisplay />} />
         </Routes>
       </AuthProvider>
     </MemoryRouter>,
@@ -189,6 +190,23 @@ describe('DashboardPage', () => {
 
       const location = await screen.findByTestId('location')
       expect(location.textContent).toBe('/surveys/new')
+    })
+
+    it('navigates to /surveys/:id when a survey card is clicked', async () => {
+      renderDashboard()
+
+      await waitFor(() => {
+        expect(screen.getByText('Customer Satisfaction Survey')).toBeInTheDocument()
+      })
+
+      const user = userEvent.setup()
+      const surveyCard = screen.getByRole('button', { name: /open survey: customer satisfaction survey/i })
+      await act(async () => {
+        await user.click(surveyCard)
+      })
+
+      const location = await screen.findByTestId('location')
+      expect(location.textContent).toBe('/surveys/10000000-0000-0000-0000-000000000001')
     })
   })
 

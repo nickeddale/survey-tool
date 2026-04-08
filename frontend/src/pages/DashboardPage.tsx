@@ -50,7 +50,7 @@ function StatCard({ label, value }: { label: string; value: number }) {
 // Survey card
 // ---------------------------------------------------------------------------
 
-function SurveyCard({ survey }: { survey: SurveyResponse }) {
+function SurveyCard({ survey, onClick }: { survey: SurveyResponse; onClick: () => void }) {
   const updatedDate = new Date(survey.updated_at).toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'short',
@@ -58,7 +58,14 @@ function SurveyCard({ survey }: { survey: SurveyResponse }) {
   })
 
   return (
-    <Card>
+    <Card
+      className="cursor-pointer hover:bg-accent transition-colors"
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && onClick()}
+      aria-label={`Open survey: ${survey.title}`}
+    >
       <CardContent className="px-4 py-3 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 min-w-0">
           <StatusBadge status={survey.status} />
@@ -162,7 +169,7 @@ function DashboardPage() {
             ) : (
               <div className="space-y-2">
                 {recentSurveys.map((survey) => (
-                  <SurveyCard key={survey.id} survey={survey} />
+                  <SurveyCard key={survey.id} survey={survey} onClick={() => navigate(`/surveys/${survey.id}`)} />
                 ))}
               </div>
             )}
