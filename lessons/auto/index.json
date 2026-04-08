@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-08T09:17:48.525Z",
+  "lastUpdated": "2026-04-08T09:22:46.303Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3412,6 +3412,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md",
+      "ticketId": "ISS-176",
+      "title": "ISS-165 regression: yes_no question type shows 'Unsupported question type'",
+      "date": "2026-04-08",
+      "categories": [
+        "testing",
+        "ui",
+        "bug-fix",
+        "feature",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -3580,7 +3596,8 @@
       "2026-04-08-iss-172-dashboard-survey-cards-are-not-clickablenavigable.md",
       "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
       "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md",
-      "2026-04-08-iss-173-clone-dialog-stays-open-after-successful-clone-nav.md"
+      "2026-04-08-iss-173-clone-dialog-stays-open-after-successful-clone-nav.md",
+      "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4013,7 +4030,8 @@
       "2026-04-08-iss-172-dashboard-survey-cards-are-not-clickablenavigable.md",
       "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
       "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md",
-      "2026-04-08-iss-173-clone-dialog-stays-open-after-successful-clone-nav.md"
+      "2026-04-08-iss-173-clone-dialog-stays-open-after-successful-clone-nav.md",
+      "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4221,7 +4239,8 @@
       "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md",
       "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
       "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md",
-      "2026-04-08-iss-173-clone-dialog-stays-open-after-successful-clone-nav.md"
+      "2026-04-08-iss-173-clone-dialog-stays-open-after-successful-clone-nav.md",
+      "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4384,7 +4403,8 @@
       "2026-04-08-iss-172-dashboard-survey-cards-are-not-clickablenavigable.md",
       "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
       "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md",
-      "2026-04-08-iss-173-clone-dialog-stays-open-after-successful-clone-nav.md"
+      "2026-04-08-iss-173-clone-dialog-stays-open-after-successful-clone-nav.md",
+      "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4801,7 +4821,8 @@
       "2026-04-08-iss-172-dashboard-survey-cards-are-not-clickablenavigable.md",
       "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
       "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md",
-      "2026-04-08-iss-173-clone-dialog-stays-open-after-successful-clone-nav.md"
+      "2026-04-08-iss-173-clone-dialog-stays-open-after-successful-clone-nav.md",
+      "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",

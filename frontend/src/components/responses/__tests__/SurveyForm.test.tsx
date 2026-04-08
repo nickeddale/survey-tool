@@ -382,6 +382,52 @@ describe('single-page mode', () => {
 })
 
 // ---------------------------------------------------------------------------
+// yes_no question type regression (ISS-176)
+// ---------------------------------------------------------------------------
+
+describe('yes_no question type', () => {
+  it('renders BooleanInput for yes_no questions (not the unsupported fallback)', () => {
+    const yesNoSurvey: SurveyFullResponse = {
+      ...mockSurvey,
+      groups: [
+        {
+          id: 'g-yn',
+          survey_id: 'survey-1',
+          title: 'Yes/No Group',
+          description: null,
+          sort_order: 1,
+          relevance: null,
+          created_at: '2024-01-01T00:00:00Z',
+          questions: [
+            {
+              id: 'q-yn',
+              group_id: 'g-yn',
+              parent_id: null,
+              question_type: 'yes_no',
+              code: 'QYN',
+              title: 'Do you agree?',
+              description: null,
+              is_required: false,
+              sort_order: 1,
+              relevance: null,
+              validation: null,
+              settings: null,
+              created_at: '2024-01-01T00:00:00Z',
+              subquestions: [],
+              answer_options: [],
+            },
+          ],
+        },
+      ],
+    }
+    renderForm({ survey: yesNoSurvey })
+
+    expect(screen.getByTestId('boolean-input-q-yn')).toBeInTheDocument()
+    expect(screen.queryByTestId('unknown-question-type')).not.toBeInTheDocument()
+  })
+})
+
+// ---------------------------------------------------------------------------
 // single_choice question type regression (ISS-165)
 // ---------------------------------------------------------------------------
 
