@@ -218,6 +218,7 @@ function QuestionInput({ question, value, errors, onChange }: QuestionInputProps
           errors={errors}
         />
       )
+    case 'yes_no':
     case 'boolean':
       return (
         <BooleanInput
