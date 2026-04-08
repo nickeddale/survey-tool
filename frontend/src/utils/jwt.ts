@@ -43,8 +43,10 @@ export function getTokenExpiry(token: string): number | null {
 /**
  * Returns true if the token will expire within the given threshold (seconds).
  * Treats malformed tokens as expired.
+ * Default threshold is 30 seconds — reduced from 60 to avoid constant proactive
+ * refresh calls during the last minute of token validity (ISS-183).
  */
-export function isTokenExpiringSoon(token: string, thresholdSeconds = 60): boolean {
+export function isTokenExpiringSoon(token: string, thresholdSeconds = 30): boolean {
   const exp = getTokenExpiry(token)
   if (exp == null) return true
   const nowSeconds = Math.floor(Date.now() / 1000)
