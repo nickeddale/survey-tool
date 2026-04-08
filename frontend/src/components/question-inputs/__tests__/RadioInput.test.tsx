@@ -131,11 +131,11 @@ describe('RadioInput — rendering', () => {
 
   it('marks the selected radio option as checked', () => {
     const options = [
-      makeOption({ id: 'opt-1', title: 'A' }),
-      makeOption({ id: 'opt-2', title: 'B' }),
+      makeOption({ id: 'opt-1', code: 'O1', title: 'A' }),
+      makeOption({ id: 'opt-2', code: 'O2', title: 'B' }),
     ]
     const question = makeQuestion({ answer_options: options })
-    render(<RadioInput value="opt-1" onChange={vi.fn()} question={question} />)
+    render(<RadioInput value="O1" onChange={vi.fn()} question={question} />)
     expect(screen.getByTestId('radio-input-opt-1')).toBeChecked()
     expect(screen.getByTestId('radio-input-opt-2')).not.toBeChecked()
   })
@@ -146,10 +146,10 @@ describe('RadioInput — rendering', () => {
 // ---------------------------------------------------------------------------
 
 describe('RadioInput — onChange', () => {
-  it('calls onChange with option id when radio is selected', async () => {
+  it('calls onChange with option code when radio is selected', async () => {
     const user = userEvent.setup()
     const onChange = vi.fn()
-    const options = [makeOption({ id: 'opt-1', title: 'A' })]
+    const options = [makeOption({ id: 'opt-1', code: 'O1', title: 'A' })]
     const question = makeQuestion({ answer_options: options })
     render(<RadioInput value="" onChange={onChange} question={question} />)
 
@@ -157,7 +157,7 @@ describe('RadioInput — onChange', () => {
       await user.click(screen.getByTestId('radio-input-opt-1'))
     })
 
-    expect(onChange).toHaveBeenCalledWith('opt-1')
+    expect(onChange).toHaveBeenCalledWith('O1')
   })
 
   it('calls onChange with __other__ when Other is selected', async () => {

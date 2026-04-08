@@ -189,21 +189,21 @@ describe('DropdownInput — searchable filter', () => {
 // ---------------------------------------------------------------------------
 
 describe('DropdownInput — onChange', () => {
-  it('calls onChange with option id when selected', async () => {
+  it('calls onChange with option code when selected', async () => {
     const user = userEvent.setup()
     const onChange = vi.fn()
     const options = [
-      makeOption({ id: 'opt-1', title: 'Alpha' }),
-      makeOption({ id: 'opt-2', title: 'Beta' }),
+      makeOption({ id: 'opt-1', code: 'O1', title: 'Alpha' }),
+      makeOption({ id: 'opt-2', code: 'O2', title: 'Beta' }),
     ]
     const question = makeQuestion({ answer_options: options })
     render(<DropdownInput value="" onChange={onChange} question={question} />)
 
     await act(async () => {
-      await user.selectOptions(screen.getByTestId('dropdown-select'), 'opt-1')
+      await user.selectOptions(screen.getByTestId('dropdown-select'), 'O1')
     })
 
-    expect(onChange).toHaveBeenCalledWith('opt-1')
+    expect(onChange).toHaveBeenCalledWith('O1')
   })
 
   it('calls onChange with __other__ when Other option is selected', async () => {

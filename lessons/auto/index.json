@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-08T19:15:15.310Z",
+  "lastUpdated": "2026-04-08T20:44:10.662Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3585,6 +3585,24 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
+      "ticketId": "ISS-186",
+      "title": "Survey submission 422: answer format mismatches between frontend and backend",
+      "date": "2026-04-08",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -3762,7 +3780,8 @@
       "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md",
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
       "2026-04-08-iss-184-responseservice-uses-apiclient-with-auth-intercept.md",
-      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md"
+      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
+      "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3921,7 +3940,8 @@
       "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md",
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
       "2026-04-08-iss-184-responseservice-uses-apiclient-with-auth-intercept.md",
-      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md"
+      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
+      "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4216,7 +4236,8 @@
       "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md",
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
       "2026-04-08-iss-184-responseservice-uses-apiclient-with-auth-intercept.md",
-      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md"
+      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
+      "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4435,7 +4456,8 @@
       "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md",
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
       "2026-04-08-iss-184-responseservice-uses-apiclient-with-auth-intercept.md",
-      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md"
+      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
+      "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4607,7 +4629,8 @@
       "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md",
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
       "2026-04-08-iss-184-responseservice-uses-apiclient-with-auth-intercept.md",
-      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md"
+      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
+      "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4877,7 +4900,8 @@
       "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
       "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
-      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md"
+      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
+      "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5042,7 +5066,8 @@
       "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md",
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
       "2026-04-08-iss-184-responseservice-uses-apiclient-with-auth-intercept.md",
-      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md"
+      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
+      "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",

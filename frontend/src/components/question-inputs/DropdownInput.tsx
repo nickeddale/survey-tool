@@ -119,7 +119,7 @@ export function DropdownInput({ value, onChange, question, errors: externalError
           {placeholder}
         </option>
         {filteredOptions.map((option) => (
-          <option key={option.id} value={option.id} data-testid={`dropdown-option-${option.id}`}>
+          <option key={option.id} value={option.code} data-testid={`dropdown-option-${option.id}`}>
             {option.title}
           </option>
         ))}
