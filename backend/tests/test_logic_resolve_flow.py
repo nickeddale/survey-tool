@@ -4,12 +4,12 @@ Covers:
 - Unauthenticated request → 200 (public endpoint, no auth required)
 - Survey not found → 404
 - Invalid survey_id format → 404
-- from_question referencing unknown question code → 404
+- current_question_id referencing unknown question id → 404
 - Circular relevance expression → 422
-- Basic forward navigation (from_question provided)
+- Basic forward navigation (current_question_id provided)
 - Backward navigation
-- from_question=None returns first visible question
-- End of survey: next_question is null
+- current_question_id=None returns first visible question
+- End of survey: next_question_id is null
 - Hidden questions skipped in navigation
 - visible_questions / hidden_questions populated correctly
 - visible_groups / hidden_groups populated correctly
@@ -112,6 +112,11 @@ def resolve_url(survey_id: str) -> str:
     return f"{SURVEYS_URL}/{survey_id}/logic/resolve-flow"
 
 
+def answer_input(question_id: str, value: object) -> dict:
+    """Build a single answer input object in the format the API expects."""
+    return {"question_id": question_id, "value": value}
+
+
 # --------------------------------------------------------------------------- #
 # Authentication / Authorization
 # --------------------------------------------------------------------------- #
@@ -124,19 +129,19 @@ async def test_unauthenticated_request_returns_200(client: AsyncClient):
     headers = await auth_headers(client)
     survey_id = await create_survey(client, headers)
     group_id = await create_group(client, headers, survey_id)
-    await create_question(client, headers, survey_id, group_id, code="Q1", sort_order=1)
+    q1 = await create_question(client, headers, survey_id, group_id, code="Q1", sort_order=1)
 
     # Call without any auth headers
     response = await client.post(
         resolve_url(survey_id),
-        json={"answers": {}},
+        json={"answers": []},
     )
     assert response.status_code == 200
     body = response.json()
-    assert "next_question" in body
+    assert "next_question_id" in body
     assert "visible_questions" in body
     assert "hidden_questions" in body
-    assert body["next_question"] == "Q1"
+    assert body["next_question_id"] == q1["id"]
 
 
 @pytest.mark.asyncio
@@ -145,7 +150,7 @@ async def test_survey_not_found_returns_404(client: AsyncClient):
     headers = await auth_headers(client)
     response = await client.post(
         resolve_url("00000000-0000-0000-0000-000000000001"),
-        json={"answers": {}},
+        json={"answers": []},
         headers=headers,
     )
     assert response.status_code == 404
@@ -160,12 +165,12 @@ async def test_survey_owned_by_other_user_returns_200(client: AsyncClient):
     headers_other = await auth_headers(client, email=_unique_email("other"))
     response = await client.post(
         resolve_url(survey_id),
-        json={"answers": {}},
+        json={"answers": []},
         headers=headers_other,
     )
     assert response.status_code == 200
     body = response.json()
-    assert "next_question" in body
+    assert "next_question_id" in body
 
 
 @pytest.mark.asyncio
@@ -174,20 +179,20 @@ async def test_invalid_survey_id_format_returns_404(client: AsyncClient):
     headers = await auth_headers(client)
     response = await client.post(
         f"{SURVEYS_URL}/not-a-uuid/logic/resolve-flow",
-        json={"answers": {}},
+        json={"answers": []},
         headers=headers,
     )
     assert response.status_code == 404
 
 
 # --------------------------------------------------------------------------- #
-# Invalid from_question
+# Invalid current_question_id
 # --------------------------------------------------------------------------- #
 
 
 @pytest.mark.asyncio
-async def test_unknown_from_question_returns_404(client: AsyncClient):
-    """from_question referencing a non-existent code → 404."""
+async def test_unknown_current_question_id_returns_404(client: AsyncClient):
+    """current_question_id referencing a non-existent UUID → 404."""
     headers = await auth_headers(client)
     survey_id = await create_survey(client, headers)
     group_id = await create_group(client, headers, survey_id)
@@ -195,7 +200,7 @@ async def test_unknown_from_question_returns_404(client: AsyncClient):
 
     response = await client.post(
         resolve_url(survey_id),
-        json={"answers": {}, "from_question": "DOES_NOT_EXIST"},
+        json={"answers": [], "current_question_id": "00000000-0000-0000-0000-000000000099"},
         headers=headers,
     )
     assert response.status_code == 404
@@ -216,12 +221,12 @@ async def test_response_has_required_fields(client: AsyncClient):
 
     response = await client.post(
         resolve_url(survey_id),
-        json={"answers": {}},
+        json={"answers": []},
         headers=headers,
     )
     assert response.status_code == 200
     body = response.json()
-    assert "next_question" in body
+    assert "next_question_id" in body
     assert "visible_questions" in body
     assert "hidden_questions" in body
     assert "visible_groups" in body
@@ -238,43 +243,43 @@ async def test_response_has_required_fields(client: AsyncClient):
 
 
 # --------------------------------------------------------------------------- #
-# from_question=None → first visible question
+# current_question_id=None → first visible question
 # --------------------------------------------------------------------------- #
 
 
 @pytest.mark.asyncio
-async def test_no_from_question_returns_first_visible(client: AsyncClient):
-    """When from_question is None, next_question is the first visible question."""
+async def test_no_current_question_id_returns_first_visible(client: AsyncClient):
+    """When current_question_id is None, next_question_id is the first visible question."""
     headers = await auth_headers(client)
     survey_id = await create_survey(client, headers)
     group_id = await create_group(client, headers, survey_id)
-    await create_question(client, headers, survey_id, group_id, code="Q1", sort_order=1)
+    q1 = await create_question(client, headers, survey_id, group_id, code="Q1", sort_order=1)
     await create_question(client, headers, survey_id, group_id, code="Q2", sort_order=2)
 
     response = await client.post(
         resolve_url(survey_id),
-        json={"answers": {}},
+        json={"answers": []},
         headers=headers,
     )
     assert response.status_code == 200
     body = response.json()
-    assert body["next_question"] == "Q1"
+    assert body["next_question_id"] == q1["id"]
 
 
 @pytest.mark.asyncio
-async def test_no_from_question_empty_survey_returns_null(client: AsyncClient):
-    """Survey with no questions → next_question is null."""
+async def test_no_current_question_id_empty_survey_returns_null(client: AsyncClient):
+    """Survey with no questions → next_question_id is null."""
     headers = await auth_headers(client)
     survey_id = await create_survey(client, headers)
 
     response = await client.post(
         resolve_url(survey_id),
-        json={"answers": {}},
+        json={"answers": []},
         headers=headers,
     )
     assert response.status_code == 200
     body = response.json()
-    assert body["next_question"] is None
+    assert body["next_question_id"] is None
 
 
 # --------------------------------------------------------------------------- #
@@ -284,41 +289,41 @@ async def test_no_from_question_empty_survey_returns_null(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_forward_navigation_returns_next_question(client: AsyncClient):
-    """from_question=Q1, direction=forward → next_question=Q2."""
+    """current_question_id=Q1, direction=forward → next_question_id=Q2."""
     headers = await auth_headers(client)
     survey_id = await create_survey(client, headers)
     group_id = await create_group(client, headers, survey_id)
-    await create_question(client, headers, survey_id, group_id, code="Q1", sort_order=1)
-    await create_question(client, headers, survey_id, group_id, code="Q2", sort_order=2)
+    q1 = await create_question(client, headers, survey_id, group_id, code="Q1", sort_order=1)
+    q2 = await create_question(client, headers, survey_id, group_id, code="Q2", sort_order=2)
     await create_question(client, headers, survey_id, group_id, code="Q3", sort_order=3)
 
     response = await client.post(
         resolve_url(survey_id),
-        json={"answers": {}, "from_question": "Q1", "direction": "forward"},
+        json={"answers": [], "current_question_id": q1["id"], "direction": "forward"},
         headers=headers,
     )
     assert response.status_code == 200
     body = response.json()
-    assert body["next_question"] == "Q2"
+    assert body["next_question_id"] == q2["id"]
 
 
 @pytest.mark.asyncio
 async def test_forward_at_last_question_returns_null(client: AsyncClient):
-    """from_question=last question, direction=forward → next_question is null."""
+    """current_question_id=last question, direction=forward → next_question_id is null."""
     headers = await auth_headers(client)
     survey_id = await create_survey(client, headers)
     group_id = await create_group(client, headers, survey_id)
     await create_question(client, headers, survey_id, group_id, code="Q1", sort_order=1)
-    await create_question(client, headers, survey_id, group_id, code="Q2", sort_order=2)
+    q2 = await create_question(client, headers, survey_id, group_id, code="Q2", sort_order=2)
 
     response = await client.post(
         resolve_url(survey_id),
-        json={"answers": {}, "from_question": "Q2", "direction": "forward"},
+        json={"answers": [], "current_question_id": q2["id"], "direction": "forward"},
         headers=headers,
     )
     assert response.status_code == 200
     body = response.json()
-    assert body["next_question"] is None
+    assert body["next_question_id"] is None
 
 
 # --------------------------------------------------------------------------- #
@@ -328,41 +333,41 @@ async def test_forward_at_last_question_returns_null(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_backward_navigation_returns_previous_question(client: AsyncClient):
-    """from_question=Q3, direction=backward → next_question=Q2."""
+    """current_question_id=Q3, direction=backward → next_question_id=Q2."""
     headers = await auth_headers(client)
     survey_id = await create_survey(client, headers)
     group_id = await create_group(client, headers, survey_id)
     await create_question(client, headers, survey_id, group_id, code="Q1", sort_order=1)
-    await create_question(client, headers, survey_id, group_id, code="Q2", sort_order=2)
-    await create_question(client, headers, survey_id, group_id, code="Q3", sort_order=3)
+    q2 = await create_question(client, headers, survey_id, group_id, code="Q2", sort_order=2)
+    q3 = await create_question(client, headers, survey_id, group_id, code="Q3", sort_order=3)
 
     response = await client.post(
         resolve_url(survey_id),
-        json={"answers": {}, "from_question": "Q3", "direction": "backward"},
+        json={"answers": [], "current_question_id": q3["id"], "direction": "backward"},
         headers=headers,
     )
     assert response.status_code == 200
     body = response.json()
-    assert body["next_question"] == "Q2"
+    assert body["next_question_id"] == q2["id"]
 
 
 @pytest.mark.asyncio
 async def test_backward_at_first_question_returns_null(client: AsyncClient):
-    """from_question=first question, direction=backward → next_question is null."""
+    """current_question_id=first question, direction=backward → next_question_id is null."""
     headers = await auth_headers(client)
     survey_id = await create_survey(client, headers)
     group_id = await create_group(client, headers, survey_id)
-    await create_question(client, headers, survey_id, group_id, code="Q1", sort_order=1)
+    q1 = await create_question(client, headers, survey_id, group_id, code="Q1", sort_order=1)
     await create_question(client, headers, survey_id, group_id, code="Q2", sort_order=2)
 
     response = await client.post(
         resolve_url(survey_id),
-        json={"answers": {}, "from_question": "Q1", "direction": "backward"},
+        json={"answers": [], "current_question_id": q1["id"], "direction": "backward"},
         headers=headers,
     )
     assert response.status_code == 200
     body = response.json()
-    assert body["next_question"] is None
+    assert body["next_question_id"] is None
 
 
 # --------------------------------------------------------------------------- #
@@ -376,23 +381,27 @@ async def test_hidden_question_skipped_in_forward_navigation(client: AsyncClient
     headers = await auth_headers(client)
     survey_id = await create_survey(client, headers)
     group_id = await create_group(client, headers, survey_id)
-    await create_question(client, headers, survey_id, group_id, code="Q1", sort_order=1)
+    q1 = await create_question(client, headers, survey_id, group_id, code="Q1", sort_order=1)
     # Q2 is hidden when Q1 != 'yes'
     await create_question(
         client, headers, survey_id, group_id, code="Q2", sort_order=2,
         relevance="{Q1} == 'yes'",
     )
-    await create_question(client, headers, survey_id, group_id, code="Q3", sort_order=3)
+    q3 = await create_question(client, headers, survey_id, group_id, code="Q3", sort_order=3)
 
     # With Q1 = 'no', Q2 is hidden → skip from Q1 to Q3
     response = await client.post(
         resolve_url(survey_id),
-        json={"answers": {"Q1": "no"}, "from_question": "Q1", "direction": "forward"},
+        json={
+            "answers": [answer_input(q1["id"], "no")],
+            "current_question_id": q1["id"],
+            "direction": "forward",
+        },
         headers=headers,
     )
     assert response.status_code == 200
     body = response.json()
-    assert body["next_question"] == "Q3"
+    assert body["next_question_id"] == q3["id"]
 
 
 @pytest.mark.asyncio
@@ -401,25 +410,25 @@ async def test_visible_and_hidden_questions_populated(client: AsyncClient):
     headers = await auth_headers(client)
     survey_id = await create_survey(client, headers)
     group_id = await create_group(client, headers, survey_id)
-    await create_question(client, headers, survey_id, group_id, code="Q1", sort_order=1)
-    await create_question(
+    q1 = await create_question(client, headers, survey_id, group_id, code="Q1", sort_order=1)
+    q2 = await create_question(
         client, headers, survey_id, group_id, code="Q2", sort_order=2,
         relevance="{Q1} == 'yes'",
     )
-    await create_question(client, headers, survey_id, group_id, code="Q3", sort_order=3)
+    q3 = await create_question(client, headers, survey_id, group_id, code="Q3", sort_order=3)
 
     response = await client.post(
         resolve_url(survey_id),
-        json={"answers": {"Q1": "no"}},
+        json={"answers": [answer_input(q1["id"], "no")]},
         headers=headers,
     )
     assert response.status_code == 200
     body = response.json()
 
-    assert "Q1" in body["visible_questions"]
-    assert "Q3" in body["visible_questions"]
-    assert "Q2" in body["hidden_questions"]
-    assert "Q2" not in body["visible_questions"]
+    assert q1["id"] in body["visible_questions"]
+    assert q3["id"] in body["visible_questions"]
+    assert q2["id"] in body["hidden_questions"]
+    assert q2["id"] not in body["visible_questions"]
 
 
 @pytest.mark.asyncio
@@ -432,7 +441,7 @@ async def test_visible_groups_populated(client: AsyncClient):
 
     response = await client.post(
         resolve_url(survey_id),
-        json={"answers": {}},
+        json={"answers": []},
         headers=headers,
     )
     assert response.status_code == 200
@@ -456,13 +465,13 @@ async def test_piped_texts_populated(client: AsyncClient):
     headers = await auth_headers(client)
     survey_id = await create_survey(client, headers)
     group_id = await create_group(client, headers, survey_id)
-    await create_question(
+    q1 = await create_question(
         client, headers, survey_id, group_id, code="Q1", sort_order=1, title="Hello {Q1}!"
     )
 
     response = await client.post(
         resolve_url(survey_id),
-        json={"answers": {"Q1": "World"}},
+        json={"answers": [answer_input(q1["id"], "World")]},
         headers=headers,
     )
     assert response.status_code == 200
@@ -485,7 +494,7 @@ async def test_piped_texts_empty_when_no_placeholders(client: AsyncClient):
 
     response = await client.post(
         resolve_url(survey_id),
-        json={"answers": {}},
+        json={"answers": []},
         headers=headers,
     )
     assert response.status_code == 200
@@ -504,29 +513,29 @@ async def test_validation_results_populated_for_all_questions(client: AsyncClien
     headers = await auth_headers(client)
     survey_id = await create_survey(client, headers)
     group_id = await create_group(client, headers, survey_id)
-    await create_question(client, headers, survey_id, group_id, code="Q1", sort_order=1)
-    await create_question(
+    q1 = await create_question(client, headers, survey_id, group_id, code="Q1", sort_order=1)
+    q2 = await create_question(
         client, headers, survey_id, group_id, code="Q2", sort_order=2,
         relevance="{Q1} == 'yes'",
     )
 
     response = await client.post(
         resolve_url(survey_id),
-        json={"answers": {}},
+        json={"answers": []},
         headers=headers,
     )
     assert response.status_code == 200
     body = response.json()
 
-    assert "Q1" in body["validation_results"]
-    assert "Q2" in body["validation_results"]
+    assert q1["id"] in body["validation_results"]
+    assert q2["id"] in body["validation_results"]
 
     # Q1 has no relevance expression → empty errors/warnings
-    assert body["validation_results"]["Q1"]["errors"] == []
+    assert body["validation_results"][q1["id"]]["errors"] == []
 
     # Q2 has a valid relevance expression using Q1 → no errors
-    assert body["validation_results"]["Q2"]["errors"] == []
-    assert "Q1" in body["validation_results"]["Q2"]["parsed_variables"]
+    assert body["validation_results"][q2["id"]]["errors"] == []
+    assert "Q1" in body["validation_results"][q2["id"]]["parsed_variables"]
 
 
 # --------------------------------------------------------------------------- #
@@ -552,7 +561,7 @@ async def test_circular_relevance_returns_422(client: AsyncClient):
 
     response = await client.post(
         resolve_url(survey_id),
-        json={"answers": {}},
+        json={"answers": []},
         headers=headers,
     )
     assert response.status_code == 422
@@ -569,17 +578,17 @@ async def test_default_direction_is_forward(client: AsyncClient):
     headers = await auth_headers(client)
     survey_id = await create_survey(client, headers)
     group_id = await create_group(client, headers, survey_id)
-    await create_question(client, headers, survey_id, group_id, code="Q1", sort_order=1)
-    await create_question(client, headers, survey_id, group_id, code="Q2", sort_order=2)
+    q1 = await create_question(client, headers, survey_id, group_id, code="Q1", sort_order=1)
+    q2 = await create_question(client, headers, survey_id, group_id, code="Q2", sort_order=2)
 
     response = await client.post(
         resolve_url(survey_id),
-        json={"answers": {}, "from_question": "Q1"},  # no direction
+        json={"answers": [], "current_question_id": q1["id"]},  # no direction
         headers=headers,
     )
     assert response.status_code == 200
     body = response.json()
-    assert body["next_question"] == "Q2"
+    assert body["next_question_id"] == q2["id"]
 
 
 # --------------------------------------------------------------------------- #
@@ -594,14 +603,14 @@ async def test_navigation_across_groups(client: AsyncClient):
     survey_id = await create_survey(client, headers)
     group1_id = await create_group(client, headers, survey_id, title="Group 1", sort_order=1)
     group2_id = await create_group(client, headers, survey_id, title="Group 2", sort_order=2)
-    await create_question(client, headers, survey_id, group1_id, code="Q1", sort_order=1)
-    await create_question(client, headers, survey_id, group2_id, code="Q2", sort_order=1)
+    q1 = await create_question(client, headers, survey_id, group1_id, code="Q1", sort_order=1)
+    q2 = await create_question(client, headers, survey_id, group2_id, code="Q2", sort_order=1)
 
     response = await client.post(
         resolve_url(survey_id),
-        json={"answers": {}, "from_question": "Q1", "direction": "forward"},
+        json={"answers": [], "current_question_id": q1["id"], "direction": "forward"},
         headers=headers,
     )
     assert response.status_code == 200
     body = response.json()
-    assert body["next_question"] == "Q2"
+    assert body["next_question_id"] == q2["id"]
