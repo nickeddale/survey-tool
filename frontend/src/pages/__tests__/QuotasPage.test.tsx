@@ -261,6 +261,14 @@ describe('QuotasPage', () => {
       await act(async () => {
         await user.type(screen.getByTestId('quota-name-input'), 'Test Quota')
         await user.type(screen.getByTestId('quota-limit-input'), '200')
+        // Add a condition (required — empty conditions are rejected by frontend validation)
+        await user.click(screen.getByTestId('add-condition-button'))
+      })
+
+      // Select a question for the condition
+      const questionSelect = screen.getByLabelText('Condition 1 question')
+      await act(async () => {
+        await user.selectOptions(questionSelect, 'q1')
       })
 
       await act(async () => {

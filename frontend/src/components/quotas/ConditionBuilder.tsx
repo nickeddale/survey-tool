@@ -77,7 +77,7 @@ function ConditionBuilder({ conditions, questions, onChange }: ConditionBuilderP
 
       {conditions.length === 0 ? (
         <p className="text-sm text-muted-foreground italic py-2">
-          No conditions — quota applies to all responses.
+          No conditions added. Add at least one condition to continue.
         </p>
       ) : (
         <div className="space-y-2" data-testid="condition-list">

@@ -89,6 +89,11 @@ function QuotaForm({
       setValidationError('Limit must be a positive integer.')
       return
     }
+    // Validate conditions: at least one condition is required
+    if (conditions.length === 0) {
+      setValidationError('At least one condition is required.')
+      return
+    }
     // Validate conditions: each must have a question selected
     const incompleteCondition = conditions.find((c) => !c.question_id)
     if (incompleteCondition) {

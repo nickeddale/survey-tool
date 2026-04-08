@@ -26,7 +26,7 @@ class QuotaCreate(BaseModel):
     @classmethod
     def conditions_non_empty(cls, v: list[QuotaCondition]) -> list[QuotaCondition]:
         if not v:
-            raise ValueError("conditions must be a non-empty list")
+            raise ValueError("conditions: at least one condition is required")
         return v
 
 
@@ -41,7 +41,7 @@ class QuotaUpdate(BaseModel):
     @classmethod
     def conditions_non_empty(cls, v: list[QuotaCondition] | None) -> list[QuotaCondition] | None:
         if v is not None and not v:
-            raise ValueError("conditions must be a non-empty list")
+            raise ValueError("conditions: at least one condition is required")
         return v
 
 

@@ -185,6 +185,30 @@ async def test_create_quota_returns_201(client: AsyncClient):
 
 
 @pytest.mark.asyncio
+async def test_create_quota_with_empty_conditions_returns_422(client: AsyncClient):
+    headers = await auth_headers(client, "quota_empty_cond@example.com")
+    survey_id = await create_survey(client, headers)
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/quotas",
+        json={
+            "name": "Empty Conditions Quota",
+            "limit": 10,
+            "action": "terminate",
+            "conditions": [],
+            "is_active": True,
+        },
+        headers=headers,
+    )
+    assert resp.status_code == 422
+    data = resp.json()
+    # FastAPI Pydantic v2 validation errors surface under 'detail' as a list
+    assert "detail" in data
+    detail_str = str(data["detail"])
+    assert "conditions" in detail_str
+
+
+@pytest.mark.asyncio
 async def test_list_quotas_returns_200_and_pagination(client: AsyncClient):
     headers = await auth_headers(client, "quota_list@example.com")
     survey_id = await create_survey(client, headers)

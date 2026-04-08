@@ -123,7 +123,7 @@ describe('QuotaForm', () => {
       expect(onCancel).toHaveBeenCalledOnce()
     })
 
-    it('calls onSubmit with correct payload when form is filled and submitted', async () => {
+    it('calls onSubmit with correct payload when form is filled and submitted with a condition', async () => {
       const user = userEvent.setup()
       const onSubmit = vi.fn().mockResolvedValue(undefined)
 
@@ -140,6 +140,14 @@ describe('QuotaForm', () => {
       await act(async () => {
         await user.type(screen.getByTestId('quota-name-input'), 'New Quota')
         await user.type(screen.getByTestId('quota-limit-input'), '150')
+        // Add a condition and select a question to satisfy validation
+        await user.click(screen.getByTestId('add-condition-button'))
+      })
+
+      // Select a question for the condition
+      const questionSelect = screen.getByLabelText('Condition 1 question')
+      await act(async () => {
+        await user.selectOptions(questionSelect, 'q1')
       })
 
       await act(async () => {
@@ -152,9 +160,33 @@ describe('QuotaForm', () => {
           limit: 150,
           action: 'terminate',
           is_active: true,
-          conditions: [],
         }),
       )
+    })
+
+    it('shows validation error when conditions list is empty on submit', async () => {
+      const user = userEvent.setup()
+      const onSubmit = vi.fn()
+
+      render(
+        <QuotaForm
+          surveyId="survey-1"
+          questions={mockQuestions}
+          quota={null}
+          onSubmit={onSubmit}
+          onCancel={vi.fn()}
+        />,
+      )
+
+      await act(async () => {
+        await user.type(screen.getByTestId('quota-name-input'), 'New Quota')
+        await user.type(screen.getByTestId('quota-limit-input'), '100')
+        await user.click(screen.getByTestId('quota-form-submit'))
+      })
+
+      expect(screen.getByTestId('quota-form-error')).toBeInTheDocument()
+      expect(screen.getByTestId('quota-form-error').textContent).toMatch(/at least one condition/i)
+      expect(onSubmit).not.toHaveBeenCalled()
     })
 
     it('shows validation error when name is empty on submit', async () => {
