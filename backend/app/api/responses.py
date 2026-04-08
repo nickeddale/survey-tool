@@ -363,6 +363,17 @@ async def update_response(
     parsed_response_id = _parse_response_id(response_id)
 
     if payload.status == "complete":
+        if payload.answers:
+            answers = [
+                {"question_id": a.question_id, "value": a.value}
+                for a in payload.answers
+            ]
+            await save_partial_response(
+                session,
+                survey_id=parsed_survey_id,
+                response_id=parsed_response_id,
+                answers=answers,
+            )
         response = await complete_response(
             session,
             survey_id=parsed_survey_id,
