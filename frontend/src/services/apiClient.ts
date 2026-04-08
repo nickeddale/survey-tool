@@ -5,11 +5,14 @@
  *   - Attaches Authorization: Bearer <access_token> from in-memory token store
  *   - Proactively refreshes if token is within 60 seconds of expiry
  *
- * Response interceptor (401 handler):
+ * Response interceptor (401/429 handler):
  *   - On 401, queues the failed request and attempts a token refresh
  *   - Uses isRefreshing flag + promise queue so concurrent 401s only trigger one refresh call
  *   - On successful refresh, drains the queue and retries all pending requests
  *   - On refresh failure, rejects all queued requests and redirects to /login
+ *   - On 429 from /auth/refresh, waits Retry-After seconds then retries once.
+ *     If the retry also 429s, rejects without redirecting (no spurious logout).
+ *   - On 429 from any other endpoint, propagates the ApiError as-is.
  *
  * Token rotation: the backend revokes the old refresh token on /auth/refresh.
  * The refresh token is stored in an httpOnly cookie — the browser sends it automatically
@@ -155,13 +158,72 @@ function isPublicRoute(): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// Response interceptor — 401 retry after refresh
+// Helpers
+// ---------------------------------------------------------------------------
+
+const REFRESH_PATH = '/auth/refresh'
+
+function isRefreshEndpoint(url: string | undefined): boolean {
+  if (!url) return false
+  return url.includes(REFRESH_PATH)
+}
+
+/**
+ * Parse the Retry-After header value (seconds integer or HTTP-date) and return
+ * the number of milliseconds to wait. Defaults to 5000 ms if absent or unparseable.
+ */
+function parseRetryAfterMs(retryAfterHeader: string | null, defaultMs = 5000): number {
+  if (!retryAfterHeader) return defaultMs
+  const seconds = parseInt(retryAfterHeader, 10)
+  if (!isNaN(seconds) && seconds >= 0) return seconds * 1000
+  // HTTP-date format
+  const date = new Date(retryAfterHeader)
+  if (!isNaN(date.getTime())) return Math.max(0, date.getTime() - Date.now())
+  return defaultMs
+}
+
+// ---------------------------------------------------------------------------
+// Response interceptor — 401/429 retry after refresh
 // ---------------------------------------------------------------------------
 
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<ApiErrorResponse>) => {
-    const originalRequest = error.config as AxiosRequestConfig & { _retried?: boolean }
+    const originalRequest = error.config as AxiosRequestConfig & {
+      _retried?: boolean
+      _refreshRateLimitRetried?: boolean
+    }
+
+    // ------------------------------------------------------------------
+    // 429 on the /auth/refresh endpoint — wait then retry once, no redirect
+    // ------------------------------------------------------------------
+    if (error.response?.status === 429 && isRefreshEndpoint(originalRequest.url)) {
+      if (originalRequest._refreshRateLimitRetried) {
+        // Already retried once after 429 — give up without redirecting
+        const { status, data } = error.response
+        const detail = data?.detail ?? { code: 'RATE_LIMITED', message: error.message }
+        return Promise.reject(new ApiError(status, detail))
+      }
+
+      originalRequest._refreshRateLimitRetried = true
+      const retryAfterMs = parseRetryAfterMs(
+        error.response.headers['retry-after'] as string | null,
+      )
+      await new Promise<void>((resolve) => setTimeout(resolve, retryAfterMs))
+
+      // Retry the refresh call directly (not via apiClient to avoid interceptor loops)
+      try {
+        const newToken = await performRefresh()
+        isRefreshing = false
+        drainQueue(newToken)
+        return newToken
+      } catch (retryErr) {
+        isRefreshing = false
+        rejectQueue(retryErr)
+        // Do NOT call redirectToLogin — rate limiting is transient, not an auth failure
+        return Promise.reject(retryErr)
+      }
+    }
 
     if (error.response?.status === 401 && !originalRequest._retried) {
       // Auth endpoints (login, register) should not trigger the refresh flow.
