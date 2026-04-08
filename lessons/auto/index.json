@@ -3446,6 +3446,24 @@
       "complexity": "medium"
     },
     {
+      "file": "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
+      "ticketId": "ISS-178",
+      "title": "Auth refresh rate limiting causes spontaneous redirects on protected pages",
+      "date": "2026-04-08",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
       "file": "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md",
       "ticketId": "ISS-180",
       "title": "Backend 500 on response completion PATCH (status: complete)",
@@ -3635,6 +3653,7 @@
       "2026-04-08-iss-173-clone-dialog-stays-open-after-successful-clone-nav.md",
       "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md",
       "2026-04-08-iss-177-closed-survey-shows-generic-404-instead-of-unavail.md",
+      "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md"
     ],
     "api": [
@@ -3788,6 +3807,7 @@
       "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
       "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md",
       "2026-04-08-iss-177-closed-survey-shows-generic-404-instead-of-unavail.md",
+      "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md"
     ],
     "database": [
@@ -4074,6 +4094,7 @@
       "2026-04-08-iss-173-clone-dialog-stays-open-after-successful-clone-nav.md",
       "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md",
       "2026-04-08-iss-177-closed-survey-shows-generic-404-instead-of-unavail.md",
+      "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md"
     ],
     "refactoring": [
@@ -4285,6 +4306,7 @@
       "2026-04-08-iss-173-clone-dialog-stays-open-after-successful-clone-nav.md",
       "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md",
       "2026-04-08-iss-177-closed-survey-shows-generic-404-instead-of-unavail.md",
+      "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md"
     ],
     "feature": [
@@ -4451,6 +4473,7 @@
       "2026-04-08-iss-173-clone-dialog-stays-open-after-successful-clone-nav.md",
       "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md",
       "2026-04-08-iss-177-closed-survey-shows-generic-404-instead-of-unavail.md",
+      "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md"
     ],
     "performance": [
@@ -4872,6 +4895,7 @@
       "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md",
       "2026-04-08-iss-173-clone-dialog-stays-open-after-successful-clone-nav.md",
       "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md",
+      "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md"
     ],
     "security": [
@@ -4984,7 +5008,8 @@
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
       "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md",
       "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
-      "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md"
+      "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md",
+      "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
