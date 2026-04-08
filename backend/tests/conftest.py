@@ -66,10 +66,17 @@ async def engine():
             " CREATE TYPE assessment_scope AS ENUM ('total', 'group');"
             " END IF; END $$"
         )
+        await conn.exec_driver_sql(
+            "DO $$ BEGIN"
+            " IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'response_status') THEN"
+            " CREATE TYPE response_status AS ENUM ('incomplete', 'complete', 'disqualified');"
+            " END IF; END $$"
+        )
         await conn.run_sync(Base.metadata.create_all)
     yield _engine
     async with _engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+        await conn.exec_driver_sql("DROP TYPE IF EXISTS response_status")
         await conn.exec_driver_sql("DROP TYPE IF EXISTS assessment_scope")
         await conn.exec_driver_sql("DROP TYPE IF EXISTS quota_action")
         await conn.exec_driver_sql("DROP TYPE IF EXISTS survey_status")
