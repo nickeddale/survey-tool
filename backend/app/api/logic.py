@@ -39,7 +39,7 @@ from app.services.expressions.flow import (
     get_previous_question,
     build_ordered_pairs,
 )
-from app.services.expressions.piping import pipe_all
+from app.services.expressions.piping import pipe_all, PipingError
 from app.services.expressions.relevance import (
     CircularRelevanceError,
     evaluate_relevance,
@@ -437,7 +437,19 @@ async def resolve_flow_endpoint(
     for group in survey.groups:
         all_questions.extend(group.questions)
 
-    piped_texts = pipe_all(all_questions, answers)
+    try:
+        piped_texts = pipe_all(all_questions, answers)
+    except (PipingError, Exception):
+        # If piping fails for any reason, fall back to unmodified question texts
+        # so the survey remains usable rather than returning a 500.
+        piped_texts = {}
+        for question in all_questions:
+            if getattr(question, "parent_id", None) is not None:
+                continue
+            piped_texts[f"{question.code}_title"] = question.title or ""
+            piped_texts[f"{question.code}_description"] = question.description or ""
+            for option in getattr(question, "answer_options", None) or []:
+                piped_texts[f"{question.code}_{option.code}_title"] = option.label or ""
 
     # ------------------------------------------------------------------
     # Validate each question's relevance expression and collect results.
