@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-08T08:55:01.851Z",
+  "lastUpdated": "2026-04-08T08:58:48.578Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3341,6 +3341,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-08-iss-172-dashboard-survey-cards-are-not-clickablenavigable.md",
+      "ticketId": "ISS-172",
+      "title": "Dashboard survey cards are not clickable/navigable",
+      "date": "2026-04-08",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "feature",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -3505,7 +3521,8 @@
       "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
       "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
       "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md",
-      "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md"
+      "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md",
+      "2026-04-08-iss-172-dashboard-survey-cards-are-not-clickablenavigable.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3653,7 +3670,8 @@
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
       "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
       "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
-      "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md"
+      "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md",
+      "2026-04-08-iss-172-dashboard-survey-cards-are-not-clickablenavigable.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3931,7 +3949,8 @@
       "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
       "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
       "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md",
-      "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md"
+      "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md",
+      "2026-04-08-iss-172-dashboard-survey-cards-are-not-clickablenavigable.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4295,7 +4314,8 @@
       "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
       "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
       "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md",
-      "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md"
+      "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md",
+      "2026-04-08-iss-172-dashboard-survey-cards-are-not-clickablenavigable.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4705,7 +4725,8 @@
       "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
       "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
       "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md",
-      "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md"
+      "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md",
+      "2026-04-08-iss-172-dashboard-survey-cards-are-not-clickablenavigable.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
