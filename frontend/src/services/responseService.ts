@@ -72,9 +72,10 @@ class ResponseService {
     responseId: string,
     answers: AnswerInput[],
   ): Promise<ResponseResponse> {
-    const response = await apiClient.patch<ResponseResponse>(
-      `/surveys/${surveyId}/responses/${responseId}`,
+    const response = await axios.patch<ResponseResponse>(
+      `${BASE_URL}/surveys/${surveyId}/responses/${responseId}`,
       { answers },
+      { headers: { 'Content-Type': 'application/json' } },
     )
     return response.data
   }
@@ -103,9 +104,10 @@ class ResponseService {
     surveyId: string,
     data: ResolveFlowRequest,
   ): Promise<ResolveFlowResponse> {
-    const response = await apiClient.post<ResolveFlowResponse>(
-      `/surveys/${surveyId}/logic/resolve-flow`,
+    const response = await axios.post<ResolveFlowResponse>(
+      `${BASE_URL}/surveys/${surveyId}/logic/resolve-flow`,
       data,
+      { headers: { 'Content-Type': 'application/json' } },
     )
     return response.data
   }
