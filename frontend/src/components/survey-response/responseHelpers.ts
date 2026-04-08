@@ -2,12 +2,29 @@ import type { AnswerInput } from '../../services/responseService'
 import type { SurveyFullResponse, QuestionGroupResponse, QuestionResponse } from '../../types/survey'
 import type { AnswerMap } from '../../hooks/useValidation'
 
-/** Convert answers map to the array format expected by the API. */
-export function answersToInput(answers: AnswerMap): AnswerInput[] {
-  return Object.entries(answers).map(([questionId, value]) => ({
-    question_id: questionId,
-    value,
-  }))
+/**
+ * Convert answers map to the array format expected by the API.
+ *
+ * @param answers - The current answer map
+ * @param questionTypeMap - Optional map of questionId → question_type for type-aware serialization
+ */
+export function answersToInput(answers: AnswerMap, questionTypeMap?: Record<string, string>): AnswerInput[] {
+  return Object.entries(answers).map(([questionId, value]) => {
+    const questionType = questionTypeMap?.[questionId]
+    // Backend expects rating as integer, not string
+    if (questionType === 'rating' && typeof value === 'string' && value !== '') {
+      const parsed = Number(value)
+      if (!isNaN(parsed)) {
+        return { question_id: questionId, value: parsed }
+      }
+    }
+    // Backend expects yes_no as 'yes'/'no', but BooleanInput stores 'true'/'false'
+    if (questionType === 'yes_no' && typeof value === 'string') {
+      if (value === 'true') return { question_id: questionId, value: 'yes' }
+      if (value === 'false') return { question_id: questionId, value: 'no' }
+    }
+    return { question_id: questionId, value }
+  })
 }
 
 /** Flatten all questions from all groups into a single array. */

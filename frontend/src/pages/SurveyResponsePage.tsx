@@ -100,6 +100,18 @@ function SurveyResponsePage() {
     : []
   const onePagePerGroup = survey?.settings?.one_page_per_group !== false
 
+  // Map of questionId → question_type for type-aware answer serialization
+  const questionTypeMap = useMemo<Record<string, string>>(() => {
+    if (!survey) return {}
+    const map: Record<string, string> = {}
+    for (const group of survey.groups) {
+      for (const q of group.questions) {
+        map[q.id] = q.question_type
+      }
+    }
+    return map
+  }, [survey])
+
   const handleStart = useCallback(async () => {
     if (!survey_id || !survey) return
     setIsStarting(true)
@@ -137,7 +149,7 @@ function SurveyResponsePage() {
     ) as BuilderQuestion[]
     const valid = validateAll(currentQuestions, answers)
     if (!valid) return
-    try { await responseService.saveProgress(survey_id, responseId, answersToInput(answers)) } catch { /* Non-fatal */ }
+    try { await responseService.saveProgress(survey_id, responseId, answersToInput(answers, questionTypeMap)) } catch { /* Non-fatal */ }
     if (nextQuestionId && onePagePerGroup) {
       const targetIndex = sortedGroups.findIndex((g) => g.questions.some((q) => q.id === nextQuestionId))
       if (targetIndex !== -1 && targetIndex !== currentPage) {
@@ -174,8 +186,8 @@ function SurveyResponsePage() {
     setIsSubmitting(true)
     setSubmitError(null)
     try {
-      await responseService.saveProgress(survey_id, responseId, answersToInput(answers))
-      await responseService.completeResponse(survey_id, responseId, answersToInput(answers))
+      await responseService.saveProgress(survey_id, responseId, answersToInput(answers, questionTypeMap))
+      await responseService.completeResponse(survey_id, responseId, answersToInput(answers, questionTypeMap))
       clearStoredResponseId(survey_id)
       setScreen('end')
     } catch (err) {

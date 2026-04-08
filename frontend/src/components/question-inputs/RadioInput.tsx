@@ -137,9 +137,9 @@ export function RadioInput({ value, onChange, question, errors: externalErrors }
             <input
               type="radio"
               name={inputId}
-              value={option.id}
-              checked={value === option.id}
-              onChange={() => handleRadioChange(option.id)}
+              value={option.code}
+              checked={value === option.code}
+              onChange={() => handleRadioChange(option.code)}
               className="accent-primary"
               data-testid={`radio-input-${option.id}`}
             />
