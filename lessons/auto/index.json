@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-08T00:10:02.442Z",
+  "lastUpdated": "2026-04-08T00:17:09.633Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3192,6 +3192,26 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md",
+      "ticketId": "ISS-165",
+      "title": "Public response form shows 'Unsupported question type: single_choice'",
+      "date": "2026-04-08",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "refactoring",
+        "bug-fix",
+        "feature",
+        "security",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -3348,7 +3368,8 @@
       "2026-04-07-iss-161-builder-add-question-dropdown-causes-navigation-aw.md",
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
       "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
-      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md"
+      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
+      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3489,7 +3510,8 @@
       "2026-04-07-iss-161-builder-add-question-dropdown-causes-navigation-aw.md",
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
       "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
-      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md"
+      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
+      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3756,7 +3778,8 @@
       "2026-04-07-iss-161-builder-add-question-dropdown-causes-navigation-aw.md",
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
       "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
-      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md"
+      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
+      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3806,7 +3829,8 @@
       "2026-04-07-iss-155-fix-validation-util-type-mismatch-39-ts-errors.md",
       "2026-04-07-iss-161-builder-add-question-dropdown-causes-navigation-aw.md",
       "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
-      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md"
+      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
+      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md"
     ],
     "bug-fix": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3951,7 +3975,8 @@
       "2026-04-07-iss-161-builder-add-question-dropdown-causes-navigation-aw.md",
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
       "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
-      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md"
+      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
+      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4102,7 +4127,8 @@
       "2026-04-07-iss-161-builder-add-question-dropdown-causes-navigation-aw.md",
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
       "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
-      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md"
+      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
+      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4352,7 +4378,8 @@
       "2026-04-07-iss-155-fix-validation-util-type-mismatch-39-ts-errors.md",
       "2026-04-07-iss-163-public-survey-page-requires-authentication-cannot.md",
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
-      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md"
+      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
+      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4498,7 +4525,8 @@
       "2026-04-07-iss-161-builder-add-question-dropdown-causes-navigation-aw.md",
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
       "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
-      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md"
+      "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
+      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -4605,7 +4633,8 @@
       "2026-04-07-iss-157-dev-seed-emails-rejected-by-email-validator-dev-lo.md",
       "2026-04-07-iss-158-no-error-message-shown-on-failed-login-401-interce.md",
       "2026-04-07-iss-163-public-survey-page-requires-authentication-cannot.md",
-      "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md"
+      "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
+      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
