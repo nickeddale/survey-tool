@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-08T00:31:44.477Z",
+  "lastUpdated": "2026-04-08T00:40:43.172Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3245,6 +3245,26 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
+      "ticketId": "ISS-167",
+      "title": "Quota creation allows empty conditions but backend rejects them",
+      "date": "2026-04-08",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -3404,7 +3424,8 @@
       "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
       "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md",
       "2026-04-08-iss-166-single-page-survey-submit-fails-with-422-validatio.md",
-      "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md"
+      "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md",
+      "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3548,7 +3569,8 @@
       "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
       "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md",
       "2026-04-08-iss-166-single-page-survey-submit-fails-with-422-validatio.md",
-      "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md"
+      "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md",
+      "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3665,7 +3687,8 @@
       "2026-04-07-iss-158-no-error-message-shown-on-failed-login-401-interce.md",
       "2026-04-07-iss-163-public-survey-page-requires-authentication-cannot.md",
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
-      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md"
+      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
+      "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3818,7 +3841,8 @@
       "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
       "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md",
       "2026-04-08-iss-166-single-page-survey-submit-fails-with-422-validatio.md",
-      "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md"
+      "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md",
+      "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4017,7 +4041,8 @@
       "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
       "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md",
       "2026-04-08-iss-166-single-page-survey-submit-fails-with-422-validatio.md",
-      "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md"
+      "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md",
+      "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4171,7 +4196,8 @@
       "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
       "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md",
       "2026-04-08-iss-166-single-page-survey-submit-fails-with-422-validatio.md",
-      "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md"
+      "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md",
+      "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4246,7 +4272,8 @@
       "2026-04-07-iss-163-public-survey-page-requires-authentication-cannot.md",
       "2026-04-07-iss-161-builder-add-question-dropdown-causes-navigation-aw.md",
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
-      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md"
+      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
+      "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4570,7 +4597,8 @@
       "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
       "2026-04-08-iss-162-builder-spurious-navigation-to-public-survey-url-d.md",
       "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md",
-      "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md"
+      "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md",
+      "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -4678,7 +4706,8 @@
       "2026-04-07-iss-158-no-error-message-shown-on-failed-login-401-interce.md",
       "2026-04-07-iss-163-public-survey-page-requires-authentication-cannot.md",
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
-      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md"
+      "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md",
+      "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
