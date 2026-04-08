@@ -256,8 +256,8 @@ function SurveysPage() {
                 <tr>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Title</th>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Status</th>
-                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">Questions</th>
-                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">Created</th>
+                  <th className="hidden sm:table-cell text-left px-4 py-3 font-medium text-muted-foreground">Questions</th>
+                  <th className="hidden sm:table-cell text-left px-4 py-3 font-medium text-muted-foreground">Created</th>
                   <th className="text-right px-4 py-3 font-medium text-muted-foreground">Actions</th>
                 </tr>
               </thead>
@@ -275,8 +275,8 @@ function SurveysPage() {
                     <td className="px-4 py-3">
                       <StatusBadge status={survey.status} />
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">0</td>
-                    <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
+                    <td className="hidden sm:table-cell px-4 py-3 text-muted-foreground">0</td>
+                    <td className="hidden sm:table-cell px-4 py-3 text-muted-foreground whitespace-nowrap">
                       {new Date(survey.created_at).toLocaleDateString(undefined, {
                         year: 'numeric',
                         month: 'short',
