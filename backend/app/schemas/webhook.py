@@ -77,6 +77,12 @@ class WebhookResponse(BaseModel):
     updated_at: datetime
 
 
+class WebhookCreateResponse(WebhookResponse):
+    """Returned only on webhook creation — includes the plaintext signing secret."""
+
+    secret: str
+
+
 class WebhookListResponse(BaseModel):
     items: list[WebhookResponse]
     total: int

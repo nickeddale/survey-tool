@@ -279,6 +279,60 @@ describe('WebhooksPage', () => {
       expect(screen.getByTestId('webhook-secret-value')).toHaveTextContent('test-secret-abc123')
     })
 
+    it('closes dialog when Done button is clicked after secret is shown', async () => {
+      const user = userEvent.setup()
+
+      server.use(
+        http.post('/api/v1/webhooks', async ({ request }) => {
+          const body = (await request.json()) as Record<string, unknown>
+          return HttpResponse.json(
+            {
+              id: 'webhook-new-test',
+              user_id: '00000000-0000-0000-0000-000000000001',
+              url: body.url as string,
+              events: body.events as string[],
+              survey_id: null,
+              is_active: true,
+              secret: 'test-secret-abc123',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            },
+            { status: 201 },
+          )
+        }),
+      )
+
+      renderWebhooks()
+
+      await waitFor(() => {
+        expect(screen.getByTestId('create-webhook-button')).toBeInTheDocument()
+      })
+
+      await act(async () => {
+        await user.click(screen.getByTestId('create-webhook-button'))
+      })
+
+      await act(async () => {
+        await user.type(screen.getByTestId('webhook-url-input'), 'https://example.com/new-hook')
+        await user.click(screen.getByTestId('webhook-event-response.completed'))
+        await user.click(screen.getByTestId('webhook-form-submit'))
+      })
+
+      await waitFor(() => {
+        expect(screen.getByTestId('webhook-secret-display')).toBeInTheDocument()
+      })
+
+      // Cancel button now reads "Done" — clicking it closes the dialog
+      const doneButton = screen.getByTestId('webhook-form-cancel')
+      expect(doneButton).toHaveTextContent('Done')
+
+      await act(async () => {
+        await user.click(doneButton)
+      })
+
+      expect(screen.queryByTestId('webhook-form-dialog')).not.toBeInTheDocument()
+    })
+
     it('shows validation error when URL is empty', async () => {
       const user = userEvent.setup()
 

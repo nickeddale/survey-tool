@@ -15,6 +15,7 @@ from app.models.user import User
 from app.models.webhook import Webhook
 from app.schemas.webhook import (
     WebhookCreate,
+    WebhookCreateResponse,
     WebhookListResponse,
     WebhookResponse,
     WebhookUpdate,
@@ -49,10 +50,10 @@ async def _get_webhook_or_404(
 
 @router.post(
     "",
-    response_model=WebhookResponse,
+    response_model=WebhookCreateResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Create a webhook",
-    description="Register a new webhook endpoint to receive event notifications. A signing secret is generated automatically.",
+    description="Register a new webhook endpoint to receive event notifications. A signing secret is generated automatically and returned once — it cannot be retrieved later.",
 )
 @limiter.limit(RATE_LIMITS["default_mutating"])
 async def create_webhook(
@@ -60,21 +61,24 @@ async def create_webhook(
     payload: WebhookCreate,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db),
-) -> WebhookResponse:
-    """Create a webhook."""
+) -> WebhookCreateResponse:
+    """Create a webhook and return the plaintext signing secret."""
+    plaintext_secret = secrets.token_hex(16)
     webhook = Webhook(
         id=uuid.uuid4(),
         user_id=current_user.id,
         survey_id=payload.survey_id,
         url=payload.url,
         events=list(payload.events),
-        secret=secrets.token_hex(16),
+        secret=plaintext_secret,
         is_active=payload.is_active,
     )
     session.add(webhook)
     await session.flush()
     await session.refresh(webhook)
-    return WebhookResponse.model_validate(webhook)
+    response = WebhookCreateResponse.model_validate(webhook)
+    response.secret = plaintext_secret
+    return response
 
 
 @router.get(

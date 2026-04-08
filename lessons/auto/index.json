@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-08T00:45:09.647Z",
+  "lastUpdated": "2026-04-08T00:57:46.671Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3284,6 +3284,27 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
+      "ticketId": "ISS-169",
+      "title": "Webhook creation dialog doesn't show signing secret and doesn't auto-close",
+      "date": "2026-04-08",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -3445,7 +3466,8 @@
       "2026-04-08-iss-166-single-page-survey-submit-fails-with-422-validatio.md",
       "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md",
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
-      "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md"
+      "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
+      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3591,7 +3613,8 @@
       "2026-04-08-iss-166-single-page-survey-submit-fails-with-422-validatio.md",
       "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md",
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
-      "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md"
+      "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
+      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3710,7 +3733,8 @@
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
       "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
-      "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md"
+      "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
+      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3865,7 +3889,8 @@
       "2026-04-08-iss-166-single-page-survey-submit-fails-with-422-validatio.md",
       "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md",
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
-      "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md"
+      "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
+      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4066,7 +4091,8 @@
       "2026-04-08-iss-166-single-page-survey-submit-fails-with-422-validatio.md",
       "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md",
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
-      "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md"
+      "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
+      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4222,7 +4248,8 @@
       "2026-04-08-iss-166-single-page-survey-submit-fails-with-422-validatio.md",
       "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md",
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
-      "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md"
+      "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
+      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4298,7 +4325,8 @@
       "2026-04-07-iss-161-builder-add-question-dropdown-causes-navigation-aw.md",
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
       "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
-      "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md"
+      "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
+      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4350,7 +4378,8 @@
       "2026-04-07-iss-156-fix-85-ts-errors-in-auth-page-and-service-tests.md",
       "2026-04-07-iss-157-dev-seed-emails-rejected-by-email-validator-dev-lo.md",
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
-      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md"
+      "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
+      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4475,7 +4504,8 @@
       "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
       "2026-04-07-iss-159-question-type-mismatch-between-frontend-builder-an.md",
       "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md",
-      "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md"
+      "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
+      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4625,7 +4655,8 @@
       "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md",
       "2026-04-08-iss-160-builder-group-title-edits-in-property-panel-dont-s.md",
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
-      "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md"
+      "2026-04-08-iss-168-statistics-completion-rate-shows-04-instead-of-40.md",
+      "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
