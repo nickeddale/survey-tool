@@ -237,6 +237,84 @@ describe('apiClient interceptors', () => {
     })
   })
 
+  describe('public survey route — no redirect on 401', () => {
+    beforeEach(() => {
+      // Simulate browser being on a public survey route
+      Object.defineProperty(window, 'location', {
+        value: { ...window.location, pathname: '/s/abc-123' },
+        writable: true,
+        configurable: true,
+      })
+    })
+
+    afterEach(() => {
+      // Restore default pathname
+      Object.defineProperty(window, 'location', {
+        value: { ...window.location, pathname: '/' },
+        writable: true,
+        configurable: true,
+      })
+    })
+
+    it('does not call redirectToLogin when on /s/* and refresh fails after 401', async () => {
+      server.use(
+        http.get(`${BASE}/surveys/abc-123/responses`, () => {
+          return HttpResponse.json(
+            { detail: { code: 'UNAUTHORIZED', message: 'No auth' } },
+            { status: 401 },
+          )
+        }),
+        http.post(`${BASE}/auth/refresh`, () => {
+          return HttpResponse.json(
+            { detail: { code: 'UNAUTHORIZED', message: 'No refresh token' } },
+            { status: 401 },
+          )
+        }),
+      )
+
+      setTokens(mockTokens.access_token)
+
+      try {
+        await apiClient.get('/surveys/abc-123/responses')
+        expect.fail('should have thrown')
+      } catch {
+        expect(mockRedirect).not.toHaveBeenCalled()
+      }
+    })
+
+    it('still triggers redirectToLogin when on a non-public route and refresh fails', async () => {
+      Object.defineProperty(window, 'location', {
+        value: { ...window.location, pathname: '/dashboard' },
+        writable: true,
+        configurable: true,
+      })
+
+      server.use(
+        http.get(`${BASE}/surveys`, () => {
+          return HttpResponse.json(
+            { detail: { code: 'UNAUTHORIZED', message: 'Token expired' } },
+            { status: 401 },
+          )
+        }),
+        http.post(`${BASE}/auth/refresh`, () => {
+          return HttpResponse.json(
+            { detail: { code: 'UNAUTHORIZED', message: 'Invalid refresh token' } },
+            { status: 401 },
+          )
+        }),
+      )
+
+      setTokens(mockTokens.access_token)
+
+      try {
+        await apiClient.get('/surveys')
+        expect.fail('should have thrown')
+      } catch {
+        expect(mockRedirect).toHaveBeenCalledOnce()
+      }
+    })
+  })
+
   describe('error normalization', () => {
     it('wraps structured error response into ApiError', async () => {
       server.use(

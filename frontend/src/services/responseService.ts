@@ -6,8 +6,11 @@
  * when no access token is present in the token store.
  */
 
+import axios from 'axios'
 import apiClient from './apiClient'
 import type { ResolveFlowRequest, ResolveFlowResponse, ResponseListResponse, ResponseDetailFull, SurveyStatisticsResponse, ExportParams } from '../types/survey'
+
+const BASE_URL = import.meta.env.VITE_API_URL ?? '/api/v1'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -53,9 +56,10 @@ class ResponseService {
     surveyId: string,
     answers: AnswerInput[] = [],
   ): Promise<ResponseResponse> {
-    const response = await apiClient.post<ResponseResponse>(
-      `/surveys/${surveyId}/responses`,
+    const response = await axios.post<ResponseResponse>(
+      `${BASE_URL}/surveys/${surveyId}/responses`,
       { answers },
+      { headers: { 'Content-Type': 'application/json' } },
     )
     return response.data
   }
@@ -83,9 +87,10 @@ class ResponseService {
     responseId: string,
     answers: AnswerInput[],
   ): Promise<ResponseResponse> {
-    const response = await apiClient.patch<ResponseResponse>(
-      `/surveys/${surveyId}/responses/${responseId}`,
+    const response = await axios.patch<ResponseResponse>(
+      `${BASE_URL}/surveys/${surveyId}/responses/${responseId}`,
       { status: 'complete', answers },
+      { headers: { 'Content-Type': 'application/json' } },
     )
     return response.data
   }

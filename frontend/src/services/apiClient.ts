@@ -117,7 +117,7 @@ apiClient.interceptors.request.use(async (config: InternalAxiosRequestConfig) =>
           isRefreshing = false
           rejectQueue(err)
           clearTokens()
-          redirectToLogin()
+          if (!isPublicRoute()) redirectToLogin()
           return Promise.reject(err)
         }
       } else {
@@ -144,6 +144,14 @@ const AUTH_PASSTHROUGH_PATHS = ['/auth/login', '/auth/register']
 function isAuthPassthrough(url: string | undefined): boolean {
   if (!url) return false
   return AUTH_PASSTHROUGH_PATHS.some((path) => url.includes(path))
+}
+
+// Public survey route prefixes — never redirect to /login when on these pages.
+const PUBLIC_ROUTE_PATTERNS = ['/s/']
+
+function isPublicRoute(): boolean {
+  if (typeof window === 'undefined') return false
+  return PUBLIC_ROUTE_PATTERNS.some((pattern) => window.location.pathname.startsWith(pattern))
 }
 
 // ---------------------------------------------------------------------------
@@ -201,7 +209,7 @@ apiClient.interceptors.response.use(
         isRefreshing = false
         rejectQueue(refreshErr)
         clearTokens()
-        redirectToLogin()
+        if (!isPublicRoute()) redirectToLogin()
         return Promise.reject(refreshErr)
       }
     }
