@@ -382,6 +382,27 @@ describe('single-page mode', () => {
 })
 
 // ---------------------------------------------------------------------------
+// single_choice question type regression (ISS-165)
+// ---------------------------------------------------------------------------
+
+describe('single_choice question type', () => {
+  it('renders RadioInput for single_choice questions (not the unsupported fallback)', () => {
+    // Navigate to page 1 which has the single_choice question (group g2)
+    renderForm({ currentPage: 1 })
+
+    expect(screen.getByTestId('radio-input-q2')).toBeInTheDocument()
+    expect(screen.queryByTestId('unknown-question-type')).not.toBeInTheDocument()
+  })
+
+  it('renders single_choice RadioInput in single-page mode', () => {
+    renderForm({ survey: mockSinglePageSurvey })
+
+    expect(screen.getByTestId('radio-input-q2')).toBeInTheDocument()
+    expect(screen.queryByTestId('unknown-question-type')).not.toBeInTheDocument()
+  })
+})
+
+// ---------------------------------------------------------------------------
 // Empty group
 // ---------------------------------------------------------------------------
 
