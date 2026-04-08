@@ -53,7 +53,7 @@ const mockSurveyWebhook: WebhookResponse = {
   id: 'webhook-2',
   user_id: 'user-1',
   url: 'https://myapp.io/hooks',
-  events: ['response.created'],
+  events: ['response.started'],
   survey_id: 'survey-1',
   is_active: false,
   secret: null,
@@ -106,11 +106,11 @@ describe('WebhookForm', () => {
         />,
       )
       const events = [
-        'response.created',
-        'response.updated',
+        'response.started',
         'response.completed',
         'survey.activated',
         'survey.closed',
+        'quota.reached',
       ]
       for (const event of events) {
         const checkbox = screen.getByTestId(`webhook-event-${event}`) as HTMLInputElement
@@ -405,10 +405,10 @@ describe('WebhookForm', () => {
       )
       const completedCheckbox = screen.getByTestId('webhook-event-response.completed') as HTMLInputElement
       const activatedCheckbox = screen.getByTestId('webhook-event-survey.activated') as HTMLInputElement
-      const createdCheckbox = screen.getByTestId('webhook-event-response.created') as HTMLInputElement
+      const startedCheckbox = screen.getByTestId('webhook-event-response.started') as HTMLInputElement
       expect(completedCheckbox.checked).toBe(true)
       expect(activatedCheckbox.checked).toBe(true)
-      expect(createdCheckbox.checked).toBe(false)
+      expect(startedCheckbox.checked).toBe(false)
     })
 
     it('pre-selects survey when survey_id is set', () => {

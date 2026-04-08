@@ -11,14 +11,9 @@ import type { WebhookResponse, WebhookCreate, WebhookEvent, SurveyResponse } fro
 
 const EVENT_OPTIONS: { value: WebhookEvent; label: string; description: string }[] = [
   {
-    value: 'response.created',
-    label: 'Response Created',
+    value: 'response.started',
+    label: 'Response Started',
     description: 'Triggered when a new survey response is started.',
-  },
-  {
-    value: 'response.updated',
-    label: 'Response Updated',
-    description: 'Triggered when an in-progress response is updated.',
   },
   {
     value: 'response.completed',
@@ -34,6 +29,11 @@ const EVENT_OPTIONS: { value: WebhookEvent; label: string; description: string }
     value: 'survey.closed',
     label: 'Survey Closed',
     description: 'Triggered when a survey is closed.',
+  },
+  {
+    value: 'quota.reached',
+    label: 'Quota Reached',
+    description: 'Triggered when a survey quota limit is reached.',
   },
 ]
 

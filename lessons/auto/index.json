@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-08T21:08:50.358Z",
+  "lastUpdated": "2026-04-08T21:14:20.589Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3667,6 +3667,24 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-08-iss-190-iss-179-confirmed-frontend-webhook-event-names-don.md",
+      "ticketId": "ISS-190",
+      "title": "ISS-179 confirmed: frontend webhook event names don't match backend valid events",
+      "date": "2026-04-08",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -3848,7 +3866,8 @@
       "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
       "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md",
       "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
-      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md"
+      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md",
+      "2026-04-08-iss-190-iss-179-confirmed-frontend-webhook-event-names-don.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4011,7 +4030,8 @@
       "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
       "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md",
       "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
-      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md"
+      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md",
+      "2026-04-08-iss-190-iss-179-confirmed-frontend-webhook-event-names-don.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4313,7 +4333,8 @@
       "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
       "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md",
       "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
-      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md"
+      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md",
+      "2026-04-08-iss-190-iss-179-confirmed-frontend-webhook-event-names-don.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4536,7 +4557,8 @@
       "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
       "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md",
       "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
-      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md"
+      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md",
+      "2026-04-08-iss-190-iss-179-confirmed-frontend-webhook-event-names-don.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4712,7 +4734,8 @@
       "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
       "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md",
       "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
-      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md"
+      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md",
+      "2026-04-08-iss-190-iss-179-confirmed-frontend-webhook-event-names-don.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4991,7 +5014,8 @@
       "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
       "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
       "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
-      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md"
+      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md",
+      "2026-04-08-iss-190-iss-179-confirmed-frontend-webhook-event-names-don.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5160,7 +5184,8 @@
       "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
       "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md",
       "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
-      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md"
+      "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md",
+      "2026-04-08-iss-190-iss-179-confirmed-frontend-webhook-event-names-don.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
