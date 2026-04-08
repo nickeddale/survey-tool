@@ -419,11 +419,11 @@ export interface AssessmentListResponse {
 // ---------------------------------------------------------------------------
 
 export type WebhookEvent =
-  | 'response.created'
-  | 'response.updated'
+  | 'response.started'
   | 'response.completed'
   | 'survey.activated'
   | 'survey.closed'
+  | 'quota.reached'
 
 export interface WebhookCreate {
   url: string
