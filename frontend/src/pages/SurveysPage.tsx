@@ -251,7 +251,7 @@ function SurveysPage() {
         <>
           {/* Table */}
           <div className="overflow-x-auto rounded-lg border border-border">
-            <table className="w-full text-sm" role="table">
+            <table className="w-full min-w-[600px] text-sm" role="table">
               <thead className="bg-muted/50">
                 <tr>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Title</th>
@@ -263,11 +263,16 @@ function SurveysPage() {
               </thead>
               <tbody className="divide-y divide-border">
                 {surveys.map((survey) => (
-                  <tr key={survey.id} className="bg-card hover:bg-muted/30 transition-colors">
+                  <tr
+                    key={survey.id}
+                    className="bg-card hover:bg-muted/30 transition-colors cursor-pointer"
+                    onClick={() => navigate(`/surveys/${survey.id}`)}
+                  >
                     <td className="px-4 py-3 font-medium text-foreground">
                       <Link
                         to={`/surveys/${survey.id}`}
                         className="hover:text-primary hover:underline transition-colors"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         {survey.title}
                       </Link>
@@ -283,7 +288,7 @@ function SurveysPage() {
                         day: 'numeric',
                       })}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-2">
                         <Button
                           variant="ghost"
