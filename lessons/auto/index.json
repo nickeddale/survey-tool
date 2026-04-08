@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-08T20:44:10.662Z",
+  "lastUpdated": "2026-04-08T20:57:11.752Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3603,6 +3603,26 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md",
+      "ticketId": "ISS-187",
+      "title": "ISS-181 not fixed: resolve-flow endpoint returns 500 Internal Server Error",
+      "date": "2026-04-08",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "documentation",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -3781,7 +3801,8 @@
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
       "2026-04-08-iss-184-responseservice-uses-apiclient-with-auth-intercept.md",
       "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
-      "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md"
+      "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
+      "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3941,7 +3962,8 @@
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
       "2026-04-08-iss-184-responseservice-uses-apiclient-with-auth-intercept.md",
       "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
-      "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md"
+      "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
+      "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4065,7 +4087,8 @@
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md",
       "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
-      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md"
+      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
+      "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4237,7 +4260,8 @@
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
       "2026-04-08-iss-184-responseservice-uses-apiclient-with-auth-intercept.md",
       "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
-      "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md"
+      "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
+      "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4457,7 +4481,8 @@
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
       "2026-04-08-iss-184-responseservice-uses-apiclient-with-auth-intercept.md",
       "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
-      "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md"
+      "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
+      "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4630,7 +4655,8 @@
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
       "2026-04-08-iss-184-responseservice-uses-apiclient-with-auth-intercept.md",
       "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
-      "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md"
+      "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
+      "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4713,7 +4739,8 @@
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md",
       "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
-      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md"
+      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
+      "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4771,7 +4798,8 @@
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md",
       "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
-      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md"
+      "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
+      "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5067,7 +5095,8 @@
       "2026-04-08-iss-183-iss-178-regression-builder-page-still-redirects-aw.md",
       "2026-04-08-iss-184-responseservice-uses-apiclient-with-auth-intercept.md",
       "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
-      "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md"
+      "2026-04-08-iss-186-survey-submission-422-answer-format-mismatches-bet.md",
+      "2026-04-08-iss-187-iss-181-not-fixed-resolve-flow-endpoint-returns-50.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",

@@ -6,9 +6,12 @@ alembic<2.0,>=1.13
 pydantic-settings<3.0,>=2.2
 python-jose[cryptography]<4.0,>=3.3
 bcrypt<6.0,>=4.0
+slowapi>=0.1.9
 
 [dev]
 pytest<9.0,>=8.1
 pytest-asyncio<0.24,>=0.23
 httpx<0.28,>=0.27
 pytest-cov<6.0,>=5.0
+pytest-httpserver<2.0,>=1.0
+bandit[toml]>=1.7

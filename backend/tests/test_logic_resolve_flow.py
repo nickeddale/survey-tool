@@ -596,6 +596,60 @@ async def test_default_direction_is_forward(client: AsyncClient):
 # --------------------------------------------------------------------------- #
 
 
+# --------------------------------------------------------------------------- #
+# Piping error graceful degradation
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.asyncio
+async def test_piping_error_in_title_returns_200_not_500(client: AsyncClient):
+    """Survey with an invalid piping expression in a question title → 200 with fallback texts."""
+    headers = await auth_headers(client)
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+    # Title contains a broken piping expression: {invalid syntax!!!}
+    # This should not cause a 500 — endpoint must degrade gracefully.
+    q1 = await create_question(
+        client, headers, survey_id, group_id, code="Q1", sort_order=1,
+        title="Hello {!!!invalid!!!}",
+    )
+
+    response = await client.post(
+        resolve_url(survey_id),
+        json={"answers": [], "current_question_id": None},
+        headers=headers,
+    )
+    assert response.status_code == 200
+    body = response.json()
+    # piped_texts must still be present and contain an entry for Q1
+    assert "piped_texts" in body
+    assert "Q1_title" in body["piped_texts"]
+
+
+@pytest.mark.asyncio
+async def test_piping_expression_with_answer_substitution_returns_200(client: AsyncClient):
+    """Valid piping expression in question title with matching answer → 200, substituted text."""
+    headers = await auth_headers(client)
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+    q1 = await create_question(
+        client, headers, survey_id, group_id, code="Q1", sort_order=1, title="Name?"
+    )
+    q2 = await create_question(
+        client, headers, survey_id, group_id, code="Q2", sort_order=2,
+        title="Hello {Q1}, how are you?",
+    )
+
+    response = await client.post(
+        resolve_url(survey_id),
+        json={"answers": [answer_input(q1["id"], "Alice")]},
+        headers=headers,
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["piped_texts"]["Q2_title"] == "Hello Alice, how are you?"
+
+
 @pytest.mark.asyncio
 async def test_navigation_across_groups(client: AsyncClient):
     """Forward navigation correctly moves from last question in group 1 to first in group 2."""
