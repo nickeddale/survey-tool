@@ -174,6 +174,31 @@ describe('LoginPage', () => {
     })
   })
 
+  describe('error message persistence', () => {
+    it('error message stays visible after failed login and page does not navigate away', async () => {
+      // Verify that after a failed login the error message remains on screen and the
+      // route stays at /login (i.e. no navigation occurs that would clear the error).
+      const user = userEvent.setup()
+      renderLoginPage()
+      await act(async () => {
+        await user.type(screen.getByLabelText(/email/i), 'wrong@example.com')
+        await user.type(screen.getByLabelText(/password/i), 'wrongpassword')
+      })
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /sign in/i }))
+      })
+
+      await waitFor(() => {
+        expect(screen.getByRole('alert')).toBeInTheDocument()
+      })
+
+      // Error should still be visible — no navigation should have occurred
+      expect(screen.getByRole('alert')).toHaveTextContent('Invalid email or password')
+      // The login form should still be rendered (not navigated away)
+      expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument()
+    })
+  })
+
   describe('backend error display', () => {
     it('shows invalid credentials error from backend', async () => {
       // Render page first without a refresh token so AuthProvider.initialize() is not triggered.

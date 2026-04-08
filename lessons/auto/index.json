@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-08T18:40:44.688Z",
+  "lastUpdated": "2026-04-08T18:48:23.003Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3504,6 +3504,24 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md",
+      "ticketId": "ISS-182",
+      "title": "ISS-171 regression: login error message still flashes and disappears after ~5s",
+      "date": "2026-04-08",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -3677,7 +3695,8 @@
       "2026-04-08-iss-177-closed-survey-shows-generic-404-instead-of-unavail.md",
       "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md",
-      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md"
+      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
+      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3832,7 +3851,8 @@
       "2026-04-08-iss-177-closed-survey-shows-generic-404-instead-of-unavail.md",
       "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md",
-      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md"
+      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
+      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4121,7 +4141,8 @@
       "2026-04-08-iss-177-closed-survey-shows-generic-404-instead-of-unavail.md",
       "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md",
-      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md"
+      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
+      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4335,7 +4356,8 @@
       "2026-04-08-iss-177-closed-survey-shows-generic-404-instead-of-unavail.md",
       "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md",
-      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md"
+      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
+      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4503,7 +4525,8 @@
       "2026-04-08-iss-177-closed-survey-shows-generic-404-instead-of-unavail.md",
       "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md",
-      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md"
+      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
+      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4928,7 +4951,8 @@
       "2026-04-08-iss-176-iss-165-regression-yesno-question-type-shows-unsup.md",
       "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
       "2026-04-08-iss-180-backend-500-on-response-completion-patch-status-co.md",
-      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md"
+      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
+      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -5042,7 +5066,8 @@
       "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
       "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md",
       "2026-04-08-iss-178-auth-refresh-rate-limiting-causes-spontaneous-redi.md",
-      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md"
+      "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
+      "2026-04-08-iss-182-iss-171-regression-login-error-message-still-flash.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",

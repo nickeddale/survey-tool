@@ -33,6 +33,9 @@ const BASE_URL = import.meta.env.VITE_API_URL ?? '/api/v1'
 
 let redirectToLogin: () => void = () => {
   if (typeof window !== 'undefined') {
+    // Do not redirect if already on /login — would cause a full-page reload that
+    // clears React state (including error messages set after a failed login).
+    if (window.location.pathname.startsWith('/login')) return
     window.location.href = '/login'
   }
 }
@@ -149,12 +152,15 @@ function isAuthPassthrough(url: string | undefined): boolean {
   return AUTH_PASSTHROUGH_PATHS.some((path) => url.includes(path))
 }
 
-// Public survey route prefixes — never redirect to /login when on these pages.
-const PUBLIC_ROUTE_PATTERNS = ['/s/']
+// Routes where a failed token refresh should not trigger a redirect to /login.
+// This includes public survey pages (/s/*) and the auth pages themselves (/login, /register).
+const NO_REDIRECT_ROUTE_PATTERNS = ['/s/', '/login', '/register']
 
 function isPublicRoute(): boolean {
   if (typeof window === 'undefined') return false
-  return PUBLIC_ROUTE_PATTERNS.some((pattern) => window.location.pathname.startsWith(pattern))
+  return NO_REDIRECT_ROUTE_PATTERNS.some((pattern) =>
+    window.location.pathname.startsWith(pattern),
+  )
 }
 
 // ---------------------------------------------------------------------------

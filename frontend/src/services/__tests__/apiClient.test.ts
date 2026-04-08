@@ -237,6 +237,81 @@ describe('apiClient interceptors', () => {
     })
   })
 
+  describe('login/register pages — no redirect on 401', () => {
+    afterEach(() => {
+      Object.defineProperty(window, 'location', {
+        value: { ...window.location, pathname: '/' },
+        writable: true,
+        configurable: true,
+      })
+    })
+
+    it('does not call redirectToLogin when on /login and background refresh fails after 401', async () => {
+      Object.defineProperty(window, 'location', {
+        value: { ...window.location, pathname: '/login' },
+        writable: true,
+        configurable: true,
+      })
+
+      server.use(
+        http.get(`${BASE}/auth/me`, () => {
+          return HttpResponse.json(
+            { detail: { code: 'UNAUTHORIZED', message: 'Token expired' } },
+            { status: 401 },
+          )
+        }),
+        http.post(`${BASE}/auth/refresh`, () => {
+          return HttpResponse.json(
+            { detail: { code: 'UNAUTHORIZED', message: 'Invalid refresh token' } },
+            { status: 401 },
+          )
+        }),
+      )
+
+      setTokens(mockTokens.access_token)
+
+      try {
+        await apiClient.get('/auth/me')
+        expect.fail('should have thrown')
+      } catch {
+        expect(mockRedirect).not.toHaveBeenCalled()
+      }
+    })
+
+    it('does not call redirectToLogin when on /register and background refresh fails after 401', async () => {
+      Object.defineProperty(window, 'location', {
+        value: { ...window.location, pathname: '/register' },
+        writable: true,
+        configurable: true,
+      })
+
+      server.use(
+        http.get(`${BASE}/auth/me`, () => {
+          return HttpResponse.json(
+            { detail: { code: 'UNAUTHORIZED', message: 'Token expired' } },
+            { status: 401 },
+          )
+        }),
+        http.post(`${BASE}/auth/refresh`, () => {
+          return HttpResponse.json(
+            { detail: { code: 'UNAUTHORIZED', message: 'Invalid refresh token' } },
+            { status: 401 },
+          )
+        }),
+      )
+
+      setTokens(mockTokens.access_token)
+
+      try {
+        await apiClient.get('/auth/me')
+        expect.fail('should have thrown')
+      } catch {
+        expect(mockRedirect).not.toHaveBeenCalled()
+      }
+    })
+
+  })
+
   describe('public survey route — no redirect on 401', () => {
     beforeEach(() => {
       // Simulate browser being on a public survey route
