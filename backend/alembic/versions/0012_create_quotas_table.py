@@ -7,7 +7,7 @@ Create Date: 2026-04-03 00:00:00.000000
 
 import sqlalchemy as sa
 from alembic import op
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import ENUM, JSONB, UUID
 
 # revision identifiers, used by Alembic.
 revision = "0012"
@@ -16,7 +16,9 @@ branch_labels = None
 depends_on = None
 
 # Reference the existing quota_action ENUM — do NOT create it here.
-quota_action = sa.Enum(
+# Use dialect-specific ENUM (not sa.Enum) so create_type=False is reliably respected
+# during op.create_table — sa.Enum(create_type=False) does not suppress CREATE TYPE.
+quota_action = ENUM(
     "terminate",
     "hide_question",
     name="quota_action",
