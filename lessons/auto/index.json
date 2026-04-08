@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-08T09:04:26.880Z",
+  "lastUpdated": "2026-04-08T09:12:35.442Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3378,6 +3378,24 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md",
+      "ticketId": "ISS-175",
+      "title": "ISS-163 regression: redirectToLogin fires on public survey routes when auth refresh fails",
+      "date": "2026-04-08",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -3544,7 +3562,8 @@
       "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md",
       "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md",
       "2026-04-08-iss-172-dashboard-survey-cards-are-not-clickablenavigable.md",
-      "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md"
+      "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
+      "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3694,7 +3713,8 @@
       "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
       "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md",
       "2026-04-08-iss-172-dashboard-survey-cards-are-not-clickablenavigable.md",
-      "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md"
+      "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
+      "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3974,7 +3994,8 @@
       "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md",
       "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md",
       "2026-04-08-iss-172-dashboard-survey-cards-are-not-clickablenavigable.md",
-      "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md"
+      "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
+      "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4180,7 +4201,8 @@
       "2026-04-08-iss-169-webhook-creation-dialog-doesnt-show-signing-secret.md",
       "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md",
       "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md",
-      "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md"
+      "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
+      "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4341,7 +4363,8 @@
       "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md",
       "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md",
       "2026-04-08-iss-172-dashboard-survey-cards-are-not-clickablenavigable.md",
-      "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md"
+      "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
+      "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4756,7 +4779,8 @@
       "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md",
       "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md",
       "2026-04-08-iss-172-dashboard-survey-cards-are-not-clickablenavigable.md",
-      "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md"
+      "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
+      "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -4867,7 +4891,8 @@
       "2026-04-08-iss-165-public-response-form-shows-unsupported-question-ty.md",
       "2026-04-08-iss-167-quota-creation-allows-empty-conditions-but-backend.md",
       "2026-04-08-iss-171-iss-158-regression-publicroute-unmounts-loginpage.md",
-      "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md"
+      "2026-04-08-iss-174-cookiesecuretrue-default-prevents-refresh-token-st.md",
+      "2026-04-08-iss-175-iss-163-regression-redirecttologin-fires-on-public.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
