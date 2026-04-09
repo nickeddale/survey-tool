@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-09T21:18:11.165Z",
+  "lastUpdated": "2026-04-09T21:22:36.343Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3885,6 +3885,23 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md",
+      "ticketId": "ISS-205",
+      "title": "Number question type renders as 'Unsupported question type: number' on public form",
+      "date": "2026-04-09",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "feature",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4076,7 +4093,8 @@
       "2026-04-09-iss-197-number-question-type-fails-with-409-type-mismatch.md",
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
       "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md",
-      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md"
+      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
+      "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4246,7 +4264,8 @@
       "2026-04-09-iss-194-add-question-level-scope-to-assessments.md",
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
       "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md",
-      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md"
+      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
+      "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4564,7 +4583,8 @@
       "2026-04-09-iss-197-number-question-type-fails-with-409-type-mismatch.md",
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
       "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md",
-      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md"
+      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
+      "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4984,7 +5004,8 @@
       "2026-04-09-iss-197-number-question-type-fails-with-409-type-mismatch.md",
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
       "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md",
-      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md"
+      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
+      "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5279,7 +5300,8 @@
       "2026-04-09-iss-193-iss-193-responsesstatus-column-type-mismatch-enum.md",
       "2026-04-09-iss-194-add-question-level-scope-to-assessments.md",
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
-      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md"
+      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
+      "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5457,7 +5479,8 @@
       "2026-04-09-iss-197-number-question-type-fails-with-409-type-mismatch.md",
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
       "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md",
-      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md"
+      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
+      "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
