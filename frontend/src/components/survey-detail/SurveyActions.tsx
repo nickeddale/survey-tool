@@ -7,7 +7,6 @@ import {
   List,
   BarChart2,
   Users,
-  Wrench,
 } from 'lucide-react'
 import { Button } from '../ui/button'
 import type { ModalType } from './types'
@@ -123,17 +122,6 @@ export function SurveyActions({ surveyId, surveyStatus, onNavigate, onOpenModal,
         Participants
       </Button>
 
-      {surveyStatus === 'draft' && (
-        <Button
-          variant="outline"
-          onClick={() => onNavigate(`/surveys/${surveyId}/builder`)}
-          aria-label="Open survey builder"
-          data-testid="builder-button"
-        >
-          <Wrench size={14} />
-          Builder
-        </Button>
-      )}
       {surveyStatus === 'draft' && (
         <Button
           variant="outline"

@@ -206,6 +206,9 @@ function SurveyDetailPage() {
       />
 
       <SurveyMetaCard
+        surveyId={survey.id}
+        surveyStatus={survey.status}
+        onNavigate={navigate}
         description={survey.description}
         welcomeMessage={survey.welcome_message}
         endMessage={survey.end_message}
@@ -228,8 +231,8 @@ function SurveyDetailPage() {
             <CardContent className="text-center py-10">
               <p className="text-muted-foreground text-sm">No question groups have been added to this survey.</p>
               {survey.status === 'draft' && (
-                <Button className="mt-3" onClick={() => navigate(`/surveys/${survey.id}/edit`)}>
-                  Edit Survey
+                <Button className="mt-3" onClick={() => navigate(`/surveys/${survey.id}/builder`)}>
+                  Builder
                 </Button>
               )}
             </CardContent>
