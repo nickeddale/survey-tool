@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AssessmentForm from '../AssessmentForm'
-import type { AssessmentResponse, QuestionGroupResponse, AssessmentCreate } from '../../../types/survey'
+import type { AssessmentResponse, QuestionGroupResponse, QuestionResponse, AssessmentCreate } from '../../../types/survey'
 
 // ---------------------------------------------------------------------------
 // Mock data
@@ -37,6 +37,7 @@ const mockExistingAssessment: AssessmentResponse = {
   name: 'High Satisfaction',
   scope: 'total',
   group_id: null,
+  question_id: null,
   min_score: 8,
   max_score: 10,
   message: 'You are very satisfied!',
@@ -50,9 +51,61 @@ const mockGroupAssessment: AssessmentResponse = {
   name: 'Group Low Score',
   scope: 'group',
   group_id: 'g1',
+  question_id: null,
   min_score: 0,
   max_score: 3,
   message: 'Needs improvement.',
+  created_at: '2024-01-01T00:00:00Z',
+  updated_at: '2024-01-01T00:00:00Z',
+}
+
+const mockQuestions: QuestionResponse[] = [
+  {
+    id: 'q1',
+    group_id: 'g1',
+    parent_id: null,
+    question_type: 'single_choice',
+    code: 'Q1',
+    title: 'How satisfied are you?',
+    description: null,
+    is_required: false,
+    sort_order: 1,
+    relevance: null,
+    validation: null,
+    settings: null,
+    created_at: '2024-01-01T00:00:00Z',
+    subquestions: [],
+    answer_options: [],
+  },
+  {
+    id: 'q2',
+    group_id: 'g1',
+    parent_id: null,
+    question_type: 'single_choice',
+    code: 'Q2',
+    title: 'Would you recommend us?',
+    description: null,
+    is_required: false,
+    sort_order: 2,
+    relevance: null,
+    validation: null,
+    settings: null,
+    created_at: '2024-01-01T00:00:00Z',
+    subquestions: [],
+    answer_options: [],
+  },
+]
+
+const mockQuestionAssessment: AssessmentResponse = {
+  id: 'assessment-3',
+  survey_id: 'survey-1',
+  name: 'Q1 Low Score',
+  scope: 'question',
+  group_id: null,
+  question_id: 'q1',
+  min_score: 0,
+  max_score: 2,
+  message: 'Low satisfaction on Q1.',
   created_at: '2024-01-01T00:00:00Z',
   updated_at: '2024-01-01T00:00:00Z',
 }
@@ -529,6 +582,200 @@ describe('AssessmentForm', () => {
 
       const groupSelect = screen.getByTestId('assessment-group-select') as HTMLSelectElement
       expect(groupSelect.value).toBe('g1')
+    })
+  })
+
+  // -------------------------------------------------------------------------
+  // Question scope
+  // -------------------------------------------------------------------------
+
+  describe('question scope', () => {
+    it('does not show question selector when scope is total', () => {
+      render(
+        <AssessmentForm
+          surveyId="survey-1"
+          groups={mockGroups}
+          questions={mockQuestions}
+          assessment={null}
+          onSubmit={vi.fn()}
+          onCancel={vi.fn()}
+        />,
+      )
+
+      expect(screen.queryByTestId('assessment-question-select')).not.toBeInTheDocument()
+    })
+
+    it('does not show question selector when scope is group', async () => {
+      const user = userEvent.setup()
+
+      render(
+        <AssessmentForm
+          surveyId="survey-1"
+          groups={mockGroups}
+          questions={mockQuestions}
+          assessment={null}
+          onSubmit={vi.fn()}
+          onCancel={vi.fn()}
+        />,
+      )
+
+      await act(async () => {
+        await user.selectOptions(screen.getByTestId('assessment-scope-select'), 'group')
+      })
+
+      expect(screen.queryByTestId('assessment-question-select')).not.toBeInTheDocument()
+    })
+
+    it('shows question selector when scope is changed to question', async () => {
+      const user = userEvent.setup()
+
+      render(
+        <AssessmentForm
+          surveyId="survey-1"
+          groups={mockGroups}
+          questions={mockQuestions}
+          assessment={null}
+          onSubmit={vi.fn()}
+          onCancel={vi.fn()}
+        />,
+      )
+
+      await act(async () => {
+        await user.selectOptions(screen.getByTestId('assessment-scope-select'), 'question')
+      })
+
+      expect(screen.getByTestId('assessment-question-select')).toBeInTheDocument()
+    })
+
+    it('hides question selector when scope is changed back to total', async () => {
+      const user = userEvent.setup()
+
+      render(
+        <AssessmentForm
+          surveyId="survey-1"
+          groups={mockGroups}
+          questions={mockQuestions}
+          assessment={null}
+          onSubmit={vi.fn()}
+          onCancel={vi.fn()}
+        />,
+      )
+
+      await act(async () => {
+        await user.selectOptions(screen.getByTestId('assessment-scope-select'), 'question')
+      })
+      expect(screen.getByTestId('assessment-question-select')).toBeInTheDocument()
+
+      await act(async () => {
+        await user.selectOptions(screen.getByTestId('assessment-scope-select'), 'total')
+      })
+      expect(screen.queryByTestId('assessment-question-select')).not.toBeInTheDocument()
+    })
+
+    it('populates question selector with survey questions', async () => {
+      const user = userEvent.setup()
+
+      render(
+        <AssessmentForm
+          surveyId="survey-1"
+          groups={mockGroups}
+          questions={mockQuestions}
+          assessment={null}
+          onSubmit={vi.fn()}
+          onCancel={vi.fn()}
+        />,
+      )
+
+      await act(async () => {
+        await user.selectOptions(screen.getByTestId('assessment-scope-select'), 'question')
+      })
+
+      expect(screen.getByText('Q1: How satisfied are you?')).toBeInTheDocument()
+      expect(screen.getByText('Q2: Would you recommend us?')).toBeInTheDocument()
+    })
+
+    it('shows error when scope is question but no question is selected', async () => {
+      const user = userEvent.setup()
+      const onSubmit = vi.fn()
+
+      render(
+        <AssessmentForm
+          surveyId="survey-1"
+          groups={mockGroups}
+          questions={mockQuestions}
+          assessment={null}
+          onSubmit={onSubmit}
+          onCancel={vi.fn()}
+        />,
+      )
+
+      await act(async () => {
+        await user.type(screen.getByTestId('assessment-name-input'), 'Test')
+        await user.selectOptions(screen.getByTestId('assessment-scope-select'), 'question')
+        await user.type(screen.getByTestId('assessment-min-score-input'), '0')
+        await user.type(screen.getByTestId('assessment-max-score-input'), '5')
+        await user.type(screen.getByTestId('assessment-message-input'), 'Test message')
+        await user.click(screen.getByTestId('assessment-form-submit'))
+      })
+
+      expect(screen.getByTestId('assessment-form-error')).toBeInTheDocument()
+      expect(screen.getByTestId('assessment-form-error').textContent).toMatch(/question is required/i)
+      expect(onSubmit).not.toHaveBeenCalled()
+    })
+
+    it('calls onSubmit with question_id when scope is question', async () => {
+      const user = userEvent.setup()
+      const onSubmit = vi.fn().mockResolvedValue(undefined)
+
+      render(
+        <AssessmentForm
+          surveyId="survey-1"
+          groups={mockGroups}
+          questions={mockQuestions}
+          assessment={null}
+          onSubmit={onSubmit}
+          onCancel={vi.fn()}
+        />,
+      )
+
+      await act(async () => {
+        await user.type(screen.getByTestId('assessment-name-input'), 'Q1 Assessment')
+        await user.selectOptions(screen.getByTestId('assessment-scope-select'), 'question')
+      })
+
+      await act(async () => {
+        await user.selectOptions(screen.getByTestId('assessment-question-select'), 'q1')
+        await user.type(screen.getByTestId('assessment-min-score-input'), '0')
+        await user.type(screen.getByTestId('assessment-max-score-input'), '5')
+        await user.type(screen.getByTestId('assessment-message-input'), 'Low score')
+      })
+
+      await act(async () => {
+        await user.click(screen.getByTestId('assessment-form-submit'))
+      })
+
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining<Partial<AssessmentCreate>>({
+          scope: 'question',
+          question_id: 'q1',
+        }),
+      )
+    })
+
+    it('shows question selector pre-filled when editing a question-scoped assessment', () => {
+      render(
+        <AssessmentForm
+          surveyId="survey-1"
+          groups={mockGroups}
+          questions={mockQuestions}
+          assessment={mockQuestionAssessment}
+          onSubmit={vi.fn()}
+          onCancel={vi.fn()}
+        />,
+      )
+
+      const questionSelect = screen.getByTestId('assessment-question-select') as HTMLSelectElement
+      expect(questionSelect.value).toBe('q1')
     })
   })
 })

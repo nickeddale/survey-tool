@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Plus, Pencil, Trash2 } from 'lucide-react'
 import assessmentService from '../services/assessmentService'
 import surveyService from '../services/surveyService'
-import type { AssessmentResponse, QuestionGroupResponse } from '../types/survey'
+import type { AssessmentResponse, QuestionGroupResponse, QuestionResponse } from '../types/survey'
 import { ApiError } from '../types/api'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
@@ -105,8 +105,9 @@ function AssessmentsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Groups (needed for group selector in form)
+  // Groups and questions (needed for selectors in form)
   const [groups, setGroups] = useState<QuestionGroupResponse[]>([])
+  const [questions, setQuestions] = useState<QuestionResponse[]>([])
 
   // Form state
   const [showForm, setShowForm] = useState(false)
@@ -154,9 +155,10 @@ function AssessmentsPage() {
     surveyService.getSurvey(surveyId).then((survey) => {
       if (!cancelled) {
         setGroups(survey.groups)
+        setQuestions(survey.questions)
       }
     }).catch(() => {
-      // Non-critical — group selector just won't have options
+      // Non-critical — group/question selectors just won't have options
     })
     return () => { cancelled = true }
   }, [surveyId])
@@ -271,6 +273,7 @@ function AssessmentsPage() {
         <AssessmentForm
           surveyId={surveyId ?? ''}
           groups={groups}
+          questions={questions}
           assessment={editingAssessment}
           onSubmit={handleFormSubmit}
           onCancel={closeForm}

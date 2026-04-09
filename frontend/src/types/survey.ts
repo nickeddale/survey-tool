@@ -372,12 +372,13 @@ export interface QuotaListResponse {
 // AssessmentResponse, AssessmentListResponse)
 // ---------------------------------------------------------------------------
 
-export type AssessmentScope = 'total' | 'group'
+export type AssessmentScope = 'total' | 'group' | 'question'
 
 export interface AssessmentCreate {
   name: string
   scope: AssessmentScope
   group_id?: string | null
+  question_id?: string | null
   min_score: number
   max_score: number
   message: string
@@ -387,6 +388,7 @@ export interface AssessmentUpdate {
   name?: string
   scope?: AssessmentScope
   group_id?: string | null
+  question_id?: string | null
   min_score?: number
   max_score?: number
   message?: string
@@ -398,6 +400,7 @@ export interface AssessmentResponse {
   name: string
   scope: AssessmentScope
   group_id: string | null
+  question_id: string | null
   min_score: number
   max_score: number
   message: string

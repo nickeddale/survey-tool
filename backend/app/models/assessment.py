@@ -11,6 +11,7 @@ from app.database import Base
 assessment_scope = ENUM(
     "total",
     "group",
+    "question",
     name="assessment_scope",
     create_type=False,
 )
@@ -44,6 +45,12 @@ class Assessment(Base):
         nullable=True,
         index=True,
     )
+    question_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("questions.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
     min_score: Mapped[float] = mapped_column(
         Numeric(precision=10, scale=2),
         nullable=False,
@@ -73,5 +80,9 @@ class Assessment(Base):
     )
     group = relationship(
         "QuestionGroup",
+        lazy="raise",
+    )
+    question = relationship(
+        "Question",
         lazy="raise",
     )

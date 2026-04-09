@@ -1,10 +1,11 @@
 """Scoring engine for survey assessments.
 
 Computes a total score for a response by summing the assessment_value of all
-selected answer options. Supports two scopes:
+selected answer options. Supports three scopes:
 
-    total - sum over all questions in the survey
-    group - sum only questions belonging to a specific question group
+    total    - sum over all questions in the survey
+    group    - sum only questions belonging to a specific question group
+    question - sum only the specified question
 
 Returns the computed score and all Assessment rules whose [min_score, max_score]
 range contains the computed score. Multiple rules may match (overlapping ranges).
@@ -40,6 +41,7 @@ async def compute_score(
         3. Load all Assessment rules for the survey.
         4. For scope=total: use all questions' answer values.
            For scope=group: use only answers for questions in the specified group.
+           For scope=question: use only answers for the specified question.
         5. Return score and all matching rules (min_score <= score <= max_score).
 
     Args:
@@ -108,6 +110,7 @@ async def compute_score(
     # Step 2b: Load all AnswerOption rows for the relevant questions that have codes
     total_score = Decimal("0")
     group_score_map: dict[uuid.UUID, Decimal] = {}  # group_id -> score
+    question_score_map: dict[uuid.UUID, Decimal] = {}  # question_id -> score
 
     if answer_code_map:
         ao_result = await session.execute(
@@ -129,6 +132,9 @@ async def compute_score(
                 group_id = question_group_map.get(ao.question_id)
                 if group_id is not None:
                     group_score_map[group_id] = group_score_map.get(group_id, Decimal("0")) + av
+                question_score_map[ao.question_id] = (
+                    question_score_map.get(ao.question_id, Decimal("0")) + av
+                )
 
     # Step 3: Load all Assessment rules for this survey
     all_assessments = await _load_assessments(session, survey_id)
@@ -142,6 +148,10 @@ async def compute_score(
             if assessment.group_id is None:
                 continue
             score_for_rule = group_score_map.get(assessment.group_id, Decimal("0"))
+        elif assessment.scope == "question":
+            if assessment.question_id is None:
+                continue
+            score_for_rule = question_score_map.get(assessment.question_id, Decimal("0"))
         else:
             continue
 
