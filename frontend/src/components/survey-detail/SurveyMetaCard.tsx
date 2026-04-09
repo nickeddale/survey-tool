@@ -1,3 +1,5 @@
+import { Pencil } from 'lucide-react'
+import { Button } from '../ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 
 const LANGUAGE_LABELS: Record<string, string> = {
@@ -12,6 +14,9 @@ const LANGUAGE_LABELS: Record<string, string> = {
 }
 
 interface SurveyMetaCardProps {
+  surveyId: string
+  surveyStatus: string
+  onNavigate: (path: string) => void
   description?: string | null
   welcomeMessage?: string | null
   endMessage?: string | null
@@ -30,6 +35,9 @@ function formattedDate(iso: string) {
 }
 
 export function SurveyMetaCard({
+  surveyId,
+  surveyStatus,
+  onNavigate,
   description,
   welcomeMessage,
   endMessage,
@@ -40,8 +48,20 @@ export function SurveyMetaCard({
 }: SurveyMetaCardProps) {
   return (
     <Card className="mb-6">
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-lg">Survey Information</CardTitle>
+        {surveyStatus === 'draft' && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onNavigate(`/surveys/${surveyId}/edit`)}
+            aria-label="Edit survey"
+            data-testid="meta-edit-button"
+          >
+            <Pencil size={14} />
+            Edit Survey
+          </Button>
+        )}
       </CardHeader>
       <CardContent className="space-y-4">
         {description && (
