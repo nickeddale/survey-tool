@@ -17,7 +17,7 @@ import { server } from '../../../test/setup'
 import { ExpressionPreview, handleTestExpression } from '../ExpressionPreview'
 import { setTokens } from '../../../services/tokenService'
 import { mockTokens } from '../../../mocks/handlers'
-import type { ValidateExpressionResult } from '../../../types/survey'
+import type { EvaluateExpressionResult } from '../../../types/survey'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -70,13 +70,12 @@ function renderPreview(props: {
 // ---------------------------------------------------------------------------
 
 describe('handleTestExpression — pure function', () => {
-  it('returns true result when validation has no errors', async () => {
+  it('returns true result when evaluate endpoint returns result: true', async () => {
     server.use(
-      http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async () => {
-        const response: ValidateExpressionResult = {
-          parsed_variables: [],
+      http.post(`${BASE}/surveys/:surveyId/logic/evaluate-expression`, async () => {
+        const response: EvaluateExpressionResult = {
+          result: true,
           errors: [],
-          warnings: [],
         }
         return HttpResponse.json(response, { status: 200 })
       }),
@@ -92,13 +91,12 @@ describe('handleTestExpression — pure function', () => {
     expect(errors).toHaveLength(0)
   })
 
-  it('returns false result when validation has errors', async () => {
+  it('returns false result when evaluate endpoint returns result: false', async () => {
     server.use(
-      http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async () => {
-        const response: ValidateExpressionResult = {
-          parsed_variables: [],
-          errors: [{ message: 'Syntax error', position: 0, code: 'SYNTAX_ERROR' }],
-          warnings: [],
+      http.post(`${BASE}/surveys/:surveyId/logic/evaluate-expression`, async () => {
+        const response: EvaluateExpressionResult = {
+          result: false,
+          errors: [],
         }
         return HttpResponse.json(response, { status: 200 })
       }),
@@ -106,11 +104,32 @@ describe('handleTestExpression — pure function', () => {
 
     const { result, errors } = await handleTestExpression(
       SURVEY_ID,
-      "{Q1} == bad",
-      { Q1: 'yes' },
+      "{Q1} == 'Yes'",
+      { Q1: 'No' },
     )
 
     expect(result).toBe(false)
+    expect(errors).toHaveLength(0)
+  })
+
+  it('returns null result when evaluate endpoint returns null result with errors', async () => {
+    server.use(
+      http.post(`${BASE}/surveys/:surveyId/logic/evaluate-expression`, async () => {
+        const response: EvaluateExpressionResult = {
+          result: null,
+          errors: [{ message: 'Syntax error', position: 0, code: 'SYNTAX_ERROR' }],
+        }
+        return HttpResponse.json(response, { status: 200 })
+      }),
+    )
+
+    const { result, errors } = await handleTestExpression(
+      SURVEY_ID,
+      "{Q1} === bad",
+      { Q1: 'yes' },
+    )
+
+    expect(result).toBeNull()
     expect(errors).toHaveLength(1)
     expect(errors[0]).toHaveProperty('message')
     expect(errors[0]).toHaveProperty('position')
@@ -119,7 +138,7 @@ describe('handleTestExpression — pure function', () => {
 
   it('returns null result when API throws', async () => {
     server.use(
-      http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async () => {
+      http.post(`${BASE}/surveys/:surveyId/logic/evaluate-expression`, async () => {
         return HttpResponse.json(
           { detail: { code: 'SERVER_ERROR', message: 'Internal error' } },
           { status: 500 },
@@ -137,38 +156,58 @@ describe('handleTestExpression — pure function', () => {
     expect(errors).toHaveLength(0)
   })
 
-  it('interpolates numeric sample values without quotes', async () => {
-    let capturedExpression: string | null = null
+  it('sends raw expression and sampleValues as context (no string interpolation)', async () => {
+    let capturedBody: { expression: string; context: Record<string, string> } | null = null
 
     server.use(
-      http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async ({ request }) => {
-        const body = (await request.json()) as { expression: string }
-        capturedExpression = body.expression
-        return HttpResponse.json({ parsed_variables: [], errors: [], warnings: [] }, { status: 200 })
+      http.post(`${BASE}/surveys/:surveyId/logic/evaluate-expression`, async ({ request }) => {
+        capturedBody = (await request.json()) as {
+          expression: string
+          context: Record<string, string>
+        }
+        return HttpResponse.json({ result: true, errors: [] }, { status: 200 })
       }),
     )
 
     await handleTestExpression(SURVEY_ID, '{Q1} > {Q2}', { Q1: '5', Q2: '3' })
 
-    // Numeric values should be interpolated without quotes
-    expect(capturedExpression).toBe('5 > 3')
+    // The raw expression must be sent, NOT interpolated
+    expect(capturedBody!.expression).toBe('{Q1} > {Q2}')
+    // Sample values are sent as context dict
+    expect(capturedBody!.context).toEqual({ Q1: '5', Q2: '3' })
   })
 
-  it('interpolates string sample values with quotes', async () => {
-    let capturedExpression: string | null = null
+  it('sends context with string values without quoting them', async () => {
+    let capturedBody: { expression: string; context: Record<string, string> } | null = null
 
     server.use(
-      http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async ({ request }) => {
-        const body = (await request.json()) as { expression: string }
-        capturedExpression = body.expression
-        return HttpResponse.json({ parsed_variables: [], errors: [], warnings: [] }, { status: 200 })
+      http.post(`${BASE}/surveys/:surveyId/logic/evaluate-expression`, async ({ request }) => {
+        capturedBody = (await request.json()) as {
+          expression: string
+          context: Record<string, string>
+        }
+        return HttpResponse.json({ result: true, errors: [] }, { status: 200 })
       }),
     )
 
-    await handleTestExpression(SURVEY_ID, "{Q1} == '{Q1}'", { Q1: 'hello' })
+    await handleTestExpression(SURVEY_ID, "{Q1} == 'Yes'", { Q1: 'Yes' })
 
-    // String values should be interpolated with quotes
-    expect(capturedExpression).toContain("'hello'")
+    // Context value must be the raw string, not quoted
+    expect(capturedBody!.context).toEqual({ Q1: 'Yes' })
+    // Expression must remain unchanged
+    expect(capturedBody!.expression).toBe("{Q1} == 'Yes'")
+  })
+
+  it('correctly distinguishes false from null: false means evaluated to false', async () => {
+    server.use(
+      http.post(`${BASE}/surveys/:surveyId/logic/evaluate-expression`, async () => {
+        return HttpResponse.json({ result: false, errors: [] }, { status: 200 })
+      }),
+    )
+
+    const { result } = await handleTestExpression(SURVEY_ID, "{Q1} == 'Yes'", { Q1: 'No' })
+    expect(result).toBe(false)
+    expect(result).not.toBeNull()
   })
 })
 
@@ -207,11 +246,11 @@ describe('ExpressionPreview — rendering', () => {
 })
 
 describe('ExpressionPreview — true result', () => {
-  it('shows true result after successful evaluation', async () => {
+  it('shows true result after evaluation returns true', async () => {
     server.use(
-      http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async () => {
+      http.post(`${BASE}/surveys/:surveyId/logic/evaluate-expression`, async () => {
         return HttpResponse.json(
-          { parsed_variables: [], errors: [], warnings: [] } satisfies ValidateExpressionResult,
+          { result: true, errors: [] } satisfies EvaluateExpressionResult,
           { status: 200 },
         )
       }),
@@ -240,15 +279,11 @@ describe('ExpressionPreview — true result', () => {
 })
 
 describe('ExpressionPreview — false result', () => {
-  it('shows false result when validation has errors', async () => {
+  it('shows false result when evaluate endpoint returns result: false', async () => {
     server.use(
-      http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async () => {
+      http.post(`${BASE}/surveys/:surveyId/logic/evaluate-expression`, async () => {
         return HttpResponse.json(
-          {
-            parsed_variables: [],
-            errors: [{ message: 'Type mismatch', position: 5, code: 'TYPE_MISMATCH' }],
-            warnings: [],
-          } satisfies ValidateExpressionResult,
+          { result: false, errors: [] } satisfies EvaluateExpressionResult,
           { status: 200 },
         )
       }),
@@ -258,7 +293,7 @@ describe('ExpressionPreview — false result', () => {
 
     const input = screen.getByTestId('sample-input-Q1')
     await act(async () => {
-      await userEvent.type(input, 'bad-value')
+      await userEvent.type(input, 'No')
     })
 
     const evaluateBtn = screen.getByTestId('test-expression-run')
@@ -273,15 +308,14 @@ describe('ExpressionPreview — false result', () => {
     expect(screen.getByTestId('test-expression-result')).toHaveTextContent('false')
   })
 
-  it('shows evaluation errors with position', async () => {
+  it('shows evaluation errors with position when evaluation has errors', async () => {
     server.use(
-      http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async () => {
+      http.post(`${BASE}/surveys/:surveyId/logic/evaluate-expression`, async () => {
         return HttpResponse.json(
           {
-            parsed_variables: [],
-            errors: [{ message: 'Type mismatch', position: 5, code: 'TYPE_MISMATCH' }],
-            warnings: [],
-          } satisfies ValidateExpressionResult,
+            result: null,
+            errors: [{ message: 'Type mismatch', position: 5, code: 'SYNTAX_ERROR' as const }],
+          } satisfies EvaluateExpressionResult,
           { status: 200 },
         )
       }),
@@ -308,15 +342,14 @@ describe('ExpressionPreview — false result', () => {
 })
 
 describe('ExpressionPreview — mock response shape assertion', () => {
-  it('mock response has correct ValidateExpressionResult shape (no valid field)', async () => {
-    let capturedResponse: ValidateExpressionResult | null = null
+  it('mock response has correct EvaluateExpressionResult shape', async () => {
+    let capturedResponse: EvaluateExpressionResult | null = null
 
     server.use(
-      http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async () => {
-        const response: ValidateExpressionResult = {
-          parsed_variables: ['Q1'],
+      http.post(`${BASE}/surveys/:surveyId/logic/evaluate-expression`, async () => {
+        const response: EvaluateExpressionResult = {
+          result: true,
           errors: [],
-          warnings: [],
         }
         capturedResponse = response
         return HttpResponse.json(response, { status: 200 })
@@ -339,14 +372,13 @@ describe('ExpressionPreview — mock response shape assertion', () => {
     })
 
     // Shape assertions
-    expect(capturedResponse).toHaveProperty('parsed_variables')
+    expect(capturedResponse).toHaveProperty('result')
     expect(capturedResponse).toHaveProperty('errors')
-    expect(capturedResponse).toHaveProperty('warnings')
-    // errors and warnings must be arrays of objects (not strings)
+    // errors must be an array
     expect(Array.isArray(capturedResponse!.errors)).toBe(true)
-    expect(Array.isArray(capturedResponse!.warnings)).toBe(true)
-    // No 'valid' field on the response
-    expect(capturedResponse).not.toHaveProperty('valid')
+    // No 'warnings' or 'parsed_variables' field on the response
+    expect(capturedResponse).not.toHaveProperty('warnings')
+    expect(capturedResponse).not.toHaveProperty('parsed_variables')
   })
 })
 

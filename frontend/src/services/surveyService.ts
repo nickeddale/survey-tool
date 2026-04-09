@@ -1,6 +1,6 @@
 import axios from 'axios'
 import apiClient from './apiClient'
-import type { SurveyResponse, SurveyFullResponse, SurveyListResponse, SurveyCreatePayload, SurveyUpdatePayload, AnswerOptionResponse, QuestionResponse, QuestionUpdatePayload, QuestionCreatePayload, QuestionGroupResponse, QuestionGroupCreatePayload, QuestionGroupUpdatePayload, GroupReorderPayload, ValidateExpressionResult } from '../types/survey'
+import type { SurveyResponse, SurveyFullResponse, SurveyListResponse, SurveyCreatePayload, SurveyUpdatePayload, AnswerOptionResponse, QuestionResponse, QuestionUpdatePayload, QuestionCreatePayload, QuestionGroupResponse, QuestionGroupCreatePayload, QuestionGroupUpdatePayload, GroupReorderPayload, ValidateExpressionResult, EvaluateExpressionResult } from '../types/survey'
 
 export interface TranslationsUpdatePayload {
   lang: string
@@ -45,8 +45,13 @@ export interface ValidateExpressionPayload {
   question_code?: string
 }
 
-// Re-export ValidateExpressionResult from types/survey for convenience
-export type { ValidateExpressionResult } from '../types/survey'
+export interface EvaluateExpressionPayload {
+  expression: string
+  context: Record<string, string>
+}
+
+// Re-export ValidateExpressionResult and EvaluateExpressionResult from types/survey for convenience
+export type { ValidateExpressionResult, EvaluateExpressionResult } from '../types/survey'
 
 class SurveyService {
   async fetchSurveys(params: SurveyFetchParams = {}): Promise<SurveyListResponse> {
@@ -272,6 +277,17 @@ class SurveyService {
   ): Promise<ValidateExpressionResult> {
     const response = await apiClient.post<ValidateExpressionResult>(
       `/surveys/${surveyId}/logic/validate-expression`,
+      data,
+    )
+    return response.data
+  }
+
+  async evaluateExpression(
+    surveyId: string,
+    data: EvaluateExpressionPayload,
+  ): Promise<EvaluateExpressionResult> {
+    const response = await apiClient.post<EvaluateExpressionResult>(
+      `/surveys/${surveyId}/logic/evaluate-expression`,
       data,
     )
     return response.data

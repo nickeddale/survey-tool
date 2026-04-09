@@ -114,6 +114,13 @@ export interface ValidateExpressionResult {
   warnings: ExpressionWarning[]
 }
 
+export interface EvaluateExpressionResult {
+  /** The actual boolean result of evaluating the expression, or null on parse/eval error. */
+  result: boolean | null
+  /** Syntax or evaluation errors encountered. */
+  errors: ExpressionError[]
+}
+
 export interface SurveyCreatePayload {
   title: string
   description?: string | null

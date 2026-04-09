@@ -2,13 +2,14 @@
  * ExpressionPreview — "Test Expression" panel for LogicEditor.
  *
  * Accepts sample values for each referenced variable (parsed_variables) and
- * calls the validate-expression endpoint to evaluate the expression. Shows a
- * true/false result based on the validation response (valid = true, errors = false).
+ * calls the evaluate-expression endpoint with the raw expression and a context
+ * dict of sample values. Displays the actual boolean result returned by the
+ * backend evaluator.
  */
 
 import { useState, useCallback } from 'react'
 import surveyService from '../../services/surveyService'
-import type { ValidateExpressionResult } from '../../types/survey'
+import type { EvaluateExpressionResult } from '../../types/survey'
 
 // ---------------------------------------------------------------------------
 // Pure helper – exported for unit testing without mounting the component
@@ -18,20 +19,14 @@ export async function handleTestExpression(
   surveyId: string,
   expression: string,
   sampleValues: Record<string, string>,
-): Promise<{ result: boolean | null; errors: ValidateExpressionResult['errors'] }> {
-  // Substitute sample values into the expression for evaluation
-  let interpolated = expression
-  for (const [varName, val] of Object.entries(sampleValues)) {
-    // Replace {VAR} with the sample value (quoted if not a number)
-    const isNumeric = val !== '' && !isNaN(Number(val))
-    const replacement = isNumeric ? val : `'${val}'`
-    interpolated = interpolated.replaceAll(`{${varName}}`, replacement)
-  }
-
+): Promise<{ result: boolean | null; errors: EvaluateExpressionResult['errors'] }> {
   try {
-    const result = await surveyService.validateExpression(surveyId, { expression: interpolated })
+    const result = await surveyService.evaluateExpression(surveyId, {
+      expression,
+      context: sampleValues,
+    })
     return {
-      result: result.errors.length === 0,
+      result: result.result,
       errors: result.errors,
     }
   } catch {
@@ -62,7 +57,7 @@ export function ExpressionPreview({
 }: ExpressionPreviewProps) {
   const [sampleValues, setSampleValues] = useState<Record<string, string>>({})
   const [testResult, setTestResult] = useState<boolean | null>(null)
-  const [testErrors, setTestErrors] = useState<ValidateExpressionResult['errors']>([])
+  const [testErrors, setTestErrors] = useState<EvaluateExpressionResult['errors']>([])
   const [isTesting, setIsTesting] = useState(false)
 
   function handleSampleChange(varName: string, value: string) {
