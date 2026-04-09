@@ -79,7 +79,7 @@ const QUESTION_TYPES = [
   { type: 'single_choice', label: 'Single Choice', icon: ToggleLeft },
   { type: 'multiple_choice', label: 'Multiple Choice', icon: CheckSquare },
   { type: 'dropdown', label: 'Dropdown', icon: List },
-  { type: 'numeric', label: 'Number', icon: Hash },
+  { type: 'number', label: 'Number', icon: Hash },
 ]
 
 // ---------------------------------------------------------------------------
