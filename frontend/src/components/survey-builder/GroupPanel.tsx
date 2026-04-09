@@ -54,7 +54,7 @@ const QUESTION_TYPES = [
   { type: 'single_choice', label: 'Single Choice' },
   { type: 'multiple_choice', label: 'Multiple Choice' },
   { type: 'dropdown', label: 'Dropdown' },
-  { type: 'numeric', label: 'Number' },
+  { type: 'number', label: 'Number' },
 ]
 
 // ---------------------------------------------------------------------------
