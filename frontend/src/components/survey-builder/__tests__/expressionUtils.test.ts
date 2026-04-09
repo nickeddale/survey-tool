@@ -235,14 +235,14 @@ describe('serializeRootGroup', () => {
     const row1: ConditionRow = { type: 'condition', id: 'r1', questionCode: 'Q1', operator: '==', value: 'yes' }
     const row2: ConditionRow = { type: 'condition', id: 'r2', questionCode: 'Q2', operator: '>', value: '5' }
     const group: ConditionGroup = { type: 'group', id: 'g1', logic: 'and', items: [row1, row2] }
-    expect(serializeRootGroup(group)).toBe("{Q1} == 'yes' AND {Q2} > 5")
+    expect(serializeRootGroup(group)).toBe("{Q1} == 'yes' and {Q2} > 5")
   })
 
   it('serializes OR group', () => {
     const row1: ConditionRow = { type: 'condition', id: 'r1', questionCode: 'Q1', operator: '==', value: 'a' }
     const row2: ConditionRow = { type: 'condition', id: 'r2', questionCode: 'Q1', operator: '==', value: 'b' }
     const group: ConditionGroup = { type: 'group', id: 'g1', logic: 'or', items: [row1, row2] }
-    expect(serializeRootGroup(group)).toBe("{Q1} == 'a' OR {Q1} == 'b'")
+    expect(serializeRootGroup(group)).toBe("{Q1} == 'a' or {Q1} == 'b'")
   })
 })
 
@@ -255,7 +255,7 @@ describe('serializeGroup', () => {
     const row1: ConditionRow = { type: 'condition', id: 'r1', questionCode: 'Q1', operator: '==', value: 'yes' }
     const row2: ConditionRow = { type: 'condition', id: 'r2', questionCode: 'Q2', operator: '==', value: 'no' }
     const group: ConditionGroup = { type: 'group', id: 'g1', logic: 'and', items: [row1, row2] }
-    expect(serializeGroup(group)).toBe("({Q1} == 'yes' AND {Q2} == 'no')")
+    expect(serializeGroup(group)).toBe("({Q1} == 'yes' and {Q2} == 'no')")
   })
 
   it('does not wrap single item', () => {
@@ -278,14 +278,14 @@ describe('round-trip: serialize(parse(expr)) === expr', () => {
   })
 
   it('round-trips AND expression', () => {
-    const expr = "{Q1} == 'yes' AND {Q2} > 5"
+    const expr = "{Q1} == 'yes' and {Q2} > 5"
     const parsed = parseExpression(expr)
     expect(parsed).not.toBeNull()
     expect(serializeRootGroup(parsed!)).toBe(expr)
   })
 
   it('round-trips OR expression', () => {
-    const expr = "{Q1} == 'a' OR {Q1} == 'b'"
+    const expr = "{Q1} == 'a' or {Q1} == 'b'"
     const parsed = parseExpression(expr)
     expect(parsed).not.toBeNull()
     expect(serializeRootGroup(parsed!)).toBe(expr)

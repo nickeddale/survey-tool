@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-09T21:22:36.343Z",
+  "lastUpdated": "2026-04-09T21:36:01.694Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3902,6 +3902,27 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md",
+      "ticketId": "ISS-201",
+      "title": "Visual builder generates uppercase AND/OR keywords not recognized by parser",
+      "date": "2026-04-09",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "refactoring",
+        "bug-fix",
+        "feature",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4094,7 +4115,8 @@
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
       "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md",
       "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
-      "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md"
+      "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md",
+      "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4265,7 +4287,8 @@
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
       "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md",
       "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
-      "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md"
+      "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md",
+      "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4584,7 +4607,8 @@
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
       "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md",
       "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
-      "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md"
+      "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md",
+      "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4640,7 +4664,8 @@
       "2026-04-08-iss-181-resolve-flow-endpoint-returns-400-for-valid-answer.md",
       "2026-04-08-iss-184-responseservice-uses-apiclient-with-auth-intercept.md",
       "2026-04-09-iss-194-add-question-level-scope-to-assessments.md",
-      "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md"
+      "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
+      "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md"
     ],
     "bug-fix": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4818,7 +4843,8 @@
       "2026-04-09-iss-197-number-question-type-fails-with-409-type-mismatch.md",
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
       "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md",
-      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md"
+      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
+      "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5005,7 +5031,8 @@
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
       "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md",
       "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
-      "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md"
+      "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md",
+      "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5161,7 +5188,8 @@
       "2026-04-09-iss-192-iss-192-migration-0013-still-fails-assessmentscope.md",
       "2026-04-09-iss-193-iss-193-responsesstatus-column-type-mismatch-enum.md",
       "2026-04-09-iss-196-relocate-builder-and-edit-survey-buttons-on-detail.md",
-      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md"
+      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
+      "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5301,7 +5329,8 @@
       "2026-04-09-iss-194-add-question-level-scope-to-assessments.md",
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
       "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
-      "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md"
+      "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md",
+      "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5480,7 +5509,8 @@
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
       "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md",
       "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
-      "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md"
+      "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md",
+      "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -5601,7 +5631,8 @@
       "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
       "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
       "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md",
-      "2026-04-09-iss-194-add-question-level-scope-to-assessments.md"
+      "2026-04-09-iss-194-add-question-level-scope-to-assessments.md",
+      "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
