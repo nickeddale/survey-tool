@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-09T07:53:12.081Z",
+  "lastUpdated": "2026-04-09T08:01:55.575Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3766,6 +3766,20 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-09-iss-195-add-builder-button-to-survey-detail-page.md",
+      "ticketId": "ISS-195",
+      "title": "Add Builder button to survey detail page",
+      "date": "2026-04-09",
+      "categories": [
+        "frontend",
+        "navigation",
+        "ui"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "low"
     }
   ],
   "categoryIndex": {
@@ -4429,7 +4443,8 @@
       "2026-04-09-iss-191-iss-191-resolve-flow-still-crashes-optionlabel-sho.md",
       "2026-04-09-iss-192-iss-192-migration-0013-still-fails-assessmentscope.md",
       "2026-04-09-iss-193-iss-193-responsesstatus-column-type-mismatch-enum.md",
-      "2026-04-09-iss-194-add-question-level-scope-to-assessments.md"
+      "2026-04-09-iss-194-add-question-level-scope-to-assessments.md",
+      "2026-04-09-iss-195-add-builder-button-to-survey-detail-page.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5431,7 +5446,8 @@
       "2026-04-03-iss-095-613-frontend-response-export-ui-and-statistics-das.md",
       "2026-04-03-iss-105-710-frontend-quota-management-ui.md",
       "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md",
-      "2026-04-04-iss-104-79-frontend-participant-management-ui.md"
+      "2026-04-04-iss-104-79-frontend-participant-management-ui.md",
+      "2026-04-09-iss-195-add-builder-button-to-survey-detail-page.md"
     ],
     "vitest": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
@@ -5454,7 +5470,8 @@
       "2026-04-03-iss-075-55-variable-resolution-system.md"
     ],
     "navigation": [
-      "2026-04-03-iss-077-57-skip-logic-implementation.md"
+      "2026-04-03-iss-077-57-skip-logic-implementation.md",
+      "2026-04-09-iss-195-add-builder-button-to-survey-detail-page.md"
     ],
     "survey-flow": [
       "2026-04-03-iss-077-57-skip-logic-implementation.md"
