@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-09T08:32:49.728Z",
+  "lastUpdated": "2026-04-09T08:41:48.737Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3796,6 +3796,23 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-09-iss-197-number-question-type-fails-with-409-type-mismatch.md",
+      "ticketId": "ISS-197",
+      "title": "Number question type fails with 409 — type mismatch",
+      "date": "2026-04-09",
+      "categories": [
+        "testing",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -3983,7 +4000,8 @@
       "2026-04-09-iss-192-iss-192-migration-0013-still-fails-assessmentscope.md",
       "2026-04-09-iss-193-iss-193-responsesstatus-column-type-mismatch-enum.md",
       "2026-04-09-iss-194-add-question-level-scope-to-assessments.md",
-      "2026-04-09-iss-196-relocate-builder-and-edit-survey-buttons-on-detail.md"
+      "2026-04-09-iss-196-relocate-builder-and-edit-survey-buttons-on-detail.md",
+      "2026-04-09-iss-197-number-question-type-fails-with-409-type-mismatch.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4280,7 +4298,8 @@
       "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md",
       "2026-04-09-iss-192-iss-192-migration-0013-still-fails-assessmentscope.md",
       "2026-04-09-iss-193-iss-193-responsesstatus-column-type-mismatch-enum.md",
-      "2026-04-09-iss-194-add-question-level-scope-to-assessments.md"
+      "2026-04-09-iss-194-add-question-level-scope-to-assessments.md",
+      "2026-04-09-iss-197-number-question-type-fails-with-409-type-mismatch.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4462,7 +4481,8 @@
       "2026-04-09-iss-193-iss-193-responsesstatus-column-type-mismatch-enum.md",
       "2026-04-09-iss-194-add-question-level-scope-to-assessments.md",
       "2026-04-09-iss-195-add-builder-button-to-survey-detail-page.md",
-      "2026-04-09-iss-196-relocate-builder-and-edit-survey-buttons-on-detail.md"
+      "2026-04-09-iss-196-relocate-builder-and-edit-survey-buttons-on-detail.md",
+      "2026-04-09-iss-197-number-question-type-fails-with-409-type-mismatch.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4691,7 +4711,8 @@
       "2026-04-09-iss-191-iss-191-resolve-flow-still-crashes-optionlabel-sho.md",
       "2026-04-09-iss-192-iss-192-migration-0013-still-fails-assessmentscope.md",
       "2026-04-09-iss-193-iss-193-responsesstatus-column-type-mismatch-enum.md",
-      "2026-04-09-iss-194-add-question-level-scope-to-assessments.md"
+      "2026-04-09-iss-194-add-question-level-scope-to-assessments.md",
+      "2026-04-09-iss-197-number-question-type-fails-with-409-type-mismatch.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4873,7 +4894,8 @@
       "2026-04-09-iss-192-iss-192-migration-0013-still-fails-assessmentscope.md",
       "2026-04-09-iss-193-iss-193-responsesstatus-column-type-mismatch-enum.md",
       "2026-04-09-iss-194-add-question-level-scope-to-assessments.md",
-      "2026-04-09-iss-196-relocate-builder-and-edit-survey-buttons-on-detail.md"
+      "2026-04-09-iss-196-relocate-builder-and-edit-survey-buttons-on-detail.md",
+      "2026-04-09-iss-197-number-question-type-fails-with-409-type-mismatch.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5338,7 +5360,8 @@
       "2026-04-09-iss-192-iss-192-migration-0013-still-fails-assessmentscope.md",
       "2026-04-09-iss-193-iss-193-responsesstatus-column-type-mismatch-enum.md",
       "2026-04-09-iss-194-add-question-level-scope-to-assessments.md",
-      "2026-04-09-iss-196-relocate-builder-and-edit-survey-buttons-on-detail.md"
+      "2026-04-09-iss-196-relocate-builder-and-edit-survey-buttons-on-detail.md",
+      "2026-04-09-iss-197-number-question-type-fails-with-409-type-mismatch.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",

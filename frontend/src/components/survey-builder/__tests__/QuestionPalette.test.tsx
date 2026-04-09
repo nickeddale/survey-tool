@@ -23,7 +23,7 @@ describe('QuestionPalette rendering', () => {
     expect(screen.getByTestId('palette-question-type-single_choice')).toBeInTheDocument()
     expect(screen.getByTestId('palette-question-type-multiple_choice')).toBeInTheDocument()
     expect(screen.getByTestId('palette-question-type-dropdown')).toBeInTheDocument()
-    expect(screen.getByTestId('palette-question-type-numeric')).toBeInTheDocument()
+    expect(screen.getByTestId('palette-question-type-number')).toBeInTheDocument()
   })
 
   it('renders buttons as disabled in read-only mode', () => {
