@@ -97,10 +97,12 @@ export interface ExpressionError {
   code: ExpressionErrorCode
 }
 
+export type ExpressionWarningCode = 'FORWARD_REFERENCE' | string
+
 export interface ExpressionWarning {
   message: string
   position: number
-  code: string
+  code: ExpressionWarningCode
 }
 
 export interface ValidateExpressionResult {
