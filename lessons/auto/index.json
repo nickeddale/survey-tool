@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-09T17:41:22.729Z",
+  "lastUpdated": "2026-04-09T21:06:16.798Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3851,6 +3851,21 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-09-iss-204-questions-with-relevance-flash-visible-before-init.md",
+      "ticketId": "ISS-204",
+      "title": "Questions with relevance flash visible before initial flow resolution completes",
+      "date": "2026-04-09",
+      "categories": [
+        "frontend",
+        "hooks",
+        "ux",
+        "survey-flow"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "low"
     }
   ],
   "categoryIndex": {
@@ -5545,7 +5560,8 @@
       "2026-04-03-iss-105-710-frontend-quota-management-ui.md",
       "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md",
       "2026-04-04-iss-104-79-frontend-participant-management-ui.md",
-      "2026-04-09-iss-195-add-builder-button-to-survey-detail-page.md"
+      "2026-04-09-iss-195-add-builder-button-to-survey-detail-page.md",
+      "2026-04-09-iss-204-questions-with-relevance-flash-visible-before-init.md"
     ],
     "vitest": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
@@ -5572,7 +5588,8 @@
       "2026-04-09-iss-195-add-builder-button-to-survey-detail-page.md"
     ],
     "survey-flow": [
-      "2026-04-03-iss-077-57-skip-logic-implementation.md"
+      "2026-04-03-iss-077-57-skip-logic-implementation.md",
+      "2026-04-09-iss-204-questions-with-relevance-flash-visible-before-init.md"
     ],
     "expressions": [
       "2026-04-03-iss-077-57-skip-logic-implementation.md"
@@ -5659,6 +5676,12 @@
     ],
     "tables": [
       "2026-04-08-iss-170-surveys-list-table-clips-columns-at-mobile-viewpor.md"
+    ],
+    "hooks": [
+      "2026-04-09-iss-204-questions-with-relevance-flash-visible-before-init.md"
+    ],
+    "ux": [
+      "2026-04-09-iss-204-questions-with-relevance-flash-visible-before-init.md"
     ]
   },
   "fileIndex": {

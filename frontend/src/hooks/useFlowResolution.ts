@@ -16,7 +16,7 @@
 import { useState, useEffect, useRef } from 'react'
 import responseService from '../services/responseService'
 import type { AnswerMap } from './useValidation'
-import type { ResolveFlowResponse } from '../types/survey'
+import type { QuestionResponse, ResolveFlowResponse } from '../types/survey'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -39,14 +39,19 @@ export interface FlowResolutionState {
   isResolving: boolean
 }
 
-const EMPTY_STATE: FlowResolutionState = {
-  visibleQuestions: new Set(),
-  hiddenQuestions: new Set(),
-  visibleGroups: new Set(),
-  hiddenGroups: new Set(),
-  pipedTexts: {},
-  nextQuestionId: null,
-  isResolving: false,
+/**
+ * Computes the initial set of hidden question ids from a flat list of questions.
+ * Questions that have a non-empty relevance expression are hidden by default until
+ * the first resolve-flow API response arrives, preventing a flash of visibility.
+ */
+export function computeInitialHiddenQuestions(questions: QuestionResponse[]): Set<string> {
+  const hidden = new Set<string>()
+  for (const q of questions) {
+    if (q.relevance != null && q.relevance !== '') {
+      hidden.add(q.id)
+    }
+  }
+  return hidden
 }
 
 // ---------------------------------------------------------------------------
@@ -56,8 +61,19 @@ const EMPTY_STATE: FlowResolutionState = {
 export function useFlowResolution(
   surveyId: string | undefined,
   answers: AnswerMap,
+  questions?: QuestionResponse[],
 ): FlowResolutionState {
-  const [state, setState] = useState<FlowResolutionState>(EMPTY_STATE)
+  const initialHidden = questions ? computeInitialHiddenQuestions(questions) : new Set<string>()
+
+  const [state, setState] = useState<FlowResolutionState>({
+    visibleQuestions: new Set(),
+    hiddenQuestions: initialHidden,
+    visibleGroups: new Set(),
+    hiddenGroups: new Set(),
+    pipedTexts: {},
+    nextQuestionId: null,
+    isResolving: false,
+  })
 
   // Stable refs so the async callback always reads the current values without
   // being included as effect dependencies (which would cause infinite re-runs).

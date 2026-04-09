@@ -9,8 +9,9 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { renderHook, act, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { server } from '../../test/setup'
-import { useFlowResolution } from '../useFlowResolution'
+import { useFlowResolution, computeInitialHiddenQuestions } from '../useFlowResolution'
 import type { AnswerMap } from '../useValidation'
+import type { QuestionResponse } from '../../types/survey'
 
 const BASE = '/api/v1'
 const SURVEY_ID = 'test-survey-123'
@@ -49,6 +50,73 @@ function makeResolveFlowResponse(overrides: Partial<{
   }
 }
 
+function makeQuestion(id: string, relevance: string | null = null): QuestionResponse {
+  return {
+    id,
+    group_id: 'g-1',
+    parent_id: null,
+    question_type: 'text',
+    code: id,
+    title: `Question ${id}`,
+    description: null,
+    is_required: false,
+    sort_order: 0,
+    relevance,
+    validation: null,
+    settings: null,
+    created_at: '2024-01-01T00:00:00Z',
+    subquestions: [],
+    answer_options: [],
+  }
+}
+
+// ---------------------------------------------------------------------------
+// computeInitialHiddenQuestions (pure function)
+// ---------------------------------------------------------------------------
+
+describe('computeInitialHiddenQuestions', () => {
+  it('returns empty set when questions array is empty', () => {
+    const result = computeInitialHiddenQuestions([])
+    expect(result.size).toBe(0)
+  })
+
+  it('hides questions with a non-empty relevance expression', () => {
+    const questions = [
+      makeQuestion('q-1', "{Q1} != ''"),
+      makeQuestion('q-2', '1 == 1'),
+    ]
+    const result = computeInitialHiddenQuestions(questions)
+    expect(result.has('q-1')).toBe(true)
+    expect(result.has('q-2')).toBe(true)
+  })
+
+  it('does not hide questions with null relevance', () => {
+    const questions = [makeQuestion('q-1', null)]
+    const result = computeInitialHiddenQuestions(questions)
+    expect(result.has('q-1')).toBe(false)
+  })
+
+  it('does not hide questions with empty string relevance', () => {
+    const questions = [makeQuestion('q-1', '')]
+    const result = computeInitialHiddenQuestions(questions)
+    expect(result.has('q-1')).toBe(false)
+  })
+
+  it('correctly partitions mixed questions', () => {
+    const questions = [
+      makeQuestion('q-1', "{Q1} != ''"),
+      makeQuestion('q-2', null),
+      makeQuestion('q-3', ''),
+      makeQuestion('q-4', 'someCondition'),
+    ]
+    const result = computeInitialHiddenQuestions(questions)
+    expect(result.has('q-1')).toBe(true)
+    expect(result.has('q-2')).toBe(false)
+    expect(result.has('q-3')).toBe(false)
+    expect(result.has('q-4')).toBe(true)
+  })
+})
+
 // ---------------------------------------------------------------------------
 // Initial state
 // ---------------------------------------------------------------------------
@@ -74,6 +142,56 @@ describe('useFlowResolution — initial state', () => {
 
     // isResolving is set to true before the debounce fires
     expect(result.current.isResolving).toBe(true)
+  })
+
+  it('pre-hides questions with relevance conditions before first API call', () => {
+    const questions = [
+      makeQuestion('q-with-relevance', "{Q1} != ''"),
+      makeQuestion('q-no-relevance', null),
+      makeQuestion('q-empty-relevance', ''),
+    ]
+
+    const { result } = renderHook(() =>
+      useFlowResolution(undefined, {}, questions),
+    )
+
+    // Questions with relevance should be hidden immediately
+    expect(result.current.hiddenQuestions.has('q-with-relevance')).toBe(true)
+    // Questions without relevance should NOT be pre-hidden
+    expect(result.current.hiddenQuestions.has('q-no-relevance')).toBe(false)
+    expect(result.current.hiddenQuestions.has('q-empty-relevance')).toBe(false)
+  })
+
+  it('pre-hidden questions are replaced by API response after first resolve', async () => {
+    const questions = [
+      makeQuestion('q-with-relevance', "{Q1} != ''"),
+      makeQuestion('q-no-relevance', null),
+    ]
+
+    server.use(
+      http.post(`${BASE}/surveys/${SURVEY_ID}/logic/resolve-flow`, () =>
+        HttpResponse.json(
+          makeResolveFlowResponse({
+            hidden_questions: [],
+            visible_questions: ['q-with-relevance', 'q-no-relevance'],
+          }),
+          { status: 200 },
+        ),
+      ),
+    )
+
+    const { result } = renderHook(() =>
+      useFlowResolution(SURVEY_ID, {}, questions),
+    )
+
+    // Before API resolves, pre-hidden question should be hidden
+    expect(result.current.hiddenQuestions.has('q-with-relevance')).toBe(true)
+
+    // After API resolves, state should reflect the server response
+    await waitFor(() => {
+      expect(result.current.hiddenQuestions.has('q-with-relevance')).toBe(false)
+      expect(result.current.visibleQuestions.has('q-with-relevance')).toBe(true)
+    }, { timeout: 1000 })
   })
 })
 
