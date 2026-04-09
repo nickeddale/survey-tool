@@ -967,6 +967,29 @@ export const handlers = [
     )
   }),
 
+  // POST /api/v1/surveys/:surveyId/logic/evaluate-expression
+  http.post(`${BASE}/surveys/:surveyId/logic/evaluate-expression`, async ({ request }) => {
+    const body = (await request.json()) as { expression: string; context: Record<string, string> }
+    const hasExpression = Boolean(body.expression && body.expression.trim())
+    if (!hasExpression) {
+      return HttpResponse.json(
+        {
+          result: null,
+          errors: [{ message: 'Expression cannot be empty', position: 0, code: 'SYNTAX_ERROR' }],
+        },
+        { status: 200 },
+      )
+    }
+    // Default mock: return true when expression is non-empty (tests override this as needed)
+    return HttpResponse.json(
+      {
+        result: true,
+        errors: [] as Array<{ message: string; position: number; code: string }>,
+      },
+      { status: 200 },
+    )
+  }),
+
   // PATCH /api/v1/auth/me
   http.patch(`${BASE}/auth/me`, async ({ request }) => {
     const authHeader = request.headers.get('Authorization')

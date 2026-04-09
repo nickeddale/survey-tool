@@ -32,6 +32,9 @@ from app.services.expression_engine import (
     ExpressionWarning,
     validate_expression,
 )
+from app.services.expressions.evaluator import EvaluationError, evaluate
+from app.services.expressions.lexer import LexerError, tokenize
+from app.services.expressions.parser import ParserError, parse
 from app.services.expressions.flow import (
     NavigationPosition,
     get_first_visible_question,
@@ -223,6 +226,140 @@ async def validate_expression_endpoint(
             for w in validation_result.warnings
         ],
     )
+
+
+# ---------------------------------------------------------------------------
+# Evaluate-expression schemas
+# ---------------------------------------------------------------------------
+
+
+class EvaluateExpressionRequest(BaseModel):
+    """Request body for the evaluate-expression endpoint.
+
+    Attributes:
+        expression: The expression string to evaluate.
+        context:    A mapping of variable names (question codes) to their
+                    sample values, used when evaluating the expression.
+    """
+
+    expression: str
+    context: Dict[str, Any] = {}
+
+
+class EvaluateExpressionResponse(BaseModel):
+    """Response body for the evaluate-expression endpoint.
+
+    Attributes:
+        result: The boolean result of evaluating the expression with the
+                provided context, or null if evaluation failed.
+        errors: Syntax or evaluation errors encountered.
+    """
+
+    result: Optional[bool]
+    errors: list[ExpressionErrorSchema]
+
+
+# ---------------------------------------------------------------------------
+# Evaluate-expression route
+# ---------------------------------------------------------------------------
+
+
+@router.post(
+    "/{survey_id}/logic/evaluate-expression",
+    response_model=EvaluateExpressionResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Evaluate a relevance expression with sample values",
+    description=(
+        "Evaluate a relevance expression against a provided context (sample variable values). "
+        "Returns the actual boolean result. Always returns 200; errors are reported in the "
+        "errors list, not as HTTP errors."
+    ),
+)
+@limiter.limit(RATE_LIMITS["default_mutating"])
+async def evaluate_expression_endpoint(
+    request: Request,
+    survey_id: str,
+    payload: EvaluateExpressionRequest,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> EvaluateExpressionResponse:
+    """Evaluate a relevance expression with provided sample context.
+
+    Parses the expression and evaluates it against the supplied context dict.
+    The result is the actual boolean value produced by the expression, not
+    just whether it has syntax errors.
+
+    Returns null result when parsing or evaluation fails; errors are listed
+    in the errors field.
+    """
+    _parse_survey_uuid(survey_id)
+
+    # Verify survey ownership (same pattern as validate-expression).
+    parsed_survey_id = _parse_survey_uuid(survey_id)
+    survey_row = await session.execute(
+        select(Survey.id).where(
+            Survey.id == parsed_survey_id,
+            Survey.user_id == current_user.id,
+        )
+    )
+    if survey_row.scalar_one_or_none() is None:
+        raise NotFoundError("Survey not found")
+
+    # Parse the expression.
+    try:
+        tokens = tokenize(payload.expression)
+        ast_root = parse(tokens)
+    except LexerError as exc:
+        return EvaluateExpressionResponse(
+            result=None,
+            errors=[
+                ExpressionErrorSchema(
+                    message=str(exc.args[0]),
+                    position=exc.position,
+                    code="SYNTAX_ERROR",
+                )
+            ],
+        )
+    except ParserError as exc:
+        return EvaluateExpressionResponse(
+            result=None,
+            errors=[
+                ExpressionErrorSchema(
+                    message=str(exc.args[0]),
+                    position=exc.position,
+                    code="SYNTAX_ERROR",
+                )
+            ],
+        )
+
+    # Evaluate against the provided context.
+    try:
+        raw_result = evaluate(ast_root, context=payload.context)
+        # Coerce to bool: mirrors Evaluator._to_bool logic
+        if raw_result is None:
+            bool_result = False
+        elif isinstance(raw_result, bool):
+            bool_result = raw_result
+        elif isinstance(raw_result, (int, float)):
+            bool_result = raw_result != 0
+        elif isinstance(raw_result, str):
+            bool_result = raw_result != ""
+        elif isinstance(raw_result, list):
+            bool_result = len(raw_result) > 0
+        else:
+            bool_result = bool(raw_result)
+        return EvaluateExpressionResponse(result=bool_result, errors=[])
+    except EvaluationError as exc:
+        return EvaluateExpressionResponse(
+            result=None,
+            errors=[
+                ExpressionErrorSchema(
+                    message=exc.args[0] if exc.args else str(exc),
+                    position=exc.position,
+                    code="SYNTAX_ERROR",
+                )
+            ],
+        )
 
 
 # ---------------------------------------------------------------------------
