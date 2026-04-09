@@ -82,7 +82,7 @@ export function serializeGroup(group: ConditionGroup): string {
   const parts = group.items.map(serializeItem).filter(Boolean)
   if (parts.length === 0) return ''
   if (parts.length === 1) return parts[0]
-  const joined = parts.join(` ${group.logic.toUpperCase()} `)
+  const joined = parts.join(` ${group.logic.toLowerCase()} `)
   return `(${joined})`
 }
 
@@ -90,7 +90,7 @@ export function serializeRootGroup(group: ConditionGroup): string {
   const parts = group.items.map(serializeItem).filter(Boolean)
   if (parts.length === 0) return ''
   if (parts.length === 1) return parts[0]
-  return parts.join(` ${group.logic.toUpperCase()} `)
+  return parts.join(` ${group.logic.toLowerCase()} `)
 }
 
 // ---------------------------------------------------------------------------

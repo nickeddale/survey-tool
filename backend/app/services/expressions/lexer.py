@@ -386,41 +386,42 @@ class Lexer:
             self._pos += 1
 
         word = self._source[start : self._pos]
+        lower = word.lower()
 
-        if word == "true" or word == "false":
-            self._tokens.append(Token(TokenType.BOOLEAN, word, start, self._pos))
+        if lower == "true" or lower == "false":
+            self._tokens.append(Token(TokenType.BOOLEAN, lower, start, self._pos))
             return
 
-        if word == "null":
-            self._tokens.append(Token(TokenType.NULL, word, start, self._pos))
+        if lower == "null":
+            self._tokens.append(Token(TokenType.NULL, lower, start, self._pos))
             return
 
-        if word in _LOGICAL_KEYWORDS:
-            self._tokens.append(Token(TokenType.LOGICAL, word, start, self._pos))
+        if lower in _LOGICAL_KEYWORDS:
+            self._tokens.append(Token(TokenType.LOGICAL, lower, start, self._pos))
             return
 
-        if word in _STRING_OP_KEYWORDS:
-            self._tokens.append(Token(TokenType.STRING_OP, word, start, self._pos))
+        if lower in _STRING_OP_KEYWORDS:
+            self._tokens.append(Token(TokenType.STRING_OP, lower, start, self._pos))
             return
 
-        if word == "contains":
+        if lower == "contains":
             # Lookahead past optional whitespace to check for '('
             # If '(' follows, treat as FUNCTION; otherwise STRING_OP.
             lookahead = self._pos
             while lookahead < len(self._source) and self._source[lookahead].isspace():
                 lookahead += 1
             if lookahead < len(self._source) and self._source[lookahead] == "(":
-                self._tokens.append(Token(TokenType.FUNCTION, word, start, self._pos))
+                self._tokens.append(Token(TokenType.FUNCTION, lower, start, self._pos))
             else:
-                self._tokens.append(Token(TokenType.STRING_OP, word, start, self._pos))
+                self._tokens.append(Token(TokenType.STRING_OP, lower, start, self._pos))
             return
 
-        if word == "in":
-            self._tokens.append(Token(TokenType.MEMBERSHIP, word, start, self._pos))
+        if lower == "in":
+            self._tokens.append(Token(TokenType.MEMBERSHIP, lower, start, self._pos))
             return
 
-        if word in _FUNCTION_KEYWORDS:
-            self._tokens.append(Token(TokenType.FUNCTION, word, start, self._pos))
+        if lower in _FUNCTION_KEYWORDS:
+            self._tokens.append(Token(TokenType.FUNCTION, lower, start, self._pos))
             return
 
         raise LexerError(
