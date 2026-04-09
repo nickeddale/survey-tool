@@ -449,7 +449,7 @@ async def resolve_flow_endpoint(
             piped_texts[f"{question.code}_title"] = question.title or ""
             piped_texts[f"{question.code}_description"] = question.description or ""
             for option in getattr(question, "answer_options", None) or []:
-                piped_texts[f"{question.code}_{option.code}_title"] = option.label or ""
+                piped_texts[f"{question.code}_{option.code}_title"] = option.title or ""
 
     # ------------------------------------------------------------------
     # Validate each question's relevance expression and collect results.

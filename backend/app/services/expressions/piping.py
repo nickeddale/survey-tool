@@ -280,7 +280,7 @@ def pipe_all(
         options = getattr(question, "answer_options", None) or []
         for option in options:
             opt_code = option.code
-            opt_label = option.label or ""
+            opt_label = option.title or ""
             result[f"{question.code}_{opt_code}_title"] = pipe(opt_label, context)
 
     return result
