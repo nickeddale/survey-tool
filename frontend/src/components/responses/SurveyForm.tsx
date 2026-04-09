@@ -200,6 +200,7 @@ function QuestionInput({ question, value, errors, onChange }: QuestionInputProps
           errors={errors}
         />
       )
+    case 'number':
     case 'numeric':
       return (
         <NumericInput
