@@ -54,8 +54,13 @@ function SurveyResponsePage() {
 
   const { errors, validateAll, clearErrors } = useValidation()
 
+  const surveyQuestions = useMemo(() => {
+    if (!survey) return []
+    return survey.groups.flatMap((g) => g.questions)
+  }, [survey])
+
   const { hiddenQuestions, hiddenGroups, pipedTexts, nextQuestionId } =
-    useFlowResolution(screen === 'form' ? survey_id : undefined, answers)
+    useFlowResolution(screen === 'form' ? survey_id : undefined, answers, surveyQuestions)
 
   const availableLanguages = useMemo(() => {
     if (!survey) return []
