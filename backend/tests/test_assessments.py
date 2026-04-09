@@ -106,6 +106,7 @@ def assessment_payload(
     max_score: float = 10,
     message: str = "Test message",
     group_id: str | None = None,
+    question_id: str | None = None,
 ) -> dict:
     payload = {
         "name": name,
@@ -116,6 +117,8 @@ def assessment_payload(
     }
     if group_id is not None:
         payload["group_id"] = group_id
+    if question_id is not None:
+        payload["question_id"] = question_id
     return payload
 
 
@@ -647,3 +650,198 @@ async def test_score_no_matching_rules_returns_empty_list(client: AsyncClient):
     data = score_resp.json()
     assert float(data["score"]) == 5.0
     assert data["matching_assessments"] == []
+
+
+# ---------------------------------------------------------------------------
+# Question Scope Tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_create_assessment_question_scope(client: AsyncClient):
+    """Creating an assessment with scope='question' and valid question_id returns 201."""
+    headers = await auth_headers(client, "create_q_asmt@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+    question_id = await create_question(client, headers, survey_id, group_id, code="Q1")
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(scope="question", question_id=question_id),
+        headers=headers,
+    )
+    assert resp.status_code == 201
+    data = resp.json()
+    assert data["scope"] == "question"
+    assert data["question_id"] == question_id
+
+
+@pytest.mark.asyncio
+async def test_create_assessment_question_scope_missing_question_id_returns_422(client: AsyncClient):
+    """scope='question' without question_id returns 422."""
+    headers = await auth_headers(client, "q_scope_no_id@example.com")
+    survey_id = await create_survey(client, headers)
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(scope="question"),
+        headers=headers,
+    )
+    assert resp.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_create_assessment_total_scope_with_question_id_returns_422(client: AsyncClient):
+    """scope='total' with question_id returns 422."""
+    headers = await auth_headers(client, "total_with_qid@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+    question_id = await create_question(client, headers, survey_id, group_id, code="Q1")
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(scope="total", question_id=question_id),
+        headers=headers,
+    )
+    assert resp.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_create_assessment_group_scope_with_question_id_returns_422(client: AsyncClient):
+    """scope='group' with question_id returns 422."""
+    headers = await auth_headers(client, "group_with_qid@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+    question_id = await create_question(client, headers, survey_id, group_id, code="Q1")
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(scope="group", group_id=group_id, question_id=question_id),
+        headers=headers,
+    )
+    assert resp.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_score_question_scope_only_sums_target_question(client: AsyncClient):
+    """Question scope only counts options from the specified question."""
+    headers = await auth_headers(client, "score_question@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+
+    q1_id = await create_question(client, headers, survey_id, group_id, code="Q1")
+    q2_id = await create_question(client, headers, survey_id, group_id, code="Q2")
+
+    # Q1 option: assessment_value=4
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/questions/{q1_id}/options",
+        json={"code": "A", "title": "A", "sort_order": 1, "assessment_value": 4},
+        headers=headers,
+    )
+    # Q2 option: assessment_value=6
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/questions/{q2_id}/options",
+        json={"code": "B", "title": "B", "sort_order": 1, "assessment_value": 6},
+        headers=headers,
+    )
+
+    await activate_survey(client, headers, survey_id)
+    response_id = await submit_response(
+        client, survey_id,
+        answers=[
+            {"question_id": q1_id, "value": "A"},
+            {"question_id": q2_id, "value": "B"},
+        ],
+    )
+
+    # Question-scoped rule for q1 only (score for q1 is 4, not 10)
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(
+            name="Q1Match", scope="question", question_id=q1_id, min_score=4, max_score=4
+        ),
+        headers=headers,
+    )
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(
+            name="Q1NoMatch", scope="question", question_id=q1_id, min_score=10, max_score=10
+        ),
+        headers=headers,
+    )
+    # Total scope rule should still see score=10
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(
+            name="TotalMatch", scope="total", min_score=10, max_score=10
+        ),
+        headers=headers,
+    )
+
+    score_resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/assessment",
+        headers=headers,
+    )
+    assert score_resp.status_code == 200
+    data = score_resp.json()
+    # Total score is 4+6=10
+    assert float(data["score"]) == 10.0
+    matching_names = [a["name"] for a in data["matching_assessments"]]
+    assert "Q1Match" in matching_names
+    assert "Q1NoMatch" not in matching_names
+    assert "TotalMatch" in matching_names
+
+
+@pytest.mark.asyncio
+async def test_score_question_scope_unselected_question_returns_zero(client: AsyncClient):
+    """Question scope returns score=0 when the target question has no answer."""
+    headers = await auth_headers(client, "score_q_unsel@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+
+    q1_id = await create_question(client, headers, survey_id, group_id, code="Q1")
+    q2_id = await create_question(client, headers, survey_id, group_id, code="Q2")
+
+    # Q1 has an option, Q2 has an option; response only answers Q1
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/questions/{q1_id}/options",
+        json={"code": "A", "title": "A", "sort_order": 1, "assessment_value": 5},
+        headers=headers,
+    )
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/questions/{q2_id}/options",
+        json={"code": "B", "title": "B", "sort_order": 1, "assessment_value": 8},
+        headers=headers,
+    )
+
+    await activate_survey(client, headers, survey_id)
+    response_id = await submit_response(
+        client, survey_id,
+        answers=[{"question_id": q1_id, "value": "A"}],
+    )
+
+    # Assessment scoped to Q2 (unanswered) that matches 0
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(
+            name="Q2ZeroMatch", scope="question", question_id=q2_id, min_score=0, max_score=0
+        ),
+        headers=headers,
+    )
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(
+            name="Q2NoMatch", scope="question", question_id=q2_id, min_score=8, max_score=8
+        ),
+        headers=headers,
+    )
+
+    score_resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/assessment",
+        headers=headers,
+    )
+    assert score_resp.status_code == 200
+    data = score_resp.json()
+    matching_names = [a["name"] for a in data["matching_assessments"]]
+    assert "Q2ZeroMatch" in matching_names
+    assert "Q2NoMatch" not in matching_names

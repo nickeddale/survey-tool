@@ -22,7 +22,7 @@ from app.schemas.assessment import (
     AssessmentUpdate,
 )
 from app.services.assessment_service import compute_score
-from app.utils.errors import NotFoundError
+from app.utils.errors import NotFoundError, UnprocessableError
 
 router = APIRouter(prefix="/surveys", tags=["assessments"])
 
@@ -115,12 +115,22 @@ async def create_assessment(
     parsed_survey_id = _parse_survey_id(survey_id)
     await _get_survey_or_404(session, parsed_survey_id, current_user.id)
 
+    if payload.scope == "group" and payload.group_id is None:
+        raise UnprocessableError("group_id is required when scope is 'group'.")
+    if payload.scope != "group" and payload.group_id is not None:
+        raise UnprocessableError("group_id must be null when scope is not 'group'.")
+    if payload.scope == "question" and payload.question_id is None:
+        raise UnprocessableError("question_id is required when scope is 'question'.")
+    if payload.scope != "question" and payload.question_id is not None:
+        raise UnprocessableError("question_id must be null when scope is not 'question'.")
+
     assessment = Assessment(
         id=uuid.uuid4(),
         survey_id=parsed_survey_id,
         name=payload.name,
         scope=payload.scope,
         group_id=payload.group_id,
+        question_id=payload.question_id,
         min_score=payload.min_score,
         max_score=payload.max_score,
         message=payload.message,
@@ -219,6 +229,21 @@ async def update_assessment(
     assessment = await _get_assessment_or_404(session, parsed_assessment_id, parsed_survey_id)
 
     update_fields = payload.model_dump(exclude_unset=True)
+
+    # Determine effective scope after applying any update
+    effective_scope = update_fields.get("scope", assessment.scope)
+    effective_group_id = update_fields.get("group_id", assessment.group_id)
+    effective_question_id = update_fields.get("question_id", assessment.question_id)
+
+    if effective_scope == "group" and effective_group_id is None:
+        raise UnprocessableError("group_id is required when scope is 'group'.")
+    if effective_scope != "group" and effective_group_id is not None:
+        raise UnprocessableError("group_id must be null when scope is not 'group'.")
+    if effective_scope == "question" and effective_question_id is None:
+        raise UnprocessableError("question_id is required when scope is 'question'.")
+    if effective_scope != "question" and effective_question_id is not None:
+        raise UnprocessableError("question_id must be null when scope is not 'question'.")
+
     for field, value in update_fields.items():
         setattr(assessment, field, value)
 

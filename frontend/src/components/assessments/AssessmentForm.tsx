@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
-import type { AssessmentResponse, AssessmentCreate, AssessmentScope, QuestionGroupResponse } from '../../types/survey'
+import type { AssessmentResponse, AssessmentCreate, AssessmentScope, QuestionGroupResponse, QuestionResponse } from '../../types/survey'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -11,6 +11,7 @@ import type { AssessmentResponse, AssessmentCreate, AssessmentScope, QuestionGro
 const SCOPE_OPTIONS: { value: AssessmentScope; label: string }[] = [
   { value: 'total', label: 'Total (entire survey)' },
   { value: 'group', label: 'Group (specific question group)' },
+  { value: 'question', label: 'Question (single question)' },
 ]
 
 const SELECT_CLASS =
@@ -23,6 +24,7 @@ const SELECT_CLASS =
 interface AssessmentFormProps {
   surveyId: string
   groups: QuestionGroupResponse[]
+  questions?: QuestionResponse[]
   assessment?: AssessmentResponse | null
   onSubmit: (data: AssessmentCreate) => Promise<void>
   onCancel: () => void
@@ -36,6 +38,7 @@ interface AssessmentFormProps {
 
 function AssessmentForm({
   groups,
+  questions = [],
   assessment,
   onSubmit,
   onCancel,
@@ -47,6 +50,7 @@ function AssessmentForm({
   const [name, setName] = useState(assessment?.name ?? '')
   const [scope, setScope] = useState<AssessmentScope>(assessment?.scope ?? 'total')
   const [groupId, setGroupId] = useState<string>(assessment?.group_id ?? '')
+  const [questionId, setQuestionId] = useState<string>(assessment?.question_id ?? '')
   const [minScore, setMinScore] = useState<string>(assessment != null ? String(assessment.min_score) : '')
   const [maxScore, setMaxScore] = useState<string>(assessment != null ? String(assessment.max_score) : '')
   const [message, setMessage] = useState(assessment?.message ?? '')
@@ -58,6 +62,7 @@ function AssessmentForm({
       setName(assessment.name)
       setScope(assessment.scope)
       setGroupId(assessment.group_id ?? '')
+      setQuestionId(assessment.question_id ?? '')
       setMinScore(String(assessment.min_score))
       setMaxScore(String(assessment.max_score))
       setMessage(assessment.message)
@@ -65,6 +70,7 @@ function AssessmentForm({
       setName('')
       setScope('total')
       setGroupId('')
+      setQuestionId('')
       setMinScore('')
       setMaxScore('')
       setMessage('')
@@ -100,6 +106,10 @@ function AssessmentForm({
       setValidationError('Group is required when scope is Group.')
       return
     }
+    if (scope === 'question' && !questionId) {
+      setValidationError('Question is required when scope is Question.')
+      return
+    }
     if (!message.trim()) {
       setValidationError('Message is required.')
       return
@@ -109,6 +119,7 @@ function AssessmentForm({
       name: name.trim(),
       scope,
       group_id: scope === 'group' ? groupId : null,
+      question_id: scope === 'question' ? questionId : null,
       min_score: parsedMin,
       max_score: parsedMax,
       message: message.trim(),
@@ -169,9 +180,13 @@ function AssessmentForm({
                   id="assessment-scope"
                   value={scope}
                   onChange={(e) => {
-                    setScope(e.target.value as AssessmentScope)
-                    if (e.target.value !== 'group') {
+                    const newScope = e.target.value as AssessmentScope
+                    setScope(newScope)
+                    if (newScope !== 'group') {
                       setGroupId('')
+                    }
+                    if (newScope !== 'question') {
+                      setQuestionId('')
                     }
                   }}
                   className={`${SELECT_CLASS} mt-1`}
@@ -200,6 +215,27 @@ function AssessmentForm({
                     {groups.map((g) => (
                       <option key={g.id} value={g.id}>
                         {g.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Question selector (only shown when scope=question) */}
+              {scope === 'question' && (
+                <div>
+                  <Label htmlFor="assessment-question">Question</Label>
+                  <select
+                    id="assessment-question"
+                    value={questionId}
+                    onChange={(e) => setQuestionId(e.target.value)}
+                    className={`${SELECT_CLASS} mt-1`}
+                    data-testid="assessment-question-select"
+                  >
+                    <option value="">Select a question...</option>
+                    {questions.map((q) => (
+                      <option key={q.id} value={q.id}>
+                        {q.code ? `${q.code}: ` : ''}{q.title}
                       </option>
                     ))}
                   </select>
