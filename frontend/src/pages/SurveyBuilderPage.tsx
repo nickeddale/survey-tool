@@ -68,13 +68,22 @@ function SurveyBuilderPage() {
     const sortedGroups = [...groups].sort((a, b) => a.sort_order - b.sort_order)
     const lastGroup = sortedGroups[sortedGroups.length - 1]
     if (!lastGroup) return
+
+    let targetGroup = lastGroup
+    if (selectedItem?.type === 'group') {
+      targetGroup = groups.find((g) => g.id === selectedItem.id) ?? lastGroup
+    } else if (selectedItem?.type === 'question') {
+      targetGroup =
+        groups.find((g) => g.questions.some((q) => q.id === selectedItem.id)) ?? lastGroup
+    }
+
     const label = QUESTION_TYPE_LABELS[questionType] ?? 'New Question'
     try {
-      const newQuestion = await surveyService.createQuestion(surveyId, lastGroup.id, {
+      const newQuestion = await surveyService.createQuestion(surveyId, targetGroup.id, {
         question_type: questionType,
         title: `New ${label}`,
       })
-      addQuestion(lastGroup.id, {
+      addQuestion(targetGroup.id, {
         ...newQuestion,
         answer_options: newQuestion.answer_options ?? [],
         subquestions: [],
