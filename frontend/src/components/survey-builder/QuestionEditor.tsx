@@ -473,6 +473,7 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
         <LogicEditor
           surveyId={surveyId}
           currentSortOrder={selectedQuestion.sort_order}
+          currentQuestionCode={selectedQuestion.code}
           previousQuestions={groups.flatMap((g) => g.questions) as BuilderQuestion[]}
           value={relevance}
           onChange={handleRelevanceChange}

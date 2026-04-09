@@ -32,6 +32,8 @@ interface LogicEditorProps {
   surveyId: string
   /** The current question's sort_order — only show questions with lower sort_order */
   currentSortOrder: number
+  /** The current question's code — sent to the validation API for forward reference detection */
+  currentQuestionCode?: string
   /** All questions across all groups, ordered by sort_order */
   previousQuestions: BuilderQuestion[]
   /** Current relevance expression string */
@@ -49,6 +51,7 @@ interface LogicEditorProps {
 export function LogicEditor({
   surveyId,
   currentSortOrder,
+  currentQuestionCode,
   previousQuestions,
   value,
   onChange,
@@ -112,7 +115,10 @@ export function LogicEditor({
       validateTimerRef.current = setTimeout(async () => {
         validateTimerRef.current = null
         try {
-          const result = await surveyService.validateExpression(surveyId, { expression: expr })
+          const payload = currentQuestionCode
+            ? { expression: expr, question_code: currentQuestionCode }
+            : { expression: expr }
+          const result = await surveyService.validateExpression(surveyId, payload)
           setValidationResult(result)
         } catch {
           setValidationResult(null)
@@ -121,7 +127,7 @@ export function LogicEditor({
         }
       }, 500)
     },
-    [surveyId],
+    [surveyId, currentQuestionCode],
   )
 
   useEffect(() => {

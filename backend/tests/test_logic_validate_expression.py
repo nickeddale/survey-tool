@@ -299,7 +299,7 @@ async def test_unknown_variable_error_includes_position(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_forward_reference_detected(client: AsyncClient):
-    """Variable with higher sort_order than question_code → FORWARD_REFERENCE."""
+    """Variable with higher sort_order than question_code → FORWARD_REFERENCE warning (not error)."""
     headers = await auth_headers(client)
     survey_id = await create_survey(client, headers)
     group_id = await create_group(client, headers, survey_id)
@@ -307,7 +307,7 @@ async def test_forward_reference_detected(client: AsyncClient):
     await create_question(client, headers, survey_id, group_id, code="Q2", sort_order=2)
     await create_question(client, headers, survey_id, group_id, code="Q3", sort_order=3)
 
-    # Q1 expression references Q3 (which is later) → forward reference
+    # Q1 expression references Q3 (which is later) → forward reference appears as warning
     response = await client.post(
         validate_url(survey_id),
         json={"expression": "{Q3} == 'Yes'", "question_code": "Q1"},
@@ -315,13 +315,16 @@ async def test_forward_reference_detected(client: AsyncClient):
     )
     assert response.status_code == 200
     body = response.json()
-    codes = [e["code"] for e in body["errors"]]
-    assert "FORWARD_REFERENCE" in codes
+    # FORWARD_REFERENCE should be a warning, not an error
+    error_codes = [e["code"] for e in body["errors"]]
+    warning_codes = [w["code"] for w in body["warnings"]]
+    assert "FORWARD_REFERENCE" not in error_codes
+    assert "FORWARD_REFERENCE" in warning_codes
 
 
 @pytest.mark.asyncio
 async def test_no_forward_reference_when_earlier_question(client: AsyncClient):
-    """Expression referencing an earlier question → no FORWARD_REFERENCE."""
+    """Expression referencing an earlier question → no FORWARD_REFERENCE in errors or warnings."""
     headers = await auth_headers(client)
     survey_id = await create_survey(client, headers)
     group_id = await create_group(client, headers, survey_id)
@@ -336,14 +339,16 @@ async def test_no_forward_reference_when_earlier_question(client: AsyncClient):
     )
     assert response.status_code == 200
     body = response.json()
-    codes = [e["code"] for e in body["errors"]]
-    assert "FORWARD_REFERENCE" not in codes
+    error_codes = [e["code"] for e in body["errors"]]
+    warning_codes = [w["code"] for w in body["warnings"]]
+    assert "FORWARD_REFERENCE" not in error_codes
+    assert "FORWARD_REFERENCE" not in warning_codes
     assert body["errors"] == []
 
 
 @pytest.mark.asyncio
 async def test_forward_reference_not_detected_without_question_code(client: AsyncClient):
-    """Without question_code, no forward-reference check is done."""
+    """Without question_code, no forward-reference check is done (no warning either)."""
     headers = await auth_headers(client)
     survey_id = await create_survey(client, headers)
     group_id = await create_group(client, headers, survey_id)
@@ -357,8 +362,10 @@ async def test_forward_reference_not_detected_without_question_code(client: Asyn
     )
     assert response.status_code == 200
     body = response.json()
-    codes = [e["code"] for e in body["errors"]]
-    assert "FORWARD_REFERENCE" not in codes
+    error_codes = [e["code"] for e in body["errors"]]
+    warning_codes = [w["code"] for w in body["warnings"]]
+    assert "FORWARD_REFERENCE" not in error_codes
+    assert "FORWARD_REFERENCE" not in warning_codes
 
 
 # --------------------------------------------------------------------------- #

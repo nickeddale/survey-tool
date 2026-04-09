@@ -52,13 +52,15 @@ function renderEditor(
     value?: string
     onChange?: (v: string) => void
     disabled?: boolean
+    currentQuestionCode?: string
   } = {},
 ) {
-  const { value = '', onChange = vi.fn(), disabled = false } = props
+  const { value = '', onChange = vi.fn(), disabled = false, currentQuestionCode } = props
   return render(
     <LogicEditor
       surveyId={SURVEY_ID}
       currentSortOrder={2}
+      currentQuestionCode={currentQuestionCode}
       previousQuestions={[mockQuestion]}
       value={value}
       onChange={onChange}
@@ -458,6 +460,68 @@ describe('LogicEditor — mock response shape assertion', () => {
     // errors and warnings should NOT be string[] — they are structured objects
     // (no 'valid' field on the response itself)
     expect(capturedResponse).not.toHaveProperty('valid')
+  })
+})
+
+describe('LogicEditor — question_code in request payload', () => {
+  it('sends question_code in request payload when currentQuestionCode is provided', async () => {
+    let capturedBody: Record<string, unknown> | null = null
+
+    server.use(
+      http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async ({ request }) => {
+        capturedBody = (await request.json()) as Record<string, unknown>
+        return HttpResponse.json(makeValidResult(), { status: 200 })
+      }),
+    )
+
+    renderEditor({ currentQuestionCode: 'Q1' })
+
+    const rawBtn = screen.getByTestId('logic-editor-mode-raw')
+    await act(async () => {
+      await userEvent.click(rawBtn)
+    })
+
+    const textarea = screen.getByTestId('logic-editor-raw-input')
+    await act(async () => {
+      fireEvent.change(textarea, { target: { value: "{Q2} == 'yes'" } })
+    })
+
+    await waitFor(() => {
+      expect(capturedBody).not.toBeNull()
+    })
+
+    expect(capturedBody).toHaveProperty('question_code', 'Q1')
+    expect(capturedBody).toHaveProperty('expression', "{Q2} == 'yes'")
+  })
+
+  it('does not send question_code when currentQuestionCode is not provided', async () => {
+    let capturedBody: Record<string, unknown> | null = null
+
+    server.use(
+      http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async ({ request }) => {
+        capturedBody = (await request.json()) as Record<string, unknown>
+        return HttpResponse.json(makeValidResult(), { status: 200 })
+      }),
+    )
+
+    renderEditor()
+
+    const rawBtn = screen.getByTestId('logic-editor-mode-raw')
+    await act(async () => {
+      await userEvent.click(rawBtn)
+    })
+
+    const textarea = screen.getByTestId('logic-editor-raw-input')
+    await act(async () => {
+      fireEvent.change(textarea, { target: { value: "{Q1} == 'yes'" } })
+    })
+
+    await waitFor(() => {
+      expect(capturedBody).not.toBeNull()
+    })
+
+    expect(capturedBody).not.toHaveProperty('question_code')
+    expect(capturedBody).toHaveProperty('expression', "{Q1} == 'yes'")
   })
 })
 

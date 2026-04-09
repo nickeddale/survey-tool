@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-09T21:06:16.798Z",
+  "lastUpdated": "2026-04-09T21:18:11.165Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3866,6 +3866,25 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "low"
+    },
+    {
+      "file": "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
+      "ticketId": "ISS-203",
+      "title": "No forward reference warning in Logic Editor validation",
+      "date": "2026-04-09",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4056,7 +4075,8 @@
       "2026-04-09-iss-196-relocate-builder-and-edit-survey-buttons-on-detail.md",
       "2026-04-09-iss-197-number-question-type-fails-with-409-type-mismatch.md",
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
-      "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md"
+      "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md",
+      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4225,7 +4245,8 @@
       "2026-04-09-iss-193-iss-193-responsesstatus-column-type-mismatch-enum.md",
       "2026-04-09-iss-194-add-question-level-scope-to-assessments.md",
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
-      "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md"
+      "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md",
+      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4542,7 +4563,8 @@
       "2026-04-09-iss-196-relocate-builder-and-edit-survey-buttons-on-detail.md",
       "2026-04-09-iss-197-number-question-type-fails-with-409-type-mismatch.md",
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
-      "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md"
+      "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md",
+      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4775,7 +4797,8 @@
       "2026-04-09-iss-194-add-question-level-scope-to-assessments.md",
       "2026-04-09-iss-197-number-question-type-fails-with-409-type-mismatch.md",
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
-      "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md"
+      "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md",
+      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4960,7 +4983,8 @@
       "2026-04-09-iss-196-relocate-builder-and-edit-survey-buttons-on-detail.md",
       "2026-04-09-iss-197-number-question-type-fails-with-409-type-mismatch.md",
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
-      "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md"
+      "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md",
+      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5115,7 +5139,8 @@
       "2026-04-09-iss-191-iss-191-resolve-flow-still-crashes-optionlabel-sho.md",
       "2026-04-09-iss-192-iss-192-migration-0013-still-fails-assessmentscope.md",
       "2026-04-09-iss-193-iss-193-responsesstatus-column-type-mismatch-enum.md",
-      "2026-04-09-iss-196-relocate-builder-and-edit-survey-buttons-on-detail.md"
+      "2026-04-09-iss-196-relocate-builder-and-edit-survey-buttons-on-detail.md",
+      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5253,7 +5278,8 @@
       "2026-04-09-iss-192-iss-192-migration-0013-still-fails-assessmentscope.md",
       "2026-04-09-iss-193-iss-193-responsesstatus-column-type-mismatch-enum.md",
       "2026-04-09-iss-194-add-question-level-scope-to-assessments.md",
-      "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md"
+      "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
+      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5430,7 +5456,8 @@
       "2026-04-09-iss-196-relocate-builder-and-edit-survey-buttons-on-detail.md",
       "2026-04-09-iss-197-number-question-type-fails-with-409-type-mismatch.md",
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
-      "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md"
+      "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md",
+      "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
