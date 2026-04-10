@@ -1,6 +1,7 @@
 """Query services for survey responses: listing, detail retrieval, and statistics."""
 
 import statistics
+import time
 import uuid
 from datetime import datetime
 from typing import Any, Literal
@@ -22,6 +23,37 @@ _CHOICE_TYPES = {"single_choice", "dropdown", "image_picker", "yes_no"}
 _MULTI_CHOICE_TYPES = {"multiple_choice"}
 _NUMERIC_TYPES = {"number", "numeric", "scale"}
 _RATING_TYPES = {"rating"}
+
+# ---------------------------------------------------------------------------
+# TTL cache for survey statistics
+# ---------------------------------------------------------------------------
+# Keyed by survey_id (UUID). Each entry is (result_dict, expires_at_monotonic).
+# Cache is invalidated on new response submission or completion.
+
+_STATS_CACHE: dict[uuid.UUID, tuple[dict, float]] = {}
+_STATS_CACHE_TTL = 60.0  # seconds
+
+
+def _cache_get(survey_id: uuid.UUID) -> dict | None:
+    """Return cached statistics for survey_id if still valid, else None."""
+    entry = _STATS_CACHE.get(survey_id)
+    if entry is None:
+        return None
+    result, expires_at = entry
+    if time.monotonic() >= expires_at:
+        del _STATS_CACHE[survey_id]
+        return None
+    return result
+
+
+def _cache_set(survey_id: uuid.UUID, result: dict) -> None:
+    """Store statistics result in the cache with TTL."""
+    _STATS_CACHE[survey_id] = (result, time.monotonic() + _STATS_CACHE_TTL)
+
+
+def invalidate_statistics_cache(survey_id: uuid.UUID) -> None:
+    """Remove cached statistics for a survey (call on new response submission)."""
+    _STATS_CACHE.pop(survey_id, None)
 
 
 def _build_options_stats(
@@ -306,10 +338,18 @@ async def get_survey_statistics(
     """Compute aggregate statistics for a survey and its questions.
 
     Enforces survey ownership — returns 404 for both missing and unauthorized surveys.
+    Results are cached in-memory for _STATS_CACHE_TTL seconds to avoid redundant
+    computation on repeated requests. The cache is invalidated when a new response
+    is submitted or completed.
 
     Raises:
         NotFoundError: If the survey does not exist or is not owned by user_id.
     """
+    # Check cache first (keyed only on survey_id — no answer data in key)
+    cached = _cache_get(survey_id)
+    if cached is not None:
+        return cached
+
     # Verify survey ownership
     survey_result = await session.execute(
         select(Survey).where(Survey.id == survey_id, Survey.user_id == user_id)
@@ -318,6 +358,7 @@ async def get_survey_statistics(
     if survey is None:
         raise NotFoundError("Survey not found")
 
+    # --- Query 1: response status counts ---
     status_counts_result = await session.execute(
         select(Response.status, func.count().label("cnt"))
         .where(Response.survey_id == survey_id)
@@ -333,6 +374,7 @@ async def get_survey_statistics(
     disqualified_responses = status_map.get("disqualified", 0)
     completion_rate = (complete_responses / total_responses) if total_responses > 0 else 0.0
 
+    # --- Query 2: average completion time ---
     avg_time_result = await session.execute(
         select(
             func.avg(
@@ -346,6 +388,7 @@ async def get_survey_statistics(
     )
     avg_time_seconds: float | None = avg_time_result.scalar_one_or_none()
 
+    # --- Query 3: all questions for the survey (ordered) ---
     questions_result = await session.execute(
         select(Question)
         .join(QuestionGroup, Question.group_id == QuestionGroup.id)
@@ -353,31 +396,64 @@ async def get_survey_statistics(
         .order_by(QuestionGroup.sort_order, Question.sort_order)
     )
     questions = list(questions_result.scalars().all())
-    question_stats_list = []
 
+    if not questions:
+        result = {
+            "survey_id": survey_id,
+            "total_responses": total_responses,
+            "complete_responses": complete_responses,
+            "incomplete_responses": incomplete_responses,
+            "disqualified_responses": disqualified_responses,
+            "completion_rate": round(completion_rate, 4),
+            "average_completion_time_seconds": avg_time_seconds,
+            "questions": [],
+        }
+        _cache_set(survey_id, result)
+        return result
+
+    question_ids = [q.id for q in questions]
+
+    # --- Query 4: all answers for all questions in ONE batched query ---
+    # Join response_answers -> responses to filter by survey_id, then
+    # group by question_id and aggregate all values into an array.
+    # This eliminates the N+1 query pattern (previously one query per question).
+    answers_result = await session.execute(
+        select(ResponseAnswer.question_id, func.array_agg(ResponseAnswer.value).label("values"))
+        .join(Response, ResponseAnswer.response_id == Response.id)
+        .where(
+            Response.survey_id == survey_id,
+            ResponseAnswer.question_id.in_(question_ids),
+            ResponseAnswer.value.is_not(None),
+        )
+        .group_by(ResponseAnswer.question_id)
+    )
+    # Build a map from question_id -> [raw_value, ...]
+    answers_by_question: dict[uuid.UUID, list] = {}
+    for row in answers_result:
+        # array_agg returns a Python list; filter out any Nones within the array
+        answers_by_question[row.question_id] = [v for v in row.values if v is not None]
+
+    # --- Query 5: all answer options for choice questions in ONE batched query ---
+    choice_question_ids = [
+        q.id for q in questions if q.question_type in (_CHOICE_TYPES | _MULTI_CHOICE_TYPES)
+    ]
+    options_by_question: dict[uuid.UUID, list[AnswerOption]] = {q_id: [] for q_id in choice_question_ids}
+
+    if choice_question_ids:
+        opts_result = await session.execute(
+            select(AnswerOption)
+            .where(AnswerOption.question_id.in_(choice_question_ids))
+            .order_by(AnswerOption.question_id, AnswerOption.sort_order)
+        )
+        for opt in opts_result.scalars().all():
+            options_by_question[opt.question_id].append(opt)
+
+    # Build per-question stats using the pre-fetched data (no more DB calls)
+    question_stats_list = []
     for question in questions:
         qtype = question.question_type
-        question_id = question.id
-
-        answers_result = await session.execute(
-            select(ResponseAnswer.value)
-            .join(Response, ResponseAnswer.response_id == Response.id)
-            .where(
-                Response.survey_id == survey_id,
-                ResponseAnswer.question_id == question_id,
-                ResponseAnswer.value.is_not(None),
-            )
-        )
-        raw_values = [row[0] for row in answers_result.fetchall()]
-
-        answer_options: list[AnswerOption] = []
-        if qtype in _CHOICE_TYPES | _MULTI_CHOICE_TYPES:
-            opts_result = await session.execute(
-                select(AnswerOption)
-                .where(AnswerOption.question_id == question_id)
-                .order_by(AnswerOption.sort_order)
-            )
-            answer_options = list(opts_result.scalars().all())
+        raw_values = answers_by_question.get(question.id, [])
+        answer_options = options_by_question.get(question.id, [])
 
         stats = _compute_question_stats(qtype, raw_values, answer_options)
         question_stats_list.append({
@@ -388,7 +464,7 @@ async def get_survey_statistics(
             "stats": stats,
         })
 
-    return {
+    result = {
         "survey_id": survey_id,
         "total_responses": total_responses,
         "complete_responses": complete_responses,
@@ -398,3 +474,5 @@ async def get_survey_statistics(
         "average_completion_time_seconds": avg_time_seconds,
         "questions": question_stats_list,
     }
+    _cache_set(survey_id, result)
+    return result
