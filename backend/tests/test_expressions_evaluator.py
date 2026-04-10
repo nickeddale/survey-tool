@@ -1179,3 +1179,83 @@ def test_normalised_string_null_check_is_false():
     """When string Q1 is normalised to '', {Q1} == null is False (not None)."""
     result = eval_expr("{Q1} == null", context={"Q1": ""})
     assert result is False
+
+
+# ---------------------------------------------------------------------------
+# Bool/string coercion in == and != (ISS-209)
+# ---------------------------------------------------------------------------
+# yes_no questions store their answer as the string 'true'/'false' in the
+# public form. The logic editor generates == true (bare boolean literal).
+# _coerce_equal must treat these as equal.
+
+
+def test_bool_true_equals_string_true():
+    """bool True == string 'true' → True."""
+    result = eval_expr('{Q1} == true', context={"Q1": "true"})
+    assert result is True
+
+
+def test_bool_true_not_equals_string_false():
+    """bool True == string 'false' → False."""
+    result = eval_expr('{Q1} == true', context={"Q1": "false"})
+    assert result is False
+
+
+def test_bool_false_equals_string_false():
+    """bool False == string 'false' → True."""
+    result = eval_expr('{Q1} == false', context={"Q1": "false"})
+    assert result is True
+
+
+def test_bool_false_not_equals_string_true():
+    """bool False == string 'true' → False."""
+    result = eval_expr('{Q1} == false', context={"Q1": "true"})
+    assert result is False
+
+
+def test_string_true_equals_bool_true_reversed():
+    """String 'true' == bool True → True (reversed operand order)."""
+    result = Evaluator._coerce_equal("true", True)
+    assert result is True
+
+
+def test_string_false_equals_bool_false_reversed():
+    """String 'false' == bool False → True (reversed operand order)."""
+    result = Evaluator._coerce_equal("false", False)
+    assert result is True
+
+
+def test_bool_true_not_equal_string_false_ne_operator():
+    """bool True != string 'false' → True."""
+    result = eval_expr('{Q1} != true', context={"Q1": "false"})
+    assert result is True
+
+
+def test_bool_false_not_equal_string_true_ne_operator():
+    """bool False != string 'true' → True."""
+    result = eval_expr('{Q1} != false', context={"Q1": "true"})
+    assert result is True
+
+
+def test_bool_true_equals_string_unrecognised_returns_false():
+    """bool True == unrecognised string 'maybe' → False."""
+    result = eval_expr('{Q1} == true', context={"Q1": "maybe"})
+    assert result is False
+
+
+def test_bool_false_equals_string_unrecognised_returns_false():
+    """bool False == unrecognised string 'maybe' → False."""
+    result = eval_expr('{Q1} == false', context={"Q1": "maybe"})
+    assert result is False
+
+
+def test_bool_true_equals_string_yes():
+    """bool True == 'yes' → True (alternative truthy string)."""
+    result = Evaluator._coerce_equal(True, "yes")
+    assert result is True
+
+
+def test_bool_false_equals_string_no():
+    """bool False == 'no' → True (alternative falsy string)."""
+    result = Evaluator._coerce_equal(False, "no")
+    assert result is True
