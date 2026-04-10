@@ -38,6 +38,7 @@ from app.services.response_query_service import (
     list_responses,
     get_response_detail,
     get_survey_statistics,
+    invalidate_statistics_cache,
 )
 from app.utils.errors import AnswerValidationError, ConflictError, ForbiddenError, NotFoundError, UnprocessableError
 
@@ -174,6 +175,9 @@ async def create_response(
 
     await session.refresh(response)
 
+    # Invalidate cached statistics so the next fetch reflects this new response
+    invalidate_statistics_cache(survey_id)
+
     get_dispatcher()(
         event="response.started",
         survey_id=survey_id,
@@ -209,6 +213,9 @@ async def complete_response(
     """
     response = await _complete_response_core(session, survey_id, response_id)
 
+    # Invalidate cached statistics so the next fetch reflects this completed response
+    invalidate_statistics_cache(survey_id)
+
     get_dispatcher()(
         event="response.completed",
         survey_id=survey_id,
@@ -231,4 +238,5 @@ __all__ = [
     "list_responses",
     "get_response_detail",
     "get_survey_statistics",
+    "invalidate_statistics_cache",
 ]
