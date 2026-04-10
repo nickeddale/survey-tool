@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-10T06:41:23.126Z",
+  "lastUpdated": "2026-04-10T13:02:49.034Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4029,6 +4029,28 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-10-iss-211-backend-cpu-saturation-under-load-single-process-b.md",
+      "ticketId": "ISS-211",
+      "title": "Backend CPU saturation under load — single-process bottleneck",
+      "date": "2026-04-10",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4227,7 +4249,8 @@
       "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md",
       "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md",
       "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md",
-      "2026-04-10-iss-210-500-server-error-on-resolve-flow-when-numeric-fiel.md"
+      "2026-04-10-iss-210-500-server-error-on-resolve-flow-when-numeric-fiel.md",
+      "2026-04-10-iss-211-backend-cpu-saturation-under-load-single-process-b.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4404,7 +4427,8 @@
       "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
       "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md",
       "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md",
-      "2026-04-10-iss-210-500-server-error-on-resolve-flow-when-numeric-fiel.md"
+      "2026-04-10-iss-210-500-server-error-on-resolve-flow-when-numeric-fiel.md",
+      "2026-04-10-iss-211-backend-cpu-saturation-under-load-single-process-b.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4538,7 +4562,8 @@
       "2026-04-09-iss-197-number-question-type-fails-with-409-type-mismatch.md",
       "2026-04-09-iss-199-number-question-type-still-sends-numeric-from-grou.md",
       "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
-      "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md"
+      "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md",
+      "2026-04-10-iss-211-backend-cpu-saturation-under-load-single-process-b.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4730,7 +4755,8 @@
       "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
       "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md",
       "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md",
-      "2026-04-10-iss-210-500-server-error-on-resolve-flow-when-numeric-fiel.md"
+      "2026-04-10-iss-210-500-server-error-on-resolve-flow-when-numeric-fiel.md",
+      "2026-04-10-iss-211-backend-cpu-saturation-under-load-single-process-b.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4972,7 +4998,8 @@
       "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md",
       "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md",
       "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md",
-      "2026-04-10-iss-210-500-server-error-on-resolve-flow-when-numeric-fiel.md"
+      "2026-04-10-iss-210-500-server-error-on-resolve-flow-when-numeric-fiel.md",
+      "2026-04-10-iss-211-backend-cpu-saturation-under-load-single-process-b.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5164,7 +5191,8 @@
       "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
       "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md",
       "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md",
-      "2026-04-10-iss-210-500-server-error-on-resolve-flow-when-numeric-fiel.md"
+      "2026-04-10-iss-210-500-server-error-on-resolve-flow-when-numeric-fiel.md",
+      "2026-04-10-iss-211-backend-cpu-saturation-under-load-single-process-b.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5256,7 +5284,8 @@
       "2026-04-09-iss-194-add-question-level-scope-to-assessments.md",
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
       "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
-      "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md"
+      "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md",
+      "2026-04-10-iss-211-backend-cpu-saturation-under-load-single-process-b.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5327,7 +5356,8 @@
       "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
       "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md",
       "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md",
-      "2026-04-10-iss-210-500-server-error-on-resolve-flow-when-numeric-fiel.md"
+      "2026-04-10-iss-210-500-server-error-on-resolve-flow-when-numeric-fiel.md",
+      "2026-04-10-iss-211-backend-cpu-saturation-under-load-single-process-b.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5469,7 +5499,8 @@
       "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
       "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md",
       "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md",
-      "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md"
+      "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
+      "2026-04-10-iss-211-backend-cpu-saturation-under-load-single-process-b.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5652,7 +5683,8 @@
       "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md",
       "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
       "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md",
-      "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md"
+      "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md",
+      "2026-04-10-iss-211-backend-cpu-saturation-under-load-single-process-b.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -5774,7 +5806,8 @@
       "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
       "2026-04-08-iss-189-iss-185-not-fixed-alembic-upgrade-head-still-fails.md",
       "2026-04-09-iss-194-add-question-level-scope-to-assessments.md",
-      "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md"
+      "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md",
+      "2026-04-10-iss-211-backend-cpu-saturation-under-load-single-process-b.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",

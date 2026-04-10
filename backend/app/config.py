@@ -61,6 +61,15 @@ class Settings(BaseSettings):
     cookie_secure: bool = True
     cookie_samesite: str = "strict"
 
+    # Worker processes
+    # Number of gunicorn worker processes. Defaults to min(4, 2*cores+1) via
+    # gunicorn.conf.py. This setting is exported here so application code can
+    # read it if needed, but the authoritative value at startup is consumed by
+    # gunicorn.conf.py (which reads NUM_WORKERS from os.environ directly,
+    # before the FastAPI app is initialised — intentional exception to the
+    # pydantic-settings convention).
+    num_workers: int = 4
+
     # Logging
     log_level: str = "INFO"
 

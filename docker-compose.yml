@@ -29,6 +29,10 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-survey}:${POSTGRES_PASSWORD:-survey}@postgres:5432/${POSTGRES_DB:-survey}
       ENVIRONMENT: development
+      # Number of gunicorn worker processes. The dev target uses plain uvicorn
+      # (--reload), so this variable is only consumed by the prod stage CMD.
+      # Override via .env or shell: NUM_WORKERS=2 docker compose up
+      NUM_WORKERS: ${NUM_WORKERS:-4}
     ports:
       - "8000:8000"
     volumes:

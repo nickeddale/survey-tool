@@ -122,7 +122,7 @@ async def test_password_stored_as_hash(client: AsyncClient, session: AsyncSessio
     user = await get_user_by_email(session, payload["email"])
     assert user is not None
     assert user.password_hash != payload["password"]
-    assert verify_password(payload["password"], user.password_hash)
+    assert await verify_password(payload["password"], user.password_hash)
 
 
 @pytest.mark.asyncio

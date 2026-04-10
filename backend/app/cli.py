@@ -51,7 +51,7 @@ async def seed() -> None:
             session.add(User(
                 id=creator_id,
                 email="creator@example.com",
-                password_hash=hash_password("password123"),
+                password_hash=await hash_password("password123"),
                 name="Dev Creator",
                 is_active=True,
             ))
@@ -64,7 +64,7 @@ async def seed() -> None:
             session.add(User(
                 id=creator2_id,
                 email="creator2@example.com",
-                password_hash=hash_password("password123"),
+                password_hash=await hash_password("password123"),
                 name="Second Creator",
                 is_active=True,
             ))
