@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-10T06:34:05.127Z",
+  "lastUpdated": "2026-04-10T06:41:23.126Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4012,6 +4012,23 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-10-iss-210-500-server-error-on-resolve-flow-when-numeric-fiel.md",
+      "ticketId": "ISS-210",
+      "title": "500 server error on resolve-flow when numeric field is cleared and used in comparison",
+      "date": "2026-04-10",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature",
+        "documentation"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4209,7 +4226,8 @@
       "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
       "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md",
       "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md",
-      "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md"
+      "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md",
+      "2026-04-10-iss-210-500-server-error-on-resolve-flow-when-numeric-fiel.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4385,7 +4403,8 @@
       "2026-04-09-iss-200-test-expression-evaluator-always-returns-true-rega.md",
       "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
       "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md",
-      "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md"
+      "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md",
+      "2026-04-10-iss-210-500-server-error-on-resolve-flow-when-numeric-fiel.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4710,7 +4729,8 @@
       "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md",
       "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
       "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md",
-      "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md"
+      "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md",
+      "2026-04-10-iss-210-500-server-error-on-resolve-flow-when-numeric-fiel.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4951,7 +4971,8 @@
       "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
       "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md",
       "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md",
-      "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md"
+      "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md",
+      "2026-04-10-iss-210-500-server-error-on-resolve-flow-when-numeric-fiel.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5142,7 +5163,8 @@
       "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md",
       "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
       "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md",
-      "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md"
+      "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md",
+      "2026-04-10-iss-210-500-server-error-on-resolve-flow-when-numeric-fiel.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5304,7 +5326,8 @@
       "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md",
       "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
       "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md",
-      "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md"
+      "2026-04-10-iss-209-expression-evaluator-true-boolean-literal-doesnt-m.md",
+      "2026-04-10-iss-210-500-server-error-on-resolve-flow-when-numeric-fiel.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
