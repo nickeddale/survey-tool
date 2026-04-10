@@ -61,6 +61,11 @@ class Settings(BaseSettings):
     cookie_secure: bool = True
     cookie_samesite: str = "strict"
 
+    # bcrypt password hashing cost factor.
+    # Default 12 is appropriate for production. Use 4 in test environments to
+    # keep the test suite fast (bcrypt at rounds=4 is ~100x faster than rounds=12).
+    bcrypt_rounds: int = 12
+
     # Worker processes
     # Number of gunicorn worker processes. Defaults to min(4, 2*cores+1) via
     # gunicorn.conf.py. This setting is exported here so application code can

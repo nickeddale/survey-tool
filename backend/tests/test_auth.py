@@ -1,5 +1,9 @@
 """Tests for JWT authentication endpoints and registration."""
 
+import asyncio
+import time
+
+import bcrypt
 import pytest
 from httpx import AsyncClient
 from jose import jwt
@@ -9,6 +13,7 @@ from app.config import settings
 from app.services.auth_service import (
     get_user_by_email,
     get_refresh_token_by_hash,
+    hash_password,
     hash_refresh_token,
     verify_password,
 )
@@ -538,3 +543,50 @@ async def test_patch_me_empty_body_returns_current_user(client: AsyncClient):
     assert response.status_code == 200
     body = response.json()
     assert body["email"] == VALID_PAYLOAD["email"]
+
+
+# --------------------------------------------------------------------------- #
+# bcrypt configuration and async offload tests
+# --------------------------------------------------------------------------- #
+
+@pytest.mark.asyncio
+async def test_hash_password_uses_configured_rounds():
+    """hash_password should produce a hash whose cost factor matches settings.bcrypt_rounds."""
+    hashed = await hash_password("testpassword")
+    # bcrypt hashes encode the cost factor in the $2b$RR$ prefix
+    cost = int(hashed.split("$")[2])
+    assert cost == settings.bcrypt_rounds
+
+
+@pytest.mark.asyncio
+async def test_verify_password_returns_true_for_correct_password():
+    """verify_password must return True when the plain password matches the hash."""
+    plain = "correcthorsebatterystaple"
+    hashed = await hash_password(plain)
+    assert await verify_password(plain, hashed) is True
+
+
+@pytest.mark.asyncio
+async def test_verify_password_returns_false_for_wrong_password():
+    """verify_password must return False when the plain password does not match."""
+    hashed = await hash_password("originalpassword")
+    assert await verify_password("wrongpassword", hashed) is False
+
+
+@pytest.mark.asyncio
+async def test_hash_password_produces_valid_bcrypt_hash():
+    """hash_password output must be verifiable by the raw bcrypt library."""
+    plain = "anypassword"
+    hashed = await hash_password(plain)
+    assert bcrypt.checkpw(plain.encode(), hashed.encode())
+
+
+@pytest.mark.asyncio
+async def test_concurrent_hashing_completes_without_error():
+    """Multiple concurrent hash_password calls must all succeed. This also
+    exercises the ThreadPoolExecutor path under concurrent load."""
+    passwords = [f"password{i}" for i in range(6)]
+    hashes = await asyncio.gather(*[hash_password(p) for p in passwords])
+    assert len(hashes) == len(passwords)
+    for plain, hashed in zip(passwords, hashes):
+        assert bcrypt.checkpw(plain.encode(), hashed.encode())
