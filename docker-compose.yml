@@ -8,6 +8,10 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-survey}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-survey}
       POSTGRES_DB: ${POSTGRES_DB:-survey}
+    command: >
+      postgres
+      -c idle_in_transaction_session_timeout=30000
+      -c statement_timeout=60000
     ports:
       - "5432:5432"
     volumes:

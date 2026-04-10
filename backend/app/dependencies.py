@@ -100,10 +100,15 @@ def require_scope(scope: str) -> Callable:
     contain ``scope``; raises HTTP 403 (ForbiddenError) otherwise.
     JWT Bearer authentication passes through unconditionally — scope restrictions
     only apply to API keys.
+
+    This dependency explicitly depends on get_current_user (and reuses its
+    session via FastAPI's dependency deduplication) to avoid opening a second
+    database connection per request.
     """
 
     async def _check(
         request: Request,
+        current_user: User = Depends(get_current_user),
         session: AsyncSession = Depends(get_db),
     ) -> None:
         api_key_header = request.headers.get("X-API-Key")
@@ -114,8 +119,7 @@ def require_scope(scope: str) -> Callable:
         key_hash = hash_api_key(api_key_header)
         record = await get_api_key_by_hash(session, key_hash)
         if record is None:
-            # Key is invalid — get_current_user will have already rejected it,
-            # but guard here in case require_scope is used standalone.
+            # Key is invalid — current_user dependency will have already rejected it.
             raise ForbiddenError("Invalid API key")
 
         scopes: list = record.scopes or []
