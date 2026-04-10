@@ -10,6 +10,11 @@ os.environ.setdefault("ENVIRONMENT", "test")
 # (not HTTPS), so Secure cookies would be silently dropped and never forwarded.
 os.environ.setdefault("COOKIE_SECURE", "false")
 
+# Use the minimum bcrypt cost factor in tests to keep hashing fast.
+# bcrypt at rounds=4 is ~100x faster than rounds=12, reducing per-test
+# overhead for any test that calls register or login.
+os.environ.setdefault("BCRYPT_ROUNDS", "4")
+
 # Force the asyncpg scheme in DATABASE_URL before any app modules are imported.
 # The container environment sets the psycopg2 scheme by default which fails with
 # the async SQLAlchemy engine at module-import time (app/database.py validates).

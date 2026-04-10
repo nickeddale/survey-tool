@@ -2,6 +2,7 @@ import asyncio
 import hashlib
 import secrets
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 
 import bcrypt
@@ -15,24 +16,30 @@ from app.models.user import User
 
 REFRESH_TOKEN_EXPIRE_DAYS = 30
 
+# Dedicated thread pool for bcrypt operations. Bounded to avoid spawning an
+# unbounded number of threads under high auth load (each bcrypt call holds a
+# thread for ~200-400ms of CPU time). max_workers caps concurrent bcrypt
+# operations; excess requests queue rather than spawning unlimited threads.
+_bcrypt_executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="bcrypt")
+
 
 async def hash_password(plain_password: str) -> str:
-    """Hash a password using bcrypt, offloaded to a thread pool to avoid
-    blocking the uvicorn event loop (bcrypt is CPU-bound)."""
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(
-        None,
-        lambda: bcrypt.hashpw(plain_password.encode(), bcrypt.gensalt()).decode(),
+    """Hash a password using bcrypt, offloaded to a dedicated thread pool to
+    avoid blocking the async event loop (bcrypt is CPU-bound). Uses configurable
+    rounds from settings so tests can lower the cost factor for speed."""
+    rounds = settings.bcrypt_rounds
+    return await asyncio.to_thread(
+        lambda: bcrypt.hashpw(
+            plain_password.encode(), bcrypt.gensalt(rounds=rounds)
+        ).decode()
     )
 
 
 async def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a bcrypt password hash, offloaded to a thread pool to avoid
-    blocking the uvicorn event loop (bcrypt is CPU-bound)."""
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(
-        None,
-        lambda: bcrypt.checkpw(plain_password.encode(), hashed_password.encode()),
+    """Verify a bcrypt password hash, offloaded to a dedicated thread pool to
+    avoid blocking the async event loop (bcrypt is CPU-bound)."""
+    return await asyncio.to_thread(
+        lambda: bcrypt.checkpw(plain_password.encode(), hashed_password.encode())
     )
 
 
