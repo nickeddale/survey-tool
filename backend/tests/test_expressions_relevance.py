@@ -654,3 +654,58 @@ def test_null_answer_not_equal_to_empty_string_for_numeric():
     result = evaluate_relevance(survey, answers={"Q_num": None})
 
     assert q_cond.id in result.visible_question_ids
+
+
+# ---------------------------------------------------------------------------
+# ISS-209: yes_no string values compared with bare boolean literals
+# ---------------------------------------------------------------------------
+
+
+def test_yes_no_string_true_matches_bool_literal_true():
+    """yes_no question answered 'true' (string) matches {Q1} == true (bool literal).
+    The public form stores yes_no answers as strings 'true'/'false'."""
+    q_target = _make_question("Q2", relevance="{Q1} == true")
+    g = _make_group([q_target], relevance=None)
+    survey = _make_survey([g])
+
+    # yes_no answer stored as the string 'true' in public survey form
+    result = evaluate_relevance(survey, answers={"Q1": "true"})
+
+    assert q_target.id in result.visible_question_ids
+    assert q_target.id not in result.hidden_question_ids
+
+
+def test_yes_no_string_false_does_not_match_bool_literal_true():
+    """yes_no question answered 'false' (string) does NOT match {Q1} == true."""
+    q_target = _make_question("Q2", relevance="{Q1} == true")
+    g = _make_group([q_target], relevance=None)
+    survey = _make_survey([g])
+
+    result = evaluate_relevance(survey, answers={"Q1": "false"})
+
+    assert q_target.id in result.hidden_question_ids
+    assert q_target.id not in result.visible_question_ids
+
+
+def test_yes_no_string_false_matches_bool_literal_false():
+    """yes_no question answered 'false' (string) matches {Q1} == false."""
+    q_target = _make_question("Q2", relevance="{Q1} == false")
+    g = _make_group([q_target], relevance=None)
+    survey = _make_survey([g])
+
+    result = evaluate_relevance(survey, answers={"Q1": "false"})
+
+    assert q_target.id in result.visible_question_ids
+    assert q_target.id not in result.hidden_question_ids
+
+
+def test_yes_no_string_true_does_not_match_bool_literal_false():
+    """yes_no question answered 'true' (string) does NOT match {Q1} == false."""
+    q_target = _make_question("Q2", relevance="{Q1} == false")
+    g = _make_group([q_target], relevance=None)
+    survey = _make_survey([g])
+
+    result = evaluate_relevance(survey, answers={"Q1": "true"})
+
+    assert q_target.id in result.hidden_question_ids
+    assert q_target.id not in result.visible_question_ids

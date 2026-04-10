@@ -295,6 +295,25 @@ class Evaluator:
                 return left == right_num
             except (ValueError, TypeError):
                 pass
+        # String-to-boolean coercion: compare bool literal with yes_no string value.
+        # yes_no questions store their answer as the string 'true'/'false' in the
+        # public form, but the logic editor generates == true (bare boolean literal).
+        _BOOL_TRUE_STRINGS = frozenset({"true", "yes", "1", "y"})
+        _BOOL_FALSE_STRINGS = frozenset({"false", "no", "0", "n"})
+        if isinstance(left, bool) and isinstance(right, str):
+            lower = right.lower()
+            if lower in _BOOL_TRUE_STRINGS:
+                return left is True
+            if lower in _BOOL_FALSE_STRINGS:
+                return left is False
+            return False
+        if isinstance(right, bool) and isinstance(left, str):
+            lower = left.lower()
+            if lower in _BOOL_TRUE_STRINGS:
+                return right is True
+            if lower in _BOOL_FALSE_STRINGS:
+                return right is False
+            return False
         return False
 
     @staticmethod
