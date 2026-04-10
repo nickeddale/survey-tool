@@ -29,6 +29,7 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.config import settings
+import app.database as app_database
 from app.database import Base, get_db
 from app.limiter import limiter
 from app.main import app
@@ -74,6 +75,10 @@ async def engine():
         )
         await conn.run_sync(Base.metadata.create_all)
     yield _engine
+    # Dispose the app-level engine so its idle pooled connections are closed
+    # before we attempt DDL (DROP TABLE requires exclusive locks, which are
+    # blocked by open idle connections from app.database.engine).
+    await app_database.engine.dispose()
     async with _engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.exec_driver_sql("DROP TYPE IF EXISTS response_status")
