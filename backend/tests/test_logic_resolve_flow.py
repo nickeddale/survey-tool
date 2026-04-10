@@ -668,3 +668,122 @@ async def test_navigation_across_groups(client: AsyncClient):
     assert response.status_code == 200
     body = response.json()
     assert body["next_question_id"] == q2["id"]
+
+
+# --------------------------------------------------------------------------- #
+# ISS-210: 500 error when numeric field is cleared
+# --------------------------------------------------------------------------- #
+
+
+async def create_numeric_question(
+    client: AsyncClient,
+    headers: dict,
+    survey_id: str,
+    group_id: str,
+    code: str,
+    sort_order: int = 1,
+    title: str = "A numeric question",
+    relevance: str | None = None,
+) -> dict:
+    """Create a numeric question (question_type='number')."""
+    payload: dict = {
+        "question_type": "number",
+        "title": title,
+        "code": code,
+        "sort_order": sort_order,
+    }
+    if relevance is not None:
+        payload["relevance"] = relevance
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json=payload,
+        headers=headers,
+    )
+    assert resp.status_code == 201
+    return resp.json()
+
+
+@pytest.mark.asyncio
+async def test_cleared_numeric_field_in_comparison_returns_200(client: AsyncClient):
+    """ISS-210: {Q2} > 100 with Q2='' (cleared numeric field) must return 200, not 500."""
+    headers = await auth_headers(client)
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+
+    q1 = await create_numeric_question(
+        client, headers, survey_id, group_id, code="Q2", sort_order=1,
+        title="Enter a number",
+    )
+    q2 = await create_question(
+        client, headers, survey_id, group_id, code="Q3", sort_order=2,
+        title="Shown when Q2 > 100",
+        relevance="{Q2} > 100",
+    )
+
+    # Submit with empty string value for the numeric question (simulates clearing the field)
+    response = await client.post(
+        resolve_url(survey_id),
+        json={"answers": [answer_input(q1["id"], "")]},
+        headers=headers,
+    )
+    assert response.status_code == 200, (
+        f"Expected 200 but got {response.status_code}: {response.text}"
+    )
+    body = response.json()
+    # Q3 depends on {Q2} > 100; with Q2='', the expression should evaluate to False → Q3 hidden
+    assert q2["id"] in body["hidden_questions"]
+    assert q2["id"] not in body["visible_questions"]
+
+
+@pytest.mark.asyncio
+async def test_cleared_numeric_field_less_than_comparison_returns_200(client: AsyncClient):
+    """ISS-210: {Q2} < 50 with Q2='' must return 200, not 500."""
+    headers = await auth_headers(client)
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+
+    q1 = await create_numeric_question(
+        client, headers, survey_id, group_id, code="Q2", sort_order=1,
+    )
+    q2 = await create_question(
+        client, headers, survey_id, group_id, code="Q3", sort_order=2,
+        relevance="{Q2} < 50",
+    )
+
+    response = await client.post(
+        resolve_url(survey_id),
+        json={"answers": [answer_input(q1["id"], "")]},
+        headers=headers,
+    )
+    assert response.status_code == 200, (
+        f"Expected 200 but got {response.status_code}: {response.text}"
+    )
+    body = response.json()
+    assert q2["id"] in body["hidden_questions"]
+
+
+@pytest.mark.asyncio
+async def test_numeric_field_with_valid_value_still_works(client: AsyncClient):
+    """ISS-210: {Q2} > 100 with Q2=150 must still evaluate to True and show Q3."""
+    headers = await auth_headers(client)
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+
+    q1 = await create_numeric_question(
+        client, headers, survey_id, group_id, code="Q2", sort_order=1,
+    )
+    q2 = await create_question(
+        client, headers, survey_id, group_id, code="Q3", sort_order=2,
+        relevance="{Q2} > 100",
+    )
+
+    response = await client.post(
+        resolve_url(survey_id),
+        json={"answers": [answer_input(q1["id"], 150)]},
+        headers=headers,
+    )
+    assert response.status_code == 200
+    body = response.json()
+    # Q3 is visible because 150 > 100
+    assert q2["id"] in body["visible_questions"]
+    assert q2["id"] not in body["hidden_questions"]

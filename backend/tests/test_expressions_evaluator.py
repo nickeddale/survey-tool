@@ -1259,3 +1259,78 @@ def test_bool_false_equals_string_no():
     """bool False == 'no' → True (alternative falsy string)."""
     result = Evaluator._coerce_equal(False, "no")
     assert result is True
+
+
+# ---------------------------------------------------------------------------
+# Empty string in ordering comparisons (ISS-210)
+# ---------------------------------------------------------------------------
+# When a numeric field is cleared in the UI the resolve-flow endpoint receives
+# '' (empty string) as the answer value.  The ordering operators must treat ''
+# as "no value" and return False rather than raising an EvaluationError (500).
+
+
+def test_empty_string_greater_than_number_returns_false():
+    """{Q2} > 100 where Q2 is '' (cleared numeric field) → False, not 500."""
+    result = eval_expr("{Q2} > 100", context={"Q2": ""})
+    assert result is False
+
+
+def test_empty_string_less_than_number_returns_false():
+    """{Q2} < 100 where Q2 is '' → False."""
+    result = eval_expr("{Q2} < 100", context={"Q2": ""})
+    assert result is False
+
+
+def test_empty_string_greater_than_or_equal_returns_false():
+    """{Q2} >= 100 where Q2 is '' → False."""
+    result = eval_expr("{Q2} >= 100", context={"Q2": ""})
+    assert result is False
+
+
+def test_empty_string_less_than_or_equal_returns_false():
+    """{Q2} <= 100 where Q2 is '' → False."""
+    result = eval_expr("{Q2} <= 100", context={"Q2": ""})
+    assert result is False
+
+
+def test_number_greater_than_empty_string_returns_false():
+    """100 > {Q2} where Q2 is '' → False (symmetric case)."""
+    result = eval_expr("100 > {Q2}", context={"Q2": ""})
+    assert result is False
+
+
+def test_number_less_than_empty_string_returns_false():
+    """100 < {Q2} where Q2 is '' → False (symmetric case)."""
+    result = eval_expr("100 < {Q2}", context={"Q2": ""})
+    assert result is False
+
+
+def test_number_greater_than_or_equal_empty_string_returns_false():
+    """100 >= {Q2} where Q2 is '' → False (symmetric case)."""
+    result = eval_expr("100 >= {Q2}", context={"Q2": ""})
+    assert result is False
+
+
+def test_number_less_than_or_equal_empty_string_returns_false():
+    """100 <= {Q2} where Q2 is '' → False (symmetric case)."""
+    result = eval_expr("100 <= {Q2}", context={"Q2": ""})
+    assert result is False
+
+
+def test_empty_string_comparison_does_not_raise():
+    """{Q2} > 100 with Q2='' must not raise EvaluationError."""
+    # Regression guard: previously raised EvaluationError (→ 500 in API)
+    try:
+        result = eval_expr("{Q2} > 100", context={"Q2": ""})
+        assert result is False
+    except EvaluationError:
+        pytest.fail("EvaluationError raised for empty-string numeric comparison")
+
+
+def test_or_expression_with_empty_string_numeric_does_not_crash():
+    """{Q1} == 'A' or {Q2} > 100 where Q2='' must evaluate to False without error."""
+    result = eval_expr(
+        "{Q1} == 'A' or {Q2} > 100",
+        context={"Q1": "B", "Q2": ""},
+    )
+    assert result is False
