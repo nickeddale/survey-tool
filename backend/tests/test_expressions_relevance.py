@@ -568,3 +568,89 @@ class TestEvalRelevance:
     def test_syntax_error_raises(self):
         with pytest.raises(RelevanceEvaluationError):
             _eval_relevance("{{bad ===", {})
+
+    # -- ISS-208: empty string context values (from resolver normalisation) --
+
+    def test_scenario_7_2_empty_string_equals_empty(self):
+        """Scenario 7.2: {Q1} == '' is True when Q1 normalised to '' (unanswered
+        string question).  The answers dict is pre-normalised by resolver."""
+        assert _eval_relevance("{Q1} == ''", {"Q1": ""}) is True
+
+    def test_scenario_7_3_empty_string_not_equal_is_false(self):
+        """Scenario 7.3: {Q1} != '' is False when Q1 normalised to ''."""
+        assert _eval_relevance("{Q1} != ''", {"Q1": ""}) is False
+
+    def test_null_check_false_for_normalised_string(self):
+        """After normalisation, {Q1} == null must be False (Q1 is '' not None)."""
+        assert _eval_relevance("{Q1} == null", {"Q1": ""}) is False
+
+
+# ---------------------------------------------------------------------------
+# ISS-208: Scenario 7.2 and 7.3 — relevance visibility with empty string
+# ---------------------------------------------------------------------------
+
+
+def test_scenario_7_2_question_hidden_when_empty_string_required():
+    """Scenario 7.2: A question with relevance {Q1} == '' should be VISIBLE
+    when Q1 is unanswered and resolver normalises it to ''."""
+    q_target = _make_question("Q2", relevance="{Q1} == ''")
+    g = _make_group([q_target], relevance=None)
+    survey = _make_survey([g])
+
+    # Q1 normalised to '' by resolver/logic path; simulate that here.
+    result = evaluate_relevance(survey, answers={"Q1": ""})
+
+    assert q_target.id in result.visible_question_ids
+    assert q_target.id not in result.hidden_question_ids
+
+
+def test_scenario_7_2_question_visible_with_answered_value():
+    """When Q1 has a non-empty answer, {Q1} == '' should be False → Q2 hidden."""
+    q_target = _make_question("Q2", relevance="{Q1} == ''")
+    g = _make_group([q_target], relevance=None)
+    survey = _make_survey([g])
+
+    result = evaluate_relevance(survey, answers={"Q1": "some answer"})
+
+    assert q_target.id in result.hidden_question_ids
+    assert q_target.id not in result.visible_question_ids
+
+
+def test_scenario_7_3_question_hidden_when_not_empty_required():
+    """Scenario 7.3: A question with relevance {Q1} != '' should be HIDDEN
+    when Q1 is unanswered (normalised to ''), matching user expectation that
+    is_not_empty conditions hide questions before interaction."""
+    q_target = _make_question("Q2", relevance="{Q1} != ''")
+    g = _make_group([q_target], relevance=None)
+    survey = _make_survey([g])
+
+    # Q1 normalised to '' by resolver/logic path.
+    result = evaluate_relevance(survey, answers={"Q1": ""})
+
+    assert q_target.id in result.hidden_question_ids
+    assert q_target.id not in result.visible_question_ids
+
+
+def test_scenario_7_3_question_visible_with_answered_value():
+    """When Q1 has a non-empty answer, {Q1} != '' should be True → Q2 visible."""
+    q_target = _make_question("Q2", relevance="{Q1} != ''")
+    g = _make_group([q_target], relevance=None)
+    survey = _make_survey([g])
+
+    result = evaluate_relevance(survey, answers={"Q1": "some answer"})
+
+    assert q_target.id in result.visible_question_ids
+    assert q_target.id not in result.hidden_question_ids
+
+
+def test_null_answer_not_equal_to_empty_string_for_numeric():
+    """A numeric unanswered question stays None (not '').  {Q_num} == '' is
+    False and {Q_num} != '' is True — distinct from string normalisation."""
+    q_cond = _make_question("Q2", relevance="{Q_num} != ''")
+    g = _make_group([q_cond], relevance=None)
+    survey = _make_survey([g])
+
+    # Numeric unanswered questions remain None, so != '' is True → visible.
+    result = evaluate_relevance(survey, answers={"Q_num": None})
+
+    assert q_cond.id in result.visible_question_ids

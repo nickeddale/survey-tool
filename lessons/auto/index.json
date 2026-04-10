@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-10T05:19:44.226Z",
+  "lastUpdated": "2026-04-10T05:30:27.173Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3974,6 +3974,25 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md",
+      "ticketId": "ISS-208",
+      "title": "Null/unanswered question values treated differently from empty string in relevance evaluation",
+      "date": "2026-04-10",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "documentation",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4169,7 +4188,8 @@
       "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md",
       "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md",
       "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
-      "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md"
+      "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md",
+      "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4343,7 +4363,8 @@
       "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md",
       "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md",
       "2026-04-09-iss-200-test-expression-evaluator-always-returns-true-rega.md",
-      "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md"
+      "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
+      "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4665,7 +4686,8 @@
       "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
       "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md",
       "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md",
-      "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md"
+      "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
+      "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4904,7 +4926,8 @@
       "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md",
       "2026-04-09-iss-200-test-expression-evaluator-always-returns-true-rega.md",
       "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
-      "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md"
+      "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md",
+      "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5093,7 +5116,8 @@
       "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
       "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md",
       "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md",
-      "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md"
+      "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
+      "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5184,7 +5208,8 @@
       "2026-04-09-iss-193-iss-193-responsesstatus-column-type-mismatch-enum.md",
       "2026-04-09-iss-194-add-question-level-scope-to-assessments.md",
       "2026-04-09-iss-198-questionpalette-adds-questions-to-wrong-group.md",
-      "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md"
+      "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
+      "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5252,7 +5277,8 @@
       "2026-04-09-iss-196-relocate-builder-and-edit-survey-buttons-on-detail.md",
       "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
       "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md",
-      "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md"
+      "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
+      "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5575,7 +5601,8 @@
       "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
       "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md",
       "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md",
-      "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md"
+      "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
+      "2026-04-10-iss-208-nullunanswered-question-values-treated-differently.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",

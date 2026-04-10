@@ -10,7 +10,8 @@ Covers:
 - Multi-select / checkbox -> Python list
 - Rating / numeric -> Python int/float
 - Yes/no / boolean -> Python bool
-- Unanswered (None value) -> Python None
+- Unanswered string-type (None value) -> '' (empty string, ISS-208)
+- Unanswered numeric/boolean/list (None value) -> Python None
 - Missing participant -> no RESPONDENT keys
 - Integration: resolver output feeds into evaluate() end-to-end
 """
@@ -125,10 +126,11 @@ def test_direct_answer_string():
 
 
 def test_direct_answer_none_unanswered():
+    # ISS-208: unanswered string-type questions normalise to '' not None.
     q = _make_question("Q1", "short_text")
     a = _make_answer(q, None)
     ctx = build_expression_context(_make_response([a]))
-    assert ctx["Q1"] is None
+    assert ctx["Q1"] == ""
 
 
 def test_direct_answer_multiple_questions():
@@ -421,11 +423,12 @@ def test_empty_response_produces_empty_context():
     assert ctx == {}
 
 
-def test_unanswered_single_choice_is_none():
+def test_unanswered_single_choice_is_empty_string():
+    # ISS-208: unanswered single_choice normalises to '' (string-type question).
     q = _make_question("Q1", "single_choice")
     a = _make_answer(q, None)
     ctx = build_expression_context(_make_response([a]))
-    assert ctx["Q1"] is None
+    assert ctx["Q1"] == ""
 
 
 # ---------------------------------------------------------------------------
@@ -434,8 +437,21 @@ def test_unanswered_single_choice_is_none():
 
 
 class TestCoerceValue:
-    def test_none_returns_none(self):
-        assert _coerce_value(None, "short_text") is None
+    def test_none_string_type_returns_empty_string(self):
+        # ISS-208: unanswered string-type questions normalise to ''.
+        assert _coerce_value(None, "short_text") == ""
+
+    def test_none_numeric_type_returns_none(self):
+        # Numeric unanswered questions stay None so null-checks still work.
+        assert _coerce_value(None, "rating") is None
+
+    def test_none_boolean_type_returns_none(self):
+        # Boolean unanswered questions stay None.
+        assert _coerce_value(None, "boolean") is None
+
+    def test_none_list_type_returns_none(self):
+        # List-type unanswered questions stay None.
+        assert _coerce_value(None, "multiple_choice") is None
 
     def test_string_passthrough(self):
         assert _coerce_value("hello", "short_text") == "hello"
@@ -568,12 +584,14 @@ def test_integration_direct_answer_string_comparison():
     assert _eval_expr("{Q1} == 'No'", ctx) is False
 
 
-def test_integration_unanswered_null():
+def test_integration_unanswered_string_normalised_to_empty():
+    # ISS-208: unanswered short_text normalises to ''; {Q1} == null is now
+    # False (it is '' not null) and {Q1} == '' is True.
     q = _make_question("Q1", "short_text")
     a = _make_answer(q, None)
     ctx = build_expression_context(_make_response([a]))
-    # Missing/null variable evaluates to None which is falsy
-    assert _eval_expr("{Q1} == null", ctx) is True
+    assert _eval_expr("{Q1} == ''", ctx) is True
+    assert _eval_expr("{Q1} == null", ctx) is False
 
 
 def test_integration_numeric_comparison():
@@ -650,3 +668,95 @@ def test_integration_unanswered_missing_from_context():
     ctx = build_expression_context(_make_response([]))
     # Q99 was never answered — evaluator treats missing variable as None
     assert _eval_expr("{Q99} == null", ctx) is True
+
+
+# ---------------------------------------------------------------------------
+# ISS-208: String-type unanswered questions normalise to empty string
+# ---------------------------------------------------------------------------
+
+
+def test_iss208_short_text_unanswered_is_empty_string():
+    """ISS-208 Scenario 7.2: unanswered short_text normalises to ''."""
+    q = _make_question("Q1", "short_text")
+    a = _make_answer(q, None)
+    ctx = build_expression_context(_make_response([a]))
+    assert ctx["Q1"] == ""
+    assert _eval_expr("{Q1} == ''", ctx) is True
+    assert _eval_expr("{Q1} != ''", ctx) is False
+
+
+def test_iss208_long_text_unanswered_is_empty_string():
+    """ISS-208: unanswered long_text normalises to ''."""
+    q = _make_question("Q1", "long_text")
+    a = _make_answer(q, None)
+    ctx = build_expression_context(_make_response([a]))
+    assert ctx["Q1"] == ""
+
+
+def test_iss208_dropdown_unanswered_is_empty_string():
+    """ISS-208: unanswered dropdown normalises to ''."""
+    q = _make_question("Q1", "dropdown")
+    a = _make_answer(q, None)
+    ctx = build_expression_context(_make_response([a]))
+    assert ctx["Q1"] == ""
+
+
+def test_iss208_radio_unanswered_is_empty_string():
+    """ISS-208: unanswered radio normalises to ''."""
+    q = _make_question("Q1", "radio")
+    a = _make_answer(q, None)
+    ctx = build_expression_context(_make_response([a]))
+    assert ctx["Q1"] == ""
+
+
+def test_iss208_numeric_unanswered_stays_none():
+    """ISS-208: unanswered numeric question stays None (null-check preserved)."""
+    q = _make_question("Q1", "rating")
+    a = _make_answer(q, None)
+    ctx = build_expression_context(_make_response([a]))
+    assert ctx["Q1"] is None
+    assert _eval_expr("{Q1} == null", ctx) is True
+
+
+def test_iss208_boolean_unanswered_stays_none():
+    """ISS-208: unanswered boolean question stays None."""
+    q = _make_question("Q1", "boolean")
+    a = _make_answer(q, None)
+    ctx = build_expression_context(_make_response([a]))
+    assert ctx["Q1"] is None
+    assert _eval_expr("{Q1} == null", ctx) is True
+
+
+def test_iss208_multiple_choice_unanswered_stays_none():
+    """ISS-208: unanswered multiple_choice question stays None (list type)."""
+    q = _make_question("Q1", "multiple_choice")
+    a = _make_answer(q, None)
+    ctx = build_expression_context(_make_response([a]))
+    assert ctx["Q1"] is None
+
+
+def test_iss208_scenario_7_2_empty_string_equals_empty():
+    """Scenario 7.2: {Q1} == '' is True for unanswered short_text question."""
+    q = _make_question("Q1", "short_text")
+    a = _make_answer(q, None)
+    ctx = build_expression_context(_make_response([a]))
+    result = _eval_expr("{Q1} == ''", ctx)
+    assert result is True
+
+
+def test_iss208_scenario_7_3_not_empty_is_false():
+    """Scenario 7.3: {Q1} != '' is False for unanswered short_text question."""
+    q = _make_question("Q1", "short_text")
+    a = _make_answer(q, None)
+    ctx = build_expression_context(_make_response([a]))
+    result = _eval_expr("{Q1} != ''", ctx)
+    assert result is False
+
+
+def test_iss208_null_check_false_for_string_type():
+    """{Q1} == null is False after string normalisation (Q1 is '' not null)."""
+    q = _make_question("Q1", "short_text")
+    a = _make_answer(q, None)
+    ctx = build_expression_context(_make_response([a]))
+    result = _eval_expr("{Q1} == null", ctx)
+    assert result is False

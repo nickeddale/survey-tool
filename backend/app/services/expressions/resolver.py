@@ -15,7 +15,8 @@ Type conversion rules (applied when populating the context dict):
     multiple_choice / checkbox / ranking  -> Python list
     rating / scale / number / numeric     -> int or float (float if fractional)
     yes_no / boolean                      -> Python bool
-    unanswered / null value               -> Python None
+    unanswered string-type questions      -> '' (empty string, ISS-208)
+    unanswered numeric/boolean/list       -> Python None
     all other types                       -> str
 
 Usage::
@@ -70,6 +71,28 @@ _BOOLEAN_QUESTION_TYPES = frozenset(
     }
 )
 
+# Question types whose unanswered (None) values should normalise to empty
+# string rather than None.  This matches user expectations: {Q1} == '' is
+# True for an unanswered text question.  Numeric and boolean types are
+# intentionally excluded so that null-checks ({Q1} == null) still work for
+# those types.
+_STRING_QUESTION_TYPES = frozenset(
+    {
+        "short_text",
+        "long_text",
+        "text",
+        "dropdown",
+        "radio",
+        "single_choice",
+        "date",
+        "time",
+        "datetime",
+        "email",
+        "url",
+        "phone",
+    }
+)
+
 
 class ResolverError(ValueError):
     """Raised when the resolver encounters an unrecoverable error."""
@@ -92,6 +115,12 @@ def _coerce_value(raw_value: Any, question_type: str) -> Any:
         The coerced Python value: list, int/float, bool, None, or str.
     """
     if raw_value is None:
+        # String-type questions normalise to empty string so that relevance
+        # expressions like {Q1} == '' evaluate to True for unanswered
+        # questions (Scenario 7.2 / ISS-208).  Non-string types (numeric,
+        # boolean, list) remain None so null-checks keep working.
+        if question_type in _STRING_QUESTION_TYPES:
+            return ""
         return None
 
     if question_type in _LIST_QUESTION_TYPES:

@@ -43,6 +43,7 @@ from app.services.expressions.flow import (
     build_ordered_pairs,
 )
 from app.services.expressions.piping import pipe_all, PipingError
+from app.services.expressions.resolver import _STRING_QUESTION_TYPES
 from app.services.expressions.relevance import (
     CircularRelevanceError,
     evaluate_relevance,
@@ -500,6 +501,23 @@ async def resolve_flow_endpoint(
         code = question_id_to_code.get(qid)
         if code is not None:
             answers[code] = answer_input.value
+
+    # ------------------------------------------------------------------
+    # Normalise unanswered string-type questions to empty string (ISS-208).
+    # Questions absent from the answers dict are treated as None in the
+    # evaluator, which makes {Q1} == '' False for unanswered text questions.
+    # Injecting '' for string-type questions ensures the initial survey state
+    # matches user expectations: is_empty conditions start hidden, not shown.
+    # ------------------------------------------------------------------
+    for group in survey.groups:
+        for question in group.questions:
+            if question.parent_id is not None:
+                continue  # subquestions are not top-level answer targets
+            code = question_id_to_code.get(question.id)
+            if code is None:
+                continue
+            if code not in answers and question.question_type in _STRING_QUESTION_TYPES:
+                answers[code] = ""
 
     # ------------------------------------------------------------------
     # Evaluate relevance to determine visible/hidden sets.

@@ -1107,3 +1107,75 @@ def test_none_inequality_is_false_for_non_none():
     # None != 10 should be True (None is not equal to 10)
     result = eval_expr("{Q2} != 10", context={"Q2": None})
     assert result is True
+
+
+# ---------------------------------------------------------------------------
+# Null vs empty string boundary cases (ISS-208)
+# ---------------------------------------------------------------------------
+# These tests document the intentional behaviour of the evaluator when
+# unanswered (None) context values are compared against empty string literals.
+# The context dict is populated by resolver.py which normalises unanswered
+# string-type questions to ''. The evaluator itself does NOT perform that
+# normalisation — it works purely with the values in the context dict.
+
+
+def test_empty_string_equals_empty_string():
+    """Sanity check: '' == '' must be True."""
+    result = eval_expr('{Q1} == ""', context={"Q1": ""})
+    assert result is True
+
+
+def test_empty_string_not_equal_is_false():
+    """Sanity check: '' != '' must be False."""
+    result = eval_expr('{Q1} != ""', context={"Q1": ""})
+    assert result is False
+
+
+def test_none_not_equal_to_empty_string():
+    """None is NOT equal to '': null answers for non-string types stay None."""
+    result = eval_expr('{Q1} == ""', context={"Q1": None})
+    assert result is False
+
+
+def test_none_not_equal_to_empty_string_inequality():
+    """None != '' is True: null (non-string type) is distinguishable from ''."""
+    result = eval_expr('{Q1} != ""', context={"Q1": None})
+    assert result is True
+
+
+def test_null_literal_not_equal_to_empty_string():
+    """null == '' must remain False: the null literal is a distinct value."""
+    result = eval_expr('null == ""')
+    assert result is False
+
+
+def test_normalised_string_equals_empty():
+    """Scenario 7.2: when resolver normalises unanswered string Q1 to '',
+    {Q1} == '' evaluates to True — simulated here by passing '' in context."""
+    result = eval_expr('{Q1} == ""', context={"Q1": ""})
+    assert result is True
+
+
+def test_normalised_string_not_empty_is_false():
+    """Scenario 7.3: when resolver normalises unanswered string Q1 to '',
+    {Q1} != '' evaluates to False — simulated here by passing '' in context."""
+    result = eval_expr('{Q1} != ""', context={"Q1": ""})
+    assert result is False
+
+
+def test_null_equality_for_numeric_unanswered():
+    """An unanswered numeric question stays None; {Q1} == null is True."""
+    result = eval_expr("{Q1} == null", context={"Q1": None})
+    assert result is True
+
+
+def test_null_equality_for_boolean_unanswered():
+    """An unanswered boolean question stays None; {Q1} == null is True."""
+    result = eval_expr("{Q1} == null", context={"Q1": None})
+    assert result is True
+
+
+def test_normalised_string_null_check_is_false():
+    """When string Q1 is normalised to '', {Q1} == null is False (not None)."""
+    result = eval_expr("{Q1} == null", context={"Q1": ""})
+    assert result is False
