@@ -27,7 +27,9 @@ from app.services.export_service import (
     build_csv_headers,
     build_json_export,
     generate_csv_stream,
+    generate_csv_stream_chunked,
     get_responses_for_export,
+    get_responses_for_export_chunked,
 )
 from app.services.response_service import (
     complete_response,
@@ -244,20 +246,19 @@ async def export_survey_responses(
     if columns is not None:
         column_list = [c.strip() for c in columns.split(",") if c.strip()]
 
-    responses = await get_responses_for_export(
-        session,
-        survey_id=parsed_survey_id,
-        user_id=current_user.id,
-        status=status_filter,
-        started_after=started_after,
-        started_before=started_before,
-        completed_after=completed_after,
-        completed_before=completed_before,
-    )
-
-    headers = build_csv_headers(responses, columns=column_list)
-
     if format == "json":
+        # JSON export loads all responses upfront (needed to build the full JSON array)
+        responses = await get_responses_for_export(
+            session,
+            survey_id=parsed_survey_id,
+            user_id=current_user.id,
+            status=status_filter,
+            started_after=started_after,
+            started_before=started_before,
+            completed_after=completed_after,
+            completed_before=completed_before,
+        )
+        headers = build_csv_headers(responses, columns=column_list)
         data = build_json_export(responses, headers)
         filename = f"survey_{survey_id}_responses.json"
         return JSONResponse(
@@ -267,10 +268,31 @@ async def export_survey_responses(
             },
         )
 
-    # Default: CSV
+    # CSV: fetch responses in chunks (avoids single large query), collect all
+    # chunks before closing the session, then stream the CSV from memory.
+    # Collecting upfront ensures the DB session is fully released before
+    # streaming begins, preventing "idle in transaction" lock contention on
+    # DROP TABLE during tests and avoiding dangling connections in production.
     filename = f"survey_{survey_id}_responses.csv"
+    all_chunks: list[list] = []
+    async for chunk in get_responses_for_export_chunked(
+        session,
+        survey_id=parsed_survey_id,
+        user_id=current_user.id,
+        status=status_filter,
+        started_after=started_after,
+        started_before=started_before,
+        completed_after=completed_after,
+        completed_before=completed_before,
+    ):
+        all_chunks.append(chunk)
+
+    async def _iter_collected():
+        for chunk in all_chunks:
+            yield chunk
+
     return StreamingResponse(
-        generate_csv_stream(responses, headers),
+        generate_csv_stream_chunked(_iter_collected(), columns=column_list),
         media_type="text/csv",
         headers={
             "Content-Disposition": f'attachment; filename="{filename}"',
