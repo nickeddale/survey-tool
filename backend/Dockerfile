@@ -39,7 +39,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy installed site-packages from builder (prod deps only, no dev extras)
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 
-# Copy uvicorn entry point from builder
+# Copy gunicorn and uvicorn entry points from builder
+COPY --from=builder /usr/local/bin/gunicorn /usr/local/bin/gunicorn
 COPY --from=builder /usr/local/bin/uvicorn /usr/local/bin/uvicorn
 
 # Copy application source
@@ -47,4 +48,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["gunicorn", "app.main:app", "--config", "gunicorn.conf.py"]

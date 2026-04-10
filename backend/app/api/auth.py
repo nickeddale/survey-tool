@@ -87,7 +87,7 @@ async def register(
 
     user = User(
         email=payload.email,
-        password_hash=hash_password(payload.password),
+        password_hash=await hash_password(payload.password),
         name=payload.name,
     )
     session.add(user)
@@ -120,7 +120,7 @@ async def login(
     )
 
     user = await get_user_by_email(session, payload.email)
-    if user is None or not verify_password(payload.password, user.password_hash):
+    if user is None or not await verify_password(payload.password, user.password_hash):
         audit_service.log_auth_event(
             event_type="login_failure",
             email=payload.email,
@@ -253,7 +253,7 @@ async def update_me(
     if payload.name is not None:
         current_user.name = payload.name
     if payload.password is not None:
-        current_user.password_hash = hash_password(payload.password)
+        current_user.password_hash = await hash_password(payload.password)
 
     session.add(current_user)
     await session.flush()

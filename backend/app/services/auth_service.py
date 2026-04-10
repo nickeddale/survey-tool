@@ -1,3 +1,4 @@
+import asyncio
 import hashlib
 import secrets
 import uuid
@@ -15,12 +16,24 @@ from app.models.user import User
 REFRESH_TOKEN_EXPIRE_DAYS = 30
 
 
-def hash_password(plain_password: str) -> str:
-    return bcrypt.hashpw(plain_password.encode(), bcrypt.gensalt()).decode()
+async def hash_password(plain_password: str) -> str:
+    """Hash a password using bcrypt, offloaded to a thread pool to avoid
+    blocking the uvicorn event loop (bcrypt is CPU-bound)."""
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(
+        None,
+        lambda: bcrypt.hashpw(plain_password.encode(), bcrypt.gensalt()).decode(),
+    )
 
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return bcrypt.checkpw(plain_password.encode(), hashed_password.encode())
+async def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verify a bcrypt password hash, offloaded to a thread pool to avoid
+    blocking the uvicorn event loop (bcrypt is CPU-bound)."""
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(
+        None,
+        lambda: bcrypt.checkpw(plain_password.encode(), hashed_password.encode()),
+    )
 
 
 async def get_user_by_email(session: AsyncSession, email: str) -> User | None:
