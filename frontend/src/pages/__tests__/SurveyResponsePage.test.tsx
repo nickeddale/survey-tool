@@ -772,6 +772,9 @@ describe('flow resolution — conditional display', () => {
   })
 
   it('applies piped text to question titles', async () => {
+    // The backend's pipe_all() returns keys in the format {code}_title with the
+    // substitution already applied. The question with code 'NAME' will have its
+    // title returned under key 'NAME_title' with all {VARIABLE} tokens resolved.
     server.use(
       http.post(`${BASE}/surveys/${SURVEY_ID}/logic/resolve-flow`, () =>
         HttpResponse.json(
@@ -780,7 +783,7 @@ describe('flow resolution — conditional display', () => {
             hidden_questions: [],
             visible_groups: ['ag1', 'ag2'],
             hidden_groups: [],
-            piped_texts: { NAME: 'Alice' },
+            piped_texts: { NAME_title: 'Hello, Alice! What is your name?' },
             next_question_id: null,
           },
           { status: 200 },
@@ -817,7 +820,7 @@ describe('flow resolution — conditional display', () => {
 
     await waitFor(() => expect(screen.getByTestId('survey-form')).toBeInTheDocument())
 
-    // After resolve-flow, {NAME} should be replaced with Alice
+    // After resolve-flow, {NAME} should be replaced with Alice (backend returns resolved text)
     await waitFor(() => {
       const titles = screen.getAllByTestId('form-question-title')
       expect(titles.some((t) => t.textContent?.includes('Hello, Alice!'))).toBe(true)

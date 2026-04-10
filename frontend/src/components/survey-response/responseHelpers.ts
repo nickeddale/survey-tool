@@ -35,6 +35,9 @@ export function flattenQuestions(groups: QuestionGroupResponse[]): QuestionRespo
 /**
  * Replace {variable} placeholders in a string using the pipedTexts map.
  * Falls back to the original text if no piped text is available for a given id.
+ *
+ * Note: this is a generic utility for legacy/fallback use. The preferred approach
+ * is to use the pre-resolved values from the backend (see buildVisibleSurvey).
  */
 export function applyPipedText(text: string, pipedTexts: Record<string, string>): string {
   return text.replace(/\{([^}]+)\}/g, (match, key) => pipedTexts[key] ?? match)
@@ -43,6 +46,11 @@ export function applyPipedText(text: string, pipedTexts: Record<string, string>)
 /**
  * Apply piped text substitutions and filter out hidden questions from survey groups.
  * Hidden questions are removed from display but answers are retained in AnswerMap.
+ *
+ * The backend's resolve-flow endpoint returns pipedTexts keyed as `{code}_title`,
+ * `{code}_description`, and `{code}_{opt_code}_title` — each value is the fully
+ * resolved text with all {VARIABLE} placeholders already substituted. We use these
+ * pre-resolved values directly instead of doing client-side regex substitution.
  */
 export function buildVisibleSurvey(
   survey: SurveyFullResponse,
@@ -54,14 +62,19 @@ export function buildVisibleSurvey(
     .filter((g) => !hiddenGroups.has(g.id))
     .map((g) => ({
       ...g,
-      title: applyPipedText(g.title, pipedTexts),
-      description: g.description ? applyPipedText(g.description, pipedTexts) : g.description,
       questions: g.questions
         .filter((q) => !hiddenQuestions.has(q.id))
         .map((q) => ({
           ...q,
-          title: applyPipedText(q.title, pipedTexts),
-          description: q.description ? applyPipedText(q.description, pipedTexts) : q.description,
+          title: pipedTexts[`${q.code}_title`] ?? q.title,
+          description:
+            q.description !== null && q.description !== undefined
+              ? (pipedTexts[`${q.code}_description`] ?? q.description)
+              : q.description,
+          answer_options: q.answer_options.map((opt) => ({
+            ...opt,
+            title: pipedTexts[`${q.code}_${opt.code}_title`] ?? opt.title,
+          })),
         })),
     }))
 

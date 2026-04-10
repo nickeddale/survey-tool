@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-10T05:10:30.608Z",
+  "lastUpdated": "2026-04-10T05:19:44.226Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -3959,6 +3959,21 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md",
+      "ticketId": "ISS-207",
+      "title": "Piping (answer substitution) not working in public survey form question titles",
+      "date": "2026-04-10",
+      "categories": [
+        "frontend",
+        "bug-fix",
+        "survey-logic",
+        "testing"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4153,7 +4168,8 @@
       "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
       "2026-04-09-iss-205-number-question-type-renders-as-unsupported-questi.md",
       "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md",
-      "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md"
+      "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
+      "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4887,7 +4903,8 @@
       "2026-04-09-iss-203-no-forward-reference-warning-in-logic-editor-valid.md",
       "2026-04-09-iss-201-visual-builder-generates-uppercase-andor-keywords.md",
       "2026-04-09-iss-200-test-expression-evaluator-always-returns-true-rega.md",
-      "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md"
+      "2026-04-10-iss-206-expression-evaluator-crashes-on-nonenonetype-numer.md",
+      "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5691,7 +5708,8 @@
       "2026-04-04-iss-104-79-frontend-participant-management-ui.md",
       "2026-04-09-iss-195-add-builder-button-to-survey-detail-page.md",
       "2026-04-09-iss-204-questions-with-relevance-flash-visible-before-init.md",
-      "2026-04-09-iss-200-test-expression-evaluator-always-returns-true-rega.md"
+      "2026-04-09-iss-200-test-expression-evaluator-always-returns-true-rega.md",
+      "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md"
     ],
     "vitest": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
@@ -5762,7 +5780,8 @@
       "2026-04-03-iss-093-611-frontend-conditional-display-and-piping-in-res.md"
     ],
     "survey-logic": [
-      "2026-04-03-iss-093-611-frontend-conditional-display-and-piping-in-res.md"
+      "2026-04-03-iss-093-611-frontend-conditional-display-and-piping-in-res.md",
+      "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md"
     ],
     "conditional-rendering": [
       "2026-04-03-iss-093-611-frontend-conditional-display-and-piping-in-res.md"
