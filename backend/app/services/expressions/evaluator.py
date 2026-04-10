@@ -184,12 +184,20 @@ class Evaluator:
         if op == "!=":
             return not self._coerce_equal(left, right)
         if op == ">":
+            if left is None or right is None:
+                return False
             return self._coerce_compare(left, right, node.start) > 0
         if op == "<":
+            if left is None or right is None:
+                return False
             return self._coerce_compare(left, right, node.start) < 0
         if op == ">=":
+            if left is None or right is None:
+                return False
             return self._coerce_compare(left, right, node.start) >= 0
         if op == "<=":
+            if left is None or right is None:
+                return False
             return self._coerce_compare(left, right, node.start) <= 0
         if op == "contains":
             return self._eval_contains(left, right, node.start)

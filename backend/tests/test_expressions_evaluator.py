@@ -1004,3 +1004,106 @@ def test_in_with_variable_array():
     # 'in' with a variable that resolves to a list
     result = eval_expr('{Q1} in {choices}', context={"Q1": "A1", "choices": ["A1", "A2"]})
     assert result is True
+
+
+# ---------------------------------------------------------------------------
+# None/NoneType numeric ordering comparisons (ISS-206)
+# ---------------------------------------------------------------------------
+
+
+def test_none_greater_than_number_returns_false():
+    # {Q2} > 10 where Q2 is None (unanswered) must return False, not raise
+    result = eval_expr("{Q2} > 10", context={"Q2": None})
+    assert result is False
+
+
+def test_none_less_than_number_returns_false():
+    # {Q2} < 10 where Q2 is None (unanswered) must return False, not raise
+    result = eval_expr("{Q2} < 10", context={"Q2": None})
+    assert result is False
+
+
+def test_none_greater_than_or_equal_returns_false():
+    result = eval_expr("{Q2} >= 10", context={"Q2": None})
+    assert result is False
+
+
+def test_none_less_than_or_equal_returns_false():
+    result = eval_expr("{Q2} <= 10", context={"Q2": None})
+    assert result is False
+
+
+def test_none_on_right_side_greater_than_returns_false():
+    # 10 > {Q2} where Q2 is None must also return False
+    result = eval_expr("10 > {Q2}", context={"Q2": None})
+    assert result is False
+
+
+def test_none_on_right_side_less_than_returns_false():
+    result = eval_expr("10 < {Q2}", context={"Q2": None})
+    assert result is False
+
+
+def test_missing_variable_ordering_returns_false():
+    # Missing variable resolves to None — ordering should return False
+    result = eval_expr("{UNANSWERED} > 5", context={})
+    assert result is False
+
+
+def test_or_expression_with_none_numeric_right_operand_does_not_crash():
+    # ISS-206: {Q1} == 'A' or {Q2} > 10 where Q2 is None crashed with
+    # RelevanceEvaluationError: Cannot compare NoneType and int.
+    # Left side is False, OR must evaluate right side — should return False.
+    result = eval_expr(
+        '{Q1} == "A" or {Q2} > 10',
+        context={"Q1": "B", "Q2": None},
+    )
+    assert result is False
+
+
+def test_or_expression_with_none_numeric_right_operand_left_true():
+    # When left side of OR is True, right side is short-circuited — no crash
+    result = eval_expr(
+        '{Q1} == "A" or {Q2} > 10',
+        context={"Q1": "A", "Q2": None},
+    )
+    assert result is True
+
+
+def test_or_expression_none_numeric_both_false():
+    # Both sides evaluate to False (Q2 None, Q3 None) — overall False
+    result = eval_expr(
+        "{Q2} > 10 or {Q3} < 5",
+        context={"Q2": None, "Q3": None},
+    )
+    assert result is False
+
+
+def test_and_expression_with_none_numeric_right_operand():
+    # AND short-circuits when left is False — right (with None) never evaluated
+    result = eval_expr(
+        '{Q1} == "A" and {Q2} > 10',
+        context={"Q1": "B", "Q2": None},
+    )
+    assert result is False
+
+
+def test_and_expression_none_numeric_left_true():
+    # Left is True, right is {Q2} > 10 with Q2=None — should return False
+    result = eval_expr(
+        '{Q1} == "A" and {Q2} > 10',
+        context={"Q1": "A", "Q2": None},
+    )
+    assert result is False
+
+
+def test_none_ordering_does_not_affect_equality():
+    # None == None should still be True (unaffected by the ordering fix)
+    result = eval_expr("{Q2} == null", context={"Q2": None})
+    assert result is True
+
+
+def test_none_inequality_is_false_for_non_none():
+    # None != 10 should be True (None is not equal to 10)
+    result = eval_expr("{Q2} != 10", context={"Q2": None})
+    assert result is True
