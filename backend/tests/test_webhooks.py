@@ -569,3 +569,90 @@ async def test_create_webhook_ssrf_error_message_descriptive(client: AsyncClient
         word in body.lower()
         for word in ["private", "loopback", "reserved", "allowed", "blocked"]
     ), f"Expected descriptive SSRF error message, got: {body}"
+
+
+# --------------------------------------------------------------------------- #
+# API key scope enforcement on webhook write endpoints (SEC-ISS-217)
+# --------------------------------------------------------------------------- #
+
+KEYS_URL = "/api/v1/auth/keys"
+
+
+async def _create_api_key(client: AsyncClient, headers: dict, scopes: list | None) -> str:
+    """Create an API key with the given scopes; return the raw key string."""
+    payload: dict = {"name": "Test Key"}
+    if scopes is not None:
+        payload["scopes"] = scopes
+    resp = await client.post(KEYS_URL, json=payload, headers=headers)
+    assert resp.status_code == 201
+    return resp.json()["key"]
+
+
+@pytest.mark.asyncio
+async def test_create_webhook_jwt_auth_returns_201(client: AsyncClient):
+    """JWT-authenticated requests to create webhooks bypass scope enforcement."""
+    headers = await auth_headers(client, "scope_wh_jwt@example.com")
+    resp = await client.post(WEBHOOKS_URL, json=webhook_payload(), headers=headers)
+    assert resp.status_code == 201
+
+
+@pytest.mark.asyncio
+async def test_create_webhook_api_key_with_scope_returns_201(client: AsyncClient):
+    """API key with webhooks:write scope can create webhooks."""
+    headers = await auth_headers(client, "scope_wh_write@example.com")
+    api_key = await _create_api_key(client, headers, scopes=["webhooks:write"])
+
+    resp = await client.post(
+        WEBHOOKS_URL,
+        json=webhook_payload(),
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.asyncio
+async def test_create_webhook_api_key_missing_scope_returns_403(client: AsyncClient):
+    """API key without webhooks:write scope cannot create webhooks."""
+    headers = await auth_headers(client, "scope_wh_noscp@example.com")
+    api_key = await _create_api_key(client, headers, scopes=["surveys:read"])
+
+    resp = await client.post(
+        WEBHOOKS_URL,
+        json=webhook_payload(),
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 403
+    body = resp.json()
+    assert body["detail"]["code"] == "FORBIDDEN"
+    assert "message" in body["detail"]
+
+
+@pytest.mark.asyncio
+async def test_create_webhook_api_key_empty_scopes_returns_403(client: AsyncClient):
+    """API key with empty scopes cannot create webhooks."""
+    headers = await auth_headers(client, "scope_wh_empty@example.com")
+    api_key = await _create_api_key(client, headers, scopes=[])
+
+    resp = await client.post(
+        WEBHOOKS_URL,
+        json=webhook_payload(),
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 403
+    body = resp.json()
+    assert body["detail"]["code"] == "FORBIDDEN"
+
+
+@pytest.mark.asyncio
+async def test_delete_webhook_api_key_missing_scope_returns_403(client: AsyncClient):
+    """API key without webhooks:write scope cannot delete webhooks."""
+    headers = await auth_headers(client, "scope_wh_del@example.com")
+    create_resp = await client.post(WEBHOOKS_URL, json=webhook_payload(), headers=headers)
+    webhook_id = create_resp.json()["id"]
+
+    api_key = await _create_api_key(client, headers, scopes=["surveys:read"])
+    resp = await client.delete(
+        f"{WEBHOOKS_URL}/{webhook_id}",
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 403

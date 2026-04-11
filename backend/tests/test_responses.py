@@ -2828,3 +2828,67 @@ async def test_response_detail_api_key_null_scopes_returns_403(client: AsyncClie
     body = resp.json()
     assert body["detail"]["code"] == "FORBIDDEN"
     assert "message" in body["detail"]
+
+
+# --------------------------------------------------------------------------- #
+# PATCH /surveys/{id}/responses/{rid}/status — API key scope (SEC-ISS-217)
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.asyncio
+async def test_update_response_status_jwt_auth_returns_200(client: AsyncClient):
+    """JWT-authenticated requests to update response status bypass scope enforcement."""
+    survey_id, response_id, headers = await _setup_survey_with_response(client)
+    resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/status",
+        json={"status": "disqualified"},
+        headers=headers,
+    )
+    assert resp.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_update_response_status_api_key_with_scope_returns_200(client: AsyncClient):
+    """API key with responses:write scope can update response status."""
+    survey_id, response_id, headers = await _setup_survey_with_response(client)
+    api_key = await _create_api_key(client, headers, scopes=["responses:write"])
+
+    resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/status",
+        json={"status": "disqualified"},
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_update_response_status_api_key_missing_scope_returns_403(client: AsyncClient):
+    """API key without responses:write scope cannot update response status."""
+    survey_id, response_id, headers = await _setup_survey_with_response(client)
+    api_key = await _create_api_key(client, headers, scopes=["responses:read"])
+
+    resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/status",
+        json={"status": "disqualified"},
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 403
+    body = resp.json()
+    assert body["detail"]["code"] == "FORBIDDEN"
+    assert "message" in body["detail"]
+
+
+@pytest.mark.asyncio
+async def test_update_response_status_api_key_empty_scopes_returns_403(client: AsyncClient):
+    """API key with empty scopes cannot update response status."""
+    survey_id, response_id, headers = await _setup_survey_with_response(client)
+    api_key = await _create_api_key(client, headers, scopes=[])
+
+    resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/status",
+        json={"status": "disqualified"},
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 403
+    body = resp.json()
+    assert body["detail"]["code"] == "FORBIDDEN"

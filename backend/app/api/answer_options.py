@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import get_current_user, pagination_params
+from app.dependencies import get_current_user, pagination_params, require_scope
 from app.utils.pagination import PaginationParams
 from app.limiter import RATE_LIMITS, limiter
 from app.models.user import User
@@ -55,6 +55,7 @@ async def create(
     question_id: str,
     payload: AnswerOptionCreate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> AnswerOptionResponse:
     parsed_survey_id = _parse_uuid(survey_id, "Survey")
@@ -128,6 +129,7 @@ async def reorder(
     question_id: str,
     payload: AnswerOptionReorderRequest,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> list[AnswerOptionResponse]:
     parsed_survey_id = _parse_uuid(survey_id, "Survey")
@@ -193,6 +195,7 @@ async def patch(
     option_id: str,
     payload: AnswerOptionUpdate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> AnswerOptionResponse:
     parsed_survey_id = _parse_uuid(survey_id, "Survey")
@@ -231,6 +234,7 @@ async def update_translations(
     option_id: str,
     payload: AnswerOptionTranslationsUpdate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> AnswerOptionResponse:
     """Update translations for a specific language in an answer option."""
@@ -257,6 +261,7 @@ async def delete(
     question_id: str,
     option_id: str,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> None:
     parsed_survey_id = _parse_uuid(survey_id, "Survey")

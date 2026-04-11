@@ -10,7 +10,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import get_current_user, pagination_params
+from app.dependencies import get_current_user, pagination_params, require_scope
 from app.utils.pagination import PaginationParams
 from app.limiter import RATE_LIMITS, limiter
 from app.models.participant import Participant
@@ -106,6 +106,7 @@ async def create_participant(
     survey_id: str,
     payload: ParticipantCreate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> ParticipantCreateResponse:
     """Create a single participant for a survey. Returns token only on creation."""
@@ -137,6 +138,7 @@ async def create_participants_batch(
     survey_id: str,
     payload: ParticipantBatchCreate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> list[ParticipantCreateResponse]:
     """Create multiple participants for a survey in a single request."""
@@ -284,6 +286,7 @@ async def update_participant(
     participant_id: str,
     payload: ParticipantUpdate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> ParticipantResponse:
     """Partially update a participant."""
@@ -313,6 +316,7 @@ async def delete_participant(
     survey_id: str,
     participant_id: str,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> None:
     """Delete a participant."""

@@ -673,3 +673,106 @@ async def test_get_public_survey_another_users_active_survey_is_accessible(clien
     response = await client.get(f"{SURVEYS_URL}/{survey_id}/public")
     assert response.status_code == 200
     assert response.json()["title"] == "Anyone's Survey"
+
+
+# --------------------------------------------------------------------------- #
+# API key scope enforcement on survey write endpoints (SEC-ISS-217)
+# --------------------------------------------------------------------------- #
+
+KEYS_URL = "/api/v1/auth/keys"
+
+
+async def _create_api_key(client: AsyncClient, headers: dict, scopes: list | None) -> str:
+    """Create an API key with the given scopes; return the raw key string."""
+    payload: dict = {"name": "Test Key"}
+    if scopes is not None:
+        payload["scopes"] = scopes
+    resp = await client.post(KEYS_URL, json=payload, headers=headers)
+    assert resp.status_code == 201
+    return resp.json()["key"]
+
+
+@pytest.mark.asyncio
+async def test_create_survey_jwt_auth_returns_201(client: AsyncClient):
+    """JWT-authenticated requests to create surveys bypass scope enforcement."""
+    headers = await auth_headers(client, "scope_survey_jwt@example.com")
+    resp = await client.post(SURVEYS_URL, json={"title": "JWT Survey"}, headers=headers)
+    assert resp.status_code == 201
+
+
+@pytest.mark.asyncio
+async def test_create_survey_api_key_with_scope_returns_201(client: AsyncClient):
+    """API key with surveys:write scope can create surveys."""
+    headers = await auth_headers(client, "scope_survey_write@example.com")
+    api_key = await _create_api_key(client, headers, scopes=["surveys:write"])
+
+    resp = await client.post(
+        SURVEYS_URL,
+        json={"title": "Scoped Survey"},
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.asyncio
+async def test_create_survey_api_key_missing_scope_returns_403(client: AsyncClient):
+    """API key without surveys:write scope cannot create surveys."""
+    headers = await auth_headers(client, "scope_survey_noscp@example.com")
+    api_key = await _create_api_key(client, headers, scopes=["surveys:read"])
+
+    resp = await client.post(
+        SURVEYS_URL,
+        json={"title": "Should Fail"},
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 403
+    body = resp.json()
+    assert body["detail"]["code"] == "FORBIDDEN"
+    assert "message" in body["detail"]
+
+
+@pytest.mark.asyncio
+async def test_create_survey_api_key_empty_scopes_returns_403(client: AsyncClient):
+    """API key with empty scopes cannot create surveys."""
+    headers = await auth_headers(client, "scope_survey_empty@example.com")
+    api_key = await _create_api_key(client, headers, scopes=[])
+
+    resp = await client.post(
+        SURVEYS_URL,
+        json={"title": "Should Fail"},
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 403
+    body = resp.json()
+    assert body["detail"]["code"] == "FORBIDDEN"
+
+
+@pytest.mark.asyncio
+async def test_patch_survey_api_key_missing_scope_returns_403(client: AsyncClient):
+    """API key without surveys:write scope cannot update surveys."""
+    headers = await auth_headers(client, "scope_survey_patch@example.com")
+    create_resp = await client.post(SURVEYS_URL, json={"title": "Orig"}, headers=headers)
+    survey_id = create_resp.json()["id"]
+
+    api_key = await _create_api_key(client, headers, scopes=["surveys:read"])
+    resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}",
+        json={"title": "Updated"},
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_delete_survey_api_key_missing_scope_returns_403(client: AsyncClient):
+    """API key without surveys:write scope cannot delete surveys."""
+    headers = await auth_headers(client, "scope_survey_del@example.com")
+    create_resp = await client.post(SURVEYS_URL, json={"title": "To Delete"}, headers=headers)
+    survey_id = create_resp.json()["id"]
+
+    api_key = await _create_api_key(client, headers, scopes=["surveys:read"])
+    resp = await client.delete(
+        f"{SURVEYS_URL}/{survey_id}",
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 403

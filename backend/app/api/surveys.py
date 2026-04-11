@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import get_current_user, pagination_params
+from app.dependencies import get_current_user, pagination_params, require_scope
 from app.utils.pagination import PaginationParams
 from app.limiter import RATE_LIMITS, limiter
 from app.models.user import User
@@ -67,6 +67,7 @@ async def create(
     request: Request,
     payload: SurveyCreate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> SurveyResponse:
     survey = await create_survey(
@@ -180,6 +181,7 @@ async def patch(
     survey_id: str,
     payload: SurveyUpdate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> SurveyResponse:
     parsed_id = _parse_survey_id(survey_id)
@@ -232,6 +234,7 @@ async def update_translations(
     survey_id: str,
     payload: SurveyTranslationsUpdate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> SurveyResponse:
     """Update translations for a specific language in a survey."""
@@ -253,6 +256,7 @@ async def delete(
     request: Request,
     survey_id: str,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> None:
     parsed_id = _parse_survey_id(survey_id)
@@ -273,6 +277,7 @@ async def activate(
     request: Request,
     survey_id: str,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> SurveyResponse:
     parsed_id = _parse_survey_id(survey_id)
@@ -294,6 +299,7 @@ async def close(
     request: Request,
     survey_id: str,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> SurveyResponse:
     parsed_id = _parse_survey_id(survey_id)
@@ -315,6 +321,7 @@ async def archive(
     request: Request,
     survey_id: str,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> SurveyResponse:
     parsed_id = _parse_survey_id(survey_id)
@@ -338,6 +345,7 @@ async def clone(
     survey_id: str,
     payload: SurveyCloneRequest = SurveyCloneRequest(),
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> SurveyResponse:
     parsed_id = _parse_survey_id(survey_id)
@@ -373,6 +381,7 @@ async def import_survey_endpoint(
     request: Request,
     payload: SurveyImportRequest,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> SurveyResponse:
     new_survey = await import_survey(

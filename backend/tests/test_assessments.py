@@ -845,3 +845,91 @@ async def test_score_question_scope_unselected_question_returns_zero(client: Asy
     matching_names = [a["name"] for a in data["matching_assessments"]]
     assert "Q2ZeroMatch" in matching_names
     assert "Q2NoMatch" not in matching_names
+
+
+# --------------------------------------------------------------------------- #
+# API key scope enforcement on assessment write endpoints (SEC-ISS-217)
+# --------------------------------------------------------------------------- #
+
+KEYS_URL = "/api/v1/auth/keys"
+
+
+async def _create_api_key(client: AsyncClient, headers: dict, scopes: list | None) -> str:
+    payload: dict = {"name": "Test Key"}
+    if scopes is not None:
+        payload["scopes"] = scopes
+    resp = await client.post(KEYS_URL, json=payload, headers=headers)
+    assert resp.status_code == 201
+    return resp.json()["key"]
+
+
+def _scope_test_assessment_payload() -> dict:
+    return {"name": "Band A", "scope": "total", "min_score": 0, "max_score": 10, "message": "Ok"}
+
+
+@pytest.mark.asyncio
+async def test_create_assessment_jwt_auth_returns_201(client: AsyncClient):
+    """JWT-authenticated requests bypass scope enforcement."""
+    headers = await auth_headers(client, "scope_asmt_jwt@example.com")
+    survey_id = await create_survey(client, headers)
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=_scope_test_assessment_payload(),
+        headers=headers,
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.asyncio
+async def test_create_assessment_api_key_with_scope_returns_201(client: AsyncClient):
+    """API key with surveys:write scope can create assessments."""
+    headers = await auth_headers(client, "scope_asmt_write@example.com")
+    survey_id = await create_survey(client, headers)
+    api_key = await _create_api_key(client, headers, scopes=["surveys:write"])
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=_scope_test_assessment_payload(),
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.asyncio
+async def test_create_assessment_api_key_missing_scope_returns_403(client: AsyncClient):
+    """API key without surveys:write scope cannot create assessments."""
+    headers = await auth_headers(client, "scope_asmt_noscp@example.com")
+    survey_id = await create_survey(client, headers)
+    api_key = await _create_api_key(client, headers, scopes=["surveys:read"])
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=_scope_test_assessment_payload(),
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 403
+    body = resp.json()
+    assert body["detail"]["code"] == "FORBIDDEN"
+    assert "message" in body["detail"]
+
+
+@pytest.mark.asyncio
+async def test_delete_assessment_api_key_missing_scope_returns_403(client: AsyncClient):
+    """API key without surveys:write scope cannot delete assessments."""
+    headers = await auth_headers(client, "scope_asmt_del@example.com")
+    survey_id = await create_survey(client, headers)
+
+    create_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=_scope_test_assessment_payload(),
+        headers=headers,
+    )
+    assessment_id = create_resp.json()["id"]
+
+    api_key = await _create_api_key(client, headers, scopes=[])
+    resp = await client.delete(
+        f"{SURVEYS_URL}/{survey_id}/assessments/{assessment_id}",
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 403

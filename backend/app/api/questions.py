@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import get_current_user, pagination_params
+from app.dependencies import get_current_user, pagination_params, require_scope
 from app.utils.pagination import PaginationParams
 from app.limiter import RATE_LIMITS, limiter
 from app.models.user import User
@@ -62,6 +62,7 @@ async def create(
     group_id: str,
     payload: QuestionCreate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> QuestionResponse:
     parsed_survey_id = _parse_uuid(survey_id, "Survey")
@@ -143,6 +144,7 @@ async def reorder(
     group_id: str,
     payload: QuestionReorderRequest,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> list[QuestionResponse]:
     parsed_survey_id = _parse_uuid(survey_id, "Survey")
@@ -212,6 +214,7 @@ async def patch(
     question_id: str,
     payload: QuestionUpdate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> QuestionResponse:
     parsed_survey_id = _parse_uuid(survey_id, "Survey")
@@ -247,6 +250,7 @@ async def update_translations(
     question_id: str,
     payload: QuestionTranslationsUpdate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> QuestionResponse:
     """Update translations for a specific language in a question."""
@@ -273,6 +277,7 @@ async def delete(
     group_id: str,
     question_id: str,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> None:
     parsed_survey_id = _parse_uuid(survey_id, "Survey")
@@ -305,6 +310,7 @@ async def create_subquestion_endpoint(
     question_id: str,
     payload: SubquestionCreate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> QuestionResponse:
     """Create a subquestion (row) for a matrix parent question.
