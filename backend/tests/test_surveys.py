@@ -776,3 +776,66 @@ async def test_delete_survey_api_key_missing_scope_returns_403(client: AsyncClie
         headers={"X-API-Key": api_key},
     )
     assert resp.status_code == 403
+
+
+# --------------------------------------------------------------------------- #
+# Title length validation (ISS-226)
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.asyncio
+async def test_create_survey_title_256_chars_returns_201(client: AsyncClient):
+    """POST with 256-char title succeeds after DB column expanded to VARCHAR(500)."""
+    headers = await auth_headers(client)
+    title = "a" * 256
+    response = await client.post(SURVEYS_URL, json={"title": title}, headers=headers)
+    assert response.status_code == 201
+    assert response.json()["title"] == title
+
+
+@pytest.mark.asyncio
+async def test_create_survey_title_500_chars_returns_201(client: AsyncClient):
+    """POST with 500-char title (max allowed) succeeds."""
+    headers = await auth_headers(client)
+    title = "a" * 500
+    response = await client.post(SURVEYS_URL, json={"title": title}, headers=headers)
+    assert response.status_code == 201
+    assert response.json()["title"] == title
+
+
+@pytest.mark.asyncio
+async def test_create_survey_title_501_chars_returns_422(client: AsyncClient):
+    """POST with 501-char title is rejected by Pydantic validation with HTTP 422."""
+    headers = await auth_headers(client)
+    title = "a" * 501
+    response = await client.post(SURVEYS_URL, json={"title": title}, headers=headers)
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_patch_survey_title_256_chars_returns_200(client: AsyncClient):
+    """PATCH with 256-char title succeeds after DB column expanded to VARCHAR(500)."""
+    headers = await auth_headers(client)
+    create_resp = await client.post(SURVEYS_URL, json={"title": "Original"}, headers=headers)
+    survey_id = create_resp.json()["id"]
+
+    title = "b" * 256
+    response = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}", json={"title": title}, headers=headers
+    )
+    assert response.status_code == 200
+    assert response.json()["title"] == title
+
+
+@pytest.mark.asyncio
+async def test_patch_survey_title_501_chars_returns_422(client: AsyncClient):
+    """PATCH with 501-char title is rejected by Pydantic validation with HTTP 422."""
+    headers = await auth_headers(client)
+    create_resp = await client.post(SURVEYS_URL, json={"title": "Original"}, headers=headers)
+    survey_id = create_resp.json()["id"]
+
+    title = "b" * 501
+    response = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}", json={"title": title}, headers=headers
+    )
+    assert response.status_code == 422

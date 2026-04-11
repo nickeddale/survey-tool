@@ -31,7 +31,7 @@ class Survey(Base):
         index=True,
     )
     title: Mapped[str] = mapped_column(
-        String(255),
+        String(500),
         nullable=False,
         index=True,
     )

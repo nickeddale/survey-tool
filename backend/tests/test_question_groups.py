@@ -588,3 +588,75 @@ async def test_list_groups_pagination_out_of_range_returns_empty_items(client: A
     assert body["total"] == 1
     assert body["page"] == 99
     assert body["items"] == []
+
+
+# --------------------------------------------------------------------------- #
+# Group title length validation (ISS-226)
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.asyncio
+async def test_create_group_title_256_chars_returns_201(client: AsyncClient):
+    """POST with 256-char title succeeds after DB column expanded to VARCHAR(500)."""
+    headers = await auth_headers(client)
+    survey_id = await create_survey(client, headers)
+    title = "a" * 256
+    response = await client.post(groups_url(survey_id), json={"title": title}, headers=headers)
+    assert response.status_code == 201
+    assert response.json()["title"] == title
+
+
+@pytest.mark.asyncio
+async def test_create_group_title_500_chars_returns_201(client: AsyncClient):
+    """POST with 500-char title (max allowed) succeeds."""
+    headers = await auth_headers(client)
+    survey_id = await create_survey(client, headers)
+    title = "a" * 500
+    response = await client.post(groups_url(survey_id), json={"title": title}, headers=headers)
+    assert response.status_code == 201
+    assert response.json()["title"] == title
+
+
+@pytest.mark.asyncio
+async def test_create_group_title_501_chars_returns_422(client: AsyncClient):
+    """POST with 501-char title is rejected by Pydantic validation with HTTP 422."""
+    headers = await auth_headers(client)
+    survey_id = await create_survey(client, headers)
+    title = "a" * 501
+    response = await client.post(groups_url(survey_id), json={"title": title}, headers=headers)
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_patch_group_title_256_chars_returns_200(client: AsyncClient):
+    """PATCH with 256-char title succeeds after DB column expanded to VARCHAR(500)."""
+    headers = await auth_headers(client)
+    survey_id = await create_survey(client, headers)
+    create_resp = await client.post(
+        groups_url(survey_id), json={"title": "Original"}, headers=headers
+    )
+    group_id = create_resp.json()["id"]
+
+    title = "b" * 256
+    response = await client.patch(
+        f"{groups_url(survey_id)}/{group_id}", json={"title": title}, headers=headers
+    )
+    assert response.status_code == 200
+    assert response.json()["title"] == title
+
+
+@pytest.mark.asyncio
+async def test_patch_group_title_501_chars_returns_422(client: AsyncClient):
+    """PATCH with 501-char title is rejected by Pydantic validation with HTTP 422."""
+    headers = await auth_headers(client)
+    survey_id = await create_survey(client, headers)
+    create_resp = await client.post(
+        groups_url(survey_id), json={"title": "Original"}, headers=headers
+    )
+    group_id = create_resp.json()["id"]
+
+    title = "b" * 501
+    response = await client.patch(
+        f"{groups_url(survey_id)}/{group_id}", json={"title": title}, headers=headers
+    )
+    assert response.status_code == 422
