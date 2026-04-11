@@ -4,10 +4,10 @@ Validates the structure and types of the {min, max, regex, min_length,
 max_length, custom_expression} rules dict stored in Question.validation.
 """
 
-import re
 from typing import Any
 
 from app.services.validators._types import QuestionValidationError
+from app.services.validators.regex_utils import validate_regex_complexity
 
 # Keys allowed in the validation JSONB field.
 _ALLOWED_KEYS = frozenset(
@@ -134,15 +134,8 @@ def validate_validation_rules(
                 )
             )
         else:
-            try:
-                re.compile(regex_val)
-            except re.error as exc:
-                errors.append(
-                    QuestionValidationError(
-                        field="validation.regex",
-                        message=f"validation.regex is not a valid regular expression: {exc}",
-                    )
-                )
+            # Validate syntax and reject known-dangerous patterns (ReDoS protection).
+            errors.extend(validate_regex_complexity(regex_val))
 
     # --- custom_expression ---
     expr_val = validation.get("custom_expression")
