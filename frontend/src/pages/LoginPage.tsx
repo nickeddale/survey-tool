@@ -8,6 +8,7 @@ import { Label } from '../components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card'
 import { ValidationErrors } from '../components/common/ValidationErrors'
 import { DevLoginPanel } from '../components/dev/DevLoginPanel'
+import { sanitizeReturnTo } from '../utils/validation'
 
 interface FieldErrors {
   email?: string
@@ -54,7 +55,7 @@ function LoginPage() {
     try {
       await login({ email, password })
       const returnTo = searchParams.get('returnTo')
-      navigate(returnTo ? decodeURIComponent(returnTo) : '/dashboard')
+      navigate(sanitizeReturnTo(returnTo))
     } catch (err) {
       if (err instanceof ApiError) {
         setError(err.message)
@@ -121,7 +122,7 @@ function LoginPage() {
                 try {
                   await login(credentials)
                   const returnTo = searchParams.get('returnTo')
-                  navigate(returnTo ? decodeURIComponent(returnTo) : '/dashboard')
+                  navigate(sanitizeReturnTo(returnTo))
                 } catch (err) {
                   if (err instanceof ApiError) {
                     setError(err.message)

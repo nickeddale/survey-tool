@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { validateAnswer } from '../validation'
+import { validateAnswer, sanitizeReturnTo } from '../validation'
 import type { BuilderQuestion } from '../../store/builderStore'
 import { getDefaultSettings } from '../../types/questionSettings'
 import type {
@@ -67,6 +67,64 @@ function makeOption(id: string, code: string, title: string) {
     created_at: '2024-01-01T00:00:00Z',
   }
 }
+
+// ---------------------------------------------------------------------------
+// sanitizeReturnTo
+// ---------------------------------------------------------------------------
+
+describe('sanitizeReturnTo', () => {
+  it('returns /dashboard for null', () => {
+    expect(sanitizeReturnTo(null)).toBe('/dashboard')
+  })
+
+  it('returns /dashboard for empty string', () => {
+    expect(sanitizeReturnTo('')).toBe('/dashboard')
+  })
+
+  it('returns /dashboard for external http URL', () => {
+    expect(sanitizeReturnTo('https://evil.com')).toBe('/dashboard')
+  })
+
+  it('returns /dashboard for URL-encoded external http URL', () => {
+    expect(sanitizeReturnTo('https%3A%2F%2Fevil.com')).toBe('/dashboard')
+  })
+
+  it('returns /dashboard for protocol-relative URL (//evil.com)', () => {
+    expect(sanitizeReturnTo('//evil.com')).toBe('/dashboard')
+  })
+
+  it('returns /dashboard for URL-encoded protocol-relative URL', () => {
+    expect(sanitizeReturnTo('%2F%2Fevil.com')).toBe('/dashboard')
+  })
+
+  it('returns /dashboard for javascript: URI', () => {
+    expect(sanitizeReturnTo('javascript:alert(1)')).toBe('/dashboard')
+  })
+
+  it('returns /dashboard for URL-encoded javascript: URI', () => {
+    expect(sanitizeReturnTo('javascript%3Aalert(1)')).toBe('/dashboard')
+  })
+
+  it('returns /dashboard for data: URI', () => {
+    expect(sanitizeReturnTo('data:text/html,<h1>evil</h1>')).toBe('/dashboard')
+  })
+
+  it('returns the path for a valid internal path', () => {
+    expect(sanitizeReturnTo('/dashboard')).toBe('/dashboard')
+  })
+
+  it('returns the path for a valid internal path with segments', () => {
+    expect(sanitizeReturnTo('/surveys/123')).toBe('/surveys/123')
+  })
+
+  it('returns the decoded path for a URL-encoded valid internal path', () => {
+    expect(sanitizeReturnTo('%2Fsurveys%2F123')).toBe('/surveys/123')
+  })
+
+  it('returns /dashboard for a path that does not start with /', () => {
+    expect(sanitizeReturnTo('surveys/123')).toBe('/dashboard')
+  })
+})
 
 // ---------------------------------------------------------------------------
 // short_text
