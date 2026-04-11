@@ -25,7 +25,7 @@ class QuestionGroup(Base):
         index=True,
     )
     title: Mapped[str] = mapped_column(
-        String(255),
+        String(500),
         nullable=False,
     )
     description: Mapped[str | None] = mapped_column(
