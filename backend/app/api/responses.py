@@ -434,6 +434,7 @@ async def update_response_status(
     response_id: str,
     payload: ResponseStatusUpdate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("responses:write")),
     session: AsyncSession = Depends(get_db),
 ) -> ResponseResponse:
     """Admin endpoint to update response status. Requires authentication.

@@ -581,3 +581,106 @@ async def test_concurrent_quota_race_condition(engine):
     assert quota_check.status_code == 200
     final_count = quota_check.json()["current_count"]
     assert final_count <= quota_limit, f"Final count {final_count} exceeds limit {quota_limit}"
+
+
+# --------------------------------------------------------------------------- #
+# API key scope enforcement on quota write endpoints (SEC-ISS-217)
+# --------------------------------------------------------------------------- #
+
+KEYS_URL = "/api/v1/auth/keys"
+
+
+async def _create_api_key(client: AsyncClient, headers: dict, scopes: list | None) -> str:
+    payload: dict = {"name": "Test Key"}
+    if scopes is not None:
+        payload["scopes"] = scopes
+    resp = await client.post(KEYS_URL, json=payload, headers=headers)
+    assert resp.status_code == 201
+    return resp.json()["key"]
+
+
+async def _create_survey_with_question(client: AsyncClient, headers: dict, email_suffix: str) -> tuple[str, str]:
+    """Create a survey with one question; return (survey_id, question_id)."""
+    survey_id = await create_survey(client, headers, title=f"Quota Scope {email_suffix}")
+    group_id = await create_group(client, headers, survey_id)
+    question_id = await create_question(client, headers, survey_id, group_id, code="QS1")
+    return survey_id, question_id
+
+
+def _quota_payload(question_id: str) -> dict:
+    return {
+        "name": "Test Quota",
+        "limit": 10,
+        "action": "terminate",
+        "conditions": [
+            {"question_id": question_id, "operator": "eq", "value": "A1"},
+        ],
+    }
+
+
+@pytest.mark.asyncio
+async def test_create_quota_jwt_auth_returns_201(client: AsyncClient):
+    """JWT-authenticated requests to create quotas bypass scope enforcement."""
+    headers = await auth_headers(client, "scope_quota_jwt@example.com")
+    survey_id, question_id = await _create_survey_with_question(client, headers, "jwt")
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/quotas",
+        json=_quota_payload(question_id),
+        headers=headers,
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.asyncio
+async def test_create_quota_api_key_with_scope_returns_201(client: AsyncClient):
+    """API key with surveys:write scope can create quotas."""
+    headers = await auth_headers(client, "scope_quota_write@example.com")
+    survey_id, question_id = await _create_survey_with_question(client, headers, "write")
+    api_key = await _create_api_key(client, headers, scopes=["surveys:write"])
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/quotas",
+        json=_quota_payload(question_id),
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.asyncio
+async def test_create_quota_api_key_missing_scope_returns_403(client: AsyncClient):
+    """API key without surveys:write scope cannot create quotas."""
+    headers = await auth_headers(client, "scope_quota_noscp@example.com")
+    survey_id, question_id = await _create_survey_with_question(client, headers, "noscp")
+    api_key = await _create_api_key(client, headers, scopes=["surveys:read"])
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/quotas",
+        json=_quota_payload(question_id),
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 403
+    body = resp.json()
+    assert body["detail"]["code"] == "FORBIDDEN"
+    assert "message" in body["detail"]
+
+
+@pytest.mark.asyncio
+async def test_delete_quota_api_key_missing_scope_returns_403(client: AsyncClient):
+    """API key without surveys:write scope cannot delete quotas."""
+    headers = await auth_headers(client, "scope_quota_del@example.com")
+    survey_id, question_id = await _create_survey_with_question(client, headers, "del")
+
+    create_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/quotas",
+        json=_quota_payload(question_id),
+        headers=headers,
+    )
+    quota_id = create_resp.json()["id"]
+
+    api_key = await _create_api_key(client, headers, scopes=[])
+    resp = await client.delete(
+        f"{SURVEYS_URL}/{survey_id}/quotas/{quota_id}",
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 403

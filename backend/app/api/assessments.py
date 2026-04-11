@@ -7,7 +7,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import get_current_user, pagination_params
+from app.dependencies import get_current_user, pagination_params, require_scope
 from app.utils.pagination import PaginationParams
 from app.limiter import RATE_LIMITS, limiter
 from app.models.assessment import Assessment
@@ -109,6 +109,7 @@ async def create_assessment(
     survey_id: str,
     payload: AssessmentCreate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> AssessmentResponse:
     """Create an assessment rule for a survey."""
@@ -220,6 +221,7 @@ async def update_assessment(
     assessment_id: str,
     payload: AssessmentUpdate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> AssessmentResponse:
     """Partially update an assessment rule."""
@@ -264,6 +266,7 @@ async def delete_assessment(
     survey_id: str,
     assessment_id: str,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> None:
     """Delete an assessment rule."""

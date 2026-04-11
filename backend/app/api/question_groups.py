@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import get_current_user, pagination_params
+from app.dependencies import get_current_user, pagination_params, require_scope
 from app.utils.pagination import PaginationParams
 from app.limiter import RATE_LIMITS, limiter
 from app.models.user import User
@@ -50,6 +50,7 @@ async def create(
     survey_id: str,
     payload: QuestionGroupCreate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> QuestionGroupResponse:
     parsed_survey_id = _parse_uuid(survey_id, "Survey")
@@ -107,6 +108,7 @@ async def reorder(
     survey_id: str,
     payload: QuestionGroupReorderRequest,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> list[QuestionGroupResponse]:
     parsed_survey_id = _parse_uuid(survey_id, "Survey")
@@ -160,6 +162,7 @@ async def patch(
     group_id: str,
     payload: QuestionGroupUpdate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> QuestionGroupResponse:
     parsed_survey_id = _parse_uuid(survey_id, "Survey")
@@ -190,6 +193,7 @@ async def update_translations(
     group_id: str,
     payload: QuestionGroupTranslationsUpdate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> QuestionGroupResponse:
     """Update translations for a specific language in a question group."""
@@ -213,6 +217,7 @@ async def delete(
     survey_id: str,
     group_id: str,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> None:
     parsed_survey_id = _parse_uuid(survey_id, "Survey")

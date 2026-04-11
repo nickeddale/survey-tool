@@ -8,7 +8,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import get_current_user, pagination_params
+from app.dependencies import get_current_user, pagination_params, require_scope
 from app.utils.pagination import PaginationParams
 from app.limiter import RATE_LIMITS, limiter
 from app.models.user import User
@@ -60,6 +60,7 @@ async def create_webhook(
     request: Request,
     payload: WebhookCreate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("webhooks:write")),
     session: AsyncSession = Depends(get_db),
 ) -> WebhookCreateResponse:
     """Create a webhook and return the plaintext signing secret."""
@@ -150,6 +151,7 @@ async def update_webhook(
     webhook_id: str,
     payload: WebhookUpdate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("webhooks:write")),
     session: AsyncSession = Depends(get_db),
 ) -> WebhookResponse:
     """Partially update a webhook."""
@@ -180,6 +182,7 @@ async def delete_webhook(
     request: Request,
     webhook_id: str,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("webhooks:write")),
     session: AsyncSession = Depends(get_db),
 ) -> None:
     """Delete a webhook."""

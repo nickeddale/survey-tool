@@ -421,3 +421,103 @@ async def test_participant_token_not_in_response_body(
     body_text = resp.text
     assert "secret-token-xyz" not in body_text
     assert "participant_token" not in body_text
+
+
+# --------------------------------------------------------------------------- #
+# API key scope enforcement on participant write endpoints (SEC-ISS-217)
+# --------------------------------------------------------------------------- #
+
+KEYS_URL = "/api/v1/auth/keys"
+
+
+async def _create_api_key(client: AsyncClient, headers: dict, scopes: list | None) -> str:
+    payload: dict = {"name": "Test Key"}
+    if scopes is not None:
+        payload["scopes"] = scopes
+    resp = await client.post(KEYS_URL, json=payload, headers=headers)
+    assert resp.status_code == 201
+    return resp.json()["key"]
+
+
+async def _jwt_headers(client: AsyncClient, email: str) -> dict:
+    await client.post(
+        REGISTER_URL,
+        json={"email": email, "password": "securepassword123", "name": "Test User"},
+    )
+    resp = await client.post(LOGIN_URL, json={"email": email, "password": "securepassword123"})
+    assert resp.status_code == 200
+    return {"Authorization": f"Bearer {resp.json()['access_token']}"}
+
+
+async def _create_survey(client: AsyncClient, headers: dict) -> str:
+    resp = await client.post(SURVEYS_URL, json={"title": "Part Scope Test"}, headers=headers)
+    assert resp.status_code == 201
+    return resp.json()["id"]
+
+
+@pytest.mark.asyncio
+async def test_create_participant_jwt_auth_returns_201(client: AsyncClient):
+    """JWT-authenticated requests bypass scope enforcement."""
+    headers = await _jwt_headers(client, "scope_part_jwt@example.com")
+    survey_id = await _create_survey(client, headers)
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/participants",
+        json={"email": "p@example.com"},
+        headers=headers,
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.asyncio
+async def test_create_participant_api_key_with_scope_returns_201(client: AsyncClient):
+    """API key with surveys:write scope can create participants."""
+    headers = await _jwt_headers(client, "scope_part_write@example.com")
+    survey_id = await _create_survey(client, headers)
+    api_key = await _create_api_key(client, headers, scopes=["surveys:write"])
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/participants",
+        json={"email": "p@example.com"},
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.asyncio
+async def test_create_participant_api_key_missing_scope_returns_403(client: AsyncClient):
+    """API key without surveys:write scope cannot create participants."""
+    headers = await _jwt_headers(client, "scope_part_noscp@example.com")
+    survey_id = await _create_survey(client, headers)
+    api_key = await _create_api_key(client, headers, scopes=["surveys:read"])
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/participants",
+        json={"email": "p@example.com"},
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 403
+    body = resp.json()
+    assert body["detail"]["code"] == "FORBIDDEN"
+    assert "message" in body["detail"]
+
+
+@pytest.mark.asyncio
+async def test_delete_participant_api_key_missing_scope_returns_403(client: AsyncClient):
+    """API key without surveys:write scope cannot delete participants."""
+    headers = await _jwt_headers(client, "scope_part_del@example.com")
+    survey_id = await _create_survey(client, headers)
+
+    create_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/participants",
+        json={"email": "todelete@example.com"},
+        headers=headers,
+    )
+    participant_id = create_resp.json()["id"]
+
+    api_key = await _create_api_key(client, headers, scopes=[])
+    resp = await client.delete(
+        f"{SURVEYS_URL}/{survey_id}/participants/{participant_id}",
+        headers={"X-API-Key": api_key},
+    )
+    assert resp.status_code == 403

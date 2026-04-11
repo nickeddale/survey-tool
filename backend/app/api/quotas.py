@@ -7,7 +7,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import get_current_user, pagination_params
+from app.dependencies import get_current_user, pagination_params, require_scope
 from app.utils.pagination import PaginationParams
 from app.limiter import RATE_LIMITS, limiter
 from app.models.question import Question
@@ -121,6 +121,7 @@ async def create_quota(
     survey_id: str,
     payload: QuotaCreate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> QuotaResponse:
     """Create a quota for a survey."""
@@ -221,6 +222,7 @@ async def update_quota(
     quota_id: str,
     payload: QuotaUpdate,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> QuotaResponse:
     """Partially update a quota."""
@@ -257,6 +259,7 @@ async def delete_quota(
     survey_id: str,
     quota_id: str,
     current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
     session: AsyncSession = Depends(get_db),
 ) -> None:
     """Delete a quota."""
