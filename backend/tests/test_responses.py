@@ -1,7 +1,12 @@
 """Tests for the public POST /api/v1/surveys/{id}/responses endpoint."""
 
 import pytest
+import uuid
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import update
+
+from app.models.survey import Survey
 
 REGISTER_URL = "/api/v1/auth/register"
 LOGIN_URL = "/api/v1/auth/login"
@@ -229,6 +234,60 @@ async def test_submit_response_to_closed_survey_returns_422(client: AsyncClient)
     assert resp.status_code == 422
     body = resp.json()
     assert body["detail"]["code"] == "UNPROCESSABLE"
+
+
+@pytest.mark.asyncio
+async def test_complete_response_on_closed_survey_returns_422(client: AsyncClient):
+    """Completing a response on a closed survey returns 422 UNPROCESSABLE."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    # Create a response while the survey is still active
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # Close the survey
+    close_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/close", headers=headers)
+    assert close_resp.status_code == 200
+
+    # Attempt to complete the response on the now-closed survey
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"status": "complete"},
+    )
+    assert patch_resp.status_code == 422
+    body = patch_resp.json()
+    assert body["detail"]["code"] == "UNPROCESSABLE"
+    assert "closed" in body["detail"]["message"]
+
+
+@pytest.mark.asyncio
+async def test_complete_response_on_draft_survey_returns_422(
+    client: AsyncClient, session: AsyncSession
+):
+    """Completing a response on a draft survey returns 422 UNPROCESSABLE."""
+    survey_id, _question_id, headers = await create_active_survey(client)
+
+    # Create a response while the survey is active
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # Revert the survey to draft status directly via DB
+    await session.execute(
+        update(Survey).where(Survey.id == uuid.UUID(survey_id)).values(status="draft")
+    )
+    await session.commit()
+
+    # Attempt to complete the response on the now-draft survey
+    patch_resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"status": "complete"},
+    )
+    assert patch_resp.status_code == 422
+    body = patch_resp.json()
+    assert body["detail"]["code"] == "UNPROCESSABLE"
+    assert "draft" in body["detail"]["message"]
 
 
 @pytest.mark.asyncio
