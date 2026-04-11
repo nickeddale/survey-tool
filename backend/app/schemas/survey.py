@@ -1,10 +1,13 @@
 import uuid
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
 from app.schemas.question_group import QuestionGroupResponse
+
+
+VALID_SURVEY_STATUSES = Literal["draft", "active", "closed", "archived"]
 
 
 class SurveyVersionResponse(BaseModel):
@@ -27,7 +30,7 @@ class SurveyVersionListResponse(BaseModel):
 class SurveyCreate(BaseModel):
     title: str = Field(max_length=500, description="Survey title displayed to respondents.", example="Customer Satisfaction Survey")
     description: str | None = Field(default=None, max_length=10000, description="Optional survey description.", example="Help us improve our service.")
-    status: str = Field(default="draft", description="Initial status of the survey.", example="draft")
+    status: VALID_SURVEY_STATUSES = Field(default="draft", description="Initial status of the survey.", example="draft")
     welcome_message: str | None = Field(default=None, max_length=10000, description="Message shown before the first question.", example="Welcome! This survey takes about 5 minutes.")
     end_message: str | None = Field(default=None, max_length=10000, description="Message shown after the last question.", example="Thank you for your feedback!")
     default_language: str = Field(default="en", description="BCP-47 language code for the survey's default language.", example="en")
