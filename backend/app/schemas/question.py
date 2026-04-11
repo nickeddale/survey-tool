@@ -10,12 +10,12 @@ from app.schemas.answer_option import AnswerOptionResponse
 
 class QuestionCreate(BaseModel):
     question_type: str = Field(description="Question type. One of: text, numeric, boolean, single_choice, multiple_choice, rating, date, matrix, ranking.", example="single_choice")
-    title: str = Field(description="Question text shown to respondents.", example="How satisfied are you with our service?")
-    code: str | None = Field(default=None, description="Short unique identifier used in expressions and exports.", example="Q1")
-    description: str | None = Field(default=None, description="Optional sub-text displayed below the question title.")
+    title: str = Field(max_length=500, description="Question text shown to respondents.", example="How satisfied are you with our service?")
+    code: str | None = Field(default=None, max_length=100, description="Short unique identifier used in expressions and exports.", example="Q1")
+    description: str | None = Field(default=None, max_length=5000, description="Optional sub-text displayed below the question title.")
     is_required: bool = Field(default=False, description="Whether the question must be answered before the response can be completed.")
     sort_order: int | None = Field(default=None, description="Display order within the group. Auto-assigned if omitted.", example=1)
-    relevance: str | None = Field(default=None, description="Expression that must evaluate to true for this question to be shown.", example="Q1 == 'yes'")
+    relevance: str | None = Field(default=None, max_length=2000, description="Expression that must evaluate to true for this question to be shown.", example="Q1 == 'yes'")
     validation: dict[str, Any] | None = Field(default=None, description="Optional validation rules as a JSON object.")
     settings: dict[str, Any] | None = Field(default=None, description="Optional question-level display settings as a JSON object.")
     parent_id: uuid.UUID | None = Field(default=None, description="Parent question ID for subquestions in matrix questions.")
@@ -32,12 +32,12 @@ class QuestionCreate(BaseModel):
 
 class QuestionUpdate(BaseModel):
     question_type: str | None = None
-    title: str | None = None
-    code: str | None = None
-    description: str | None = None
+    title: str | None = Field(default=None, max_length=500)
+    code: str | None = Field(default=None, max_length=100)
+    description: str | None = Field(default=None, max_length=5000)
     is_required: bool | None = None
     sort_order: int | None = None
-    relevance: str | None = None
+    relevance: str | None = Field(default=None, max_length=2000)
     validation: dict[str, Any] | None = None
     settings: dict[str, Any] | None = None
 
@@ -82,9 +82,9 @@ QuestionResponse.model_rebuild()
 
 
 class SubquestionCreate(BaseModel):
-    title: str
-    code: str | None = None
-    description: str | None = None
+    title: str = Field(max_length=500)
+    code: str | None = Field(default=None, max_length=100)
+    description: str | None = Field(default=None, max_length=5000)
     is_required: bool = False
     sort_order: int | None = None
 

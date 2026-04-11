@@ -6,15 +6,15 @@ from pydantic import BaseModel, Field
 
 
 class AnswerOptionCreate(BaseModel):
-    title: str = Field(description="Answer option label displayed to respondents.", example="Strongly Agree")
-    code: str | None = Field(default=None, description="Short identifier used in exports and expressions.", example="A1")
+    title: str = Field(max_length=500, description="Answer option label displayed to respondents.", example="Strongly Agree")
+    code: str | None = Field(default=None, max_length=100, description="Short identifier used in exports and expressions.", example="A1")
     sort_order: int | None = Field(default=None, description="Display order within the question. Auto-assigned if omitted.", example=1)
     assessment_value: int = Field(default=0, description="Numeric score value used for assessment calculations.", example=5)
 
 
 class AnswerOptionUpdate(BaseModel):
-    title: str | None = None
-    code: str | None = None
+    title: str | None = Field(default=None, max_length=500)
+    code: str | None = Field(default=None, max_length=100)
     sort_order: int | None = None
     assessment_value: int | None = None
 

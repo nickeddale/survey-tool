@@ -25,21 +25,21 @@ class SurveyVersionListResponse(BaseModel):
 
 
 class SurveyCreate(BaseModel):
-    title: str = Field(description="Survey title displayed to respondents.", example="Customer Satisfaction Survey")
-    description: str | None = Field(default=None, description="Optional survey description.", example="Help us improve our service.")
+    title: str = Field(max_length=500, description="Survey title displayed to respondents.", example="Customer Satisfaction Survey")
+    description: str | None = Field(default=None, max_length=10000, description="Optional survey description.", example="Help us improve our service.")
     status: str = Field(default="draft", description="Initial status of the survey.", example="draft")
-    welcome_message: str | None = Field(default=None, description="Message shown before the first question.", example="Welcome! This survey takes about 5 minutes.")
-    end_message: str | None = Field(default=None, description="Message shown after the last question.", example="Thank you for your feedback!")
+    welcome_message: str | None = Field(default=None, max_length=10000, description="Message shown before the first question.", example="Welcome! This survey takes about 5 minutes.")
+    end_message: str | None = Field(default=None, max_length=10000, description="Message shown after the last question.", example="Thank you for your feedback!")
     default_language: str = Field(default="en", description="BCP-47 language code for the survey's default language.", example="en")
     settings: dict[str, Any] | None = Field(default=None, description="Optional survey-level settings as a JSON object.")
 
 
 class SurveyUpdate(BaseModel):
-    title: str | None = None
-    description: str | None = None
+    title: str | None = Field(default=None, max_length=500)
+    description: str | None = Field(default=None, max_length=10000)
     status: str | None = None
-    welcome_message: str | None = None
-    end_message: str | None = None
+    welcome_message: str | None = Field(default=None, max_length=10000)
+    end_message: str | None = Field(default=None, max_length=10000)
     default_language: str | None = None
     settings: dict[str, Any] | None = None
 

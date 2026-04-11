@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-11T07:34:28.988Z",
+  "lastUpdated": "2026-04-11T07:45:42.846Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4266,6 +4266,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-11-iss-222-no-request-body-size-limit-large-payload-dos.md",
+      "ticketId": "ISS-222",
+      "title": "No request body size limit — large payload DoS",
+      "date": "2026-04-11",
+      "categories": [
+        "security",
+        "middleware",
+        "dos-prevention",
+        "pydantic",
+        "asgi"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -6127,7 +6143,8 @@
       "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md",
       "2026-04-11-iss-217-api-key-scope-enforcement-apply-requirescope-to-wr.md",
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
-      "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md"
+      "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md",
+      "2026-04-11-iss-222-no-request-body-size-limit-large-payload-dos.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
@@ -6262,6 +6279,18 @@
     ],
     "ux": [
       "2026-04-09-iss-204-questions-with-relevance-flash-visible-before-init.md"
+    ],
+    "middleware": [
+      "2026-04-11-iss-222-no-request-body-size-limit-large-payload-dos.md"
+    ],
+    "dos-prevention": [
+      "2026-04-11-iss-222-no-request-body-size-limit-large-payload-dos.md"
+    ],
+    "pydantic": [
+      "2026-04-11-iss-222-no-request-body-size-limit-large-payload-dos.md"
+    ],
+    "asgi": [
+      "2026-04-11-iss-222-no-request-body-size-limit-large-payload-dos.md"
     ]
   },
   "fileIndex": {
