@@ -4,6 +4,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.models.question import Question
 from app.models.question_group import QuestionGroup
 from app.models.survey import Survey
 from app.services.survey_service import check_survey_editable
@@ -85,7 +86,10 @@ async def create_group(
     result = await session.execute(
         select(QuestionGroup)
         .where(QuestionGroup.id == group.id)
-        .options(selectinload(QuestionGroup.questions))
+        .options(
+            selectinload(QuestionGroup.questions).selectinload(Question.subquestions),
+            selectinload(QuestionGroup.questions).selectinload(Question.answer_options),
+        )
     )
     return result.scalar_one()
 
@@ -105,7 +109,10 @@ async def get_group_by_id(
             QuestionGroup.survey_id == survey_id,
             Survey.user_id == user_id,
         )
-        .options(selectinload(QuestionGroup.questions))
+        .options(
+            selectinload(QuestionGroup.questions).selectinload(Question.subquestions),
+            selectinload(QuestionGroup.questions).selectinload(Question.answer_options),
+        )
     )
     return result.scalar_one_or_none()
 
@@ -123,7 +130,10 @@ async def list_groups(
         select(QuestionGroup)
         .where(QuestionGroup.survey_id == survey_id)
         .order_by(QuestionGroup.sort_order)
-        .options(selectinload(QuestionGroup.questions))
+        .options(
+            selectinload(QuestionGroup.questions).selectinload(Question.subquestions),
+            selectinload(QuestionGroup.questions).selectinload(Question.answer_options),
+        )
     )
     return list(result.scalars().all())
 
@@ -151,7 +161,10 @@ async def update_group(
     result = await session.execute(
         select(QuestionGroup)
         .where(QuestionGroup.id == group.id)
-        .options(selectinload(QuestionGroup.questions))
+        .options(
+            selectinload(QuestionGroup.questions).selectinload(Question.subquestions),
+            selectinload(QuestionGroup.questions).selectinload(Question.answer_options),
+        )
     )
     return result.scalar_one()
 
@@ -211,6 +224,9 @@ async def reorder_groups(
         select(QuestionGroup)
         .where(QuestionGroup.survey_id == survey_id)
         .order_by(QuestionGroup.sort_order)
-        .options(selectinload(QuestionGroup.questions))
+        .options(
+            selectinload(QuestionGroup.questions).selectinload(Question.subquestions),
+            selectinload(QuestionGroup.questions).selectinload(Question.answer_options),
+        )
     )
     return list(result2.scalars().all())
