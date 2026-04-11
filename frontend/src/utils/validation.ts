@@ -25,6 +25,31 @@ import type {
 } from '../types/questionSettings'
 
 // ---------------------------------------------------------------------------
+// URL safety
+// ---------------------------------------------------------------------------
+
+/**
+ * Sanitizes the `returnTo` query parameter to prevent open redirect and XSS attacks.
+ *
+ * Allows only safe internal paths:
+ * - Must start with exactly one `/` (not `//` which is protocol-relative)
+ * - Must not contain `:` before the first `/` (blocks `javascript:`, `https:`, `data:`, etc.)
+ *
+ * Returns `/dashboard` as a safe fallback for any null, empty, or invalid input.
+ */
+export function sanitizeReturnTo(value: string | null): string {
+  if (!value) return '/dashboard'
+  const decoded = decodeURIComponent(value)
+  // Must start with a single '/' but not '//'
+  if (!decoded.startsWith('/') || decoded.startsWith('//')) return '/dashboard'
+  // Reject any scheme-like prefix (e.g. javascript:, https:, data:)
+  const colonIndex = decoded.indexOf(':')
+  const slashIndex = decoded.indexOf('/')
+  if (colonIndex !== -1 && colonIndex < slashIndex) return '/dashboard'
+  return decoded
+}
+
+// ---------------------------------------------------------------------------
 // Return type
 // ---------------------------------------------------------------------------
 

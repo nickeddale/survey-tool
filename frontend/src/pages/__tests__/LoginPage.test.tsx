@@ -172,6 +172,51 @@ describe('LoginPage', () => {
       const location = await screen.findByTestId('location')
       expect(location.textContent).toBe('/surveys/123')
     })
+
+    it('falls back to /dashboard when returnTo is an external URL (open redirect blocked)', async () => {
+      const user = userEvent.setup()
+      renderLoginPage('/login?returnTo=https%3A%2F%2Fevil.com')
+      await act(async () => {
+        await user.type(screen.getByLabelText(/email/i), 'test@example.com')
+        await user.type(screen.getByLabelText(/password/i), 'password123')
+      })
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /sign in/i }))
+      })
+
+      const location = await screen.findByTestId('location')
+      expect(location.textContent).toBe('/dashboard')
+    })
+
+    it('falls back to /dashboard when returnTo is a protocol-relative URL (open redirect blocked)', async () => {
+      const user = userEvent.setup()
+      renderLoginPage('/login?returnTo=%2F%2Fevil.com')
+      await act(async () => {
+        await user.type(screen.getByLabelText(/email/i), 'test@example.com')
+        await user.type(screen.getByLabelText(/password/i), 'password123')
+      })
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /sign in/i }))
+      })
+
+      const location = await screen.findByTestId('location')
+      expect(location.textContent).toBe('/dashboard')
+    })
+
+    it('falls back to /dashboard when returnTo is a javascript: URI (XSS blocked)', async () => {
+      const user = userEvent.setup()
+      renderLoginPage('/login?returnTo=javascript%3Aalert(1)')
+      await act(async () => {
+        await user.type(screen.getByLabelText(/email/i), 'test@example.com')
+        await user.type(screen.getByLabelText(/password/i), 'password123')
+      })
+      await act(async () => {
+        await user.click(screen.getByRole('button', { name: /sign in/i }))
+      })
+
+      const location = await screen.findByTestId('location')
+      expect(location.textContent).toBe('/dashboard')
+    })
   })
 
   describe('error message persistence', () => {
