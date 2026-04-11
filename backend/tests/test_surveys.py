@@ -92,6 +92,15 @@ async def test_create_survey_returns_all_fields(client: AsyncClient):
 
 
 @pytest.mark.asyncio
+async def test_create_survey_invalid_status_returns_422(client: AsyncClient):
+    headers = await auth_headers(client)
+    response = await client.post(
+        SURVEYS_URL, json={"title": "Test", "status": "invalid"}, headers=headers
+    )
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
 async def test_create_survey_requires_auth(client: AsyncClient):
     response = await client.post(SURVEYS_URL, json={"title": "No Auth"})
     assert response.status_code == 403
