@@ -28,6 +28,7 @@ from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.webhook import Webhook
+from app.utils.ssrf_protection import resolve_and_validate_url
 
 logger = logging.getLogger(__name__)
 
@@ -229,6 +230,30 @@ async def _deliver_and_log(
             hashlib.sha256,
         ).hexdigest()
         headers["X-Webhook-Signature"] = f"sha256={signature}"
+
+    # DNS rebinding protection: resolve hostname and validate all returned IPs
+    # immediately before delivery. This catches DNS rebinding attacks where a
+    # hostname initially resolves to a public IP but later resolves to a private one.
+    try:
+        await resolve_and_validate_url(wh_url)
+    except ValueError as ssrf_exc:
+        logger.warning(
+            "Webhook delivery blocked by SSRF protection: webhook_id=%s url=%s reason=%s",
+            wh_id,
+            wh_url,
+            ssrf_exc,
+        )
+        async with session_factory() as session:
+            result = await session.execute(
+                select(WebhookDeliveryLog).where(WebhookDeliveryLog.delivery_id == delivery_id)
+            )
+            log_row = result.scalar_one_or_none()
+            if log_row is not None:
+                log_row.status = "failed"
+                log_row.attempt_count = 0
+                log_row.last_error = f"SSRF protection: {ssrf_exc}"
+                await session.commit()
+        return
 
     for attempt in range(max_attempts):
         attempt_count = attempt + 1

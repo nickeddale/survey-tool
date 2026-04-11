@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-10T18:02:35.530Z",
+  "lastUpdated": "2026-04-11T06:30:18.393Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4141,6 +4141,26 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-11-iss-216-webhook-ssrf-protection-add-ip-blocklist-and-dns-r.md",
+      "ticketId": "ISS-216",
+      "title": "Webhook SSRF Protection — Add IP blocklist and DNS resolution check",
+      "date": "2026-04-11",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "documentation",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4344,7 +4364,8 @@
       "2026-04-10-iss-212-csv-export-endpoint-timeout-p9560s-at-5-vus.md",
       "2026-04-10-iss-213-statistics-endpoint-slow-p95145s-for-500-response.md",
       "2026-04-10-iss-214-bcrypt-cpu-contention-degrades-auth-throughput-und.md",
-      "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md"
+      "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md",
+      "2026-04-11-iss-216-webhook-ssrf-protection-add-ip-blocklist-and-dns-r.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4526,7 +4547,8 @@
       "2026-04-10-iss-212-csv-export-endpoint-timeout-p9560s-at-5-vus.md",
       "2026-04-10-iss-213-statistics-endpoint-slow-p95145s-for-500-response.md",
       "2026-04-10-iss-214-bcrypt-cpu-contention-degrades-auth-throughput-und.md",
-      "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md"
+      "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md",
+      "2026-04-11-iss-216-webhook-ssrf-protection-add-ip-blocklist-and-dns-r.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4665,7 +4687,8 @@
       "2026-04-10-iss-212-csv-export-endpoint-timeout-p9560s-at-5-vus.md",
       "2026-04-10-iss-213-statistics-endpoint-slow-p95145s-for-500-response.md",
       "2026-04-10-iss-214-bcrypt-cpu-contention-degrades-auth-throughput-und.md",
-      "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md"
+      "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md",
+      "2026-04-11-iss-216-webhook-ssrf-protection-add-ip-blocklist-and-dns-r.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4862,7 +4885,8 @@
       "2026-04-10-iss-212-csv-export-endpoint-timeout-p9560s-at-5-vus.md",
       "2026-04-10-iss-213-statistics-endpoint-slow-p95145s-for-500-response.md",
       "2026-04-10-iss-214-bcrypt-cpu-contention-degrades-auth-throughput-und.md",
-      "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md"
+      "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md",
+      "2026-04-11-iss-216-webhook-ssrf-protection-add-ip-blocklist-and-dns-r.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5112,7 +5136,8 @@
       "2026-04-10-iss-212-csv-export-endpoint-timeout-p9560s-at-5-vus.md",
       "2026-04-10-iss-213-statistics-endpoint-slow-p95145s-for-500-response.md",
       "2026-04-10-iss-214-bcrypt-cpu-contention-degrades-auth-throughput-und.md",
-      "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md"
+      "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md",
+      "2026-04-11-iss-216-webhook-ssrf-protection-add-ip-blocklist-and-dns-r.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5309,7 +5334,8 @@
       "2026-04-10-iss-212-csv-export-endpoint-timeout-p9560s-at-5-vus.md",
       "2026-04-10-iss-213-statistics-endpoint-slow-p95145s-for-500-response.md",
       "2026-04-10-iss-214-bcrypt-cpu-contention-degrades-auth-throughput-und.md",
-      "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md"
+      "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md",
+      "2026-04-11-iss-216-webhook-ssrf-protection-add-ip-blocklist-and-dns-r.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5405,7 +5431,8 @@
       "2026-04-10-iss-211-backend-cpu-saturation-under-load-single-process-b.md",
       "2026-04-10-iss-212-csv-export-endpoint-timeout-p9560s-at-5-vus.md",
       "2026-04-10-iss-213-statistics-endpoint-slow-p95145s-for-500-response.md",
-      "2026-04-10-iss-214-bcrypt-cpu-contention-degrades-auth-throughput-und.md"
+      "2026-04-10-iss-214-bcrypt-cpu-contention-degrades-auth-throughput-und.md",
+      "2026-04-11-iss-216-webhook-ssrf-protection-add-ip-blocklist-and-dns-r.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5481,7 +5508,8 @@
       "2026-04-10-iss-212-csv-export-endpoint-timeout-p9560s-at-5-vus.md",
       "2026-04-10-iss-213-statistics-endpoint-slow-p95145s-for-500-response.md",
       "2026-04-10-iss-214-bcrypt-cpu-contention-degrades-auth-throughput-und.md",
-      "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md"
+      "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md",
+      "2026-04-11-iss-216-webhook-ssrf-protection-add-ip-blocklist-and-dns-r.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5816,7 +5844,8 @@
       "2026-04-10-iss-212-csv-export-endpoint-timeout-p9560s-at-5-vus.md",
       "2026-04-10-iss-213-statistics-endpoint-slow-p95145s-for-500-response.md",
       "2026-04-10-iss-214-bcrypt-cpu-contention-degrades-auth-throughput-und.md",
-      "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md"
+      "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md",
+      "2026-04-11-iss-216-webhook-ssrf-protection-add-ip-blocklist-and-dns-r.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
