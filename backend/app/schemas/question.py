@@ -10,7 +10,7 @@ from app.schemas.answer_option import AnswerOptionResponse
 
 class QuestionCreate(BaseModel):
     question_type: str = Field(description="Question type. One of: text, numeric, boolean, single_choice, multiple_choice, rating, date, matrix, ranking.", example="single_choice")
-    title: str = Field(max_length=500, description="Question text shown to respondents.", example="How satisfied are you with our service?")
+    title: str = Field(min_length=1, max_length=500, description="Question text shown to respondents.", example="How satisfied are you with our service?")
     code: str | None = Field(default=None, max_length=100, description="Short unique identifier used in expressions and exports.", example="Q1")
     description: str | None = Field(default=None, max_length=5000, description="Optional sub-text displayed below the question title.")
     is_required: bool = Field(default=False, description="Whether the question must be answered before the response can be completed.")
@@ -32,7 +32,7 @@ class QuestionCreate(BaseModel):
 
 class QuestionUpdate(BaseModel):
     question_type: str | None = None
-    title: str | None = Field(default=None, max_length=500)
+    title: str | None = Field(default=None, min_length=1, max_length=500)
     code: str | None = Field(default=None, max_length=100)
     description: str | None = Field(default=None, max_length=5000)
     is_required: bool | None = None

@@ -28,7 +28,7 @@ class SurveyVersionListResponse(BaseModel):
 
 
 class SurveyCreate(BaseModel):
-    title: str = Field(max_length=500, description="Survey title displayed to respondents.", example="Customer Satisfaction Survey")
+    title: str = Field(min_length=1, max_length=500, description="Survey title displayed to respondents.", example="Customer Satisfaction Survey")
     description: str | None = Field(default=None, max_length=10000, description="Optional survey description.", example="Help us improve our service.")
     status: VALID_SURVEY_STATUSES = Field(default="draft", description="Initial status of the survey.", example="draft")
     welcome_message: str | None = Field(default=None, max_length=10000, description="Message shown before the first question.", example="Welcome! This survey takes about 5 minutes.")
@@ -38,7 +38,7 @@ class SurveyCreate(BaseModel):
 
 
 class SurveyUpdate(BaseModel):
-    title: str | None = Field(default=None, max_length=500)
+    title: str | None = Field(default=None, min_length=1, max_length=500)
     description: str | None = Field(default=None, max_length=10000)
     status: str | None = None
     welcome_message: str | None = Field(default=None, max_length=10000)
