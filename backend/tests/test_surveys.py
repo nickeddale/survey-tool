@@ -596,8 +596,8 @@ async def test_get_public_survey_returns_groups_and_questions(client: AsyncClien
 
 
 @pytest.mark.asyncio
-async def test_get_public_survey_returns_200_for_draft_survey(client: AsyncClient):
-    """Public endpoint returns 200 with status='draft' so the frontend can show UnavailableScreen."""
+async def test_get_public_survey_returns_404_for_draft_survey(client: AsyncClient):
+    """Public endpoint returns 404 for draft surveys — unauthenticated users must not see unpublished content."""
     headers = await auth_headers(client)
     create_resp = await client.post(
         SURVEYS_URL, json={"title": "Draft Survey"}, headers=headers
@@ -605,13 +605,12 @@ async def test_get_public_survey_returns_200_for_draft_survey(client: AsyncClien
     survey_id = create_resp.json()["id"]
 
     response = await client.get(f"{SURVEYS_URL}/{survey_id}/public")
-    assert response.status_code == 200
-    assert response.json()["status"] == "draft"
+    assert response.status_code == 404
 
 
 @pytest.mark.asyncio
-async def test_get_public_survey_returns_200_for_closed_survey(client: AsyncClient):
-    """Public endpoint returns 200 with status='closed' so the frontend can show UnavailableScreen."""
+async def test_get_public_survey_returns_404_for_closed_survey(client: AsyncClient):
+    """Public endpoint returns 404 for closed surveys — only active surveys are publicly accessible."""
     headers = await auth_headers(client)
     create_resp = await client.post(
         SURVEYS_URL, json={"title": "Closed Survey", "status": "closed"}, headers=headers
@@ -619,13 +618,12 @@ async def test_get_public_survey_returns_200_for_closed_survey(client: AsyncClie
     survey_id = create_resp.json()["id"]
 
     response = await client.get(f"{SURVEYS_URL}/{survey_id}/public")
-    assert response.status_code == 200
-    assert response.json()["status"] == "closed"
+    assert response.status_code == 404
 
 
 @pytest.mark.asyncio
-async def test_get_public_survey_returns_200_for_archived_survey(client: AsyncClient):
-    """Public endpoint returns 200 with status='archived' so the frontend can show UnavailableScreen."""
+async def test_get_public_survey_returns_404_for_archived_survey(client: AsyncClient):
+    """Public endpoint returns 404 for archived surveys — only active surveys are publicly accessible."""
     headers = await auth_headers(client)
     create_resp = await client.post(
         SURVEYS_URL, json={"title": "Archived Survey", "status": "archived"}, headers=headers
@@ -633,8 +631,7 @@ async def test_get_public_survey_returns_200_for_archived_survey(client: AsyncCl
     survey_id = create_resp.json()["id"]
 
     response = await client.get(f"{SURVEYS_URL}/{survey_id}/public")
-    assert response.status_code == 200
-    assert response.json()["status"] == "archived"
+    assert response.status_code == 404
 
 
 @pytest.mark.asyncio
