@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-11T07:29:48.584Z",
+  "lastUpdated": "2026-04-11T07:34:28.988Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4245,6 +4245,27 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md",
+      "ticketId": "ISS-221",
+      "title": "Missing HTTP security headers on frontend and backend",
+      "date": "2026-04-11",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4453,7 +4474,8 @@
       "2026-04-11-iss-217-api-key-scope-enforcement-apply-requirescope-to-wr.md",
       "2026-04-11-iss-218-open-redirect-xss-via-returnto-parameter-on-login.md",
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
-      "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md"
+      "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
+      "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4640,7 +4662,8 @@
       "2026-04-11-iss-217-api-key-scope-enforcement-apply-requirescope-to-wr.md",
       "2026-04-11-iss-218-open-redirect-xss-via-returnto-parameter-on-login.md",
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
-      "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md"
+      "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
+      "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4986,7 +5009,8 @@
       "2026-04-11-iss-217-api-key-scope-enforcement-apply-requirescope-to-wr.md",
       "2026-04-11-iss-218-open-redirect-xss-via-returnto-parameter-on-login.md",
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
-      "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md"
+      "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
+      "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5241,7 +5265,8 @@
       "2026-04-11-iss-217-api-key-scope-enforcement-apply-requirescope-to-wr.md",
       "2026-04-11-iss-218-open-redirect-xss-via-returnto-parameter-on-login.md",
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
-      "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md"
+      "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
+      "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5443,7 +5468,8 @@
       "2026-04-11-iss-217-api-key-scope-enforcement-apply-requirescope-to-wr.md",
       "2026-04-11-iss-218-open-redirect-xss-via-returnto-parameter-on-login.md",
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
-      "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md"
+      "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
+      "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5544,7 +5570,8 @@
       "2026-04-11-iss-217-api-key-scope-enforcement-apply-requirescope-to-wr.md",
       "2026-04-11-iss-218-open-redirect-xss-via-returnto-parameter-on-login.md",
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
-      "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md"
+      "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
+      "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5624,7 +5651,8 @@
       "2026-04-11-iss-216-webhook-ssrf-protection-add-ip-blocklist-and-dns-r.md",
       "2026-04-11-iss-217-api-key-scope-enforcement-apply-requirescope-to-wr.md",
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
-      "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md"
+      "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
+      "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5774,7 +5802,8 @@
       "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md",
       "2026-04-11-iss-217-api-key-scope-enforcement-apply-requirescope-to-wr.md",
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
-      "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md"
+      "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
+      "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5967,7 +5996,8 @@
       "2026-04-11-iss-217-api-key-scope-enforcement-apply-requirescope-to-wr.md",
       "2026-04-11-iss-218-open-redirect-xss-via-returnto-parameter-on-login.md",
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
-      "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md"
+      "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
+      "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -6096,7 +6126,8 @@
       "2026-04-10-iss-214-bcrypt-cpu-contention-degrades-auth-throughput-und.md",
       "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md",
       "2026-04-11-iss-217-api-key-scope-enforcement-apply-requirescope-to-wr.md",
-      "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md"
+      "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
+      "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
