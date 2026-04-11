@@ -9,6 +9,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Create non-root user (pip install still runs as root in this stage)
+RUN adduser --disabled-password --gecos '' appuser
+
 # Copy project definition and source for installation
 COPY pyproject.toml ./
 COPY . .
@@ -21,6 +24,13 @@ FROM builder AS dev
 
 # Install dev dependencies on top of prod deps
 RUN pip install --no-cache-dir ".[dev]"
+
+# Run as non-root user
+# NOTE: The ./backend:/app volume mount in docker-compose.yml overrides container
+# file ownership at runtime. Non-root enforcement in dev depends on the host
+# ./backend directory being readable/writable by the container UID (appuser, uid=1000).
+# On Linux hosts, ensure host files are accessible: chmod o+rX ./backend or match UIDs.
+USER appuser
 
 EXPOSE 8000
 
@@ -36,6 +46,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
     && rm -rf /var/lib/apt/lists/*
 
+# Create non-root user before copying files
+RUN adduser --disabled-password --gecos '' appuser
+
 # Copy installed site-packages from builder (prod deps only, no dev extras)
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 
@@ -43,8 +56,12 @@ COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/pytho
 COPY --from=builder /usr/local/bin/gunicorn /usr/local/bin/gunicorn
 COPY --from=builder /usr/local/bin/uvicorn /usr/local/bin/uvicorn
 
-# Copy application source
+# Copy application source and set ownership to non-root user
 COPY . .
+RUN chown -R appuser:appuser /app
+
+# Drop to non-root user for all runtime operations
+USER appuser
 
 EXPOSE 8000
 

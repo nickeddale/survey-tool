@@ -37,6 +37,8 @@ services:
       # (--reload), so this variable is only consumed by the prod stage CMD.
       # Override via .env or shell: NUM_WORKERS=2 docker compose up
       NUM_WORKERS: ${NUM_WORKERS:-4}
+    security_opt:
+      - no-new-privileges:true
     ports:
       - "8000:8000"
     volumes:

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-11T10:08:32.760Z",
+"lastUpdated": "2026-04-11T10:08:32.760Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4289,18 +4289,40 @@
       "title": "[API] POST /api/v1/surveys — Title >255 chars causes 500 (DB column mismatch)",
       "date": "2026-04-11",
       "categories": [
-        "testing",
-        "api",
         "database",
-        "ui",
-        "bug-fix",
-        "feature",
-        "security",
-        "documentation",
-        "config",
-        "ci-cd"
+        "validation",
+        "alembic",
+        "pydantic",
+        "bug-fix"
       ],
-      "filesModified": [],
+      "filesModified": [
+        "backend/app/schemas/survey.py",
+        "backend/app/schemas/question_group.py",
+        "backend/app/schemas/quota.py",
+        "backend/app/models/survey.py",
+        "backend/app/models/question_group.py",
+        "backend/alembic/versions/0022_fix_title_column_lengths.py",
+        "backend/tests/test_surveys.py",
+        "backend/tests/test_question_groups.py"
+      ],
+      "outcome": "success",
+      "complexity": "low"
+    },
+    {
+      "file": "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md",
+      "ticketId": "ISS-223",
+      "title": "Backend container runs as root — add non-root user",
+      "date": "2026-04-11",
+      "categories": [
+        "docker",
+        "security",
+        "hardening",
+        "containers"
+      ],
+      "filesModified": [
+        "backend/Dockerfile",
+        "docker-compose.yml"
+      ],
       "outcome": "success",
       "complexity": "medium"
     }
@@ -4513,7 +4535,7 @@
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
       "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
       "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md",
-      "2026-04-11-iss-226-api-post-apiv1surveys-title-255-chars-causes-500-d.md"
+      "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4702,7 +4724,7 @@
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
       "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
       "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md",
-      "2026-04-11-iss-226-api-post-apiv1surveys-title-255-chars-causes-500-d.md"
+      "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5051,7 +5073,7 @@
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
       "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
       "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md",
-      "2026-04-11-iss-226-api-post-apiv1surveys-title-255-chars-causes-500-d.md"
+      "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5512,7 +5534,7 @@
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
       "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
       "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md",
-      "2026-04-11-iss-226-api-post-apiv1surveys-title-255-chars-causes-500-d.md"
+      "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5696,7 +5718,7 @@
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
       "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
       "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md",
-      "2026-04-11-iss-226-api-post-apiv1surveys-title-255-chars-causes-500-d.md"
+      "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5848,7 +5870,7 @@
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
       "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
       "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md",
-      "2026-04-11-iss-226-api-post-apiv1surveys-title-255-chars-causes-500-d.md"
+      "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6043,7 +6065,7 @@
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
       "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
       "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md",
-      "2026-04-11-iss-226-api-post-apiv1surveys-title-255-chars-causes-500-d.md"
+      "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -6175,7 +6197,7 @@
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
       "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md",
       "2026-04-11-iss-222-no-request-body-size-limit-large-payload-dos.md",
-      "2026-04-11-iss-226-api-post-apiv1surveys-title-255-chars-causes-500-d.md"
+      "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
