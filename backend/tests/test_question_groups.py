@@ -660,3 +660,150 @@ async def test_patch_group_title_501_chars_returns_422(client: AsyncClient):
         f"{groups_url(survey_id)}/{group_id}", json={"title": title}, headers=headers
     )
     assert response.status_code == 422
+
+
+# --------------------------------------------------------------------------- #
+# ISS-229: Group endpoints must not 500 when questions have subquestions/options
+# --------------------------------------------------------------------------- #
+
+
+async def _setup_group_with_nested_questions(
+    client: AsyncClient, headers: dict
+) -> tuple[str, str]:
+    """Create survey + group with a matrix_single question (subquestions) and a
+    single_choice question (answer options). Returns (survey_id, group_id)."""
+    survey_id = await create_survey(client, headers, title="Nested Survey")
+
+    # Create the group
+    group_resp = await client.post(
+        groups_url(survey_id), json={"title": "Nested Group"}, headers=headers
+    )
+    assert group_resp.status_code == 201
+    group_id = group_resp.json()["id"]
+
+    # Create a matrix_single question inside the group
+    matrix_resp = await client.post(
+        f"/api/v1/surveys/{survey_id}/groups/{group_id}/questions",
+        json={"question_type": "matrix_single", "title": "Matrix Q"},
+        headers=headers,
+    )
+    assert matrix_resp.status_code == 201
+    matrix_q_id = matrix_resp.json()["id"]
+
+    # Add a subquestion (row) to the matrix question
+    sq_resp = await client.post(
+        f"/api/v1/surveys/{survey_id}/questions/{matrix_q_id}/subquestions",
+        json={"title": "Row 1"},
+        headers=headers,
+    )
+    assert sq_resp.status_code == 201
+
+    # Create a single_choice question inside the group
+    choice_resp = await client.post(
+        f"/api/v1/surveys/{survey_id}/groups/{group_id}/questions",
+        json={"question_type": "single_choice", "title": "Choice Q"},
+        headers=headers,
+    )
+    assert choice_resp.status_code == 201
+    choice_q_id = choice_resp.json()["id"]
+
+    # Add an answer option to the single_choice question
+    opt_resp = await client.post(
+        f"/api/v1/surveys/{survey_id}/questions/{choice_q_id}/options",
+        json={"text": "Option A", "code": "A"},
+        headers=headers,
+    )
+    assert opt_resp.status_code == 201
+
+    return survey_id, group_id
+
+
+@pytest.mark.asyncio
+async def test_create_group_with_nested_questions_returns_200(client: AsyncClient):
+    """POST group response includes questions with subquestions and answer_options (ISS-229)."""
+    headers = await auth_headers(client, email="iss229_create@example.com")
+    survey_id = await create_survey(client, headers)
+    resp = await client.post(
+        groups_url(survey_id), json={"title": "Empty Group"}, headers=headers
+    )
+    assert resp.status_code == 201
+    assert "questions" in resp.json()
+
+
+@pytest.mark.asyncio
+async def test_get_group_with_nested_questions_returns_200(client: AsyncClient):
+    """GET /groups/{gid} returns 200 (not 500) when questions have nested relations (ISS-229)."""
+    headers = await auth_headers(client, email="iss229_get@example.com")
+    survey_id, group_id = await _setup_group_with_nested_questions(client, headers)
+
+    response = await client.get(f"{groups_url(survey_id)}/{group_id}", headers=headers)
+    assert response.status_code == 200
+    body = response.json()
+    assert body["id"] == group_id
+    questions = body["questions"]
+    assert len(questions) == 2
+    matrix_q = next(q for q in questions if q["question_type"] == "matrix_single")
+    assert len(matrix_q["subquestions"]) == 1
+    choice_q = next(q for q in questions if q["question_type"] == "single_choice")
+    assert len(choice_q["answer_options"]) == 1
+
+
+@pytest.mark.asyncio
+async def test_list_groups_with_nested_questions_returns_200(client: AsyncClient):
+    """GET /groups returns 200 (not 500) when questions have nested relations (ISS-229)."""
+    headers = await auth_headers(client, email="iss229_list@example.com")
+    survey_id, group_id = await _setup_group_with_nested_questions(client, headers)
+
+    response = await client.get(groups_url(survey_id), headers=headers)
+    assert response.status_code == 200
+    items = response.json()["items"]
+    assert len(items) == 1
+    questions = items[0]["questions"]
+    assert len(questions) == 2
+    matrix_q = next(q for q in questions if q["question_type"] == "matrix_single")
+    assert len(matrix_q["subquestions"]) == 1
+    choice_q = next(q for q in questions if q["question_type"] == "single_choice")
+    assert len(choice_q["answer_options"]) == 1
+
+
+@pytest.mark.asyncio
+async def test_patch_group_with_nested_questions_returns_200(client: AsyncClient):
+    """PATCH /groups/{gid} returns 200 (not 500) when questions have nested relations (ISS-229)."""
+    headers = await auth_headers(client, email="iss229_patch@example.com")
+    survey_id, group_id = await _setup_group_with_nested_questions(client, headers)
+
+    response = await client.patch(
+        f"{groups_url(survey_id)}/{group_id}",
+        json={"title": "Updated Title"},
+        headers=headers,
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["title"] == "Updated Title"
+    questions = body["questions"]
+    assert len(questions) == 2
+    matrix_q = next(q for q in questions if q["question_type"] == "matrix_single")
+    assert len(matrix_q["subquestions"]) == 1
+    choice_q = next(q for q in questions if q["question_type"] == "single_choice")
+    assert len(choice_q["answer_options"]) == 1
+
+
+@pytest.mark.asyncio
+async def test_reorder_groups_with_nested_questions_returns_200(client: AsyncClient):
+    """PATCH /groups/reorder returns 200 (not 500) when questions have nested relations (ISS-229)."""
+    headers = await auth_headers(client, email="iss229_reorder@example.com")
+    survey_id, group_id = await _setup_group_with_nested_questions(client, headers)
+
+    reorder_payload = {"order": [{"id": group_id, "sort_order": 1}]}
+    response = await client.patch(
+        f"{groups_url(survey_id)}/reorder", json=reorder_payload, headers=headers
+    )
+    assert response.status_code == 200
+    groups = response.json()
+    assert len(groups) == 1
+    questions = groups[0]["questions"]
+    assert len(questions) == 2
+    matrix_q = next(q for q in questions if q["question_type"] == "matrix_single")
+    assert len(matrix_q["subquestions"]) == 1
+    choice_q = next(q for q in questions if q["question_type"] == "single_choice")
+    assert len(choice_q["answer_options"]) == 1

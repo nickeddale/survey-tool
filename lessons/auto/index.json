@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-11T11:33:54.149Z",
+  "lastUpdated": "2026-04-11T12:24:12.789Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4381,6 +4381,25 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
+      "ticketId": "ISS-229",
+      "title": "[API] Group endpoints return 500 — missing nested eager loading",
+      "date": "2026-04-11",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "documentation",
+        "config"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4594,7 +4613,8 @@
       "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md",
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "2026-04-11-iss-228-api-post-surveysidquestionsidsubquestions-matrixsi.md",
-      "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md"
+      "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
+      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4786,7 +4806,8 @@
       "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md",
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "2026-04-11-iss-228-api-post-surveysidquestionsidsubquestions-matrixsi.md",
-      "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md"
+      "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
+      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4933,7 +4954,8 @@
       "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
       "2026-04-11-iss-226-api-post-apiv1surveys-title-255-chars-causes-500-d.md",
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
-      "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md"
+      "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
+      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5139,7 +5161,8 @@
       "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md",
       "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md",
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
-      "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md"
+      "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
+      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5400,7 +5423,8 @@
       "2026-04-11-iss-226-api-post-apiv1surveys-title-255-chars-causes-500-d.md",
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "2026-04-11-iss-228-api-post-surveysidquestionsidsubquestions-matrixsi.md",
-      "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md"
+      "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
+      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5607,7 +5631,8 @@
       "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md",
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "2026-04-11-iss-228-api-post-surveysidquestionsidsubquestions-matrixsi.md",
-      "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md"
+      "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
+      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5792,7 +5817,8 @@
       "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
       "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md",
       "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md",
-      "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md"
+      "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
+      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5946,7 +5972,8 @@
       "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md",
       "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md",
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
-      "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md"
+      "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
+      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
