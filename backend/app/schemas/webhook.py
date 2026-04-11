@@ -4,6 +4,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from app.utils.ssrf_protection import is_safe_url
+
 
 VALID_EVENTS = Literal[
     "response.started",
@@ -33,6 +35,10 @@ class WebhookCreate(BaseModel):
     def validate_url_format(cls, v: str) -> str:
         if not (v.startswith("http://") or v.startswith("https://")):
             raise ValueError("url must start with http:// or https://")
+        if not is_safe_url(v):
+            raise ValueError(
+                "url targets a private, loopback, or reserved address and is not allowed"
+            )
         return v
 
     @field_validator("events")
@@ -54,6 +60,10 @@ class WebhookUpdate(BaseModel):
     def validate_url_format(cls, v: str | None) -> str | None:
         if v is not None and not (v.startswith("http://") or v.startswith("https://")):
             raise ValueError("url must start with http:// or https://")
+        if v is not None and not is_safe_url(v):
+            raise ValueError(
+                "url targets a private, loopback, or reserved address and is not allowed"
+            )
         return v
 
     @field_validator("events")

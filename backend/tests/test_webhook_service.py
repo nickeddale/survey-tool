@@ -520,6 +520,155 @@ async def test_deliver_webhook_success_after_two_failures():
 
 
 # ---------------------------------------------------------------------------
+# DNS rebinding protection tests: _deliver_and_log with SSRF check
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_deliver_and_log_blocked_by_ssrf_does_not_make_http_request(wh_engine):
+    """_deliver_and_log must not POST to a URL that resolves to a private IP (DNS rebinding)."""
+    import socket as _socket
+
+    from app.models.webhook_delivery_log import WebhookDeliveryLog
+
+    factory = async_sessionmaker(wh_engine, class_=AsyncSession, expire_on_commit=False)
+    delivery_id = uuid.uuid4()
+
+    async with factory() as sess:
+        user = User(
+            id=uuid.uuid4(),
+            email=f"ssrf-test-{uuid.uuid4()}@example.com",
+            password_hash="hashed",
+            name="SSRF Test",
+        )
+        sess.add(user)
+        survey = Survey(
+            id=uuid.uuid4(),
+            user_id=user.id,
+            title="SSRF Test Survey",
+            status="active",
+        )
+        sess.add(survey)
+        wh = Webhook(**make_webhook_row(
+            user_id=user.id,
+            survey_id=survey.id,
+            events=["response.completed"],
+            url="https://public-looking.example.com/hook",
+            secret="",
+        ))
+        sess.add(wh)
+        await sess.commit()
+        wh_id = wh.id
+
+    # Mock getaddrinfo at the call-site module level so the SSRF utility sees it
+    mock_addr_info = [
+        (_socket.AF_INET, _socket.SOCK_STREAM, 6, "", ("192.168.1.1", 0)),
+    ]
+
+    http_post_called = []
+
+    async def mock_post(url, content, headers, **kwargs):
+        http_post_called.append(url)
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        return mock_response
+
+    mock_client = AsyncMock()
+    mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+    mock_client.__aexit__ = AsyncMock(return_value=False)
+    mock_client.post = mock_post
+
+    with patch("app.utils.ssrf_protection.socket.getaddrinfo", return_value=mock_addr_info):
+        with patch("httpx.AsyncClient", return_value=mock_client):
+            await _deliver_and_log(
+                session_factory=factory,
+                wh_id=wh_id,
+                wh_url="https://public-looking.example.com/hook",
+                wh_secret="",
+                payload={"event": "response.completed", "data": {}},
+                event="response.completed",
+                delivery_id=delivery_id,
+            )
+
+    # HTTP request must NOT have been made
+    assert http_post_called == [], (
+        f"Expected no HTTP request, but got: {http_post_called}"
+    )
+
+    # Delivery log must be marked as failed with SSRF error
+    async with factory() as sess:
+        result = await sess.execute(
+            select(WebhookDeliveryLog).where(WebhookDeliveryLog.delivery_id == delivery_id)
+        )
+        log = result.scalar_one_or_none()
+
+    assert log is not None
+    assert log.status == "failed"
+    assert log.last_error is not None
+    assert "ssrf" in log.last_error.lower() or "private" in log.last_error.lower() or "blocked" in log.last_error.lower(), (
+        f"Expected SSRF-related error message in log, got: {log.last_error!r}"
+    )
+
+
+@pytest.mark.asyncio
+async def test_deliver_and_log_ssrf_logs_warning(wh_engine, caplog):
+    """_deliver_and_log must log a warning when SSRF protection blocks delivery."""
+    import logging as _logging
+    import socket as _socket
+
+    factory = async_sessionmaker(wh_engine, class_=AsyncSession, expire_on_commit=False)
+    delivery_id = uuid.uuid4()
+
+    async with factory() as sess:
+        user = User(
+            id=uuid.uuid4(),
+            email=f"ssrf-log-{uuid.uuid4()}@example.com",
+            password_hash="hashed",
+            name="SSRF Log Test",
+        )
+        sess.add(user)
+        survey = Survey(
+            id=uuid.uuid4(),
+            user_id=user.id,
+            title="SSRF Log Survey",
+            status="active",
+        )
+        sess.add(survey)
+        wh = Webhook(**make_webhook_row(
+            user_id=user.id,
+            survey_id=survey.id,
+            events=["response.completed"],
+            url="https://rebinding.example.com/hook",
+            secret="",
+        ))
+        sess.add(wh)
+        await sess.commit()
+        wh_id = wh.id
+
+    mock_addr_info = [
+        (_socket.AF_INET, _socket.SOCK_STREAM, 6, "", ("10.0.0.1", 0)),
+    ]
+
+    with patch("app.utils.ssrf_protection.socket.getaddrinfo", return_value=mock_addr_info):
+        with caplog.at_level(_logging.WARNING, logger="app.services.webhook_service"):
+            await _deliver_and_log(
+                session_factory=factory,
+                wh_id=wh_id,
+                wh_url="https://rebinding.example.com/hook",
+                wh_secret="",
+                payload={"event": "response.completed", "data": {}},
+                event="response.completed",
+                delivery_id=delivery_id,
+            )
+
+    # A warning must have been logged about SSRF blocking
+    ssrf_logs = [r for r in caplog.records if "ssrf" in r.message.lower() or "blocked" in r.message.lower()]
+    assert ssrf_logs, (
+        f"Expected a warning log about SSRF blocking, got records: {[r.message for r in caplog.records]}"
+    )
+
+
+# ---------------------------------------------------------------------------
 # Integration fixtures
 # ---------------------------------------------------------------------------
 

@@ -10,6 +10,7 @@ Tests cover:
     - survey_id nullable (global webhook)
     - User isolation (user A cannot access user B webhooks)
     - Unauthenticated access returns 401/403
+    - SSRF protection: blocked URLs return 400/422
 """
 
 import uuid
@@ -483,3 +484,88 @@ async def test_delete_webhook_wrong_user_returns_404(client: AsyncClient):
     # Webhook still exists for owner
     get_resp = await client.get(f"{WEBHOOKS_URL}/{webhook_id}", headers=headers1)
     assert get_resp.status_code == 200
+
+
+# ---------------------------------------------------------------------------
+# SSRF protection tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "blocked_url",
+    [
+        pytest.param("http://127.0.0.1/hook", id="loopback-127.0.0.1"),
+        pytest.param("http://10.0.0.1/hook", id="rfc1918-10.0.0.1"),
+        pytest.param("http://192.168.1.1/hook", id="rfc1918-192.168.1.1"),
+        pytest.param("http://172.16.0.1/hook", id="rfc1918-172.16.0.1"),
+        pytest.param("http://169.254.169.254/hook", id="metadata-169.254.169.254"),
+        pytest.param("http://localhost/hook", id="loopback-localhost"),
+        pytest.param("http://0x7f000001/hook", id="hex-loopback"),
+        pytest.param("http://2130706433/hook", id="decimal-loopback"),
+        pytest.param("http://0177.0.0.1/hook", id="octal-loopback"),
+        pytest.param("http://[::1]/hook", id="ipv6-loopback"),
+        pytest.param("http://[::ffff:127.0.0.1]/hook", id="ipv6-mapped-loopback"),
+        pytest.param("http://metadata.google.internal/hook", id="metadata-google-internal"),
+    ],
+)
+async def test_create_webhook_ssrf_blocked_url_returns_400(client: AsyncClient, blocked_url: str):
+    """POST /webhooks with a blocked (SSRF) URL must return 400."""
+    headers = await auth_headers(client, f"ssrf_{hash(blocked_url) & 0xFFFFFF}@example.com")
+    resp = await client.post(
+        WEBHOOKS_URL,
+        json=webhook_payload(url=blocked_url),
+        headers=headers,
+    )
+    assert resp.status_code == 400, (
+        f"Expected 400 for blocked URL {blocked_url!r}, got {resp.status_code}: {resp.text}"
+    )
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "blocked_url",
+    [
+        pytest.param("http://127.0.0.1/hook", id="update-loopback-127.0.0.1"),
+        pytest.param("http://10.0.0.1/hook", id="update-rfc1918-10.0.0.1"),
+        pytest.param("http://192.168.1.1/hook", id="update-rfc1918-192.168.1.1"),
+        pytest.param("http://169.254.169.254/hook", id="update-metadata"),
+        pytest.param("http://localhost/hook", id="update-localhost"),
+        pytest.param("http://0x7f000001/hook", id="update-hex-loopback"),
+    ],
+)
+async def test_update_webhook_ssrf_blocked_url_returns_400(client: AsyncClient, blocked_url: str):
+    """PATCH /webhooks/{id} with a blocked (SSRF) URL must return 400."""
+    headers = await auth_headers(client, f"ssrf_upd_{hash(blocked_url) & 0xFFFFFF}@example.com")
+    # First create a valid webhook
+    create_resp = await client.post(WEBHOOKS_URL, json=webhook_payload(), headers=headers)
+    assert create_resp.status_code == 201
+    webhook_id = create_resp.json()["id"]
+
+    # Then attempt to update to a blocked URL
+    patch_resp = await client.patch(
+        f"{WEBHOOKS_URL}/{webhook_id}",
+        json={"url": blocked_url},
+        headers=headers,
+    )
+    assert patch_resp.status_code == 400, (
+        f"Expected 400 for blocked URL {blocked_url!r} on PATCH, got {patch_resp.status_code}: {patch_resp.text}"
+    )
+
+
+@pytest.mark.asyncio
+async def test_create_webhook_ssrf_error_message_descriptive(client: AsyncClient):
+    """The error message for a blocked URL should be descriptive."""
+    headers = await auth_headers(client, "ssrf_msg@example.com")
+    resp = await client.post(
+        WEBHOOKS_URL,
+        json=webhook_payload(url="http://127.0.0.1/hook"),
+        headers=headers,
+    )
+    assert resp.status_code == 400
+    body = resp.text
+    # The error should mention something about private/loopback/reserved
+    assert any(
+        word in body.lower()
+        for word in ["private", "loopback", "reserved", "allowed", "blocked"]
+    ), f"Expected descriptive SSRF error message, got: {body}"
