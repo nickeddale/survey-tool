@@ -156,7 +156,7 @@ async def get_public(
 ) -> SurveyFullResponse:
     parsed_id = _parse_survey_id(survey_id)
     survey = await get_survey_full_public(session, parsed_id)
-    if survey is None:
+    if survey is None or survey.status != "active":
         raise NotFoundError("Survey not found")
 
     validated = SurveyFullResponse.model_validate(survey)
