@@ -229,6 +229,36 @@ async def test_create_subquestion_auto_generates_code(client: AsyncClient):
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("question_type", ["matrix_single", "matrix_multiple"])
+async def test_create_subquestion_for_matrix_single_and_multiple_returns_201(
+    client: AsyncClient, question_type: str
+):
+    """matrix_single and matrix_multiple should be recognized as matrix types."""
+    email = f"matrix_sq_{question_type}@example.com"
+    headers = await auth_headers(client, email)
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+
+    create_resp = await client.post(
+        questions_url(survey_id, group_id),
+        json={"question_type": question_type, "title": "Matrix Q"},
+        headers=headers,
+    )
+    assert create_resp.status_code == 201, create_resp.json()
+    question_id = create_resp.json()["id"]
+
+    sq_resp = await client.post(
+        subquestions_url(survey_id, question_id),
+        json={"title": "Item A"},
+        headers=headers,
+    )
+    assert sq_resp.status_code == 201, sq_resp.json()
+    parent_data = sq_resp.json()
+    assert len(parent_data["subquestions"]) == 1
+    assert parent_data["subquestions"][0]["title"] == "Item A"
+
+
+@pytest.mark.asyncio
 async def test_create_subquestion_for_non_matrix_type_returns_422(client: AsyncClient):
     headers = await auth_headers(client, "matrix_sq_non_matrix@example.com")
     survey_id = await create_survey(client, headers)

@@ -378,7 +378,7 @@ async def reorder_questions(
     return list(result2.scalars().all())
 
 
-MATRIX_QUESTION_TYPES = frozenset({"matrix", "matrix_dropdown", "matrix_dynamic"})
+MATRIX_QUESTION_TYPES = frozenset({"matrix", "matrix_single", "matrix_multiple", "matrix_dropdown", "matrix_dynamic"})
 
 
 async def create_subquestion(
