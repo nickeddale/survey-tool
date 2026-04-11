@@ -20,6 +20,8 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from app.services.validators.regex_utils import safe_regex_search as _safe_regex_search
+
 __all__ = [
     "is_empty",
     "contains",
@@ -280,12 +282,17 @@ def regex_match(string: Any, pattern: Any, position: int = 0) -> bool:
             position,
         )
     try:
-        return bool(re.search(pattern, string))
+        return bool(_safe_regex_search(pattern, string))
     except re.error as exc:
         raise _error(
             f"regex_match(): invalid regex pattern {pattern!r}: {exc}",
             position,
         ) from exc
+    except TimeoutError:
+        raise _error(
+            f"regex_match(): pattern {pattern!r} timed out — too complex to evaluate safely",
+            position,
+        )
 
 
 # ---------------------------------------------------------------------------

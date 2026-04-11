@@ -17,6 +17,7 @@ import re
 from typing import Any
 
 from app.utils.errors import UnprocessableError
+from app.services.validators.regex_utils import safe_regex_search
 
 
 # ---------------------------------------------------------------------------
@@ -65,13 +66,17 @@ def _apply_text_validation_rules(value: str, validation: dict[str, Any] | None) 
 
     if regex is not None:
         try:
-            if not re.search(regex, value):
+            if not safe_regex_search(regex, value):
                 raise UnprocessableError(
-                    f"Answer does not match the required pattern"
+                    "Answer does not match the required pattern"
                 )
         except re.error:
             # Invalid regex was stored — skip pattern check gracefully.
             pass
+        except TimeoutError:
+            raise UnprocessableError(
+                "Regex validation timed out — the pattern is too complex to evaluate safely"
+            )
 
 
 def _check_email_format(value: str) -> None:
