@@ -38,6 +38,7 @@ async def _complete_response_core(
 
     Raises:
         NotFoundError: If the response does not exist for this survey.
+        UnprocessableError: If the survey is not in 'active' status.
         ConflictError: If the response is already complete.
         UnprocessableError: If the response is disqualified.
         AnswerValidationError: If any visible answers fail validation (422, all errors).
@@ -58,6 +59,11 @@ async def _complete_response_core(
 
     if response is None:
         raise NotFoundError("Response not found")
+
+    if response.survey.status != "active":
+        raise UnprocessableError(
+            f"Survey is not accepting responses: status is '{response.survey.status}'"
+        )
 
     if response.status == "complete":
         raise ConflictError("Response is already complete")
