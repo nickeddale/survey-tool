@@ -25,7 +25,7 @@ VALID_EVENT_VALUES = {
 
 
 class WebhookCreate(BaseModel):
-    url: str = Field(description="HTTPS (or HTTP) endpoint URL that will receive webhook payloads.", example="https://example.com/hooks/survey")
+    url: str = Field(max_length=2048, description="HTTPS (or HTTP) endpoint URL that will receive webhook payloads.", example="https://example.com/hooks/survey")
     events: list[VALID_EVENTS] = Field(description="List of event types to subscribe to.", example=["response.completed", "survey.activated"])
     survey_id: uuid.UUID | None = Field(default=None, description="Optional survey UUID to scope events to a single survey. Null means all surveys.")
     is_active: bool = Field(default=True, description="Whether this webhook is active and will receive deliveries.")
@@ -50,7 +50,7 @@ class WebhookCreate(BaseModel):
 
 
 class WebhookUpdate(BaseModel):
-    url: str | None = None
+    url: str | None = Field(default=None, max_length=2048)
     events: list[VALID_EVENTS] | None = None
     survey_id: uuid.UUID | None = None
     is_active: bool | None = None

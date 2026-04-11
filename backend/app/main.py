@@ -1,3 +1,4 @@
+import json
 import logging
 import time
 import traceback
@@ -10,6 +11,10 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.types import ASGIApp, Receive, Scope, Send
+
+# Maximum allowed request body size: 1 MB
+MAX_BODY_SIZE = 1_048_576
 
 from app.api.answer_options import router as answer_options_router
 from app.api.assessments import router as assessments_router
@@ -210,11 +215,103 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         return response
 
 
+class RequestBodySizeLimitMiddleware:
+    """Raw ASGI middleware that rejects requests with bodies exceeding MAX_BODY_SIZE bytes.
+
+    Uses a raw ASGI interface (not BaseHTTPMiddleware) so the body is never fully
+    buffered into memory before the limit is enforced. The middleware:
+    1. Fast-path rejects requests where the Content-Length header alone exceeds the limit.
+    2. Accumulates streamed body chunks and rejects once the running total exceeds the limit.
+    """
+
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        # Fast-path: reject immediately if Content-Length header exceeds limit.
+        headers = dict(scope.get("headers", []))
+        content_length_raw = headers.get(b"content-length")
+        if content_length_raw is not None:
+            try:
+                content_length = int(content_length_raw)
+            except ValueError:
+                content_length = 0
+            if content_length > MAX_BODY_SIZE:
+                await self._send_413(send)
+                return
+
+        # Stream enforcement: wrap the receive callable to accumulate byte count.
+        total_received = 0
+        limit_exceeded = False
+
+        async def limited_receive() -> dict:
+            nonlocal total_received, limit_exceeded
+            message = await receive()
+            if message.get("type") == "http.request":
+                body_chunk = message.get("body", b"")
+                total_received += len(body_chunk)
+                if total_received > MAX_BODY_SIZE:
+                    limit_exceeded = True
+                    # Return a sentinel that signals end-of-body so the framework
+                    # doesn't hang waiting for more chunks; the 413 will be sent
+                    # by the response path below.
+                    return {"type": "http.request", "body": b"", "more_body": False}
+            return message
+
+        # Intercept the send callable so we can substitute a 413 response.
+        response_started = False
+
+        async def checked_send(message: dict) -> None:
+            nonlocal response_started
+            if limit_exceeded and message.get("type") == "http.response.start":
+                response_started = True
+                # Replace whatever the app was going to send with a 413.
+                await self._send_413(send)
+                return
+            if limit_exceeded and message.get("type") == "http.response.body":
+                # Body already sent as part of _send_413; discard the app body.
+                return
+            await send(message)
+
+        await self.app(scope, limited_receive, checked_send)
+
+        # If the limit was exceeded but the app never sent a response (e.g. it
+        # raised before touching send), emit 413 now.
+        if limit_exceeded and not response_started:
+            await self._send_413(send)
+
+    @staticmethod
+    async def _send_413(send: Send) -> None:
+        body = json.dumps(
+            {"detail": {"code": "PAYLOAD_TOO_LARGE", "message": "Request body exceeds the 1 MB limit"}}
+        ).encode("utf-8")
+        await send(
+            {
+                "type": "http.response.start",
+                "status": 413,
+                "headers": [
+                    (b"content-type", b"application/json"),
+                    (b"content-length", str(len(body)).encode()),
+                ],
+            }
+        )
+        await send({"type": "http.response.body", "body": body, "more_body": False})
+
+
 app.add_middleware(RequestLoggingMiddleware)
 app.add_middleware(SlowAPIMiddleware)
 # SecurityHeadersMiddleware registered last so it is the outermost wrapper,
 # ensuring security headers are added to ALL responses including CORS and error responses.
 app.add_middleware(SecurityHeadersMiddleware)
+# RequestBodySizeLimitMiddleware wraps the route handlers directly (innermost middleware
+# position), rejecting oversized bodies before they reach route logic or the DB layer.
+# Starlette applies middleware in reverse registration order, so adding it here makes it
+# the innermost non-route layer — it still runs before any route handler executes.
+app.add_middleware(RequestBodySizeLimitMiddleware)
 
 
 # ---------------------------------------------------------------------------

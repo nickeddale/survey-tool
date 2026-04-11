@@ -9,17 +9,17 @@ if TYPE_CHECKING:
 
 
 class QuestionGroupCreate(BaseModel):
-    title: str = Field(description="Group title displayed as a section heading.", example="Demographic Information")
-    description: str | None = Field(default=None, description="Optional sub-text displayed below the group title.")
+    title: str = Field(max_length=500, description="Group title displayed as a section heading.", example="Demographic Information")
+    description: str | None = Field(default=None, max_length=5000, description="Optional sub-text displayed below the group title.")
     sort_order: int | None = Field(default=None, description="Display order within the survey. Auto-assigned if omitted.", example=1)
-    relevance: str | None = Field(default=None, description="Expression that must evaluate to true for this group to be shown.", example="age >= 18")
+    relevance: str | None = Field(default=None, max_length=2000, description="Expression that must evaluate to true for this group to be shown.", example="age >= 18")
 
 
 class QuestionGroupUpdate(BaseModel):
-    title: str | None = None
-    description: str | None = None
+    title: str | None = Field(default=None, max_length=500)
+    description: str | None = Field(default=None, max_length=5000)
     sort_order: int | None = None
-    relevance: str | None = None
+    relevance: str | None = Field(default=None, max_length=2000)
 
 
 class QuestionGroupTranslationsUpdate(BaseModel):
