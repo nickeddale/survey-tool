@@ -39,7 +39,7 @@ describe('authService', () => {
       // The retried login still fails (bad credentials) and is normalized to ApiError.
       setTokens(mockTokens.access_token)
       await expect(
-        authService.login({ email: 'bad@example.com', password: 'wrong' }),
+        authService.login({ email: 'bad@example.com', password: 'wrong' })
       ).rejects.toMatchObject({ status: 401, code: 'UNAUTHORIZED' })
     })
   })
@@ -64,7 +64,7 @@ describe('authService', () => {
 
     it('throws ApiError on conflict (duplicate email)', async () => {
       await expect(
-        authService.register({ email: 'existing@example.com', password: 'password123' }),
+        authService.register({ email: 'existing@example.com', password: 'password123' })
       ).rejects.toMatchObject({ status: 409, code: 'CONFLICT' })
     })
   })
@@ -81,8 +81,11 @@ describe('authService', () => {
     it('clears access token even if backend call fails', async () => {
       server.use(
         http.post(`${BASE}/auth/logout`, () => {
-          return HttpResponse.json({ detail: { code: 'INTERNAL_ERROR', message: 'Server error' } }, { status: 500 })
-        }),
+          return HttpResponse.json(
+            { detail: { code: 'INTERNAL_ERROR', message: 'Server error' } },
+            { status: 500 }
+          )
+        })
       )
       await authService.login({ email: 'test@example.com', password: 'password123' })
       await authService.logout()
@@ -96,7 +99,7 @@ describe('authService', () => {
           const text = await request.text()
           capturedBody = text ? JSON.parse(text) : {}
           return new HttpResponse(null, { status: 204 })
-        }),
+        })
       )
       await authService.login({ email: 'test@example.com', password: 'password123' })
       await authService.logout()
@@ -120,7 +123,7 @@ describe('authService', () => {
           const text = await request.text()
           capturedBody = text ? JSON.parse(text) : {}
           return HttpResponse.json(mockNewTokens, { status: 200 })
-        }),
+        })
       )
       await authService.login({ email: 'test@example.com', password: 'password123' })
       await authService.refreshToken()
@@ -148,9 +151,9 @@ describe('authService', () => {
         http.post(`${BASE}/auth/refresh`, () => {
           return HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'No refresh token' } },
-            { status: 401 },
+            { status: 401 }
           )
-        }),
+        })
       )
       await expect(authService.getCurrentUser()).rejects.toBeTruthy()
     })

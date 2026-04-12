@@ -685,9 +685,9 @@ async def create_numeric_question(
     title: str = "A numeric question",
     relevance: str | None = None,
 ) -> dict:
-    """Create a numeric question (question_type='number')."""
+    """Create a numeric question (question_type='numeric')."""
     payload: dict = {
-        "question_type": "number",
+        "question_type": "numeric",
         "title": title,
         "code": code,
         "sort_order": sort_order,

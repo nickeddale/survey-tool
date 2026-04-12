@@ -8,7 +8,14 @@
 
 import axios from 'axios'
 import apiClient from './apiClient'
-import type { ResolveFlowRequest, ResolveFlowResponse, ResponseListResponse, ResponseDetailFull, SurveyStatisticsResponse, ExportParams } from '../types/survey'
+import type {
+  ResolveFlowRequest,
+  ResolveFlowResponse,
+  ResponseListResponse,
+  ResponseDetailFull,
+  SurveyStatisticsResponse,
+  ExportParams,
+} from '../types/survey'
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? '/api/v1'
 
@@ -52,14 +59,11 @@ class ResponseService {
    * Create a new (in-progress) response for the given survey.
    * Returns the created ResponseResponse with its id.
    */
-  async createResponse(
-    surveyId: string,
-    answers: AnswerInput[] = [],
-  ): Promise<ResponseResponse> {
+  async createResponse(surveyId: string, answers: AnswerInput[] = []): Promise<ResponseResponse> {
     const response = await axios.post<ResponseResponse>(
       `${BASE_URL}/surveys/${surveyId}/responses`,
       { answers },
-      { headers: { 'Content-Type': 'application/json' } },
+      { headers: { 'Content-Type': 'application/json' } }
     )
     return response.data
   }
@@ -70,12 +74,12 @@ class ResponseService {
   async saveProgress(
     surveyId: string,
     responseId: string,
-    answers: AnswerInput[],
+    answers: AnswerInput[]
   ): Promise<ResponseResponse> {
     const response = await axios.patch<ResponseResponse>(
       `${BASE_URL}/surveys/${surveyId}/responses/${responseId}`,
       { answers },
-      { headers: { 'Content-Type': 'application/json' } },
+      { headers: { 'Content-Type': 'application/json' } }
     )
     return response.data
   }
@@ -86,12 +90,12 @@ class ResponseService {
   async completeResponse(
     surveyId: string,
     responseId: string,
-    answers: AnswerInput[],
+    answers: AnswerInput[]
   ): Promise<ResponseResponse> {
     const response = await axios.patch<ResponseResponse>(
       `${BASE_URL}/surveys/${surveyId}/responses/${responseId}`,
       { status: 'complete', answers },
-      { headers: { 'Content-Type': 'application/json' } },
+      { headers: { 'Content-Type': 'application/json' } }
     )
     return response.data
   }
@@ -100,14 +104,11 @@ class ResponseService {
    * Resolve survey flow logic: determines which questions/groups are visible
    * and computes piped text substitutions for the given answer state.
    */
-  async resolveFlow(
-    surveyId: string,
-    data: ResolveFlowRequest,
-  ): Promise<ResolveFlowResponse> {
+  async resolveFlow(surveyId: string, data: ResolveFlowRequest): Promise<ResolveFlowResponse> {
     const response = await axios.post<ResolveFlowResponse>(
       `${BASE_URL}/surveys/${surveyId}/logic/resolve-flow`,
       data,
-      { headers: { 'Content-Type': 'application/json' } },
+      { headers: { 'Content-Type': 'application/json' } }
     )
     return response.data
   }
@@ -127,24 +128,20 @@ class ResponseService {
       status?: string
       sort_by?: 'started_at' | 'completed_at' | 'status'
       sort_order?: 'asc' | 'desc'
-    } = {},
+    } = {}
   ): Promise<ResponseListResponse> {
-    const response = await apiClient.get<ResponseListResponse>(
-      `/surveys/${surveyId}/responses`,
-      { params },
-    )
+    const response = await apiClient.get<ResponseListResponse>(`/surveys/${surveyId}/responses`, {
+      params,
+    })
     return response.data
   }
 
   /**
    * Get full response detail with enriched answers. Requires authentication.
    */
-  async getResponseDetail(
-    surveyId: string,
-    responseId: string,
-  ): Promise<ResponseDetailFull> {
+  async getResponseDetail(surveyId: string, responseId: string): Promise<ResponseDetailFull> {
     const response = await apiClient.get<ResponseDetailFull>(
-      `/surveys/${surveyId}/responses/${responseId}/detail`,
+      `/surveys/${surveyId}/responses/${responseId}/detail`
     )
     return response.data
   }
@@ -153,10 +150,7 @@ class ResponseService {
    * Export survey responses as CSV or JSON. Requires authentication.
    * Returns a Blob for file download.
    */
-  async exportResponses(
-    surveyId: string,
-    params: ExportParams,
-  ): Promise<Blob> {
+  async exportResponses(surveyId: string, params: ExportParams): Promise<Blob> {
     const queryParams: Record<string, string> = {
       format: params.format,
     }
@@ -167,13 +161,10 @@ class ResponseService {
       queryParams.columns = params.columns.join(',')
     }
 
-    const response = await apiClient.get(
-      `/surveys/${surveyId}/responses/export`,
-      {
-        params: queryParams,
-        responseType: 'blob',
-      },
-    )
+    const response = await apiClient.get(`/surveys/${surveyId}/responses/export`, {
+      params: queryParams,
+      responseType: 'blob',
+    })
     return response.data as Blob
   }
 
@@ -182,7 +173,7 @@ class ResponseService {
    */
   async getSurveyStatistics(surveyId: string): Promise<SurveyStatisticsResponse> {
     const response = await apiClient.get<SurveyStatisticsResponse>(
-      `/surveys/${surveyId}/statistics`,
+      `/surveys/${surveyId}/statistics`
     )
     return response.data
   }

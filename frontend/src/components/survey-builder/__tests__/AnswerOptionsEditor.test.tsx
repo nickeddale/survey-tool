@@ -124,13 +124,7 @@ describe('show/hide based on question type', () => {
 
   choiceTypes.forEach((type) => {
     it(`renders for question type: ${type}`, () => {
-      render(
-        <AnswerOptionsEditor
-          {...defaultProps}
-          questionType={type}
-          options={[]}
-        />,
-      )
+      render(<AnswerOptionsEditor {...defaultProps} questionType={type} options={[]} />)
       expect(screen.getByTestId('answer-options-editor')).toBeInTheDocument()
     })
   })
@@ -138,11 +132,7 @@ describe('show/hide based on question type', () => {
   nonChoiceTypes.forEach((type) => {
     it(`returns null for question type: ${type}`, () => {
       const { container } = render(
-        <AnswerOptionsEditor
-          {...defaultProps}
-          questionType={type}
-          options={[]}
-        />,
+        <AnswerOptionsEditor {...defaultProps} questionType={type} options={[]} />
       )
       expect(container.firstChild).toBeNull()
     })
@@ -159,13 +149,7 @@ describe('option rendering', () => {
       makeOption('o1', 'A1', 'Very Satisfied', 1),
       makeOption('o2', 'A2', 'Satisfied', 2),
     ]
-    render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="single_choice"
-        options={options}
-      />,
-    )
+    render(<AnswerOptionsEditor {...defaultProps} questionType="single_choice" options={options} />)
 
     expect(screen.getByTestId('option-row-o1')).toBeInTheDocument()
     expect(screen.getByTestId('option-row-o2')).toBeInTheDocument()
@@ -173,63 +157,34 @@ describe('option rendering', () => {
 
   it('displays option code in badge', () => {
     const options = [makeOption('o1', 'A1', 'Very Satisfied')]
-    render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="single_choice"
-        options={options}
-      />,
-    )
+    render(<AnswerOptionsEditor {...defaultProps} questionType="single_choice" options={options} />)
 
     expect(screen.getByTestId('option-code-o1')).toHaveTextContent('A1')
   })
 
   it('renders title input with current value', () => {
     const options = [makeOption('o1', 'A1', 'Very Satisfied')]
-    render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="single_choice"
-        options={options}
-      />,
-    )
+    render(<AnswerOptionsEditor {...defaultProps} questionType="single_choice" options={options} />)
 
     expect(screen.getByTestId('option-title-o1')).toHaveValue('Very Satisfied')
   })
 
   it('shows option count in header', () => {
     const options = [makeOption('o1', 'A1', 'Opt 1'), makeOption('o2', 'A2', 'Opt 2')]
-    render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="single_choice"
-        options={options}
-      />,
-    )
+    render(<AnswerOptionsEditor {...defaultProps} questionType="single_choice" options={options} />)
 
     expect(screen.getByText('Answer Options (2)')).toBeInTheDocument()
   })
 
   it('shows empty state when no options', () => {
-    render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="single_choice"
-        options={[]}
-      />,
-    )
+    render(<AnswerOptionsEditor {...defaultProps} questionType="single_choice" options={[]} />)
 
     expect(screen.getByTestId('options-empty-state')).toBeInTheDocument()
   })
 
   it('hides empty state in readOnly mode', () => {
     render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="single_choice"
-        options={[]}
-        readOnly
-      />,
+      <AnswerOptionsEditor {...defaultProps} questionType="single_choice" options={[]} readOnly />
     )
 
     expect(screen.queryByTestId('options-empty-state')).not.toBeInTheDocument()
@@ -243,13 +198,7 @@ describe('option rendering', () => {
 describe('drag handles', () => {
   it('shows drag handle when not readOnly', () => {
     const options = [makeOption('o1', 'A1', 'Option')]
-    render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="single_choice"
-        options={options}
-      />,
-    )
+    render(<AnswerOptionsEditor {...defaultProps} questionType="single_choice" options={options} />)
 
     expect(screen.getByTestId('option-drag-handle-o1')).toBeInTheDocument()
   })
@@ -262,7 +211,7 @@ describe('drag handles', () => {
         questionType="single_choice"
         options={options}
         readOnly
-      />,
+      />
     )
 
     expect(screen.queryByTestId('option-drag-handle-o1')).not.toBeInTheDocument()
@@ -275,25 +224,14 @@ describe('drag handles', () => {
 
 describe('add option', () => {
   it('shows Add Option button when not readOnly', () => {
-    render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="single_choice"
-        options={[]}
-      />,
-    )
+    render(<AnswerOptionsEditor {...defaultProps} questionType="single_choice" options={[]} />)
 
     expect(screen.getByTestId('add-option-button')).toBeInTheDocument()
   })
 
   it('hides Add Option button when readOnly', () => {
     render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="single_choice"
-        options={[]}
-        readOnly
-      />,
+      <AnswerOptionsEditor {...defaultProps} questionType="single_choice" options={[]} readOnly />
     )
 
     expect(screen.queryByTestId('add-option-button')).not.toBeInTheDocument()
@@ -337,13 +275,7 @@ describe('add option', () => {
       ],
     })
 
-    render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="single_choice"
-        options={[]}
-      />,
-    )
+    render(<AnswerOptionsEditor {...defaultProps} questionType="single_choice" options={[]} />)
 
     await act(async () => {
       await user.click(screen.getByTestId('add-option-button'))
@@ -353,14 +285,16 @@ describe('add option', () => {
       expect(surveyService.createOption).toHaveBeenCalledWith(
         'survey-1',
         'q1',
-        expect.objectContaining({ code: 'A1' }),
+        expect.objectContaining({ code: 'A1' })
       )
     })
   })
 
   it('auto-generates codes A1, A2, A3... for new options', async () => {
     const existingOptions = [makeOption('o1', 'A1', 'Opt 1')]
-    vi.mocked(surveyService.createOption).mockResolvedValue(makeOption('opt-new', 'A2', 'Option A2'))
+    vi.mocked(surveyService.createOption).mockResolvedValue(
+      makeOption('opt-new', 'A2', 'Option A2')
+    )
 
     const user = userEvent.setup()
 
@@ -403,7 +337,7 @@ describe('add option', () => {
         {...defaultProps}
         questionType="single_choice"
         options={existingOptions}
-      />,
+      />
     )
 
     await act(async () => {
@@ -414,7 +348,7 @@ describe('add option', () => {
       expect(surveyService.createOption).toHaveBeenCalledWith(
         'survey-1',
         'q1',
-        expect.objectContaining({ code: 'A2' }),
+        expect.objectContaining({ code: 'A2' })
       )
     })
   })
@@ -458,13 +392,7 @@ describe('add option', () => {
       ],
     })
 
-    render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="single_choice"
-        options={[]}
-      />,
-    )
+    render(<AnswerOptionsEditor {...defaultProps} questionType="single_choice" options={[]} />)
 
     await act(async () => {
       await user.click(screen.getByTestId('add-option-button'))
@@ -489,13 +417,7 @@ describe('inline title edit', () => {
     const user = userEvent.setup()
     const options = [makeOption('o1', 'A1', 'Old Title')]
 
-    render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="single_choice"
-        options={options}
-      />,
-    )
+    render(<AnswerOptionsEditor {...defaultProps} questionType="single_choice" options={options} />)
 
     const titleInput = screen.getByTestId('option-title-o1')
     await act(async () => {
@@ -510,7 +432,7 @@ describe('inline title edit', () => {
         'survey-1',
         'q1',
         'o1',
-        expect.objectContaining({ title: 'New Title' }),
+        expect.objectContaining({ title: 'New Title' })
       )
     })
   })
@@ -523,7 +445,7 @@ describe('inline title edit', () => {
         questionType="single_choice"
         options={options}
         readOnly
-      />,
+      />
     )
 
     expect(screen.getByTestId('option-title-o1')).toBeDisabled()
@@ -539,13 +461,7 @@ describe('assessment value edit', () => {
     const user = userEvent.setup()
     const options = [{ ...makeOption('o1', 'A1', 'Option'), assessment_value: 5 }]
 
-    render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="single_choice"
-        options={options}
-      />,
-    )
+    render(<AnswerOptionsEditor {...defaultProps} questionType="single_choice" options={options} />)
 
     const assessInput = screen.getByTestId('option-assessment-o1')
     await act(async () => {
@@ -560,7 +476,7 @@ describe('assessment value edit', () => {
         'survey-1',
         'q1',
         'o1',
-        expect.objectContaining({ assessment_value: 10 }),
+        expect.objectContaining({ assessment_value: 10 })
       )
     })
   })
@@ -573,7 +489,7 @@ describe('assessment value edit', () => {
         questionType="single_choice"
         options={options}
         readOnly
-      />,
+      />
     )
 
     expect(screen.getByTestId('option-assessment-o1')).toBeDisabled()
@@ -587,13 +503,7 @@ describe('assessment value edit', () => {
 describe('delete option', () => {
   it('shows delete button for each option', () => {
     const options = [makeOption('o1', 'A1', 'Option')]
-    render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="single_choice"
-        options={options}
-      />,
-    )
+    render(<AnswerOptionsEditor {...defaultProps} questionType="single_choice" options={options} />)
 
     expect(screen.getByTestId('option-delete-o1')).toBeInTheDocument()
   })
@@ -606,7 +516,7 @@ describe('delete option', () => {
         questionType="single_choice"
         options={options}
         readOnly
-      />,
+      />
     )
 
     expect(screen.queryByTestId('option-delete-o1')).not.toBeInTheDocument()
@@ -616,13 +526,7 @@ describe('delete option', () => {
     const user = userEvent.setup()
     const options = [makeOption('o1', 'A1', 'Option')]
 
-    render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="single_choice"
-        options={options}
-      />,
-    )
+    render(<AnswerOptionsEditor {...defaultProps} questionType="single_choice" options={options} />)
 
     await act(async () => {
       await user.click(screen.getByTestId('option-delete-o1'))
@@ -669,13 +573,7 @@ describe('delete option', () => {
     })
 
     const options = [makeOption('o1', 'A1', 'Option')]
-    render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="single_choice"
-        options={options}
-      />,
-    )
+    render(<AnswerOptionsEditor {...defaultProps} questionType="single_choice" options={options} />)
 
     // Click delete, then confirm
     await act(async () => {
@@ -694,13 +592,7 @@ describe('delete option', () => {
     const user = userEvent.setup()
     const options = [makeOption('o1', 'A1', 'Option')]
 
-    render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="single_choice"
-        options={options}
-      />,
-    )
+    render(<AnswerOptionsEditor {...defaultProps} questionType="single_choice" options={options} />)
 
     await act(async () => {
       await user.click(screen.getByTestId('option-delete-o1'))
@@ -756,13 +648,7 @@ describe('delete option', () => {
     })
 
     const options = [makeOption('o1', 'A1', 'Option')]
-    render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="single_choice"
-        options={options}
-      />,
-    )
+    render(<AnswerOptionsEditor {...defaultProps} questionType="single_choice" options={options} />)
 
     await act(async () => {
       await user.click(screen.getByTestId('option-delete-o1'))
@@ -789,26 +675,14 @@ describe('delete option', () => {
 describe('image_picker question type', () => {
   it('shows image URL field for image_picker', () => {
     const options = [makeOption('o1', 'A1', 'Image Option')]
-    render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="image_picker"
-        options={options}
-      />,
-    )
+    render(<AnswerOptionsEditor {...defaultProps} questionType="image_picker" options={options} />)
 
     expect(screen.getByTestId('option-image-url-o1')).toBeInTheDocument()
   })
 
   it('does not show image URL field for non image_picker', () => {
     const options = [makeOption('o1', 'A1', 'Option')]
-    render(
-      <AnswerOptionsEditor
-        {...defaultProps}
-        questionType="single_choice"
-        options={options}
-      />,
-    )
+    render(<AnswerOptionsEditor {...defaultProps} questionType="single_choice" options={options} />)
 
     expect(screen.queryByTestId('option-image-url-o1')).not.toBeInTheDocument()
   })
@@ -821,7 +695,7 @@ describe('image_picker question type', () => {
         questionType="image_picker"
         options={options}
         readOnly
-      />,
+      />
     )
 
     expect(screen.getByTestId('option-image-url-o1')).toBeDisabled()

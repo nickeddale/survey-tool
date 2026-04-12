@@ -28,9 +28,7 @@ describe('ValidationErrors — with errors', () => {
   })
 
   it('renders all error messages', () => {
-    render(
-      <ValidationErrors errors={['Error one', 'Error two', 'Error three']} />
-    )
+    render(<ValidationErrors errors={['Error one', 'Error two', 'Error three']} />)
     expect(screen.getByText('Error one')).toBeInTheDocument()
     expect(screen.getByText('Error two')).toBeInTheDocument()
     expect(screen.getByText('Error three')).toBeInTheDocument()

@@ -43,10 +43,7 @@ interface ConditionBuilderProps {
 
 function ConditionBuilder({ conditions, questions, onChange }: ConditionBuilderProps) {
   function addCondition() {
-    onChange([
-      ...conditions,
-      { question_id: '', operator: 'eq', value: '' },
-    ])
+    onChange([...conditions, { question_id: '', operator: 'eq', value: '' }])
   }
 
   function removeCondition(index: number) {
@@ -54,9 +51,7 @@ function ConditionBuilder({ conditions, questions, onChange }: ConditionBuilderP
   }
 
   function updateCondition(index: number, patch: Partial<ConditionRow>) {
-    onChange(
-      conditions.map((c, i) => (i === index ? { ...c, ...patch } : c)),
-    )
+    onChange(conditions.map((c, i) => (i === index ? { ...c, ...patch } : c)))
   }
 
   return (
@@ -122,11 +117,7 @@ function ConditionBuilder({ conditions, questions, onChange }: ConditionBuilderP
               <Input
                 value={condition.value}
                 onChange={(e) => updateCondition(index, { value: e.target.value })}
-                placeholder={
-                  condition.operator === 'in'
-                    ? 'val1, val2, ...'
-                    : 'Value'
-                }
+                placeholder={condition.operator === 'in' ? 'val1, val2, ...' : 'Value'}
                 aria-label={`Condition ${index + 1} value`}
                 className="flex-1 min-w-[120px]"
               />

@@ -111,11 +111,7 @@ function GroupContent({ group }: GroupContentProps) {
           .slice()
           .sort((a, b) => a.sort_order - b.sort_order)
           .map((question) => (
-            <QuestionPreview
-              key={question.id}
-              question={question as BuilderQuestion}
-              interactive
-            />
+            <QuestionPreview key={question.id} question={question as BuilderQuestion} interactive />
           ))}
         {group.questions.length === 0 && (
           <p className="text-sm text-muted-foreground italic" data-testid="preview-group-empty">
@@ -175,15 +171,13 @@ function SurveyPreviewPage() {
     return () => {
       cancelled = true
     }
-  }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [id])
 
   // -------------------------------------------------------------------------
   // Derived state
   // -------------------------------------------------------------------------
 
-  const sortedGroups = survey
-    ? [...survey.groups].sort((a, b) => a.sort_order - b.sort_order)
-    : []
+  const sortedGroups = survey ? [...survey.groups].sort((a, b) => a.sort_order - b.sort_order) : []
 
   const onePagePerGroup = survey?.settings?.one_page_per_group !== false
   // Default to true; only false if explicitly set to false
@@ -191,7 +185,8 @@ function SurveyPreviewPage() {
   const totalGroups = sortedGroups.length
 
   // For progress: welcome = 0, groups = 1..n, end = n+1
-  const progressCurrent = screen === 'welcome' ? 0 : screen === 'end' ? totalGroups : currentGroupIndex + 1
+  const progressCurrent =
+    screen === 'welcome' ? 0 : screen === 'end' ? totalGroups : currentGroupIndex + 1
   const progressTotal = totalGroups
 
   const handleReturnToBuilder = () => {
@@ -242,8 +237,14 @@ function SurveyPreviewPage() {
 
   if (error || !survey) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen gap-4" data-testid="preview-error">
-        <div className="p-4 text-sm text-destructive bg-destructive/10 rounded-md max-w-md text-center" role="alert">
+      <div
+        className="flex flex-col items-center justify-center h-screen gap-4"
+        data-testid="preview-error"
+      >
+        <div
+          className="p-4 text-sm text-destructive bg-destructive/10 rounded-md max-w-md text-center"
+          role="alert"
+        >
           {error ?? 'Failed to load survey.'}
         </div>
         <Button variant="outline" onClick={() => navigate('/surveys')}>
@@ -282,7 +283,10 @@ function SurveyPreviewPage() {
 
       {/* Progress bar (shown when in group or end screen and there are groups) */}
       {totalGroups > 0 && (screen === 'group' || screen === 'end') && (
-        <div className="px-8 pt-4 max-w-2xl w-full mx-auto shrink-0" data-testid="preview-progress-container">
+        <div
+          className="px-8 pt-4 max-w-2xl w-full mx-auto shrink-0"
+          data-testid="preview-progress-container"
+        >
           <ProgressBar current={progressCurrent} total={progressTotal} />
         </div>
       )}
@@ -293,7 +297,10 @@ function SurveyPreviewPage() {
           {/* Welcome screen */}
           {screen === 'welcome' && (
             <div data-testid="preview-welcome-screen">
-              <h1 className="text-3xl font-bold text-foreground mb-4" data-testid="preview-survey-title">
+              <h1
+                className="text-3xl font-bold text-foreground mb-4"
+                data-testid="preview-survey-title"
+              >
                 {survey.title}
               </h1>
               {survey.description && (
@@ -342,7 +349,10 @@ function SurveyPreviewPage() {
           {/* End screen */}
           {screen === 'end' && (
             <div data-testid="preview-end-screen">
-              <h1 className="text-3xl font-bold text-foreground mb-4" data-testid="preview-end-title">
+              <h1
+                className="text-3xl font-bold text-foreground mb-4"
+                data-testid="preview-end-title"
+              >
                 Thank You!
               </h1>
               {survey.end_message ? (
@@ -363,16 +373,12 @@ function SurveyPreviewPage() {
       </main>
 
       {/* Navigation footer */}
-      {(screen === 'group') && (
+      {screen === 'group' && (
         <footer
           className="flex items-center justify-between px-8 py-4 border-t border-border bg-background shrink-0"
           data-testid="preview-navigation"
         >
-          <Button
-            variant="outline"
-            onClick={handlePrevious}
-            data-testid="preview-previous-button"
-          >
+          <Button variant="outline" onClick={handlePrevious} data-testid="preview-previous-button">
             <ArrowLeft size={14} />
             Previous
           </Button>
@@ -383,14 +389,15 @@ function SurveyPreviewPage() {
             </span>
           )}
 
-          <Button
-            onClick={handleNext}
-            data-testid="preview-next-button"
-          >
+          <Button onClick={handleNext} data-testid="preview-next-button">
             {onePagePerGroup && currentGroupIndex < totalGroups - 1 ? (
-              <>Next <ArrowRight size={14} /></>
+              <>
+                Next <ArrowRight size={14} />
+              </>
             ) : (
-              <>Submit <ArrowRight size={14} /></>
+              <>
+                Submit <ArrowRight size={14} />
+              </>
             )}
           </Button>
         </footer>

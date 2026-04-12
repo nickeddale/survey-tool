@@ -18,7 +18,7 @@ import type { EvaluateExpressionResult } from '../../types/survey'
 export async function handleTestExpression(
   surveyId: string,
   expression: string,
-  sampleValues: Record<string, string>,
+  sampleValues: Record<string, string>
 ): Promise<{ result: boolean | null; errors: EvaluateExpressionResult['errors'] }> {
   try {
     const result = await surveyService.evaluateExpression(surveyId, {
@@ -82,7 +82,7 @@ export function ExpressionPreview({
   }, [surveyId, expression, sampleValues])
 
   const hasMissingValues = parsedVariables.some(
-    (v) => sampleValues[v] === undefined || sampleValues[v] === '',
+    (v) => sampleValues[v] === undefined || sampleValues[v] === ''
   )
 
   return (
@@ -145,9 +145,7 @@ export function ExpressionPreview({
         {!isTesting && testResult !== null && (
           <span
             className={`text-xs font-semibold px-2 py-0.5 rounded ${
-              testResult
-                ? 'bg-green-100 text-green-700'
-                : 'bg-red-100 text-red-700'
+              testResult ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
             }`}
             data-testid="test-expression-result"
           >

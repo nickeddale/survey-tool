@@ -49,11 +49,7 @@ function renderPreview(props: {
   parsedVariables?: string[]
   disabled?: boolean
 }) {
-  const {
-    expression = "{Q1} == 'yes'",
-    parsedVariables = ['Q1'],
-    disabled = false,
-  } = props
+  const { expression = "{Q1} == 'yes'", parsedVariables = ['Q1'], disabled = false } = props
 
   return render(
     <ExpressionPreview
@@ -61,7 +57,7 @@ function renderPreview(props: {
       expression={expression}
       parsedVariables={parsedVariables}
       disabled={disabled}
-    />,
+    />
   )
 }
 
@@ -78,14 +74,10 @@ describe('handleTestExpression — pure function', () => {
           errors: [],
         }
         return HttpResponse.json(response, { status: 200 })
-      }),
+      })
     )
 
-    const { result, errors } = await handleTestExpression(
-      SURVEY_ID,
-      "{Q1} == 'yes'",
-      { Q1: 'yes' },
-    )
+    const { result, errors } = await handleTestExpression(SURVEY_ID, "{Q1} == 'yes'", { Q1: 'yes' })
 
     expect(result).toBe(true)
     expect(errors).toHaveLength(0)
@@ -99,14 +91,10 @@ describe('handleTestExpression — pure function', () => {
           errors: [],
         }
         return HttpResponse.json(response, { status: 200 })
-      }),
+      })
     )
 
-    const { result, errors } = await handleTestExpression(
-      SURVEY_ID,
-      "{Q1} == 'Yes'",
-      { Q1: 'No' },
-    )
+    const { result, errors } = await handleTestExpression(SURVEY_ID, "{Q1} == 'Yes'", { Q1: 'No' })
 
     expect(result).toBe(false)
     expect(errors).toHaveLength(0)
@@ -120,14 +108,10 @@ describe('handleTestExpression — pure function', () => {
           errors: [{ message: 'Syntax error', position: 0, code: 'SYNTAX_ERROR' }],
         }
         return HttpResponse.json(response, { status: 200 })
-      }),
+      })
     )
 
-    const { result, errors } = await handleTestExpression(
-      SURVEY_ID,
-      "{Q1} === bad",
-      { Q1: 'yes' },
-    )
+    const { result, errors } = await handleTestExpression(SURVEY_ID, '{Q1} === bad', { Q1: 'yes' })
 
     expect(result).toBeNull()
     expect(errors).toHaveLength(1)
@@ -141,16 +125,12 @@ describe('handleTestExpression — pure function', () => {
       http.post(`${BASE}/surveys/:surveyId/logic/evaluate-expression`, async () => {
         return HttpResponse.json(
           { detail: { code: 'SERVER_ERROR', message: 'Internal error' } },
-          { status: 500 },
+          { status: 500 }
         )
-      }),
+      })
     )
 
-    const { result, errors } = await handleTestExpression(
-      SURVEY_ID,
-      "{Q1} == 'yes'",
-      { Q1: 'yes' },
-    )
+    const { result, errors } = await handleTestExpression(SURVEY_ID, "{Q1} == 'yes'", { Q1: 'yes' })
 
     expect(result).toBeNull()
     expect(errors).toHaveLength(0)
@@ -166,7 +146,7 @@ describe('handleTestExpression — pure function', () => {
           context: Record<string, string>
         }
         return HttpResponse.json({ result: true, errors: [] }, { status: 200 })
-      }),
+      })
     )
 
     await handleTestExpression(SURVEY_ID, '{Q1} > {Q2}', { Q1: '5', Q2: '3' })
@@ -187,7 +167,7 @@ describe('handleTestExpression — pure function', () => {
           context: Record<string, string>
         }
         return HttpResponse.json({ result: true, errors: [] }, { status: 200 })
-      }),
+      })
     )
 
     await handleTestExpression(SURVEY_ID, "{Q1} == 'Yes'", { Q1: 'Yes' })
@@ -202,7 +182,7 @@ describe('handleTestExpression — pure function', () => {
     server.use(
       http.post(`${BASE}/surveys/:surveyId/logic/evaluate-expression`, async () => {
         return HttpResponse.json({ result: false, errors: [] }, { status: 200 })
-      }),
+      })
     )
 
     const { result } = await handleTestExpression(SURVEY_ID, "{Q1} == 'Yes'", { Q1: 'No' })
@@ -230,7 +210,7 @@ describe('ExpressionPreview — rendering', () => {
   it('shows message when no variables are referenced', () => {
     renderPreview({ parsedVariables: [] })
     expect(
-      screen.getByText('No variables referenced in the current expression.'),
+      screen.getByText('No variables referenced in the current expression.')
     ).toBeInTheDocument()
   })
 
@@ -249,11 +229,10 @@ describe('ExpressionPreview — true result', () => {
   it('shows true result after evaluation returns true', async () => {
     server.use(
       http.post(`${BASE}/surveys/:surveyId/logic/evaluate-expression`, async () => {
-        return HttpResponse.json(
-          { result: true, errors: [] } satisfies EvaluateExpressionResult,
-          { status: 200 },
-        )
-      }),
+        return HttpResponse.json({ result: true, errors: [] } satisfies EvaluateExpressionResult, {
+          status: 200,
+        })
+      })
     )
 
     renderPreview({ parsedVariables: ['Q1'] })
@@ -282,11 +261,10 @@ describe('ExpressionPreview — false result', () => {
   it('shows false result when evaluate endpoint returns result: false', async () => {
     server.use(
       http.post(`${BASE}/surveys/:surveyId/logic/evaluate-expression`, async () => {
-        return HttpResponse.json(
-          { result: false, errors: [] } satisfies EvaluateExpressionResult,
-          { status: 200 },
-        )
-      }),
+        return HttpResponse.json({ result: false, errors: [] } satisfies EvaluateExpressionResult, {
+          status: 200,
+        })
+      })
     )
 
     renderPreview({ parsedVariables: ['Q1'] })
@@ -316,9 +294,9 @@ describe('ExpressionPreview — false result', () => {
             result: null,
             errors: [{ message: 'Type mismatch', position: 5, code: 'SYNTAX_ERROR' as const }],
           } satisfies EvaluateExpressionResult,
-          { status: 200 },
+          { status: 200 }
         )
-      }),
+      })
     )
 
     renderPreview({ parsedVariables: ['Q1'] })
@@ -353,7 +331,7 @@ describe('ExpressionPreview — mock response shape assertion', () => {
         }
         capturedResponse = response
         return HttpResponse.json(response, { status: 200 })
-      }),
+      })
     )
 
     renderPreview({ parsedVariables: ['Q1'] })

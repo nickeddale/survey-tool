@@ -53,7 +53,6 @@ from app.services.validators.misc_validators import (
     validate_time_answer,
     validate_datetime_answer,
     validate_file_upload_answer,
-    validate_number_answer,
 )
 from app.services.validators.special_validators import (
     validate_ranking_settings,
@@ -89,7 +88,7 @@ _CHOICE_TYPES = frozenset({"single_choice", "dropdown", "multiple_choice"})
 _MATRIX_TYPES = frozenset({"matrix", "matrix_dropdown", "matrix_dynamic"})
 _SCALAR_TYPES = frozenset({"numeric", "rating", "boolean", "date"})
 _TEXT_TYPES = frozenset({"short_text", "long_text", "huge_text", "email", "phone", "url"})
-_MISC_TYPES = frozenset({"scale", "yes_no", "time", "datetime", "file_upload", "number"})
+_MISC_TYPES = frozenset({"scale", "yes_no", "time", "datetime", "file_upload"})
 # Special types that require answer_options in their config/answer validators
 _SPECIAL_CHOICE_TYPES = frozenset({"ranking", "image_picker"})
 
@@ -154,7 +153,6 @@ _ANSWER_VALIDATORS: dict[str, Callable[..., None]] = {
     "time": validate_time_answer,
     "datetime": validate_datetime_answer,
     "file_upload": validate_file_upload_answer,
-    "number": validate_number_answer,
     # special choice-like (signature: answer, question, answer_options)
     "ranking": validate_ranking_answer,
     "image_picker": validate_image_picker_answer,

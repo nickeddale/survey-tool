@@ -63,7 +63,7 @@ function getSessionSeed(questionId: string): number {
 function validate(
   value: Record<string, string>,
   subquestionCodes: string[],
-  isAllRowsRequired: boolean,
+  isAllRowsRequired: boolean
 ): string[] {
   const errs: string[] = []
   if (isAllRowsRequired) {
@@ -79,7 +79,12 @@ function validate(
 // Component
 // ---------------------------------------------------------------------------
 
-export function MatrixInput({ value, onChange, question, errors: externalErrors }: MatrixInputProps) {
+export function MatrixInput({
+  value,
+  onChange,
+  question,
+  errors: externalErrors,
+}: MatrixInputProps) {
   const s = (question.settings ?? {}) as Partial<MatrixSettings>
   const alternateRows = s.alternate_rows ?? true
   const isAllRowsRequired = s.is_all_rows_required ?? false
@@ -115,11 +120,7 @@ export function MatrixInput({ value, onChange, question, errors: externalErrors 
   }
 
   return (
-    <div
-      className="space-y-2"
-      data-testid={`matrix-input-${question.id}`}
-      onBlur={handleBlur}
-    >
+    <div className="space-y-2" data-testid={`matrix-input-${question.id}`} onBlur={handleBlur}>
       <div className="overflow-x-auto">
         <table
           className="w-full border-collapse text-sm"

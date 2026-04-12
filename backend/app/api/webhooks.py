@@ -77,9 +77,7 @@ async def create_webhook(
     session.add(webhook)
     await session.flush()
     await session.refresh(webhook)
-    response = WebhookCreateResponse.model_validate(webhook)
-    response.secret = plaintext_secret
-    return response
+    return WebhookCreateResponse.model_validate(webhook)
 
 
 @router.get(

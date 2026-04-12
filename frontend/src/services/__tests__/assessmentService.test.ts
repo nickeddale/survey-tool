@@ -22,7 +22,9 @@ describe('assessmentService', () => {
   describe('listAssessments()', () => {
     it('returns a list of assessments for a survey', async () => {
       const result = await assessmentService.listAssessments(SURVEY_ID)
-      expect(result.items).toHaveLength(mockAssessments.filter((a) => a.survey_id === SURVEY_ID).length)
+      expect(result.items).toHaveLength(
+        mockAssessments.filter((a) => a.survey_id === SURVEY_ID).length
+      )
       expect(result.total).toBeGreaterThanOrEqual(2)
     })
 
@@ -37,9 +39,9 @@ describe('assessmentService', () => {
         http.get(`${BASE}/surveys/${SURVEY_ID}/assessments`, () =>
           HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-            { status: 401 },
-          ),
-        ),
+            { status: 401 }
+          )
+        )
       )
 
       clearTokens()
@@ -53,9 +55,9 @@ describe('assessmentService', () => {
         http.get(`${BASE}/surveys/${SURVEY_ID}/assessments`, () =>
           HttpResponse.json(
             { detail: { code: 'INTERNAL_SERVER_ERROR', message: 'Server error' } },
-            { status: 500 },
-          ),
-        ),
+            { status: 500 }
+          )
+        )
       )
 
       await expect(assessmentService.listAssessments(SURVEY_ID)).rejects.toThrow()
@@ -76,7 +78,7 @@ describe('assessmentService', () => {
 
     it('throws ApiError on 404', async () => {
       await expect(
-        assessmentService.getAssessment(SURVEY_ID, 'non-existent-id'),
+        assessmentService.getAssessment(SURVEY_ID, 'non-existent-id')
       ).rejects.toMatchObject({ status: 404 })
     })
   })
@@ -123,9 +125,9 @@ describe('assessmentService', () => {
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
             },
-            { status: 201 },
+            { status: 201 }
           )
-        }),
+        })
       )
 
       await assessmentService.createAssessment(SURVEY_ID, {
@@ -161,7 +163,7 @@ describe('assessmentService', () => {
 
     it('throws ApiError on 404', async () => {
       await expect(
-        assessmentService.updateAssessment(SURVEY_ID, 'non-existent-id', { name: 'X' }),
+        assessmentService.updateAssessment(SURVEY_ID, 'non-existent-id', { name: 'X' })
       ).rejects.toMatchObject({ status: 404 })
     })
   })
@@ -174,7 +176,7 @@ describe('assessmentService', () => {
     it('deletes an assessment without returning data', async () => {
       const target = mockAssessments[0]
       await expect(
-        assessmentService.deleteAssessment(SURVEY_ID, target.id),
+        assessmentService.deleteAssessment(SURVEY_ID, target.id)
       ).resolves.toBeUndefined()
     })
 
@@ -183,15 +185,15 @@ describe('assessmentService', () => {
         http.delete(`${BASE}/surveys/${SURVEY_ID}/assessments/:assessmentId`, () =>
           HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-            { status: 401 },
-          ),
-        ),
+            { status: 401 }
+          )
+        )
       )
 
       clearTokens()
-      await expect(
-        assessmentService.deleteAssessment(SURVEY_ID, 'any-id'),
-      ).rejects.toMatchObject({ status: 401 })
+      await expect(assessmentService.deleteAssessment(SURVEY_ID, 'any-id')).rejects.toMatchObject({
+        status: 401,
+      })
     })
   })
 })

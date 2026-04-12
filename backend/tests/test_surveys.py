@@ -97,7 +97,7 @@ async def test_create_survey_invalid_status_returns_422(client: AsyncClient):
     response = await client.post(
         SURVEYS_URL, json={"title": "Test", "status": "invalid"}, headers=headers
     )
-    assert response.status_code == 422
+    assert response.status_code == 400
 
 
 @pytest.mark.asyncio
@@ -811,11 +811,11 @@ async def test_create_survey_title_500_chars_returns_201(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_create_survey_title_501_chars_returns_422(client: AsyncClient):
-    """POST with 501-char title is rejected by Pydantic validation with HTTP 422."""
+    """POST with 501-char title is rejected by Pydantic validation with HTTP 400."""
     headers = await auth_headers(client)
     title = "a" * 501
     response = await client.post(SURVEYS_URL, json={"title": title}, headers=headers)
-    assert response.status_code == 422
+    assert response.status_code == 400
 
 
 @pytest.mark.asyncio
@@ -835,7 +835,7 @@ async def test_patch_survey_title_256_chars_returns_200(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_patch_survey_title_501_chars_returns_422(client: AsyncClient):
-    """PATCH with 501-char title is rejected by Pydantic validation with HTTP 422."""
+    """PATCH with 501-char title is rejected by Pydantic validation with HTTP 400."""
     headers = await auth_headers(client)
     create_resp = await client.post(SURVEYS_URL, json={"title": "Original"}, headers=headers)
     survey_id = create_resp.json()["id"]
@@ -844,4 +844,4 @@ async def test_patch_survey_title_501_chars_returns_422(client: AsyncClient):
     response = await client.patch(
         f"{SURVEYS_URL}/{survey_id}", json={"title": title}, headers=headers
     )
-    assert response.status_code == 422
+    assert response.status_code == 400

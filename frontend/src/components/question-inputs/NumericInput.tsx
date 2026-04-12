@@ -59,7 +59,12 @@ function validate(value: string, s: Partial<NumericSettings>, isRequired: boolea
 // Component
 // ---------------------------------------------------------------------------
 
-export function NumericInput({ value, onChange, question, errors: externalErrors }: NumericInputProps) {
+export function NumericInput({
+  value,
+  onChange,
+  question,
+  errors: externalErrors,
+}: NumericInputProps) {
   const s = (question.settings ?? {}) as Partial<NumericSettings>
   const prefix = s.prefix ?? null
   const suffix = s.suffix ?? null

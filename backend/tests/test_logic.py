@@ -574,14 +574,20 @@ def test_validate_expression_error_codes(
         )
 
     assert isinstance(result, ValidationResult)
-    assert len(result.errors) >= 1, (
-        f"Expected at least one error with code={expected_code!r}, got no errors"
-    )
-    error_codes = [e.code for e in result.errors]
-    # FORWARD_REFERENCE may appear as an error (not just a warning) in the engine
-    assert expected_code in error_codes, (
-        f"Expected error code {expected_code!r} in {error_codes!r}"
-    )
+    # FORWARD_REFERENCE is reported as a warning, not an error
+    if expected_code == "FORWARD_REFERENCE":
+        warning_codes = [w.code for w in result.warnings]
+        assert expected_code in warning_codes, (
+            f"Expected warning code {expected_code!r} in {warning_codes!r}"
+        )
+    else:
+        assert len(result.errors) >= 1, (
+            f"Expected at least one error with code={expected_code!r}, got no errors"
+        )
+        error_codes = [e.code for e in result.errors]
+        assert expected_code in error_codes, (
+            f"Expected error code {expected_code!r} in {error_codes!r}"
+        )
 
 
 # ---------------------------------------------------------------------------

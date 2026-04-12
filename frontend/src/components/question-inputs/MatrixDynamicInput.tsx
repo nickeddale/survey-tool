@@ -33,7 +33,12 @@ export interface MatrixDynamicInputProps {
 // Component
 // ---------------------------------------------------------------------------
 
-export function MatrixDynamicInput({ value, onChange, question, errors: externalErrors }: MatrixDynamicInputProps) {
+export function MatrixDynamicInput({
+  value,
+  onChange,
+  question,
+  errors: externalErrors,
+}: MatrixDynamicInputProps) {
   const s = (question.settings ?? {}) as Partial<MatrixDynamicSettings>
   const rowCount = s.row_count ?? 1
   const minRowCount = s.min_row_count ?? 0
@@ -56,9 +61,7 @@ export function MatrixDynamicInput({ value, onChange, question, errors: external
   const canRemoveRow = rows.length > minRowCount
 
   function handleCellChange(rowIdx: number, colCode: string, cellValue: string) {
-    const next = rows.map((row, i) =>
-      i === rowIdx ? { ...row, [colCode]: cellValue } : row
-    )
+    const next = rows.map((row, i) => (i === rowIdx ? { ...row, [colCode]: cellValue } : row))
     setRows(next)
     onChange(next)
   }
@@ -78,10 +81,7 @@ export function MatrixDynamicInput({ value, onChange, question, errors: external
   }
 
   return (
-    <div
-      className="space-y-3"
-      data-testid={`matrix-dynamic-input-${question.id}`}
-    >
+    <div className="space-y-3" data-testid={`matrix-dynamic-input-${question.id}`}>
       <div className="overflow-x-auto">
         <table
           className="w-full border-collapse text-sm"
@@ -106,7 +106,11 @@ export function MatrixDynamicInput({ value, onChange, question, errors: external
             {rows.map((row, rowIdx) => (
               <tr key={rowIdx} data-testid={`matrix-dynamic-row-${rowIdx}`}>
                 {question.answer_options.map((option) => (
-                  <td key={option.id} className="px-3 py-2" data-testid={`matrix-dynamic-cell-${rowIdx}-${option.code}`}>
+                  <td
+                    key={option.id}
+                    className="px-3 py-2"
+                    data-testid={`matrix-dynamic-cell-${rowIdx}-${option.code}`}
+                  >
                     <input
                       type="text"
                       value={row[option.code] ?? ''}

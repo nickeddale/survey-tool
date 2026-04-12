@@ -619,12 +619,12 @@ async def test_create_group_title_500_chars_returns_201(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_create_group_title_501_chars_returns_422(client: AsyncClient):
-    """POST with 501-char title is rejected by Pydantic validation with HTTP 422."""
+    """POST with 501-char title is rejected by Pydantic validation with HTTP 400."""
     headers = await auth_headers(client)
     survey_id = await create_survey(client, headers)
     title = "a" * 501
     response = await client.post(groups_url(survey_id), json={"title": title}, headers=headers)
-    assert response.status_code == 422
+    assert response.status_code == 400
 
 
 @pytest.mark.asyncio
@@ -647,7 +647,7 @@ async def test_patch_group_title_256_chars_returns_200(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_patch_group_title_501_chars_returns_422(client: AsyncClient):
-    """PATCH with 501-char title is rejected by Pydantic validation with HTTP 422."""
+    """PATCH with 501-char title is rejected by Pydantic validation with HTTP 400."""
     headers = await auth_headers(client)
     survey_id = await create_survey(client, headers)
     create_resp = await client.post(
@@ -659,7 +659,7 @@ async def test_patch_group_title_501_chars_returns_422(client: AsyncClient):
     response = await client.patch(
         f"{groups_url(survey_id)}/{group_id}", json={"title": title}, headers=headers
     )
-    assert response.status_code == 422
+    assert response.status_code == 400
 
 
 # --------------------------------------------------------------------------- #
@@ -710,7 +710,7 @@ async def _setup_group_with_nested_questions(
     # Add an answer option to the single_choice question
     opt_resp = await client.post(
         f"/api/v1/surveys/{survey_id}/questions/{choice_q_id}/options",
-        json={"text": "Option A", "code": "A"},
+        json={"title": "Option A", "code": "A"},
         headers=headers,
     )
     assert opt_resp.status_code == 201

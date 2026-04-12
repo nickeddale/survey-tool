@@ -129,10 +129,7 @@ describe('MatrixInput — rendering', () => {
 
   it('renders a radio button per cell (subquestion × option)', () => {
     const subquestions = [makeSubquestion({ code: 'SQ001' })]
-    const options = [
-      makeOption({ code: 'A1' }),
-      makeOption({ id: 'opt-2', code: 'A2' }),
-    ]
+    const options = [makeOption({ code: 'A1' }), makeOption({ id: 'opt-2', code: 'A2' })]
     const question = makeQuestion({ subquestions, answer_options: options })
     render(<MatrixInput value={{}} onChange={vi.fn()} question={question} />)
     expect(screen.getByTestId('matrix-cell-SQ001-A1')).toBeInTheDocument()
@@ -143,10 +140,7 @@ describe('MatrixInput — rendering', () => {
 
   it('marks the selected radio as checked', () => {
     const subquestions = [makeSubquestion({ code: 'SQ001' })]
-    const options = [
-      makeOption({ code: 'A1' }),
-      makeOption({ id: 'opt-2', code: 'A2' }),
-    ]
+    const options = [makeOption({ code: 'A1' }), makeOption({ id: 'opt-2', code: 'A2' })]
     const question = makeQuestion({ subquestions, answer_options: options })
     render(<MatrixInput value={{ SQ001: 'A1' }} onChange={vi.fn()} question={question} />)
     expect(screen.getByTestId('matrix-radio-SQ001-A1')).toBeChecked()
@@ -306,7 +300,9 @@ describe('MatrixInput — is_all_rows_required validation', () => {
       settings: makeSettings({ is_all_rows_required: true }),
       subquestions,
     })
-    render(<MatrixInput value={{ SQ001: 'A1', SQ002: 'A1' }} onChange={vi.fn()} question={question} />)
+    render(
+      <MatrixInput value={{ SQ001: 'A1', SQ002: 'A1' }} onChange={vi.fn()} question={question} />
+    )
 
     fireEvent.blur(screen.getByTestId('matrix-input-q-matrix-1'))
 
@@ -335,7 +331,12 @@ describe('MatrixInput — external errors prop', () => {
   it('displays external errors immediately without blur', () => {
     const question = makeQuestion()
     render(
-      <MatrixInput value={{}} onChange={vi.fn()} question={question} errors={['Server error occurred']} />
+      <MatrixInput
+        value={{}}
+        onChange={vi.fn()}
+        question={question}
+        errors={['Server error occurred']}
+      />
     )
     expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error occurred')
   })

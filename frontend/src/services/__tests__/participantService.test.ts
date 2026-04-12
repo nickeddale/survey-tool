@@ -23,7 +23,7 @@ describe('participantService', () => {
     it('returns a list of participants for a survey', async () => {
       const result = await participantService.listParticipants(SURVEY_ID)
       expect(result.items).toHaveLength(
-        mockParticipants.filter((p) => p.survey_id === SURVEY_ID).length,
+        mockParticipants.filter((p) => p.survey_id === SURVEY_ID).length
       )
       expect(result.total).toBeGreaterThanOrEqual(2)
     })
@@ -44,9 +44,9 @@ describe('participantService', () => {
           capturedUrl = request.url
           return HttpResponse.json(
             { items: [], total: 0, page: 1, per_page: 20, pages: 1 },
-            { status: 200 },
+            { status: 200 }
           )
-        }),
+        })
       )
 
       await participantService.listParticipants(SURVEY_ID, { email: 'test@example.com' })
@@ -60,9 +60,9 @@ describe('participantService', () => {
           capturedUrl = request.url
           return HttpResponse.json(
             { items: [], total: 0, page: 1, per_page: 20, pages: 1 },
-            { status: 200 },
+            { status: 200 }
           )
-        }),
+        })
       )
 
       await participantService.listParticipants(SURVEY_ID, { completed: true })
@@ -74,9 +74,9 @@ describe('participantService', () => {
         http.get(`${BASE}/surveys/${SURVEY_ID}/participants`, () =>
           HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-            { status: 401 },
-          ),
-        ),
+            { status: 401 }
+          )
+        )
       )
 
       clearTokens()
@@ -122,9 +122,9 @@ describe('participantService', () => {
               created_at: new Date().toISOString(),
               token: 'test-token-xyz',
             },
-            { status: 201 },
+            { status: 201 }
           )
-        }),
+        })
       )
 
       await participantService.createParticipant(SURVEY_ID, {
@@ -146,10 +146,7 @@ describe('participantService', () => {
   describe('createParticipantsBatch()', () => {
     it('creates multiple participants and returns array', async () => {
       const result = await participantService.createParticipantsBatch(SURVEY_ID, {
-        items: [
-          { email: 'batch1@example.com' },
-          { email: 'batch2@example.com' },
-        ],
+        items: [{ email: 'batch1@example.com' }, { email: 'batch2@example.com' }],
       })
 
       expect(Array.isArray(result)).toBe(true)
@@ -174,7 +171,7 @@ describe('participantService', () => {
 
     it('throws ApiError on 404', async () => {
       await expect(
-        participantService.updateParticipant(SURVEY_ID, 'non-existent-id', { email: 'x@x.com' }),
+        participantService.updateParticipant(SURVEY_ID, 'non-existent-id', { email: 'x@x.com' })
       ).rejects.toMatchObject({ status: 404 })
     })
   })
@@ -187,7 +184,7 @@ describe('participantService', () => {
     it('deletes a participant without returning data', async () => {
       const target = mockParticipants[0]
       await expect(
-        participantService.deleteParticipant(SURVEY_ID, target.id),
+        participantService.deleteParticipant(SURVEY_ID, target.id)
       ).resolves.toBeUndefined()
     })
 
@@ -196,15 +193,15 @@ describe('participantService', () => {
         http.delete(`${BASE}/surveys/${SURVEY_ID}/participants/:participantId`, () =>
           HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-            { status: 401 },
-          ),
-        ),
+            { status: 401 }
+          )
+        )
       )
 
       clearTokens()
-      await expect(
-        participantService.deleteParticipant(SURVEY_ID, 'any-id'),
-      ).rejects.toMatchObject({ status: 401 })
+      await expect(participantService.deleteParticipant(SURVEY_ID, 'any-id')).rejects.toMatchObject(
+        { status: 401 }
+      )
     })
   })
 })

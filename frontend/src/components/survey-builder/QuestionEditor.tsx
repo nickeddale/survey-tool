@@ -13,10 +13,7 @@ import type { BuilderQuestion } from '../../store/builderStore'
 import { QuestionSettingsForm } from './settings/QuestionSettingsForm'
 import { AnswerOptionsEditor } from './AnswerOptionsEditor'
 import { LogicEditor } from './LogicEditor'
-import {
-  getDefaultSettings,
-  getCompatibleSettings,
-} from '../../types/questionSettings'
+import { getDefaultSettings, getCompatibleSettings } from '../../types/questionSettings'
 import type { QuestionSettings } from '../../types/questionSettings'
 
 // ---------------------------------------------------------------------------
@@ -50,7 +47,13 @@ const QUESTION_TYPE_OPTIONS = [
 ]
 
 // Types that have answer options — changing away from these loses options data
-const CHOICE_TYPES = new Set(['single_choice', 'multiple_choice', 'dropdown', 'ranking', 'image_picker'])
+const CHOICE_TYPES = new Set([
+  'single_choice',
+  'multiple_choice',
+  'dropdown',
+  'ranking',
+  'image_picker',
+])
 
 function isIncompatibleTypeChange(from: string, to: string): boolean {
   return CHOICE_TYPES.has(from) !== CHOICE_TYPES.has(to)
@@ -58,12 +61,14 @@ function isIncompatibleTypeChange(from: string, to: string): boolean {
 
 // Auto-generate a code from a title: uppercase letters/numbers, collapse spaces to underscores
 function generateCode(title: string): string {
-  return title
-    .toUpperCase()
-    .replace(/[^A-Z0-9 ]/g, '')
-    .trim()
-    .replace(/\s+/g, '_')
-    .slice(0, 20) || 'Q'
+  return (
+    title
+      .toUpperCase()
+      .replace(/[^A-Z0-9 ]/g, '')
+      .trim()
+      .replace(/\s+/g, '_')
+      .slice(0, 20) || 'Q'
+  )
 }
 
 // ---------------------------------------------------------------------------
@@ -86,13 +91,15 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
   const setSaveStatus = useBuilderStore((s) => s.setSaveStatus)
 
   // Find selected question and its group
-  const selectedGroup = selectedItem?.type === 'question'
-    ? groups.find((g) => g.questions.some((q) => q.id === selectedItem.id)) ?? null
-    : null
+  const selectedGroup =
+    selectedItem?.type === 'question'
+      ? (groups.find((g) => g.questions.some((q) => q.id === selectedItem.id)) ?? null)
+      : null
 
-  const selectedQuestion: BuilderQuestion | null = selectedItem?.type === 'question'
-    ? (selectedGroup?.questions.find((q) => q.id === selectedItem.id) ?? null)
-    : null
+  const selectedQuestion: BuilderQuestion | null =
+    selectedItem?.type === 'question'
+      ? (selectedGroup?.questions.find((q) => q.id === selectedItem.id) ?? null)
+      : null
 
   // -------------------------------------------------------------------------
   // Local form state (controlled)
@@ -110,7 +117,7 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
 
   // Type-specific settings (JSONB)
   const [settingsJson, setSettingsJson] = useState<QuestionSettings>(() =>
-    getDefaultSettings('short_text'),
+    getDefaultSettings('short_text')
   )
 
   // Settings section expand/collapse state (local UI only — not persisted)
@@ -152,13 +159,14 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
       setIsRequired(selectedQuestion.is_required)
       setRelevance(selectedQuestion.relevance ?? '')
       setValidationJson(
-        selectedQuestion.validation ? JSON.stringify(selectedQuestion.validation, null, 2) : '',
+        selectedQuestion.validation ? JSON.stringify(selectedQuestion.validation, null, 2) : ''
       )
       setValidationError(null)
       setPendingType(null)
 
       // Initialize settings from question, null-coalescing with defaults
-      const initialSettings = (selectedQuestion.settings as QuestionSettings | null) ??
+      const initialSettings =
+        (selectedQuestion.settings as QuestionSettings | null) ??
         getDefaultSettings(selectedQuestion.question_type)
       setSettingsJson(initialSettings)
 
@@ -190,7 +198,7 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
         }
       }, 500)
     },
-    [surveyId, setSaveStatus],
+    [surveyId, setSaveStatus]
   )
 
   // -------------------------------------------------------------------------
@@ -309,7 +317,10 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
   function handleSettingsChange(updates: Partial<Record<string, unknown>>) {
     if (!selectedGroup || !selectedQuestion) return
 
-    const newSettings = { ...(settingsJson as unknown as Record<string, unknown>), ...updates } as unknown as QuestionSettings
+    const newSettings = {
+      ...(settingsJson as unknown as Record<string, unknown>),
+      ...updates,
+    } as unknown as QuestionSettings
     setSettingsJson(newSettings)
     updateQuestion(selectedGroup.id, selectedQuestion.id, { settings: newSettings })
     schedulePatch(selectedGroup.id, selectedQuestion.id, { settings: newSettings })
@@ -351,8 +362,8 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
             Changing the question type may cause answer options to be lost.
           </p>
           <p className="text-xs text-amber-700">
-            Switching from &ldquo;{questionType}&rdquo; to &ldquo;{pendingType}&rdquo; is incompatible.
-            Do you want to continue?
+            Switching from &ldquo;{questionType}&rdquo; to &ldquo;{pendingType}&rdquo; is
+            incompatible. Do you want to continue?
           </p>
           <div className="flex gap-2">
             <button
@@ -464,7 +475,9 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
           disabled={readOnly}
           data-testid="property-question-required"
         />
-        <label htmlFor="prop-required" className="text-sm">Required</label>
+        <label htmlFor="prop-required" className="text-sm">
+          Required
+        </label>
       </div>
 
       {/* Relevance expression */}
@@ -508,10 +521,7 @@ export function QuestionEditor({ surveyId, readOnly = false }: QuestionEditorPro
       </div>
 
       {/* Type Settings collapsible section */}
-      <div
-        className="rounded-md border border-border"
-        data-testid="type-settings-section"
-      >
+      <div className="rounded-md border border-border" data-testid="type-settings-section">
         <button
           className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-muted-foreground
             hover:bg-muted/50 rounded-md transition-colors"

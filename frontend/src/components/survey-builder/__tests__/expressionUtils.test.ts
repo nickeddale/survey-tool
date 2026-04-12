@@ -68,47 +68,101 @@ describe('getOperatorsForType', () => {
 
 describe('serializeCondition', () => {
   it('returns empty string when questionCode is empty', () => {
-    const row: ConditionRow = { type: 'condition', id: 'x', questionCode: '', operator: '==', value: 'yes' }
+    const row: ConditionRow = {
+      type: 'condition',
+      id: 'x',
+      questionCode: '',
+      operator: '==',
+      value: 'yes',
+    }
     expect(serializeCondition(row)).toBe('')
   })
 
   it('serializes is_empty operator', () => {
-    const row: ConditionRow = { type: 'condition', id: 'x', questionCode: 'Q1', operator: 'is_empty', value: '' }
+    const row: ConditionRow = {
+      type: 'condition',
+      id: 'x',
+      questionCode: 'Q1',
+      operator: 'is_empty',
+      value: '',
+    }
     expect(serializeCondition(row)).toBe("{Q1} == ''")
   })
 
   it('serializes is_not_empty operator', () => {
-    const row: ConditionRow = { type: 'condition', id: 'x', questionCode: 'Q1', operator: 'is_not_empty', value: '' }
+    const row: ConditionRow = {
+      type: 'condition',
+      id: 'x',
+      questionCode: 'Q1',
+      operator: 'is_not_empty',
+      value: '',
+    }
     expect(serializeCondition(row)).toBe("{Q1} != ''")
   })
 
   it('serializes contains operator', () => {
-    const row: ConditionRow = { type: 'condition', id: 'x', questionCode: 'Q1', operator: 'contains', value: 'hello' }
+    const row: ConditionRow = {
+      type: 'condition',
+      id: 'x',
+      questionCode: 'Q1',
+      operator: 'contains',
+      value: 'hello',
+    }
     expect(serializeCondition(row)).toBe("{Q1} contains 'hello'")
   })
 
   it('serializes == with string value (quotes)', () => {
-    const row: ConditionRow = { type: 'condition', id: 'x', questionCode: 'Q1', operator: '==', value: 'yes' }
+    const row: ConditionRow = {
+      type: 'condition',
+      id: 'x',
+      questionCode: 'Q1',
+      operator: '==',
+      value: 'yes',
+    }
     expect(serializeCondition(row)).toBe("{Q1} == 'yes'")
   })
 
   it('serializes == with numeric value (no quotes)', () => {
-    const row: ConditionRow = { type: 'condition', id: 'x', questionCode: 'Q1', operator: '==', value: '42' }
+    const row: ConditionRow = {
+      type: 'condition',
+      id: 'x',
+      questionCode: 'Q1',
+      operator: '==',
+      value: '42',
+    }
     expect(serializeCondition(row)).toBe('{Q1} == 42')
   })
 
   it('serializes > operator', () => {
-    const row: ConditionRow = { type: 'condition', id: 'x', questionCode: 'Q2', operator: '>', value: '5' }
+    const row: ConditionRow = {
+      type: 'condition',
+      id: 'x',
+      questionCode: 'Q2',
+      operator: '>',
+      value: '5',
+    }
     expect(serializeCondition(row)).toBe('{Q2} > 5')
   })
 
   it('serializes != with string value', () => {
-    const row: ConditionRow = { type: 'condition', id: 'x', questionCode: 'Q3', operator: '!=', value: 'no' }
+    const row: ConditionRow = {
+      type: 'condition',
+      id: 'x',
+      questionCode: 'Q3',
+      operator: '!=',
+      value: 'no',
+    }
     expect(serializeCondition(row)).toBe("{Q3} != 'no'")
   })
 
   it('serializes empty string value with quotes', () => {
-    const row: ConditionRow = { type: 'condition', id: 'x', questionCode: 'Q1', operator: '==', value: '' }
+    const row: ConditionRow = {
+      type: 'condition',
+      id: 'x',
+      questionCode: 'Q1',
+      operator: '==',
+      value: '',
+    }
     expect(serializeCondition(row)).toBe("{Q1} == ''")
   })
 })
@@ -226,21 +280,51 @@ describe('serializeRootGroup', () => {
   })
 
   it('serializes single condition without wrapping parens', () => {
-    const row: ConditionRow = { type: 'condition', id: 'x', questionCode: 'Q1', operator: '==', value: 'yes' }
+    const row: ConditionRow = {
+      type: 'condition',
+      id: 'x',
+      questionCode: 'Q1',
+      operator: '==',
+      value: 'yes',
+    }
     const group: ConditionGroup = { type: 'group', id: 'g1', logic: 'and', items: [row] }
     expect(serializeRootGroup(group)).toBe("{Q1} == 'yes'")
   })
 
   it('serializes AND group without extra wrapping parens', () => {
-    const row1: ConditionRow = { type: 'condition', id: 'r1', questionCode: 'Q1', operator: '==', value: 'yes' }
-    const row2: ConditionRow = { type: 'condition', id: 'r2', questionCode: 'Q2', operator: '>', value: '5' }
+    const row1: ConditionRow = {
+      type: 'condition',
+      id: 'r1',
+      questionCode: 'Q1',
+      operator: '==',
+      value: 'yes',
+    }
+    const row2: ConditionRow = {
+      type: 'condition',
+      id: 'r2',
+      questionCode: 'Q2',
+      operator: '>',
+      value: '5',
+    }
     const group: ConditionGroup = { type: 'group', id: 'g1', logic: 'and', items: [row1, row2] }
     expect(serializeRootGroup(group)).toBe("{Q1} == 'yes' and {Q2} > 5")
   })
 
   it('serializes OR group', () => {
-    const row1: ConditionRow = { type: 'condition', id: 'r1', questionCode: 'Q1', operator: '==', value: 'a' }
-    const row2: ConditionRow = { type: 'condition', id: 'r2', questionCode: 'Q1', operator: '==', value: 'b' }
+    const row1: ConditionRow = {
+      type: 'condition',
+      id: 'r1',
+      questionCode: 'Q1',
+      operator: '==',
+      value: 'a',
+    }
+    const row2: ConditionRow = {
+      type: 'condition',
+      id: 'r2',
+      questionCode: 'Q1',
+      operator: '==',
+      value: 'b',
+    }
     const group: ConditionGroup = { type: 'group', id: 'g1', logic: 'or', items: [row1, row2] }
     expect(serializeRootGroup(group)).toBe("{Q1} == 'a' or {Q1} == 'b'")
   })
@@ -252,14 +336,32 @@ describe('serializeRootGroup', () => {
 
 describe('serializeGroup', () => {
   it('wraps multiple items in parentheses', () => {
-    const row1: ConditionRow = { type: 'condition', id: 'r1', questionCode: 'Q1', operator: '==', value: 'yes' }
-    const row2: ConditionRow = { type: 'condition', id: 'r2', questionCode: 'Q2', operator: '==', value: 'no' }
+    const row1: ConditionRow = {
+      type: 'condition',
+      id: 'r1',
+      questionCode: 'Q1',
+      operator: '==',
+      value: 'yes',
+    }
+    const row2: ConditionRow = {
+      type: 'condition',
+      id: 'r2',
+      questionCode: 'Q2',
+      operator: '==',
+      value: 'no',
+    }
     const group: ConditionGroup = { type: 'group', id: 'g1', logic: 'and', items: [row1, row2] }
     expect(serializeGroup(group)).toBe("({Q1} == 'yes' and {Q2} == 'no')")
   })
 
   it('does not wrap single item', () => {
-    const row: ConditionRow = { type: 'condition', id: 'r1', questionCode: 'Q1', operator: '==', value: 'yes' }
+    const row: ConditionRow = {
+      type: 'condition',
+      id: 'r1',
+      questionCode: 'Q1',
+      operator: '==',
+      value: 'yes',
+    }
     const group: ConditionGroup = { type: 'group', id: 'g1', logic: 'and', items: [row] }
     expect(serializeGroup(group)).toBe("{Q1} == 'yes'")
   })
@@ -319,8 +421,20 @@ describe('round-trip: serialize(parse(expr)) === expr', () => {
 
 describe('round-trip: parse(serialize(group)) matches group structure', () => {
   it('preserves logic and condition values', () => {
-    const row1: ConditionRow = { type: 'condition', id: 'r1', questionCode: 'Q1', operator: '==', value: 'yes' }
-    const row2: ConditionRow = { type: 'condition', id: 'r2', questionCode: 'Q2', operator: '>', value: '5' }
+    const row1: ConditionRow = {
+      type: 'condition',
+      id: 'r1',
+      questionCode: 'Q1',
+      operator: '==',
+      value: 'yes',
+    }
+    const row2: ConditionRow = {
+      type: 'condition',
+      id: 'r2',
+      questionCode: 'Q2',
+      operator: '>',
+      value: '5',
+    }
     const group: ConditionGroup = { type: 'group', id: 'g1', logic: 'and', items: [row1, row2] }
 
     const serialized = serializeRootGroup(group)

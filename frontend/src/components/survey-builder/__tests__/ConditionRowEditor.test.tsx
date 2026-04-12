@@ -63,7 +63,7 @@ describe('ValueInput', () => {
         question={makeQuestion({ question_type: 'short_text' })}
         value="hello"
         onChange={onChange}
-      />,
+      />
     )
     const input = screen.getByRole('textbox', { name: /condition value/i })
     expect(input).toBeInTheDocument()
@@ -77,7 +77,7 @@ describe('ValueInput', () => {
         question={makeQuestion({ question_type: 'numeric' })}
         value="42"
         onChange={onChange}
-      />,
+      />
     )
     const input = screen.getByRole('spinbutton', { name: /numeric value/i })
     expect(input).toBeInTheDocument()
@@ -91,7 +91,7 @@ describe('ValueInput', () => {
         question={makeQuestion({ question_type: 'boolean' })}
         value="true"
         onChange={onChange}
-      />,
+      />
     )
     const select = screen.getByRole('combobox', { name: /boolean value/i })
     expect(select).toBeInTheDocument()
@@ -120,7 +120,7 @@ describe('ValueInput', () => {
         question={makeQuestion({ question_type: 'single_choice', answer_options: [] })}
         value=""
         onChange={onChange}
-      />,
+      />
     )
     // Falls through to the text input fallback
     const input = screen.getByRole('textbox', { name: /condition value/i })
@@ -135,7 +135,7 @@ describe('ValueInput', () => {
         question={makeQuestion({ question_type: 'short_text' })}
         value=""
         onChange={onChange}
-      />,
+      />
     )
     const input = screen.getByRole('textbox', { name: /condition value/i })
     await act(async () => {
@@ -151,7 +151,7 @@ describe('ValueInput', () => {
         value=""
         onChange={vi.fn()}
         disabled
-      />,
+      />
     )
     expect(screen.getByRole('textbox', { name: /condition value/i })).toBeDisabled()
   })
@@ -170,7 +170,7 @@ describe('ConditionRowEditor', () => {
         onChange={vi.fn()}
         onRemove={vi.fn()}
         isOnly={true}
-      />,
+      />
     )
     expect(screen.getByRole('combobox', { name: /select question/i })).toBeInTheDocument()
   })
@@ -183,7 +183,7 @@ describe('ConditionRowEditor', () => {
         onChange={vi.fn()}
         onRemove={vi.fn()}
         isOnly={true}
-      />,
+      />
     )
     expect(screen.getByRole('combobox', { name: /select operator/i })).toBeInTheDocument()
   })
@@ -196,7 +196,7 @@ describe('ConditionRowEditor', () => {
         onChange={vi.fn()}
         onRemove={vi.fn()}
         isOnly={true}
-      />,
+      />
     )
     expect(screen.queryByRole('button', { name: /remove condition/i })).not.toBeInTheDocument()
   })
@@ -209,7 +209,7 @@ describe('ConditionRowEditor', () => {
         onChange={vi.fn()}
         onRemove={vi.fn()}
         isOnly={false}
-      />,
+      />
     )
     expect(screen.getByRole('button', { name: /remove condition/i })).toBeInTheDocument()
   })
@@ -224,7 +224,7 @@ describe('ConditionRowEditor', () => {
         onChange={vi.fn()}
         onRemove={onRemove}
         isOnly={false}
-      />,
+      />
     )
     await act(async () => {
       await user.click(screen.getByRole('button', { name: /remove condition/i }))
@@ -243,7 +243,7 @@ describe('ConditionRowEditor', () => {
         onChange={onChange}
         onRemove={vi.fn()}
         isOnly={true}
-      />,
+      />
     )
     const questionSelect = screen.getByRole('combobox', { name: /select question/i })
     await act(async () => {
@@ -264,7 +264,7 @@ describe('ConditionRowEditor', () => {
         onChange={vi.fn()}
         onRemove={vi.fn()}
         isOnly={true}
-      />,
+      />
     )
     // ValueInput should not be rendered — no text/number/select for value
     expect(screen.queryByRole('textbox', { name: /condition value/i })).not.toBeInTheDocument()
@@ -280,7 +280,7 @@ describe('ConditionRowEditor', () => {
         onRemove={vi.fn()}
         isOnly={true}
         disabled={true}
-      />,
+      />
     )
     const questionSelect = screen.getByRole('combobox', { name: /select question/i })
     expect(questionSelect).toBeDisabled()

@@ -78,7 +78,10 @@ function LoginPage() {
         </CardHeader>
         <CardContent>
           {error && (
-            <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+            <div
+              className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+              role="alert"
+            >
               {error}
             </div>
           )}
@@ -92,7 +95,10 @@ function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
               />
-              <ValidationErrors errors={fieldErrors.email ? [fieldErrors.email] : []} id="login-email-error" />
+              <ValidationErrors
+                errors={fieldErrors.email ? [fieldErrors.email] : []}
+                id="login-email-error"
+              />
             </div>
             <div className="space-y-1">
               <Label htmlFor="password">Password</Label>
@@ -103,7 +109,10 @@ function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
               />
-              <ValidationErrors errors={fieldErrors.password ? [fieldErrors.password] : []} id="login-password-error" />
+              <ValidationErrors
+                errors={fieldErrors.password ? [fieldErrors.password] : []}
+                id="login-password-error"
+              />
             </div>
             <Button type="submit" disabled={isSubmitting} className="w-full">
               {isSubmitting ? 'Signing in...' : 'Sign In'}

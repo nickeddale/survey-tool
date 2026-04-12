@@ -82,7 +82,15 @@ const mockSurvey: SurveyFullResponse = {
           created_at: '2024-01-01T00:00:00Z',
           subquestions: [],
           answer_options: [
-            { id: 'o1', question_id: 'q2', code: 'A1', title: 'Good', sort_order: 1, assessment_value: 1, created_at: '2024-01-01T00:00:00Z' },
+            {
+              id: 'o1',
+              question_id: 'q2',
+              code: 'A1',
+              title: 'Good',
+              sort_order: 1,
+              assessment_value: 1,
+              created_at: '2024-01-01T00:00:00Z',
+            },
           ],
         },
       ],
@@ -139,7 +147,7 @@ function renderForm({
       onNext={onNext}
       onPrev={onPrev}
       onSubmit={onSubmit}
-    />,
+    />
   )
 }
 
@@ -185,7 +193,9 @@ describe('basic rendering', () => {
   it('renders question description when present', () => {
     renderForm()
 
-    expect(screen.getByTestId('form-question-description')).toHaveTextContent('Please enter your full name')
+    expect(screen.getByTestId('form-question-description')).toHaveTextContent(
+      'Please enter your full name'
+    )
   })
 
   it('shows required indicator for required questions', () => {

@@ -64,12 +64,12 @@ describe('proactive refresh — no redirect on 429 (ISS-183)', () => {
       http.post(`${BASE}/auth/refresh`, () => {
         return HttpResponse.json(
           { detail: { code: 'RATE_LIMITED', message: 'Too many requests' } },
-          { status: 429, headers: { 'Retry-After': '1' } },
+          { status: 429, headers: { 'Retry-After': '1' } }
         )
       }),
       http.get(`${BASE}/surveys`, () => {
         return HttpResponse.json({ items: [] })
-      }),
+      })
     )
 
     // The proactive refresh will fail with 429 — should NOT redirect
@@ -85,12 +85,12 @@ describe('proactive refresh — no redirect on 429 (ISS-183)', () => {
       http.post(`${BASE}/auth/refresh`, () => {
         return HttpResponse.json(
           { detail: { code: 'RATE_LIMITED', message: 'Too many requests' } },
-          { status: 429, headers: { 'Retry-After': '1' } },
+          { status: 429, headers: { 'Retry-After': '1' } }
         )
       }),
       http.get(`${BASE}/surveys`, () => {
         return HttpResponse.json({ items: [] })
-      }),
+      })
     )
 
     const promise = apiClient.get('/surveys').catch((e) => e)
@@ -117,16 +117,16 @@ describe('proactive refresh — no redirect on 429 (ISS-183)', () => {
       http.post(`${BASE}/auth/refresh`, () => {
         return HttpResponse.json(
           { detail: { code: 'UNAUTHORIZED', message: 'Refresh token expired' } },
-          { status: 401 },
+          { status: 401 }
         )
       }),
       http.get(`${BASE}/protected-resource`, () => {
         // Returns 401 — simulates a protected endpoint with no valid token
         return HttpResponse.json(
           { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-          { status: 401 },
+          { status: 401 }
         )
-      }),
+      })
     )
 
     // No token is set so request goes out without Authorization.
@@ -155,7 +155,7 @@ describe('proactive refresh — no redirect on 429 (ISS-183)', () => {
         refreshCallCount++
         return HttpResponse.json(
           { detail: { code: 'RATE_LIMITED', message: 'Too many requests' } },
-          { status: 429, headers: { 'Retry-After': '1' } },
+          { status: 429, headers: { 'Retry-After': '1' } }
         )
       }),
       http.get(`${BASE}/surveys`, ({ request }) => {
@@ -165,11 +165,13 @@ describe('proactive refresh — no redirect on 429 (ISS-183)', () => {
           return HttpResponse.json({ items: [] })
         }
         return HttpResponse.json({ items: [] })
-      }),
+      })
     )
 
     // First request — proactive refresh fires, hits 429, sets cooldown
-    const firstPromise = apiClient.get('/surveys').catch(() => {/* proactive may reject */})
+    const firstPromise = apiClient.get('/surveys').catch(() => {
+      /* proactive may reject */
+    })
     await vi.runAllTimersAsync()
     await firstPromise
 
@@ -179,7 +181,9 @@ describe('proactive refresh — no redirect on 429 (ISS-183)', () => {
     setTokens(makeSoonExpiringToken(10))
 
     // Second request — should be within cooldown, so NO proactive refresh should fire
-    const secondPromise = apiClient.get('/surveys').catch(() => {/* ignore */})
+    const secondPromise = apiClient.get('/surveys').catch(() => {
+      /* ignore */
+    })
     await vi.runAllTimersAsync()
     await secondPromise
 

@@ -1,5 +1,9 @@
 import type { AnswerInput } from '../../services/responseService'
-import type { SurveyFullResponse, QuestionGroupResponse, QuestionResponse } from '../../types/survey'
+import type {
+  SurveyFullResponse,
+  QuestionGroupResponse,
+  QuestionResponse,
+} from '../../types/survey'
 import type { AnswerMap } from '../../hooks/useValidation'
 
 /**
@@ -8,7 +12,10 @@ import type { AnswerMap } from '../../hooks/useValidation'
  * @param answers - The current answer map
  * @param questionTypeMap - Optional map of questionId → question_type for type-aware serialization
  */
-export function answersToInput(answers: AnswerMap, questionTypeMap?: Record<string, string>): AnswerInput[] {
+export function answersToInput(
+  answers: AnswerMap,
+  questionTypeMap?: Record<string, string>
+): AnswerInput[] {
   return Object.entries(answers).map(([questionId, value]) => {
     const questionType = questionTypeMap?.[questionId]
     // Backend expects rating as integer, not string
@@ -56,7 +63,7 @@ export function buildVisibleSurvey(
   survey: SurveyFullResponse,
   hiddenQuestions: Set<string>,
   hiddenGroups: Set<string>,
-  pipedTexts: Record<string, string>,
+  pipedTexts: Record<string, string>
 ): SurveyFullResponse {
   const visibleGroups = survey.groups
     .filter((g) => !hiddenGroups.has(g.id))

@@ -5,7 +5,9 @@ import type { QuestionResponse } from '../../types/survey'
 export function AnswerOptionItem({ code, title }: { code: string; title: string }) {
   return (
     <div className="flex items-center gap-2 py-1 pl-4">
-      <span className="text-xs font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded">{code}</span>
+      <span className="text-xs font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+        {code}
+      </span>
       <span className="text-sm text-foreground">{title}</span>
     </div>
   )
@@ -17,7 +19,10 @@ export function QuestionItem({ question }: { question: QuestionResponse }) {
   const hasSubquestions = question.subquestions.length > 0
 
   return (
-    <div className="border border-border rounded-md bg-card" data-testid={`question-item-${question.id}`}>
+    <div
+      className="border border-border rounded-md bg-card"
+      data-testid={`question-item-${question.id}`}
+    >
       <div
         className="flex items-start gap-2 p-3 cursor-pointer select-none"
         onClick={() => setExpanded((e) => !e)}
@@ -28,7 +33,11 @@ export function QuestionItem({ question }: { question: QuestionResponse }) {
       >
         <div className="mt-0.5 text-muted-foreground">
           {hasOptions || hasSubquestions ? (
-            expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />
+            expanded ? (
+              <ChevronDown size={14} />
+            ) : (
+              <ChevronRight size={14} />
+            )
           ) : (
             <span className="inline-block w-3.5" />
           )}
@@ -43,7 +52,9 @@ export function QuestionItem({ question }: { question: QuestionResponse }) {
               {question.question_type}
             </span>
             {question.is_required && (
-              <span className="text-xs text-destructive bg-destructive/10 px-1.5 py-0.5 rounded">required</span>
+              <span className="text-xs text-destructive bg-destructive/10 px-1.5 py-0.5 rounded">
+                required
+              </span>
             )}
           </div>
           {question.description && (

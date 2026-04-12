@@ -33,12 +33,17 @@ function renderParticipants(surveyId = SURVEY_ID) {
           <Route path="/surveys/:id" element={<LocationDisplay />} />
         </Routes>
       </AuthProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
 function resetAuthStore() {
-  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
+  useAuthStore.setState({
+    user: null,
+    isAuthenticated: false,
+    isInitializing: false,
+    isLoading: false,
+  })
 }
 
 // ---------------------------------------------------------------------------
@@ -52,7 +57,12 @@ describe('ParticipantsPage', () => {
     resetAuthStore()
     setTokens(mockTokens.access_token)
     localStorage.removeItem('devtracker_refresh_token')
-    useAuthStore.setState({ user: mockUser, isAuthenticated: true, isInitializing: false, isLoading: false })
+    useAuthStore.setState({
+      user: mockUser,
+      isAuthenticated: true,
+      isInitializing: false,
+      isLoading: false,
+    })
   })
 
   afterEach(() => {
@@ -67,7 +77,7 @@ describe('ParticipantsPage', () => {
   describe('loading state', () => {
     it('renders loading skeleton while data is being fetched', async () => {
       server.use(
-        http.get(`/api/v1/surveys/${SURVEY_ID}/participants`, () => new Promise<never>(() => {})),
+        http.get(`/api/v1/surveys/${SURVEY_ID}/participants`, () => new Promise<never>(() => {}))
       )
 
       renderParticipants()
@@ -157,9 +167,9 @@ describe('ParticipantsPage', () => {
         http.get(`/api/v1/surveys/${SURVEY_ID}/participants`, () =>
           HttpResponse.json(
             { items: [], total: 0, page: 1, per_page: 20, pages: 1 },
-            { status: 200 },
-          ),
-        ),
+            { status: 200 }
+          )
+        )
       )
 
       renderParticipants()
@@ -170,7 +180,7 @@ describe('ParticipantsPage', () => {
 
       expect(screen.getByText(/no participants have been added/i)).toBeInTheDocument()
       expect(
-        screen.getByRole('button', { name: /add your first participant/i }),
+        screen.getByRole('button', { name: /add your first participant/i })
       ).toBeInTheDocument()
     })
   })
@@ -233,10 +243,7 @@ describe('ParticipantsPage', () => {
       })
 
       await act(async () => {
-        await user.type(
-          screen.getByTestId('participant-email-input'),
-          'newuser@example.com',
-        )
+        await user.type(screen.getByTestId('participant-email-input'), 'newuser@example.com')
       })
 
       await act(async () => {
@@ -249,7 +256,7 @@ describe('ParticipantsPage', () => {
 
       expect(screen.getByTestId('created-token-value')).toBeInTheDocument()
       expect(screen.getByTestId('created-token-value').textContent).toBe(
-        'mock-token-abc123xyz456def789ghi0',
+        'mock-token-abc123xyz456def789ghi0'
       )
     })
 
@@ -267,10 +274,7 @@ describe('ParticipantsPage', () => {
       })
 
       await act(async () => {
-        await user.type(
-          screen.getByTestId('participant-email-input'),
-          'newuser@example.com',
-        )
+        await user.type(screen.getByTestId('participant-email-input'), 'newuser@example.com')
       })
 
       await act(async () => {
@@ -323,16 +327,13 @@ describe('ParticipantsPage', () => {
 
       let patchCalled = false
       server.use(
-        http.patch(
-          `/api/v1/surveys/${SURVEY_ID}/participants/:participantId`,
-          async () => {
-            patchCalled = true
-            return HttpResponse.json(
-              { ...mockParticipants[0], email: 'alice-updated@example.com' },
-              { status: 200 },
-            )
-          },
-        ),
+        http.patch(`/api/v1/surveys/${SURVEY_ID}/participants/:participantId`, async () => {
+          patchCalled = true
+          return HttpResponse.json(
+            { ...mockParticipants[0], email: 'alice-updated@example.com' },
+            { status: 200 }
+          )
+        })
       )
 
       renderParticipants()
@@ -393,7 +394,7 @@ describe('ParticipantsPage', () => {
         http.delete(`/api/v1/surveys/${SURVEY_ID}/participants/:participantId`, () => {
           deleteCalled = true
           return new HttpResponse(null, { status: 204 })
-        }),
+        })
       )
 
       renderParticipants()
@@ -420,13 +421,10 @@ describe('ParticipantsPage', () => {
 
       let deletedId = ''
       server.use(
-        http.delete(
-          `/api/v1/surveys/${SURVEY_ID}/participants/:participantId`,
-          ({ params }) => {
-            deletedId = params.participantId as string
-            return new HttpResponse(null, { status: 204 })
-          },
-        ),
+        http.delete(`/api/v1/surveys/${SURVEY_ID}/participants/:participantId`, ({ params }) => {
+          deletedId = params.participantId as string
+          return new HttpResponse(null, { status: 204 })
+        })
       )
 
       renderParticipants()
@@ -483,9 +481,9 @@ describe('ParticipantsPage', () => {
         http.get(`/api/v1/surveys/${SURVEY_ID}/participants`, () =>
           HttpResponse.json(
             { detail: { code: 'INTERNAL_SERVER_ERROR', message: 'Internal server error' } },
-            { status: 500 },
-          ),
-        ),
+            { status: 500 }
+          )
+        )
       )
 
       renderParticipants()
@@ -521,9 +519,9 @@ describe('ParticipantsPage', () => {
           capturedUrl = request.url
           return HttpResponse.json(
             { items: [], total: 0, page: 1, per_page: 20, pages: 1 },
-            { status: 200 },
+            { status: 200 }
           )
-        }),
+        })
       )
 
       renderParticipants()
@@ -640,7 +638,7 @@ describe('ParticipantsPage', () => {
         expect(screen.getByTestId('copy-link-error')).toBeInTheDocument()
       })
       expect(screen.getByTestId('copy-link-error')).toHaveTextContent(
-        'Failed to copy link to clipboard',
+        'Failed to copy link to clipboard'
       )
     })
 

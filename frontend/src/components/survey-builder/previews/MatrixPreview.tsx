@@ -7,7 +7,11 @@
  */
 
 import type { BuilderQuestion } from '../../../store/builderStore'
-import type { MatrixSettings, MatrixDropdownSettings, MatrixDynamicSettings } from '../../../types/questionSettings'
+import type {
+  MatrixSettings,
+  MatrixDropdownSettings,
+  MatrixDynamicSettings,
+} from '../../../types/questionSettings'
 
 export interface QuestionPreviewProps {
   question: BuilderQuestion
@@ -48,10 +52,7 @@ export function MatrixPreview({ question }: QuestionPreviewProps) {
               </tr>
             ) : (
               subquestions.map((sub, idx) => (
-                <tr
-                  key={sub.id}
-                  className={s.alternate_rows && idx % 2 === 1 ? 'bg-muted/30' : ''}
-                >
+                <tr key={sub.id} className={s.alternate_rows && idx % 2 === 1 ? 'bg-muted/30' : ''}>
                   <td className="p-2 text-sm">{sub.title}</td>
                   {answer_options.map((opt) => (
                     <td key={opt.id} className="p-2 text-center">
@@ -116,10 +117,7 @@ export function MatrixPreview({ question }: QuestionPreviewProps) {
               </tr>
             ) : (
               subquestions.map((sub, idx) => (
-                <tr
-                  key={sub.id}
-                  className={s.alternate_rows && idx % 2 === 1 ? 'bg-muted/30' : ''}
-                >
+                <tr key={sub.id} className={s.alternate_rows && idx % 2 === 1 ? 'bg-muted/30' : ''}>
                   <td className="p-2 text-sm">{sub.title}</td>
                   {answer_options.map((opt) => (
                     <td key={opt.id} className="p-2">
@@ -219,11 +217,7 @@ export function MatrixPreview({ question }: QuestionPreviewProps) {
                           disabled
                         />
                       ) : cellType === 'radio' ? (
-                        <input
-                          type="radio"
-                          className="opacity-60 pointer-events-none"
-                          disabled
-                        />
+                        <input type="radio" className="opacity-60 pointer-events-none" disabled />
                       ) : (
                         <input
                           type="text"

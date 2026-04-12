@@ -32,7 +32,7 @@ function ExportDialog({ open, onOpenChange, surveyId, questions }: ExportDialogP
   const [format, setFormat] = useState<'csv' | 'json'>('csv')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [selectedColumns, setSelectedColumns] = useState<Set<string>>(
-    () => new Set(questions.map((q) => q.code)),
+    () => new Set(questions.map((q) => q.code))
   )
   const [isExporting, setIsExporting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -65,9 +65,7 @@ function ExportDialog({ open, onOpenChange, surveyId, questions }: ExportDialogP
     setIsExporting(true)
 
     try {
-      const columns = questions
-        .filter((q) => selectedColumns.has(q.code))
-        .map((q) => q.code)
+      const columns = questions.filter((q) => selectedColumns.has(q.code)).map((q) => q.code)
 
       const blob = await responseService.exportResponses(surveyId, {
         format,
@@ -138,7 +136,10 @@ function ExportDialog({ open, onOpenChange, surveyId, questions }: ExportDialogP
 
           {/* Status filter */}
           <div>
-            <label htmlFor="export-status-filter" className="text-sm font-medium text-foreground mb-2 block">
+            <label
+              htmlFor="export-status-filter"
+              className="text-sm font-medium text-foreground mb-2 block"
+            >
               Status Filter
             </label>
             <select
@@ -211,11 +212,7 @@ function ExportDialog({ open, onOpenChange, surveyId, questions }: ExportDialogP
         </div>
 
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isExporting}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isExporting}>
             Cancel
           </Button>
           <Button

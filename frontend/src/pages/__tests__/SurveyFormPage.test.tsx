@@ -21,7 +21,10 @@ function LocationDisplay() {
 
 function renderForm(initialUrl: string) {
   return render(
-    <MemoryRouter initialEntries={[initialUrl]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <MemoryRouter
+      initialEntries={[initialUrl]}
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
       <AuthProvider>
         <Routes>
           <Route path="/surveys/new" element={<SurveyFormPage />} />
@@ -30,12 +33,17 @@ function renderForm(initialUrl: string) {
           <Route path="/surveys" element={<LocationDisplay />} />
         </Routes>
       </AuthProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
 function resetAuthStore() {
-  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
+  useAuthStore.setState({
+    user: null,
+    isAuthenticated: false,
+    isInitializing: false,
+    isLoading: false,
+  })
 }
 
 // A draft survey from mock data
@@ -58,7 +66,12 @@ describe('SurveyFormPage', () => {
     setTokens(mockTokens.access_token)
     localStorage.removeItem('devtracker_refresh_token')
     // Pre-populate auth store so authenticated API calls work correctly.
-    useAuthStore.setState({ user: mockUser, isAuthenticated: true, isInitializing: false, isLoading: false })
+    useAuthStore.setState({
+      user: mockUser,
+      isAuthenticated: true,
+      isInitializing: false,
+      isLoading: false,
+    })
   })
 
   afterEach(() => {
@@ -118,9 +131,9 @@ describe('SurveyFormPage', () => {
         http.post('/api/v1/surveys', () =>
           HttpResponse.json(
             { detail: { code: 'VALIDATION_ERROR', message: 'Title must be unique' } },
-            { status: 422 },
-          ),
-        ),
+            { status: 422 }
+          )
+        )
       )
 
       const user = userEvent.setup()
@@ -140,9 +153,7 @@ describe('SurveyFormPage', () => {
     })
 
     it('shows loading state (button disabled) during submit', async () => {
-      server.use(
-        http.post('/api/v1/surveys', () => new Promise<never>(() => {})),
-      )
+      server.use(http.post('/api/v1/surveys', () => new Promise<never>(() => {})))
 
       const user = userEvent.setup()
 
@@ -181,9 +192,7 @@ describe('SurveyFormPage', () => {
 
   describe('edit mode (/surveys/:id/edit)', () => {
     it('shows loading state while fetching survey', () => {
-      server.use(
-        http.get('/api/v1/surveys/:id', () => new Promise<never>(() => {})),
-      )
+      server.use(http.get('/api/v1/surveys/:id', () => new Promise<never>(() => {})))
 
       renderForm(`/surveys/${draftSurvey.id}/edit`)
 
@@ -202,8 +211,8 @@ describe('SurveyFormPage', () => {
 
       server.use(
         http.get('/api/v1/surveys/:id', () =>
-          HttpResponse.json(surveyWithDescription, { status: 200 }),
-        ),
+          HttpResponse.json(surveyWithDescription, { status: 200 })
+        )
       )
 
       renderForm(`/surveys/${draftSurvey.id}/edit`)
@@ -221,9 +230,7 @@ describe('SurveyFormPage', () => {
 
     it('calls updateSurvey and redirects to /surveys/:id on success', async () => {
       server.use(
-        http.get('/api/v1/surveys/:id', () =>
-          HttpResponse.json(draftSurvey, { status: 200 }),
-        ),
+        http.get('/api/v1/surveys/:id', () => HttpResponse.json(draftSurvey, { status: 200 }))
       )
 
       const user = userEvent.setup()
@@ -254,9 +261,9 @@ describe('SurveyFormPage', () => {
         http.get('/api/v1/surveys/:id', () =>
           HttpResponse.json(
             { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
-            { status: 404 },
-          ),
-        ),
+            { status: 404 }
+          )
+        )
       )
 
       renderForm('/surveys/nonexistent-id/edit')
@@ -270,9 +277,7 @@ describe('SurveyFormPage', () => {
 
     it('shows read-only view for non-draft (active) survey', async () => {
       server.use(
-        http.get('/api/v1/surveys/:id', () =>
-          HttpResponse.json(activeSurvey, { status: 200 }),
-        ),
+        http.get('/api/v1/surveys/:id', () => HttpResponse.json(activeSurvey, { status: 200 }))
       )
 
       renderForm(`/surveys/${activeSurvey.id}/edit`)
@@ -290,9 +295,7 @@ describe('SurveyFormPage', () => {
       const closedSurvey = mockSurveys.find((s) => s.status === 'closed')!
 
       server.use(
-        http.get('/api/v1/surveys/:id', () =>
-          HttpResponse.json(closedSurvey, { status: 200 }),
-        ),
+        http.get('/api/v1/surveys/:id', () => HttpResponse.json(closedSurvey, { status: 200 }))
       )
 
       renderForm(`/surveys/${closedSurvey.id}/edit`)
@@ -307,9 +310,7 @@ describe('SurveyFormPage', () => {
 
     it('readonly view shows Back to Surveys button that navigates to /surveys', async () => {
       server.use(
-        http.get('/api/v1/surveys/:id', () =>
-          HttpResponse.json(activeSurvey, { status: 200 }),
-        ),
+        http.get('/api/v1/surveys/:id', () => HttpResponse.json(activeSurvey, { status: 200 }))
       )
 
       const user = userEvent.setup()
@@ -333,9 +334,9 @@ describe('SurveyFormPage', () => {
         http.get('/api/v1/surveys/:id', () =>
           HttpResponse.json(
             { detail: { code: 'INTERNAL_SERVER_ERROR', message: 'Something went wrong' } },
-            { status: 500 },
-          ),
-        ),
+            { status: 500 }
+          )
+        )
       )
 
       renderForm(`/surveys/${draftSurvey.id}/edit`)
@@ -349,9 +350,7 @@ describe('SurveyFormPage', () => {
 
     it('shows validation error when title is cleared and form is submitted in edit mode', async () => {
       server.use(
-        http.get('/api/v1/surveys/:id', () =>
-          HttpResponse.json(draftSurvey, { status: 200 }),
-        ),
+        http.get('/api/v1/surveys/:id', () => HttpResponse.json(draftSurvey, { status: 200 }))
       )
 
       const user = userEvent.setup()
@@ -373,9 +372,7 @@ describe('SurveyFormPage', () => {
 
     it('cancel button navigates to /surveys in edit mode', async () => {
       server.use(
-        http.get('/api/v1/surveys/:id', () =>
-          HttpResponse.json(draftSurvey, { status: 200 }),
-        ),
+        http.get('/api/v1/surveys/:id', () => HttpResponse.json(draftSurvey, { status: 200 }))
       )
 
       const user = userEvent.setup()

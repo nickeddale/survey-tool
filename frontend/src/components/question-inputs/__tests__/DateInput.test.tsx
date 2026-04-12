@@ -227,9 +227,7 @@ describe('DateInput — accessibility', () => {
 
   it('sets aria-describedby pointing to error container when errors present', () => {
     const question = makeQuestion({ id: 'q-test' })
-    render(
-      <DateInput value="" onChange={vi.fn()} question={question} errors={['Required']} />
-    )
+    render(<DateInput value="" onChange={vi.fn()} question={question} errors={['Required']} />)
     const input = screen.getByTestId('date-input')
     expect(input).toHaveAttribute('aria-describedby', 'question-q-test-error')
     expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')

@@ -63,7 +63,7 @@ function getSessionSeed(questionId: string): number {
 function validate(
   value: Record<string, string>,
   subquestionCodes: string[],
-  isAllRowsRequired: boolean,
+  isAllRowsRequired: boolean
 ): string[] {
   const errs: string[] = []
   if (isAllRowsRequired) {
@@ -79,7 +79,12 @@ function validate(
 // Component
 // ---------------------------------------------------------------------------
 
-export function MatrixDropdownInput({ value, onChange, question, errors: externalErrors }: MatrixDropdownInputProps) {
+export function MatrixDropdownInput({
+  value,
+  onChange,
+  question,
+  errors: externalErrors,
+}: MatrixDropdownInputProps) {
   const s = (question.settings ?? {}) as Partial<MatrixDropdownSettings>
   const alternateRows = s.alternate_rows ?? true
   const isAllRowsRequired = s.is_all_rows_required ?? false

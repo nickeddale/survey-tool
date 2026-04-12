@@ -99,7 +99,7 @@ function validateShortText(
   value: string,
   s: Partial<ShortTextSettings>,
   isRequired: boolean,
-  field: string,
+  field: string
 ): ValidationError[] {
   const errors: ValidationError[] = []
   if (isRequired && value.trim() === '') {
@@ -123,7 +123,7 @@ function validateLongText(
   value: string,
   s: Partial<LongTextSettings>,
   isRequired: boolean,
-  field: string,
+  field: string
 ): ValidationError[] {
   const errors: ValidationError[] = []
   if (isRequired && value.trim() === '') {
@@ -141,7 +141,7 @@ function validateHugeText(
   value: string,
   s: Partial<HugeTextSettings>,
   isRequired: boolean,
-  field: string,
+  field: string
 ): ValidationError[] {
   const errors: ValidationError[] = []
   const plainText = s.rich_text ? stripHtml(value) : value
@@ -160,7 +160,7 @@ function validateRadio(
   value: string,
   _s: Partial<RadioSettings>,
   isRequired: boolean,
-  field: string,
+  field: string
 ): ValidationError[] {
   const errors: ValidationError[] = []
   if (isRequired && value === '') {
@@ -176,7 +176,7 @@ function validateDropdown(
   value: string,
   _s: Partial<DropdownSettings>,
   isRequired: boolean,
-  field: string,
+  field: string
 ): ValidationError[] {
   const errors: ValidationError[] = []
   if (isRequired && value === '') {
@@ -189,7 +189,7 @@ function validateCheckbox(
   value: string[],
   s: Partial<CheckboxSettings>,
   isRequired: boolean,
-  field: string,
+  field: string
 ): ValidationError[] {
   const errors: ValidationError[] = []
   const OTHER_VALUE = '__other__'
@@ -199,7 +199,12 @@ function validateCheckbox(
     errors.push({ field, message: 'This field is required.' })
     return errors
   }
-  if (s.min_choices !== null && s.min_choices !== undefined && realCount > 0 && realCount < s.min_choices) {
+  if (
+    s.min_choices !== null &&
+    s.min_choices !== undefined &&
+    realCount > 0 &&
+    realCount < s.min_choices
+  ) {
     errors.push({
       field,
       message: `Please select at least ${s.min_choices} option${s.min_choices !== 1 ? 's' : ''}.`,
@@ -219,7 +224,7 @@ function validateRanking(
   _s: Partial<RankingSettings>,
   isRequired: boolean,
   allOptionIds: string[],
-  field: string,
+  field: string
 ): ValidationError[] {
   const errors: ValidationError[] = []
   if (isRequired && value.length === 0) {
@@ -237,7 +242,7 @@ function validateImagePicker(
   value: string[],
   s: Partial<ImagePickerSettings>,
   isRequired: boolean,
-  field: string,
+  field: string
 ): ValidationError[] {
   const errors: ValidationError[] = []
   if (isRequired && value.length === 0) {
@@ -246,7 +251,12 @@ function validateImagePicker(
   }
   const multiSelect = s.multi_select ?? false
   if (multiSelect) {
-    if (s.min_choices !== null && s.min_choices !== undefined && value.length > 0 && value.length < s.min_choices) {
+    if (
+      s.min_choices !== null &&
+      s.min_choices !== undefined &&
+      value.length > 0 &&
+      value.length < s.min_choices
+    ) {
       errors.push({
         field,
         message: `Please select at least ${s.min_choices} image${s.min_choices !== 1 ? 's' : ''}.`,
@@ -267,7 +277,7 @@ function validateMatrix(
   s: Partial<MatrixSettings>,
   isRequired: boolean,
   subquestionCodes: string[],
-  field: string,
+  field: string
 ): ValidationError[] {
   const errors: ValidationError[] = []
   const isAllRowsRequired = s.is_all_rows_required ?? false
@@ -289,7 +299,7 @@ function validateMatrixDropdown(
   s: Partial<MatrixDropdownSettings>,
   isRequired: boolean,
   subquestionCodes: string[],
-  field: string,
+  field: string
 ): ValidationError[] {
   const errors: ValidationError[] = []
   const isAllRowsRequired = s.is_all_rows_required ?? false
@@ -309,7 +319,7 @@ function validateMatrixDropdown(
 function validateMatrixDynamic(
   _value: Record<string, string>[],
   _isRequired: boolean,
-  _field: string,
+  _field: string
 ): ValidationError[] {
   // MatrixDynamic has no external validation constraints (no is_all_rows_required)
   // and uses internal row management (min/max row counts control UI, not answer validity).
@@ -320,7 +330,7 @@ function validateNumeric(
   value: string,
   s: Partial<NumericSettings>,
   isRequired: boolean,
-  field: string,
+  field: string
 ): ValidationError[] {
   const errors: ValidationError[] = []
   if (value.trim() === '') {
@@ -354,7 +364,7 @@ function validateRating(
   value: string,
   _s: Partial<RatingSettings>,
   isRequired: boolean,
-  field: string,
+  field: string
 ): ValidationError[] {
   const errors: ValidationError[] = []
   if (isRequired && value === '') {
@@ -367,7 +377,7 @@ function validateBoolean(
   value: string,
   _s: Partial<BooleanSettings>,
   isRequired: boolean,
-  field: string,
+  field: string
 ): ValidationError[] {
   const errors: ValidationError[] = []
   if (isRequired && value === '') {
@@ -380,7 +390,7 @@ function validateDate(
   value: string,
   s: Partial<DateSettings>,
   isRequired: boolean,
-  field: string,
+  field: string
 ): ValidationError[] {
   const errors: ValidationError[] = []
   if (value.trim() === '') {
@@ -411,7 +421,7 @@ function validateFileUpload(
   value: File[],
   s: Partial<FileUploadSettings>,
   isRequired: boolean,
-  field: string,
+  field: string
 ): ValidationError[] {
   const errors: ValidationError[] = []
   if (isRequired && value.length === 0) {
@@ -436,11 +446,11 @@ function validateFileUpload(
 // ---------------------------------------------------------------------------
 
 export type QuestionAnswer =
-  | string           // short_text, long_text, huge_text, radio, dropdown, boolean, rating, numeric, date
-  | string[]         // checkbox, ranking, image_picker
-  | Record<string, string>        // matrix, matrix_dropdown
-  | Record<string, string>[]      // matrix_dynamic
-  | File[]           // file_upload
+  | string // short_text, long_text, huge_text, radio, dropdown, boolean, rating, numeric, date
+  | string[] // checkbox, ranking, image_picker
+  | Record<string, string> // matrix, matrix_dropdown
+  | Record<string, string>[] // matrix_dynamic
+  | File[] // file_upload
 
 // ---------------------------------------------------------------------------
 // Core function
@@ -453,7 +463,10 @@ export type QuestionAnswer =
  * @param answer   - The current answer value (type depends on question_type)
  * @returns        ValidationResult with valid flag and array of errors
  */
-export function validateAnswer(question: BuilderQuestion, answer: QuestionAnswer): ValidationResult {
+export function validateAnswer(
+  question: BuilderQuestion,
+  answer: QuestionAnswer
+): ValidationResult {
   const field = question.code || question.id
   const s = (question.settings ?? {}) as Record<string, unknown>
   const isRequired = question.is_required
@@ -462,7 +475,12 @@ export function validateAnswer(question: BuilderQuestion, answer: QuestionAnswer
 
   switch (question.question_type) {
     case 'short_text':
-      errors = validateShortText(answer as string, s as Partial<ShortTextSettings>, isRequired, field)
+      errors = validateShortText(
+        answer as string,
+        s as Partial<ShortTextSettings>,
+        isRequired,
+        field
+      )
       break
 
     case 'long_text':
@@ -482,17 +500,33 @@ export function validateAnswer(question: BuilderQuestion, answer: QuestionAnswer
       break
 
     case 'checkbox':
-      errors = validateCheckbox(answer as string[], s as Partial<CheckboxSettings>, isRequired, field)
+      errors = validateCheckbox(
+        answer as string[],
+        s as Partial<CheckboxSettings>,
+        isRequired,
+        field
+      )
       break
 
     case 'ranking': {
       const allOptionIds = question.answer_options.map((o) => o.id)
-      errors = validateRanking(answer as string[], s as Partial<RankingSettings>, isRequired, allOptionIds, field)
+      errors = validateRanking(
+        answer as string[],
+        s as Partial<RankingSettings>,
+        isRequired,
+        allOptionIds,
+        field
+      )
       break
     }
 
     case 'image_picker':
-      errors = validateImagePicker(answer as string[], s as Partial<ImagePickerSettings>, isRequired, field)
+      errors = validateImagePicker(
+        answer as string[],
+        s as Partial<ImagePickerSettings>,
+        isRequired,
+        field
+      )
       break
 
     case 'matrix': {
@@ -502,7 +536,7 @@ export function validateAnswer(question: BuilderQuestion, answer: QuestionAnswer
         s as Partial<MatrixSettings>,
         isRequired,
         subquestionCodes,
-        field,
+        field
       )
       break
     }
@@ -514,17 +548,13 @@ export function validateAnswer(question: BuilderQuestion, answer: QuestionAnswer
         s as Partial<MatrixDropdownSettings>,
         isRequired,
         subquestionCodes,
-        field,
+        field
       )
       break
     }
 
     case 'matrix_dynamic':
-      errors = validateMatrixDynamic(
-        answer as Record<string, string>[],
-        isRequired,
-        field,
-      )
+      errors = validateMatrixDynamic(answer as Record<string, string>[], isRequired, field)
       break
 
     case 'numeric':
@@ -544,7 +574,12 @@ export function validateAnswer(question: BuilderQuestion, answer: QuestionAnswer
       break
 
     case 'file_upload':
-      errors = validateFileUpload(answer as File[], s as Partial<FileUploadSettings>, isRequired, field)
+      errors = validateFileUpload(
+        answer as File[],
+        s as Partial<FileUploadSettings>,
+        isRequired,
+        field
+      )
       break
 
     case 'expression':

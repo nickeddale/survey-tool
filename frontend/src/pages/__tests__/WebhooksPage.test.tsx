@@ -31,12 +31,17 @@ function renderWebhooks() {
           <Route path="/dashboard" element={<LocationDisplay />} />
         </Routes>
       </AuthProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
 function resetAuthStore() {
-  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
+  useAuthStore.setState({
+    user: null,
+    isAuthenticated: false,
+    isInitializing: false,
+    isLoading: false,
+  })
 }
 
 // ---------------------------------------------------------------------------
@@ -50,7 +55,12 @@ describe('WebhooksPage', () => {
     resetAuthStore()
     setTokens(mockTokens.access_token)
     localStorage.removeItem('devtracker_refresh_token')
-    useAuthStore.setState({ user: mockUser, isAuthenticated: true, isInitializing: false, isLoading: false })
+    useAuthStore.setState({
+      user: mockUser,
+      isAuthenticated: true,
+      isInitializing: false,
+      isLoading: false,
+    })
   })
 
   afterEach(() => {
@@ -64,9 +74,7 @@ describe('WebhooksPage', () => {
 
   describe('loading state', () => {
     it('renders loading skeleton while data is being fetched', async () => {
-      server.use(
-        http.get('/api/v1/webhooks', () => new Promise<never>(() => {})),
-      )
+      server.use(http.get('/api/v1/webhooks', () => new Promise<never>(() => {})))
 
       renderWebhooks()
 
@@ -110,8 +118,12 @@ describe('WebhooksPage', () => {
       })
 
       const webhook1 = mockWebhooks[0]
-      expect(screen.getByTestId(`webhook-event-badge-${webhook1.id}-response.completed`)).toBeInTheDocument()
-      expect(screen.getByTestId(`webhook-event-badge-${webhook1.id}-response.created`)).toBeInTheDocument()
+      expect(
+        screen.getByTestId(`webhook-event-badge-${webhook1.id}-response.completed`)
+      ).toBeInTheDocument()
+      expect(
+        screen.getByTestId(`webhook-event-badge-${webhook1.id}-response.created`)
+      ).toBeInTheDocument()
     })
 
     it('renders active/inactive badges', async () => {
@@ -173,9 +185,9 @@ describe('WebhooksPage', () => {
         http.get('/api/v1/webhooks', () =>
           HttpResponse.json(
             { items: [], total: 0, page: 1, per_page: 10, total_pages: 1 },
-            { status: 200 },
-          ),
-        ),
+            { status: 200 }
+          )
+        )
       )
 
       renderWebhooks()
@@ -251,9 +263,9 @@ describe('WebhooksPage', () => {
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
             },
-            { status: 201 },
+            { status: 201 }
           )
-        }),
+        })
       )
 
       renderWebhooks()
@@ -297,9 +309,9 @@ describe('WebhooksPage', () => {
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
             },
-            { status: 201 },
+            { status: 201 }
           )
-        }),
+        })
       )
 
       renderWebhooks()
@@ -451,7 +463,7 @@ describe('WebhooksPage', () => {
         http.delete('/api/v1/webhooks/:webhookId', () => {
           deleteCalled = true
           return new HttpResponse(null, { status: 204 })
-        }),
+        })
       )
 
       renderWebhooks()
@@ -481,7 +493,7 @@ describe('WebhooksPage', () => {
         http.delete('/api/v1/webhooks/:webhookId', ({ params }) => {
           deletedId = params.webhookId as string
           return new HttpResponse(null, { status: 204 })
-        }),
+        })
       )
 
       renderWebhooks()
@@ -520,13 +532,16 @@ describe('WebhooksPage', () => {
           patchBody = body
           const webhook = mockWebhooks.find((w) => w.id === params.webhookId)
           if (!webhook) {
-            return HttpResponse.json({ detail: { code: 'NOT_FOUND', message: 'Not found' } }, { status: 404 })
+            return HttpResponse.json(
+              { detail: { code: 'NOT_FOUND', message: 'Not found' } },
+              { status: 404 }
+            )
           }
           return HttpResponse.json(
             { ...webhook, ...body, updated_at: new Date().toISOString() },
-            { status: 200 },
+            { status: 200 }
           )
-        }),
+        })
       )
 
       renderWebhooks()
@@ -559,10 +574,16 @@ describe('WebhooksPage', () => {
         http.post('/api/v1/webhooks/:webhookId/test', ({ params }) => {
           const webhook = mockWebhooks.find((w) => w.id === params.webhookId)
           if (!webhook) {
-            return HttpResponse.json({ detail: { code: 'NOT_FOUND', message: 'Not found' } }, { status: 404 })
+            return HttpResponse.json(
+              { detail: { code: 'NOT_FOUND', message: 'Not found' } },
+              { status: 404 }
+            )
           }
-          return HttpResponse.json({ success: true, status_code: 200, error: null }, { status: 200 })
-        }),
+          return HttpResponse.json(
+            { success: true, status_code: 200, error: null },
+            { status: 200 }
+          )
+        })
       )
 
       renderWebhooks()
@@ -590,9 +611,9 @@ describe('WebhooksPage', () => {
         http.post('/api/v1/webhooks/:webhookId/test', () => {
           return HttpResponse.json(
             { success: false, status_code: 503, error: 'Connection refused' },
-            { status: 200 },
+            { status: 200 }
           )
-        }),
+        })
       )
 
       renderWebhooks()
@@ -647,9 +668,9 @@ describe('WebhooksPage', () => {
         http.get('/api/v1/webhooks', () =>
           HttpResponse.json(
             { detail: { code: 'INTERNAL_SERVER_ERROR', message: 'Internal server error' } },
-            { status: 500 },
-          ),
-        ),
+            { status: 500 }
+          )
+        )
       )
 
       renderWebhooks()

@@ -28,13 +28,7 @@ interface ParticipantFormProps {
 // Token Display (shown once after creation)
 // ---------------------------------------------------------------------------
 
-function TokenDisplay({
-  token,
-  onClose,
-}: {
-  token: string
-  onClose: () => void
-}) {
+function TokenDisplay({ token, onClose }: { token: string; onClose: () => void }) {
   const [copied, setCopied] = useState(false)
 
   function handleCopy() {
@@ -53,20 +47,14 @@ function TokenDisplay({
     >
       <Card className="max-w-md w-full mx-4 shadow-lg">
         <CardContent className="p-6">
-          <h2
-            id="token-display-title"
-            className="text-lg font-semibold text-foreground mb-2"
-          >
+          <h2 id="token-display-title" className="text-lg font-semibold text-foreground mb-2">
             Participant Token
           </h2>
           <p className="text-sm text-muted-foreground mb-4">
             This token will only be shown once. Copy it now and store it securely.
           </p>
           <div className="flex items-center gap-2 p-3 bg-muted rounded-md mb-4">
-            <code
-              className="font-mono text-sm flex-1 break-all"
-              data-testid="created-token-value"
-            >
+            <code className="font-mono text-sm flex-1 break-all" data-testid="created-token-value">
               {token}
             </code>
             <Button
@@ -109,13 +97,13 @@ function ParticipantForm({
   // Form fields
   const [email, setEmail] = useState(participant?.email ?? '')
   const [usesRemaining, setUsesRemaining] = useState(
-    participant?.uses_remaining != null ? String(participant.uses_remaining) : '',
+    participant?.uses_remaining != null ? String(participant.uses_remaining) : ''
   )
   const [validFrom, setValidFrom] = useState(
-    participant?.valid_from ? participant.valid_from.slice(0, 16) : '',
+    participant?.valid_from ? participant.valid_from.slice(0, 16) : ''
   )
   const [validUntil, setValidUntil] = useState(
-    participant?.valid_until ? participant.valid_until.slice(0, 16) : '',
+    participant?.valid_until ? participant.valid_until.slice(0, 16) : ''
   )
   const [attributes, setAttributes] = useState<KeyValuePair[]>(() => {
     if (!participant?.attributes) return []
@@ -129,9 +117,7 @@ function ParticipantForm({
   useEffect(() => {
     if (participant) {
       setEmail(participant.email ?? '')
-      setUsesRemaining(
-        participant.uses_remaining != null ? String(participant.uses_remaining) : '',
-      )
+      setUsesRemaining(participant.uses_remaining != null ? String(participant.uses_remaining) : '')
       setValidFrom(participant.valid_from ? participant.valid_from.slice(0, 16) : '')
       setValidUntil(participant.valid_until ? participant.valid_until.slice(0, 16) : '')
       setAttributes(
@@ -140,7 +126,7 @@ function ParticipantForm({
               key,
               value: String(value),
             }))
-          : [],
+          : []
       )
     }
   }, [participant])
@@ -158,9 +144,7 @@ function ParticipantForm({
   }
 
   function updateAttribute(index: number, field: 'key' | 'value', val: string) {
-    setAttributes((prev) =>
-      prev.map((pair, i) => (i === index ? { ...pair, [field]: val } : pair)),
-    )
+    setAttributes((prev) => prev.map((pair, i) => (i === index ? { ...pair, [field]: val } : pair)))
   }
 
   // ---------------------------------------------------------------------------
@@ -203,12 +187,7 @@ function ParticipantForm({
 
   // If a token was just created, show the token display overlay
   if (createdToken) {
-    return (
-      <TokenDisplay
-        token={createdToken}
-        onClose={() => onTokenAcknowledged?.()}
-      />
-    )
+    return <TokenDisplay token={createdToken} onClose={() => onTokenAcknowledged?.()} />
   }
 
   return (
@@ -221,10 +200,7 @@ function ParticipantForm({
     >
       <Card className="max-w-lg w-full mx-4 shadow-lg max-h-[90vh] overflow-y-auto">
         <CardContent className="p-6">
-          <h2
-            id="participant-form-title"
-            className="text-lg font-semibold text-foreground mb-4"
-          >
+          <h2 id="participant-form-title" className="text-lg font-semibold text-foreground mb-4">
             {isEdit ? 'Edit Participant' : 'Add Participant'}
           </h2>
 
@@ -266,7 +242,9 @@ function ParticipantForm({
                 className="block text-sm font-medium text-foreground mb-1"
               >
                 Uses Remaining
-                <span className="ml-1 text-xs text-muted-foreground">(leave blank for unlimited)</span>
+                <span className="ml-1 text-xs text-muted-foreground">
+                  (leave blank for unlimited)
+                </span>
               </label>
               <input
                 id="participant-uses"
@@ -319,9 +297,7 @@ function ParticipantForm({
             {/* Attributes */}
             <div className="mb-4">
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-foreground">
-                  Attributes
-                </label>
+                <label className="block text-sm font-medium text-foreground">Attributes</label>
                 <Button
                   type="button"
                   variant="outline"
@@ -374,19 +350,10 @@ function ParticipantForm({
 
             {/* Actions */}
             <div className="flex gap-3 justify-end mt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-                disabled={isLoading}
-              >
+              <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                disabled={isLoading}
-                data-testid="participant-form-submit"
-              >
+              <Button type="submit" disabled={isLoading} data-testid="participant-form-submit">
                 {isLoading
                   ? isEdit
                     ? 'Saving...'

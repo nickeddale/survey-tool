@@ -20,7 +20,10 @@ function LocationDisplay() {
 
 function renderRegisterPage() {
   return render(
-    <MemoryRouter initialEntries={['/register']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <MemoryRouter
+      initialEntries={['/register']}
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
       <AuthProvider>
         <Routes>
           <Route path="/register" element={<RegisterPage />} />
@@ -28,15 +31,26 @@ function renderRegisterPage() {
           <Route path="/login" element={<LocationDisplay />} />
         </Routes>
       </AuthProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
 function resetAuthStore() {
-  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
+  useAuthStore.setState({
+    user: null,
+    isAuthenticated: false,
+    isInitializing: false,
+    isLoading: false,
+  })
 }
 
-async function fillForm(user: ReturnType<typeof userEvent.setup>, name: string, email: string, password: string, confirmPassword: string) {
+async function fillForm(
+  user: ReturnType<typeof userEvent.setup>,
+  name: string,
+  email: string,
+  password: string,
+  confirmPassword: string
+) {
   await user.type(screen.getByLabelText('Name'), name)
   await user.type(screen.getByLabelText('Email'), email)
   await user.type(screen.getByLabelText('Password'), password)
@@ -100,7 +114,9 @@ describe('RegisterPage', () => {
       fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Test User' } })
       fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'notanemail' } })
       fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'password123' } })
-      fireEvent.change(screen.getByLabelText('Confirm Password'), { target: { value: 'password123' } })
+      fireEvent.change(screen.getByLabelText('Confirm Password'), {
+        target: { value: 'password123' },
+      })
       fireEvent.submit(screen.getByRole('button', { name: /create account/i }).closest('form')!)
       expect(await screen.findByText('Please enter a valid email address')).toBeInTheDocument()
     })
@@ -173,9 +189,7 @@ describe('RegisterPage', () => {
 
   describe('loading state', () => {
     it('disables the button and shows loading text while submitting', async () => {
-      server.use(
-        http.post('/api/v1/auth/register', () => new Promise<never>(() => {})),
-      )
+      server.use(http.post('/api/v1/auth/register', () => new Promise<never>(() => {})))
 
       const user = userEvent.setup()
       renderRegisterPage()
@@ -241,9 +255,7 @@ describe('RegisterPage', () => {
     })
 
     it('shows generic error message for non-ApiError failures', async () => {
-      server.use(
-        http.post('/api/v1/auth/register', () => HttpResponse.error()),
-      )
+      server.use(http.post('/api/v1/auth/register', () => HttpResponse.error()))
 
       const user = userEvent.setup()
       renderRegisterPage()
@@ -255,7 +267,9 @@ describe('RegisterPage', () => {
       })
 
       await waitFor(() => {
-        expect(screen.getByRole('alert')).toHaveTextContent('Registration failed. Please try again.')
+        expect(screen.getByRole('alert')).toHaveTextContent(
+          'Registration failed. Please try again.'
+        )
       })
     })
   })
