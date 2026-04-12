@@ -7,8 +7,8 @@ Thanks for your interest in contributing! This guide will help you get started.
 The easiest way to get everything running is with Docker Compose:
 
 ```bash
-git clone https://github.com/your-username/survey_tool.git
-cd survey_tool
+git clone https://github.com/nickeddale/survey-tool.git
+cd survey-tool
 docker compose up
 ```
 

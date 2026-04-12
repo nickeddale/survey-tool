@@ -6,9 +6,12 @@ An open-source survey platform inspired by LimeSurvey, built with FastAPI and Re
 
 ## Features
 
-- **Survey Builder** with drag-and-drop question ordering
+- **Survey Builder** with drag-and-drop question ordering and live preview
+- **27+ Question Types** — short text, long text, single choice, multiple choice, dropdown, ranking, matrix, rating, scale, number, date, boolean, file upload, and more
 - **Conditional Logic** and skip patterns via a custom expression language
-- **Multiple Question Types** — text, number, radio, checkbox, dropdown, boolean, date, ranking, matrix, and more
+- **Piped Text** — dynamically inject answer values into question text and descriptions
+- **Multi-Language Support** with per-survey translations
+- **Rich Text Editing** for long-form question content
 - **Authentication** — JWT bearer tokens and API keys
 - **Response Collection** with CSV export
 - **Participant Management** with token-based access and CSV import
@@ -46,6 +49,7 @@ Once the containers are healthy:
 - [Question Types](docs/QUESTION_TYPES.md) — Supported types and configuration
 - [Expression Language](docs/EXPRESSION_LANGUAGE.md) — Conditional logic syntax
 - [Database Schema](docs/DATABASE_SCHEMA.md) — ERD and table definitions
+- [Project Plan](docs/PROJECT_PLAN.md) — Roadmap and development phases
 
 ## Development
 
