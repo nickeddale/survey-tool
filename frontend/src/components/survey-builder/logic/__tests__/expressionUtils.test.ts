@@ -4,7 +4,6 @@ import {
   serializeGroup,
   serializeRootGroup,
   parseExpression,
-  makeEmptyCondition,
 } from '../expressionUtils'
 import type { ConditionGroup, ConditionRow } from '../types'
 
