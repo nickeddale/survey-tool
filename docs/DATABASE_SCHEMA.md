@@ -82,13 +82,13 @@ All primary keys are UUIDs. Timestamps use `TIMESTAMP WITH TIME ZONE`. JSONB col
 |---|---|---|---|
 | `id` | `UUID` | `PRIMARY KEY`, `DEFAULT gen_random_uuid()` | |
 | `user_id` | `UUID` | `NOT NULL`, `REFERENCES users(id) ON DELETE CASCADE` | Survey owner |
-| `title` | `VARCHAR(255)` | `NOT NULL` | Survey title |
+| `title` | `VARCHAR(500)` | `NOT NULL` | Survey title |
 | `description` | `TEXT` | | Optional longer description |
 | `status` | `survey_status` | `NOT NULL`, `DEFAULT 'draft'` | See ENUM: `survey_status` |
 | `welcome_message` | `TEXT` | | Shown before the first question |
 | `end_message` | `TEXT` | | Shown after survey completion |
 | `default_language` | `VARCHAR(10)` | `NOT NULL`, `DEFAULT 'en'` | ISO 639-1 language code |
-| `settings` | `JSONB` | `NOT NULL`, `DEFAULT '{}'` | Format preferences, anonymity flag, date format, etc. |
+| `settings` | `JSONB` | | Format preferences, anonymity flag, date format, etc. |
 | `created_at` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | |
 | `updated_at` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | |
 
@@ -98,7 +98,7 @@ All primary keys are UUIDs. Timestamps use `TIMESTAMP WITH TIME ZONE`. JSONB col
 |---|---|---|---|
 | `id` | `UUID` | `PRIMARY KEY`, `DEFAULT gen_random_uuid()` | |
 | `survey_id` | `UUID` | `NOT NULL`, `REFERENCES surveys(id) ON DELETE CASCADE` | Parent survey |
-| `title` | `VARCHAR(255)` | `NOT NULL` | Group heading |
+| `title` | `VARCHAR(500)` | `NOT NULL` | Group heading |
 | `description` | `TEXT` | | Optional group description |
 | `sort_order` | `INTEGER` | `NOT NULL`, `DEFAULT 0` | Display order within the survey |
 | `relevance` | `TEXT` | | Expression for conditional display (see Expression Language docs) |
@@ -118,8 +118,8 @@ All primary keys are UUIDs. Timestamps use `TIMESTAMP WITH TIME ZONE`. JSONB col
 | `is_required` | `BOOLEAN` | `NOT NULL`, `DEFAULT false` | Whether an answer is mandatory |
 | `sort_order` | `INTEGER` | `NOT NULL`, `DEFAULT 0` | Display order within the group |
 | `relevance` | `TEXT` | | Expression for conditional display |
-| `validation` | `JSONB` | `NOT NULL`, `DEFAULT '{}'` | Validation rules: `{"min": 0, "max": 100, "regex": "^[0-9]+$"}` |
-| `settings` | `JSONB` | `NOT NULL`, `DEFAULT '{}'` | Type-specific settings (e.g., `{"rows": 5}` for huge_text) |
+| `validation` | `JSONB` | | Validation rules: `{"min": 0, "max": 100, "regex": "^[0-9]+$"}` |
+| `settings` | `JSONB` | | Type-specific settings (e.g., `{"rows": 5}` for huge_text) |
 | `created_at` | `TIMESTAMPTZ` | `NOT NULL`, `DEFAULT now()` | |
 
 #### `answer_options`
@@ -257,19 +257,28 @@ Stored as `VARCHAR(50)` on the `questions` table. Valid values:
 | `short_text` | Text | Single-line text input |
 | `long_text` | Text | Multi-line textarea |
 | `huge_text` | Text | Large textarea with configurable rows |
-| `radio` | Choice | Single-select radio buttons |
+| `single_choice` | Choice | Single-select radio buttons |
+| `multiple_choice` | Choice | Multi-select checkboxes |
 | `dropdown` | Choice | Single-select dropdown menu |
-| `checkbox` | Choice | Multi-select checkboxes |
 | `ranking` | Choice | Drag-to-rank ordering of options |
 | `image_picker` | Choice | Select from image-based options |
-| `matrix` | Matrix/Array | Grid with radio buttons per row |
+| `matrix` | Matrix/Array | Generic matrix grid |
+| `matrix_single` | Matrix/Array | Grid with radio buttons per row |
+| `matrix_multiple` | Matrix/Array | Grid with checkboxes per row |
 | `matrix_dropdown` | Matrix/Array | Grid with dropdowns per row |
 | `matrix_dynamic` | Matrix/Array | Dynamic row grid (respondent adds rows) |
-| `numeric` | Scalar | Numeric input with optional min/max |
 | `rating` | Scalar | Star or scale rating |
-| `boolean` | Scalar | Yes/No toggle |
+| `scale` | Scalar | Linear scale input |
+| `number` | Scalar | Numeric input with optional min/max |
 | `date` | Scalar | Date picker |
+| `time` | Scalar | Time picker |
+| `datetime` | Scalar | Date and time picker |
 | `file_upload` | Special | File attachment |
+| `email` | Special | Email address input |
+| `phone` | Special | Phone number input |
+| `url` | Special | URL input |
+| `yes_no` | Special | Yes/No selection |
+| `boolean` | Scalar | Boolean toggle |
 | `expression` | Special | Computed value (not user-editable) |
 | `html` | Special | Static HTML content block (not a question) |
 
