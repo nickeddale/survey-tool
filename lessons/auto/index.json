@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-13T18:29:50.213Z",
+  "lastUpdated": "2026-04-13T18:47:59.437Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4525,6 +4525,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-13-iss-236-frontend-email-invitations-management-page.md",
+      "ticketId": "ISS-236",
+      "title": "Frontend Email Invitations management page",
+      "date": "2026-04-13",
+      "categories": [
+        "frontend",
+        "react",
+        "ui-patterns",
+        "testing",
+        "forms"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4745,7 +4761,8 @@
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
       "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
-      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md"
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
+      "2026-04-13-iss-236-frontend-email-invitations-management-page.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6499,7 +6516,8 @@
       "2026-04-09-iss-195-add-builder-button-to-survey-detail-page.md",
       "2026-04-09-iss-204-questions-with-relevance-flash-visible-before-init.md",
       "2026-04-09-iss-200-test-expression-evaluator-always-returns-true-rega.md",
-      "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md"
+      "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md",
+      "2026-04-13-iss-236-frontend-email-invitations-management-page.md"
     ],
     "vitest": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
@@ -6541,7 +6559,8 @@
       "2026-04-03-iss-095-613-frontend-response-export-ui-and-statistics-das.md",
       "2026-04-03-iss-105-710-frontend-quota-management-ui.md",
       "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md",
-      "2026-04-04-iss-104-79-frontend-participant-management-ui.md"
+      "2026-04-04-iss-104-79-frontend-participant-management-ui.md",
+      "2026-04-13-iss-236-frontend-email-invitations-management-page.md"
     ],
     "expression-builder": [
       "2026-04-03-iss-080-510-frontend-relevance-expression-builder-ui.md"
@@ -6597,7 +6616,8 @@
       "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md"
     ],
     "forms": [
-      "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md"
+      "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md",
+      "2026-04-13-iss-236-frontend-email-invitations-management-page.md"
     ],
     "module-splitting": [
       "2026-04-06-iss-123-cq-01-split-responseservicepy-into-focused-modules.md"
@@ -6634,6 +6654,9 @@
     ],
     "asgi": [
       "2026-04-11-iss-222-no-request-body-size-limit-large-payload-dos.md"
+    ],
+    "ui-patterns": [
+      "2026-04-13-iss-236-frontend-email-invitations-management-page.md"
     ]
   },
   "fileIndex": {
