@@ -82,7 +82,7 @@ describe('EmailInvitationForm', () => {
 
   it('shows API error when error prop provided', () => {
     render(
-      <EmailInvitationForm onSubmit={vi.fn()} onCancel={vi.fn()} error="Server error occurred" />,
+      <EmailInvitationForm onSubmit={vi.fn()} onCancel={vi.fn()} error="Server error occurred" />
     )
 
     expect(screen.getByTestId('form-error')).toHaveTextContent('Server error occurred')
@@ -105,8 +105,6 @@ describe('EmailInvitationForm', () => {
     await user.type(screen.getByTestId('inv-email-input'), 'test@example.com')
     await user.click(screen.getByTestId('inv-submit-button'))
 
-    expect(onSubmit).toHaveBeenCalledWith(
-      expect.objectContaining({ invitation_type: 'reminder' }),
-    )
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ invitation_type: 'reminder' }))
   })
 })

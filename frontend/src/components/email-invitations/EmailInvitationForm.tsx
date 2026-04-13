@@ -55,10 +55,7 @@ function EmailInvitationForm({ onSubmit, onCancel, isLoading, error }: EmailInvi
     >
       <Card className="max-w-lg w-full mx-4 shadow-lg">
         <CardContent className="p-6">
-          <h2
-            id="invitation-form-title"
-            className="text-lg font-semibold text-foreground mb-4"
-          >
+          <h2 id="invitation-form-title" className="text-lg font-semibold text-foreground mb-4">
             Send Invitation
           </h2>
 
@@ -75,10 +72,7 @@ function EmailInvitationForm({ onSubmit, onCancel, isLoading, error }: EmailInvi
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Recipient Email */}
             <div>
-              <label
-                htmlFor="inv-email"
-                className="block text-sm font-medium text-foreground mb-1"
-              >
+              <label htmlFor="inv-email" className="block text-sm font-medium text-foreground mb-1">
                 Recipient Email <span className="text-destructive">*</span>
               </label>
               <input
@@ -95,10 +89,7 @@ function EmailInvitationForm({ onSubmit, onCancel, isLoading, error }: EmailInvi
 
             {/* Recipient Name */}
             <div>
-              <label
-                htmlFor="inv-name"
-                className="block text-sm font-medium text-foreground mb-1"
-              >
+              <label htmlFor="inv-name" className="block text-sm font-medium text-foreground mb-1">
                 Recipient Name
               </label>
               <input
@@ -135,10 +126,7 @@ function EmailInvitationForm({ onSubmit, onCancel, isLoading, error }: EmailInvi
 
             {/* Invitation Type */}
             <div>
-              <label
-                htmlFor="inv-type"
-                className="block text-sm font-medium text-foreground mb-1"
-              >
+              <label htmlFor="inv-type" className="block text-sm font-medium text-foreground mb-1">
                 Type
               </label>
               <select

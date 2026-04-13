@@ -1,4 +1,14 @@
-import { ArrowLeft, Pencil, Copy, Download, Trash2, List, BarChart2, Users, Mail } from 'lucide-react'
+import {
+  ArrowLeft,
+  Pencil,
+  Copy,
+  Download,
+  Trash2,
+  List,
+  BarChart2,
+  Users,
+  Mail,
+} from 'lucide-react'
 import { Button } from '../ui/button'
 import type { ModalType } from './types'
 

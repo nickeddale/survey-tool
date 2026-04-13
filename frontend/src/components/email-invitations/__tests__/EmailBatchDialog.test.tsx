@@ -104,8 +104,11 @@ describe('EmailBatchDialog', () => {
   it('shows error when batch send fails', async () => {
     server.use(
       http.post(`/api/v1/surveys/${SURVEY_ID}/invitations/batch`, () =>
-        HttpResponse.json({ detail: { code: 'SERVER_ERROR', message: 'Internal error' } }, { status: 500 }),
-      ),
+        HttpResponse.json(
+          { detail: { code: 'SERVER_ERROR', message: 'Internal error' } },
+          { status: 500 }
+        )
+      )
     )
 
     const user = userEvent.setup()

@@ -55,7 +55,10 @@ function formatRate(rate: number): string {
 function EmailStatsCards({ stats, isLoading }: EmailStatsCardsProps) {
   if (isLoading || !stats) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6" data-testid="stats-cards-loading">
+      <div
+        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6"
+        data-testid="stats-cards-loading"
+      >
         {Array.from({ length: 6 }).map((_, i) => (
           <MetricCardSkeleton key={i} />
         ))}
@@ -64,32 +67,15 @@ function EmailStatsCards({ stats, isLoading }: EmailStatsCardsProps) {
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6" data-testid="stats-cards">
-      <MetricCard
-        label="Sent"
-        value={stats.total_sent}
-        testId="stat-total-sent"
-      />
-      <MetricCard
-        label="Delivered"
-        value={stats.total_delivered}
-        testId="stat-total-delivered"
-      />
-      <MetricCard
-        label="Bounced"
-        value={stats.total_bounced}
-        testId="stat-total-bounced"
-      />
-      <MetricCard
-        label="Failed"
-        value={stats.total_failed}
-        testId="stat-total-failed"
-      />
-      <MetricCard
-        label="Open Rate"
-        value={formatRate(stats.open_rate)}
-        testId="stat-open-rate"
-      />
+    <div
+      className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6"
+      data-testid="stats-cards"
+    >
+      <MetricCard label="Sent" value={stats.total_sent} testId="stat-total-sent" />
+      <MetricCard label="Delivered" value={stats.total_delivered} testId="stat-total-delivered" />
+      <MetricCard label="Bounced" value={stats.total_bounced} testId="stat-total-bounced" />
+      <MetricCard label="Failed" value={stats.total_failed} testId="stat-total-failed" />
+      <MetricCard label="Open Rate" value={formatRate(stats.open_rate)} testId="stat-open-rate" />
       <MetricCard
         label="Click Rate"
         value={formatRate(stats.click_rate)}
