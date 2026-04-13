@@ -411,6 +411,41 @@ export const mockQuotas = [
   },
 ]
 
+export const mockEmailInvitations = [
+  {
+    id: 'inv-00000000-0000-0000-0000-000000000001',
+    survey_id: '10000000-0000-0000-0000-000000000002',
+    recipient_email: 'alice@example.com',
+    recipient_name: 'Alice',
+    subject: 'You are invited to take our survey',
+    invitation_type: 'invite',
+    status: 'delivered',
+    sent_at: '2024-01-10T10:00:00Z',
+    delivered_at: '2024-01-10T10:01:00Z',
+    opened_at: '2024-01-10T11:00:00Z',
+    clicked_at: null,
+    bounced_at: null,
+    created_at: '2024-01-10T10:00:00Z',
+    updated_at: '2024-01-10T10:01:00Z',
+  },
+  {
+    id: 'inv-00000000-0000-0000-0000-000000000002',
+    survey_id: '10000000-0000-0000-0000-000000000002',
+    recipient_email: 'bob@example.com',
+    recipient_name: null,
+    subject: null,
+    invitation_type: 'reminder',
+    status: 'sent',
+    sent_at: '2024-01-11T10:00:00Z',
+    delivered_at: null,
+    opened_at: null,
+    clicked_at: null,
+    bounced_at: null,
+    created_at: '2024-01-11T10:00:00Z',
+    updated_at: '2024-01-11T10:00:00Z',
+  },
+]
+
 export const mockParticipants = [
   {
     id: 'part-00000000-0000-0000-0000-000000000001',
@@ -1537,6 +1572,176 @@ export const handlers = [
 
   // DELETE /api/v1/auth/keys/:keyId
   http.delete(`${BASE}/auth/keys/:keyId`, ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  // ---------------------------------------------------------------------------
+  // Email Invitation endpoints
+  // ---------------------------------------------------------------------------
+
+  // GET /api/v1/surveys/:surveyId/invitations/stats
+  http.get(`${BASE}/surveys/:surveyId/invitations/stats`, ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const surveyInvitations = mockEmailInvitations.filter((i) => i.survey_id === params.surveyId)
+    const totalSent = surveyInvitations.filter((i) => i.sent_at).length
+    const totalDelivered = surveyInvitations.filter((i) => i.delivered_at).length
+    const totalOpened = surveyInvitations.filter((i) => i.opened_at).length
+    const totalClicked = surveyInvitations.filter((i) => i.clicked_at).length
+    return HttpResponse.json(
+      {
+        total_sent: totalSent,
+        total_delivered: totalDelivered,
+        total_bounced: 0,
+        total_failed: 0,
+        open_rate: totalSent > 0 ? totalOpened / totalSent : 0,
+        click_rate: totalSent > 0 ? totalClicked / totalSent : 0,
+      },
+      { status: 200 },
+    )
+  }),
+
+  // GET /api/v1/surveys/:surveyId/invitations
+  http.get(`${BASE}/surveys/:surveyId/invitations`, ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const url = new URL(request.url)
+    const page = Math.max(1, parseInt(url.searchParams.get('page') ?? '1', 10) || 1)
+    const perPage = Math.max(1, parseInt(url.searchParams.get('per_page') ?? '20', 10) || 20)
+    const statusFilter = url.searchParams.get('status')
+    const typeFilter = url.searchParams.get('invitation_type')
+
+    let items = mockEmailInvitations.filter((i) => i.survey_id === params.surveyId)
+    if (statusFilter) {
+      items = items.filter((i) => i.status === statusFilter)
+    }
+    if (typeFilter) {
+      items = items.filter((i) => i.invitation_type === typeFilter)
+    }
+
+    const total = items.length
+    const totalPages = Math.max(1, Math.ceil(total / perPage))
+    const start = (page - 1) * perPage
+    const pageItems = items.slice(start, start + perPage)
+
+    return HttpResponse.json(
+      { items: pageItems, total, page, per_page: perPage, total_pages: totalPages },
+      { status: 200 },
+    )
+  }),
+
+  // GET /api/v1/surveys/:surveyId/invitations/:invitationId
+  http.get(`${BASE}/surveys/:surveyId/invitations/:invitationId`, ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const invitation = mockEmailInvitations.find(
+      (i) => i.id === params.invitationId && i.survey_id === params.surveyId,
+    )
+    if (!invitation) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Invitation not found' } },
+        { status: 404 },
+      )
+    }
+    return HttpResponse.json(invitation, { status: 200 })
+  }),
+
+  // POST /api/v1/surveys/:surveyId/invitations/batch
+  http.post(`${BASE}/surveys/:surveyId/invitations/batch`, async ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const body = (await request.json()) as { items: Array<{ email: string; name?: string }> }
+    return HttpResponse.json(
+      { sent: body.items.length, failed: 0, skipped: 0 },
+      { status: 201 },
+    )
+  }),
+
+  // POST /api/v1/surveys/:surveyId/invitations
+  http.post(`${BASE}/surveys/:surveyId/invitations`, async ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 },
+      )
+    }
+    const body = (await request.json()) as Record<string, unknown>
+    const newInvitation = {
+      id: `inv-new-${Date.now()}`,
+      survey_id: params.surveyId as string,
+      recipient_email: (body.recipient_email as string) ?? '',
+      recipient_name: (body.recipient_name as string | null) ?? null,
+      subject: (body.subject as string | null) ?? null,
+      invitation_type: (body.invitation_type as string) ?? 'invite',
+      status: 'sent',
+      sent_at: new Date().toISOString(),
+      delivered_at: null,
+      opened_at: null,
+      clicked_at: null,
+      bounced_at: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+    return HttpResponse.json(newInvitation, { status: 201 })
+  }),
+
+  // POST /api/v1/surveys/:surveyId/invitations/:invitationId/resend
+  http.post(
+    `${BASE}/surveys/:surveyId/invitations/:invitationId/resend`,
+    ({ request, params }) => {
+      const authHeader = request.headers.get('Authorization')
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return HttpResponse.json(
+          { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+          { status: 401 },
+        )
+      }
+      const invitation = mockEmailInvitations.find(
+        (i) => i.id === params.invitationId && i.survey_id === params.surveyId,
+      )
+      if (!invitation) {
+        return HttpResponse.json(
+          { detail: { code: 'NOT_FOUND', message: 'Invitation not found' } },
+          { status: 404 },
+        )
+      }
+      return HttpResponse.json(
+        { ...invitation, status: 'sent', sent_at: new Date().toISOString() },
+        { status: 200 },
+      )
+    },
+  ),
+
+  // DELETE /api/v1/surveys/:surveyId/invitations/:invitationId
+  http.delete(`${BASE}/surveys/:surveyId/invitations/:invitationId`, ({ request }) => {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
