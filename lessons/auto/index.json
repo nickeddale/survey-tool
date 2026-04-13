@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-13T18:22:43.123Z",
+  "lastUpdated": "2026-04-13T18:29:50.213Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4507,6 +4507,24 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
+      "ticketId": "ISS-235",
+      "title": "Frontend TypeScript types and API service for email invitations",
+      "date": "2026-04-13",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4726,7 +4744,8 @@
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
-      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4924,7 +4943,8 @@
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
-      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5077,7 +5097,8 @@
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
-      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5289,7 +5310,8 @@
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
-      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5556,7 +5578,8 @@
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
-      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5769,7 +5792,8 @@
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
-      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6324,7 +6348,8 @@
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
-      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
