@@ -16,6 +16,8 @@ from app.schemas.email_invitation import (
     EmailInvitationCreate,
     EmailInvitationListResponse,
     EmailInvitationResponse,
+    SendRemindersRequest,
+    SendRemindersResponse,
 )
 from app.services import email_invitation_service
 from app.utils.errors import NotFoundError
@@ -151,6 +153,40 @@ async def list_invitations(
         per_page=result["per_page"],
         pages=result["pages"],
     )
+
+
+@router.post(
+    "/{survey_id}/email-invitations/send-reminders",
+    response_model=SendRemindersResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Send reminder emails to incomplete participants",
+    description=(
+        "Send reminder emails to all participants who have not completed the survey and "
+        "have a linked email invitation. Optionally filter by days_since_invite and max_reminders."
+    ),
+)
+@limiter.limit(RATE_LIMITS["default_mutating"])
+async def send_reminders(
+    request: Request,
+    survey_id: str,
+    payload: SendRemindersRequest,
+    current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
+    session: AsyncSession = Depends(get_db),
+) -> SendRemindersResponse:
+    """Send reminder emails to incomplete participants."""
+    parsed_survey_id = _parse_survey_id(survey_id)
+    survey = await _get_survey_or_404(session, parsed_survey_id, current_user.id)
+
+    summary = await email_invitation_service.send_reminders(
+        session=session,
+        survey_id=parsed_survey_id,
+        days_since_invite=payload.days_since_invite,
+        max_reminders=payload.max_reminders,
+        survey_title=survey.title,
+        survey_description=survey.description,
+    )
+    return SendRemindersResponse(**summary)
 
 
 @router.get(

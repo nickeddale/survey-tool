@@ -73,6 +73,12 @@ class EmailInvitation(Base):
         default=0,
         server_default=text("0"),
     )
+    reminder_count: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=0,
+        server_default=text("0"),
+    )
     invitation_type: Mapped[str] = mapped_column(
         String(50),
         nullable=False,

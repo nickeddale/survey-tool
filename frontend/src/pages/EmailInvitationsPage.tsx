@@ -1,12 +1,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Plus, Upload, Search } from 'lucide-react'
+import { ArrowLeft, Plus, Upload, Search, Bell } from 'lucide-react'
 import emailInvitationService from '../services/emailInvitationService'
 import type {
   EmailInvitationResponse,
   EmailInvitationStats,
   EmailInvitationBatchResponse,
   EmailInvitationCreate,
+  SendRemindersRequest,
+  SendRemindersResponse,
 } from '../types/survey'
 import { ApiError } from '../types/api'
 import { Button } from '../components/ui/button'
@@ -53,10 +55,7 @@ function ConfirmDeleteModal({
     >
       <Card className="max-w-md w-full mx-4 shadow-lg">
         <CardContent className="p-6">
-          <h2
-            id="delete-invitation-title"
-            className="text-lg font-semibold text-foreground mb-2"
-          >
+          <h2 id="delete-invitation-title" className="text-lg font-semibold text-foreground mb-2">
             Delete Invitation
           </h2>
           <p className="text-sm text-muted-foreground mb-4">
@@ -110,10 +109,7 @@ function BatchResultsModal({ result, onClose }: BatchResultsModalProps) {
     >
       <Card className="max-w-md w-full mx-4 shadow-lg">
         <CardContent className="p-6">
-          <h2
-            id="batch-results-title"
-            className="text-lg font-semibold text-foreground mb-2"
-          >
+          <h2 id="batch-results-title" className="text-lg font-semibold text-foreground mb-2">
             Batch Send Complete
           </h2>
           <div className="text-sm text-muted-foreground mb-4 space-y-1">
@@ -134,6 +130,164 @@ function BatchResultsModal({ result, onClose }: BatchResultsModalProps) {
           </div>
           <div className="flex justify-end">
             <Button onClick={onClose} data-testid="batch-results-close">
+              Done
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Send Reminders dialog
+// ---------------------------------------------------------------------------
+
+interface SendRemindersDialogProps {
+  isLoading?: boolean
+  error?: string | null
+  onConfirm: (params: SendRemindersRequest) => void
+  onCancel: () => void
+}
+
+function SendRemindersDialog({ isLoading, error, onConfirm, onCancel }: SendRemindersDialogProps) {
+  const [daysSinceInvite, setDaysSinceInvite] = useState<string>('')
+  const [maxReminders, setMaxReminders] = useState<string>('')
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const params: SendRemindersRequest = {}
+    const days = parseInt(daysSinceInvite, 10)
+    const max = parseInt(maxReminders, 10)
+    if (!isNaN(days) && days >= 1) params.days_since_invite = days
+    if (!isNaN(max) && max >= 1) params.max_reminders = max
+    onConfirm(params)
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="send-reminders-title"
+      data-testid="send-reminders-dialog"
+    >
+      <Card className="max-w-md w-full mx-4 shadow-lg">
+        <CardContent className="p-6">
+          <h2 id="send-reminders-title" className="text-lg font-semibold text-foreground mb-2">
+            Send Reminder Emails
+          </h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Send reminder emails to participants who have not yet completed the survey. Only
+            participants with an existing invitation will be reminded.
+          </p>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label
+                htmlFor="days-since-invite"
+                className="block text-sm font-medium text-foreground mb-1"
+              >
+                Minimum days since original invite
+              </label>
+              <input
+                id="days-since-invite"
+                type="number"
+                min={1}
+                value={daysSinceInvite}
+                onChange={(e) => setDaysSinceInvite(e.target.value)}
+                placeholder="e.g. 3 (leave blank for any)"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                data-testid="days-since-invite-input"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Only remind participants whose invite was sent at least this many days ago.
+              </p>
+            </div>
+            <div>
+              <label
+                htmlFor="max-reminders"
+                className="block text-sm font-medium text-foreground mb-1"
+              >
+                Maximum reminders per participant
+              </label>
+              <input
+                id="max-reminders"
+                type="number"
+                min={1}
+                value={maxReminders}
+                onChange={(e) => setMaxReminders(e.target.value)}
+                placeholder="e.g. 2 (leave blank for unlimited)"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                data-testid="max-reminders-input"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Skip participants who have already received this many reminders.
+              </p>
+            </div>
+            {error && (
+              <div
+                className="p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+                role="alert"
+              >
+                {error}
+              </div>
+            )}
+            <div className="flex gap-3 justify-end pt-2">
+              <Button variant="outline" type="button" onClick={onCancel} disabled={isLoading}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isLoading} data-testid="send-reminders-confirm">
+                {isLoading ? 'Sending...' : 'Send Reminders'}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Reminder results modal
+// ---------------------------------------------------------------------------
+
+interface ReminderResultsModalProps {
+  result: SendRemindersResponse
+  onClose: () => void
+}
+
+function ReminderResultsModal({ result, onClose }: ReminderResultsModalProps) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="reminder-results-title"
+      data-testid="reminder-results-modal"
+    >
+      <Card className="max-w-md w-full mx-4 shadow-lg">
+        <CardContent className="p-6">
+          <h2 id="reminder-results-title" className="text-lg font-semibold text-foreground mb-2">
+            Reminders Sent
+          </h2>
+          <div className="text-sm text-muted-foreground mb-4 space-y-1">
+            <p>
+              <strong className="text-foreground">{result.sent}</strong> reminder
+              {result.sent !== 1 ? 's' : ''} sent successfully.
+            </p>
+            {result.skipped > 0 && (
+              <p>
+                <strong>{result.skipped}</strong> skipped (already completed or limit reached).
+              </p>
+            )}
+            {result.failed > 0 && (
+              <p className="text-destructive">
+                <strong>{result.failed}</strong> failed.
+              </p>
+            )}
+          </div>
+          <div className="flex justify-end">
+            <Button onClick={onClose} data-testid="reminder-results-close">
               Done
             </Button>
           </div>
@@ -174,9 +328,7 @@ function EmailInvitationsPage() {
   const [formError, setFormError] = useState<string | null>(null)
 
   // Delete state
-  const [deletingInvitation, setDeletingInvitation] = useState<EmailInvitationResponse | null>(
-    null,
-  )
+  const [deletingInvitation, setDeletingInvitation] = useState<EmailInvitationResponse | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
@@ -186,6 +338,12 @@ function EmailInvitationsPage() {
   // Batch state
   const [showBatch, setShowBatch] = useState(false)
   const [batchResult, setBatchResult] = useState<EmailInvitationBatchResponse | null>(null)
+
+  // Reminders state
+  const [showReminders, setShowReminders] = useState(false)
+  const [remindersLoading, setRemindersLoading] = useState(false)
+  const [remindersError, setRemindersError] = useState<string | null>(null)
+  const [remindersResult, setRemindersResult] = useState<SendRemindersResponse | null>(null)
 
   // ---------------------------------------------------------------------------
   // Load data
@@ -269,7 +427,7 @@ function EmailInvitationsPage() {
         setFormLoading(false)
       }
     },
-    [surveyId, loadInvitations, loadStats],
+    [surveyId, loadInvitations, loadStats]
   )
 
   // ---------------------------------------------------------------------------
@@ -326,7 +484,7 @@ function EmailInvitationsPage() {
         setResendingId(null)
       }
     },
-    [surveyId, loadInvitations, loadStats],
+    [surveyId, loadInvitations, loadStats]
   )
 
   // ---------------------------------------------------------------------------
@@ -338,6 +496,33 @@ function EmailInvitationsPage() {
     setBatchResult(result)
     void Promise.all([loadInvitations(), loadStats()])
   }
+
+  // ---------------------------------------------------------------------------
+  // Send Reminders
+  // ---------------------------------------------------------------------------
+
+  const handleSendReminders = useCallback(
+    async (params: SendRemindersRequest) => {
+      if (!surveyId) return
+      setRemindersLoading(true)
+      setRemindersError(null)
+      try {
+        const result = await emailInvitationService.sendReminders(surveyId, params)
+        setShowReminders(false)
+        setRemindersResult(result)
+        void Promise.all([loadInvitations(), loadStats()])
+      } catch (err) {
+        if (err instanceof ApiError) {
+          setRemindersError(err.message)
+        } else {
+          setRemindersError('Failed to send reminders. Please try again.')
+        }
+      } finally {
+        setRemindersLoading(false)
+      }
+    },
+    [surveyId, loadInvitations, loadStats]
+  )
 
   // ---------------------------------------------------------------------------
   // Filter helpers
@@ -402,6 +587,22 @@ function EmailInvitationsPage() {
         <BatchResultsModal result={batchResult} onClose={() => setBatchResult(null)} />
       )}
 
+      {showReminders && (
+        <SendRemindersDialog
+          isLoading={remindersLoading}
+          error={remindersError}
+          onConfirm={handleSendReminders}
+          onCancel={() => {
+            setShowReminders(false)
+            setRemindersError(null)
+          }}
+        />
+      )}
+
+      {remindersResult && (
+        <ReminderResultsModal result={remindersResult} onClose={() => setRemindersResult(null)} />
+      )}
+
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <Button
@@ -414,6 +615,18 @@ function EmailInvitationsPage() {
           <ArrowLeft size={18} />
         </Button>
         <h1 className="text-2xl font-bold text-foreground flex-1">Email Invitations</h1>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setRemindersError(null)
+            setShowReminders(true)
+          }}
+          className="gap-1.5"
+          data-testid="send-reminders-button"
+        >
+          <Bell size={15} />
+          Send Reminders
+        </Button>
         <Button
           variant="outline"
           onClick={() => setShowBatch(true)}

@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from typing import Optional
 
 
 class EmailInvitationCreate(BaseModel):
@@ -32,6 +33,7 @@ class EmailInvitationResponse(BaseModel):
     clicked_at: datetime | None
     error_message: str | None
     attempt_count: int
+    reminder_count: int
     invitation_type: str
     created_at: datetime
     updated_at: datetime
@@ -48,3 +50,22 @@ class EmailInvitationListResponse(BaseModel):
 class EmailInvitationUpdate(BaseModel):
     subject: str | None = None
     status: str | None = None
+
+
+class SendRemindersRequest(BaseModel):
+    days_since_invite: Optional[int] = Field(
+        default=None,
+        ge=1,
+        description="Only remind participants whose original invite was sent at least this many days ago.",
+    )
+    max_reminders: Optional[int] = Field(
+        default=None,
+        ge=1,
+        description="Skip participants who have already received this many or more reminders.",
+    )
+
+
+class SendRemindersResponse(BaseModel):
+    sent: int
+    skipped: int
+    failed: int

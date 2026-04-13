@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-13T18:47:59.437Z",
+  "lastUpdated": "2026-04-13T19:03:03.230Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4541,6 +4541,27 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
+      "ticketId": "ISS-237",
+      "title": "Automated reminder emails for incomplete surveys",
+      "date": "2026-04-13",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4762,7 +4783,8 @@
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
       "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
       "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
-      "2026-04-13-iss-236-frontend-email-invitations-management-page.md"
+      "2026-04-13-iss-236-frontend-email-invitations-management-page.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4961,7 +4983,8 @@
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
       "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
-      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md"
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5115,7 +5138,8 @@
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
       "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
-      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md"
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5328,7 +5352,8 @@
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
       "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
-      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md"
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5596,7 +5621,8 @@
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
       "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
-      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md"
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5810,7 +5836,8 @@
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
       "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
-      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md"
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6003,7 +6030,8 @@
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
-      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6163,7 +6191,8 @@
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
-      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6366,7 +6395,8 @@
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
       "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
-      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md"
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -6504,7 +6534,8 @@
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
-      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
