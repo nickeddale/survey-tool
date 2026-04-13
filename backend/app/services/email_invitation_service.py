@@ -15,6 +15,7 @@ from app.config import settings
 from app.models.email_invitation import EmailInvitation
 from app.models.participant import Participant
 from app.services import email_service
+from app.services import template_service
 from app.utils.errors import NotFoundError, ValidationError
 from app.utils.pagination import PaginationParams
 
@@ -59,27 +60,24 @@ def _build_email_body(
     recipient_name: str | None,
     survey_link: str,
     invitation_type: str,
+    survey_title: str = "",
+    survey_description: str | None = None,
+    custom_message: str | None = None,
 ) -> tuple[str, str]:
-    """Return (html_body, text_body) for the invitation email."""
-    greeting = f"Hello {recipient_name}," if recipient_name else "Hello,"
-    action = "reminder" if invitation_type == "reminder" else "invitation"
-
-    html_body = f"""<html>
-<body>
-<p>{greeting}</p>
-<p>You have received a survey {action}. Please click the link below to participate:</p>
-<p><a href="{survey_link}">{survey_link}</a></p>
-<p>Thank you for your participation.</p>
-</body>
-</html>"""
-
-    text_body = (
-        f"{greeting}\n\n"
-        f"You have received a survey {action}. Please visit the link below to participate:\n\n"
-        f"{survey_link}\n\n"
-        "Thank you for your participation."
+    """Return (html_body, text_body) for the invitation email using Jinja2 templates."""
+    template_name = (
+        "email/reminder.html" if invitation_type == "reminder" else "email/invitation.html"
     )
-
+    context = {
+        "recipient_name": recipient_name,
+        "survey_link": survey_link,
+        "survey_title": survey_title,
+        "survey_description": survey_description,
+        "custom_message": custom_message,
+        "sender_name": settings.smtp_from_name,
+    }
+    html_body = template_service.render_template(template_name, **context)
+    text_body = template_service.html_to_text(html_body)
     return html_body, text_body
 
 
@@ -90,6 +88,9 @@ async def send_invitation(
     recipient_name: str | None = None,
     subject: str | None = None,
     invitation_type: str = "invite",
+    survey_title: str = "",
+    survey_description: str | None = None,
+    custom_message: str | None = None,
 ) -> EmailInvitation:
     """Create an EmailInvitation record, dispatch via email_service, and update status."""
     participant = await get_or_create_participant(session, survey_id, recipient_email, recipient_name)
@@ -115,7 +116,14 @@ async def send_invitation(
     await session.flush()
     await session.refresh(invitation)
 
-    html_body, text_body = _build_email_body(recipient_name, survey_link, invitation_type)
+    html_body, text_body = _build_email_body(
+        recipient_name,
+        survey_link,
+        invitation_type,
+        survey_title=survey_title,
+        survey_description=survey_description,
+        custom_message=custom_message,
+    )
 
     try:
         await email_service.send_email(
@@ -144,6 +152,8 @@ async def send_batch_invitations(
     items: list[dict],
     subject: str | None = None,
     invitation_type: str = "invite",
+    survey_title: str = "",
+    survey_description: str | None = None,
 ) -> dict:
     """Send invitations to a list of {email, name} items. Returns summary counts."""
     sent = 0
@@ -167,6 +177,7 @@ async def send_batch_invitations(
 
         item_subject = item.get("subject") or subject
         item_type = item.get("invitation_type") or invitation_type
+        item_custom_message = item.get("custom_message")
 
         try:
             invitation = await send_invitation(
@@ -176,6 +187,9 @@ async def send_batch_invitations(
                 recipient_name=name,
                 subject=item_subject,
                 invitation_type=item_type,
+                survey_title=survey_title,
+                survey_description=survey_description,
+                custom_message=item_custom_message,
             )
             if invitation.status == "sent":
                 sent += 1
@@ -290,7 +304,9 @@ async def resend_invitation(
             survey_link = _build_survey_link(survey_id, participant.token)
 
     html_body, text_body = _build_email_body(
-        invitation.recipient_name, survey_link, invitation.invitation_type
+        invitation.recipient_name,
+        survey_link,
+        invitation.invitation_type,
     )
 
     try:

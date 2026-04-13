@@ -81,6 +81,7 @@ async def send_invitation(
         recipient_name=payload.recipient_name,
         subject=payload.subject,
         invitation_type=payload.invitation_type or "invite",
+        custom_message=payload.custom_message,
     )
     return EmailInvitationResponse.model_validate(invitation)
 
