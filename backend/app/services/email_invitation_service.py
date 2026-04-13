@@ -56,10 +56,19 @@ def _build_survey_link(survey_id: uuid.UUID, token: str) -> str:
     return f"{base}/s/{survey_id}?token={token}"
 
 
+def _build_tracking_urls(invitation_id: uuid.UUID) -> tuple[str, str]:
+    """Return (tracking_open_url, tracking_click_url) for the given invitation."""
+    base = settings.backend_url.rstrip("/")
+    open_url = f"{base}/api/v1/email/track/open/{invitation_id}"
+    click_url = f"{base}/api/v1/email/track/click/{invitation_id}"
+    return open_url, click_url
+
+
 def _build_email_body(
     recipient_name: str | None,
     survey_link: str,
     invitation_type: str,
+    invitation_id: uuid.UUID | None = None,
     survey_title: str = "",
     survey_description: str | None = None,
     custom_message: str | None = None,
@@ -68,9 +77,19 @@ def _build_email_body(
     template_name = (
         "email/reminder.html" if invitation_type == "reminder" else "email/invitation.html"
     )
+
+    if invitation_id is not None:
+        tracking_open_url, tracking_click_url = _build_tracking_urls(invitation_id)
+    else:
+        # Fallback: link directly to the survey if no invitation_id available
+        tracking_open_url = ""
+        tracking_click_url = survey_link
+
     context = {
         "recipient_name": recipient_name,
         "survey_link": survey_link,
+        "tracking_open_url": tracking_open_url,
+        "tracking_click_url": tracking_click_url,
         "survey_title": survey_title,
         "survey_description": survey_description,
         "custom_message": custom_message,
@@ -120,6 +139,7 @@ async def send_invitation(
         recipient_name,
         survey_link,
         invitation_type,
+        invitation_id=invitation.id,
         survey_title=survey_title,
         survey_description=survey_description,
         custom_message=custom_message,
@@ -264,6 +284,61 @@ async def get_invitation(
     return invitation
 
 
+async def get_invitation_stats(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+) -> dict:
+    """Aggregate delivery statistics for all invitations in a survey.
+
+    Returns total counts by status, open/click rates, and breakdown by
+    invitation_type.
+    """
+    result = await session.execute(
+        select(EmailInvitation).where(EmailInvitation.survey_id == survey_id)
+    )
+    invitations = list(result.scalars().all())
+
+    total = len(invitations)
+    sent = sum(1 for i in invitations if i.status == "sent")
+    delivered = sent  # treat sent as delivered (no separate delivery webhook)
+    bounced = 0  # placeholder — no bounce tracking in current model
+    failed = sum(1 for i in invitations if i.status == "failed")
+    opened = sum(1 for i in invitations if i.opened_at is not None)
+    clicked = sum(1 for i in invitations if i.clicked_at is not None)
+
+    open_rate = round(opened / sent, 4) if sent > 0 else 0.0
+    click_rate = round(clicked / sent, 4) if sent > 0 else 0.0
+
+    # Breakdown by invitation_type
+    type_counts: dict[str, dict] = {}
+    for invitation in invitations:
+        t = invitation.invitation_type
+        if t not in type_counts:
+            type_counts[t] = {"total": 0, "sent": 0, "failed": 0, "opened": 0, "clicked": 0}
+        type_counts[t]["total"] += 1
+        if invitation.status == "sent":
+            type_counts[t]["sent"] += 1
+        if invitation.status == "failed":
+            type_counts[t]["failed"] += 1
+        if invitation.opened_at is not None:
+            type_counts[t]["opened"] += 1
+        if invitation.clicked_at is not None:
+            type_counts[t]["clicked"] += 1
+
+    return {
+        "total": total,
+        "sent": sent,
+        "delivered": delivered,
+        "bounced": bounced,
+        "failed": failed,
+        "opened": opened,
+        "clicked": clicked,
+        "open_rate": open_rate,
+        "click_rate": click_rate,
+        "breakdown": type_counts,
+    }
+
+
 async def delete_invitation(
     session: AsyncSession,
     invitation_id: uuid.UUID,
@@ -307,6 +382,7 @@ async def resend_invitation(
         invitation.recipient_name,
         survey_link,
         invitation.invitation_type,
+        invitation_id=invitation.id,
     )
 
     try:
