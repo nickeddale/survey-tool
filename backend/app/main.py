@@ -19,6 +19,7 @@ MAX_BODY_SIZE = 1_048_576
 from app.api.answer_options import router as answer_options_router
 from app.api.assessments import router as assessments_router
 from app.api.auth import router as auth_router
+from app.api.email_invitations import router as email_invitations_router
 from app.api.webhooks import router as webhooks_router
 from app.api.logic import router as logic_router
 from app.api.participants import router as participants_router
@@ -155,6 +156,14 @@ _OPENAPI_TAGS = [
             "The validate-expression endpoint checks syntax and variable references. "
             "The resolve-flow endpoint computes visible/hidden questions and next question "
             "for a given answer state."
+        ),
+    },
+    {
+        "name": "email-invitations",
+        "description": (
+            "Send and manage email invitations for surveys. Supports single and batch sending, "
+            "automatic participant creation, and tracking of invitation status. "
+            "Failed invitations can be resent."
         ),
     },
 ]
@@ -442,6 +451,7 @@ app.include_router(participants_router, prefix="/api/v1")
 app.include_router(quotas_router, prefix="/api/v1")
 app.include_router(assessments_router, prefix="/api/v1")
 app.include_router(webhooks_router, prefix="/api/v1")
+app.include_router(email_invitations_router, prefix="/api/v1")
 
 
 @app.get("/health")

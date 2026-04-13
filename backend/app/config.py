@@ -88,6 +88,9 @@ class Settings(BaseSettings):
     smtp_use_tls: bool = True
     smtp_enabled: bool = False
 
+    # Frontend
+    frontend_url: str = "http://localhost:3000"
+
     @property
     def cors_origins_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]

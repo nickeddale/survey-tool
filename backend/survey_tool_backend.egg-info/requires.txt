@@ -7,6 +7,9 @@ pydantic-settings<3.0,>=2.2
 python-jose[cryptography]<4.0,>=3.3
 bcrypt<6.0,>=4.0
 slowapi>=0.1.9
+gunicorn<24.0,>=22.0
+regex>=2023.0
+aiosmtplib<4.0,>=3.0
 
 [dev]
 pytest<9.0,>=8.1
