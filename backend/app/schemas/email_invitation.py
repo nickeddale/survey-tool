@@ -9,6 +9,7 @@ class EmailInvitationCreate(BaseModel):
     recipient_name: str | None = Field(default=None, description="Optional display name of the recipient.")
     subject: str | None = Field(default=None, description="Email subject line. Defaults to a standard invitation subject if not provided.")
     invitation_type: str | None = Field(default="invite", description="Type of invitation: 'invite' or 'reminder'.")
+    custom_message: str | None = Field(default=None, description="Optional custom message to include in the invitation email body.")
 
 
 class EmailInvitationBatchCreate(BaseModel):
