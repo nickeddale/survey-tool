@@ -37,14 +37,7 @@ export function QuestionCard({
 }: QuestionCardProps) {
   const isSelected = selectedItem?.type === 'question' && selectedItem.id === question.id
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: question.id,
     disabled: readOnly || isOverlay,
   })
@@ -107,9 +100,7 @@ export function QuestionCard({
           <span className="text-xs text-muted-foreground bg-muted/60 px-1 py-0.5 rounded">
             {question.question_type}
           </span>
-          {question.is_required && (
-            <span className="text-xs text-destructive">*</span>
-          )}
+          {question.is_required && <span className="text-xs text-destructive">*</span>}
         </div>
       </div>
     </div>

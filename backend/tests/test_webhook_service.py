@@ -1111,15 +1111,19 @@ async def test_deliver_and_log_creates_log_row_status_delivered(wh_engine):
     mock_client.post = mock_post
 
     with patch("httpx.AsyncClient", return_value=mock_client):
-        await _deliver_and_log(
-            session_factory=factory,
-            wh_id=wh_id,
-            wh_url="https://example.com/hook",
-            wh_secret="",
-            payload={"event": "response.completed", "data": {}},
-            event="response.completed",
-            delivery_id=delivery_id,
-        )
+        with patch(
+            "app.services.webhook_service.resolve_and_validate_url",
+            new_callable=AsyncMock,
+        ):
+            await _deliver_and_log(
+                session_factory=factory,
+                wh_id=wh_id,
+                wh_url="https://example.com/hook",
+                wh_secret="",
+                payload={"event": "response.completed", "data": {}},
+                event="response.completed",
+                delivery_id=delivery_id,
+            )
 
     async with factory() as sess:
         result = await sess.execute(
@@ -1181,15 +1185,19 @@ async def test_deliver_and_log_creates_log_row_status_failed_after_max_retries(w
 
     with patch("httpx.AsyncClient", return_value=mock_client):
         with patch("asyncio.sleep", new_callable=AsyncMock):
-            await _deliver_and_log(
-                session_factory=factory,
-                wh_id=wh_id,
-                wh_url="https://unreachable.example.com/hook",
-                wh_secret="",
-                payload={"event": "response.completed", "data": {}},
-                event="response.completed",
-                delivery_id=delivery_id,
-            )
+            with patch(
+                "app.services.webhook_service.resolve_and_validate_url",
+                new_callable=AsyncMock,
+            ):
+                await _deliver_and_log(
+                    session_factory=factory,
+                    wh_id=wh_id,
+                    wh_url="https://unreachable.example.com/hook",
+                    wh_secret="",
+                    payload={"event": "response.completed", "data": {}},
+                    event="response.completed",
+                    delivery_id=delivery_id,
+                )
 
     async with factory() as sess:
         result = await sess.execute(

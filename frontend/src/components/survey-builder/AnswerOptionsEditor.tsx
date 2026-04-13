@@ -37,7 +37,13 @@ import type { AnswerOptionResponse } from '../../types/survey'
 // Constants
 // ---------------------------------------------------------------------------
 
-const CHOICE_TYPES = new Set(['single_choice', 'dropdown', 'multiple_choice', 'ranking', 'image_picker'])
+const CHOICE_TYPES = new Set([
+  'single_choice',
+  'dropdown',
+  'multiple_choice',
+  'ranking',
+  'image_picker',
+])
 
 // ---------------------------------------------------------------------------
 // Types
@@ -219,7 +225,7 @@ export function AnswerOptionsEditor({
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
   // ---------------------------------------------------------------------------
@@ -286,7 +292,7 @@ export function AnswerOptionsEditor({
         setSaveStatus('error', 'Failed to save option. Please try again.')
       }
     },
-    [surveyId, groupId, questionId, updateOption, undo, setSaveStatus],
+    [surveyId, groupId, questionId, updateOption, undo, setSaveStatus]
   )
 
   const handleAssessmentChange = useCallback(
@@ -301,7 +307,7 @@ export function AnswerOptionsEditor({
         setSaveStatus('error', 'Failed to save option. Please try again.')
       }
     },
-    [surveyId, groupId, questionId, updateOption, undo, setSaveStatus],
+    [surveyId, groupId, questionId, updateOption, undo, setSaveStatus]
   )
 
   const handleImageUrlChange = useCallback(
@@ -318,7 +324,7 @@ export function AnswerOptionsEditor({
         setSaveStatus('error', 'Failed to save option. Please try again.')
       }
     },
-    [surveyId, groupId, questionId, updateOption, undo, setSaveStatus],
+    [surveyId, groupId, questionId, updateOption, undo, setSaveStatus]
   )
 
   const handleDeleteRequest = useCallback((optionId: string) => {
@@ -367,7 +373,7 @@ export function AnswerOptionsEditor({
       const newOrder = arrayMove(
         currentOptions.map((o) => o.id),
         oldIndex,
-        newIndex,
+        newIndex
       )
 
       reorderOptions(groupId, questionId, newOrder)
@@ -380,7 +386,7 @@ export function AnswerOptionsEditor({
         setSaveStatus('error', 'Failed to save option order. Please try again.')
       }
     },
-    [surveyId, groupId, questionId, reorderOptions, undo, setSaveStatus],
+    [surveyId, groupId, questionId, reorderOptions, undo, setSaveStatus]
   )
 
   // Only show for choice-type questions (after all hooks to comply with Rules of Hooks)
@@ -466,11 +472,7 @@ export function AnswerOptionsEditor({
         </p>
       )}
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={optionIds} strategy={verticalListSortingStrategy}>
           <div className="space-y-1">
             {options.map((option) => (

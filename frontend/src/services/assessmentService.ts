@@ -12,17 +12,20 @@ export interface AssessmentFetchParams {
 }
 
 class AssessmentService {
-  async listAssessments(surveyId: string, params: AssessmentFetchParams = {}): Promise<AssessmentListResponse> {
+  async listAssessments(
+    surveyId: string,
+    params: AssessmentFetchParams = {}
+  ): Promise<AssessmentListResponse> {
     const response = await apiClient.get<AssessmentListResponse>(
       `/surveys/${surveyId}/assessments`,
-      { params },
+      { params }
     )
     return response.data
   }
 
   async getAssessment(surveyId: string, assessmentId: string): Promise<AssessmentResponse> {
     const response = await apiClient.get<AssessmentResponse>(
-      `/surveys/${surveyId}/assessments/${assessmentId}`,
+      `/surveys/${surveyId}/assessments/${assessmentId}`
     )
     return response.data
   }
@@ -30,15 +33,19 @@ class AssessmentService {
   async createAssessment(surveyId: string, data: AssessmentCreate): Promise<AssessmentResponse> {
     const response = await apiClient.post<AssessmentResponse>(
       `/surveys/${surveyId}/assessments`,
-      data,
+      data
     )
     return response.data
   }
 
-  async updateAssessment(surveyId: string, assessmentId: string, data: AssessmentUpdate): Promise<AssessmentResponse> {
+  async updateAssessment(
+    surveyId: string,
+    assessmentId: string,
+    data: AssessmentUpdate
+  ): Promise<AssessmentResponse> {
     const response = await apiClient.patch<AssessmentResponse>(
       `/surveys/${surveyId}/assessments/${assessmentId}`,
-      data,
+      data
     )
     return response.data
   }

@@ -51,7 +51,12 @@ function validate(plainText: string, s: Partial<HugeTextSettings>, isRequired: b
 // Component
 // ---------------------------------------------------------------------------
 
-export function HugeTextInput({ value, onChange, question, errors: externalErrors }: HugeTextInputProps) {
+export function HugeTextInput({
+  value,
+  onChange,
+  question,
+  errors: externalErrors,
+}: HugeTextInputProps) {
   const s = (question.settings ?? {}) as Partial<HugeTextSettings>
   const rows = s.rows ?? 10
   const maxLength = s.max_length ?? null

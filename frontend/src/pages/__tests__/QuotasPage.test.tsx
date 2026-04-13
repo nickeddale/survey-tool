@@ -33,12 +33,17 @@ function renderQuotas(surveyId = SURVEY_ID) {
           <Route path="/surveys/:id" element={<LocationDisplay />} />
         </Routes>
       </AuthProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
 function resetAuthStore() {
-  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
+  useAuthStore.setState({
+    user: null,
+    isAuthenticated: false,
+    isInitializing: false,
+    isLoading: false,
+  })
 }
 
 // ---------------------------------------------------------------------------
@@ -52,7 +57,12 @@ describe('QuotasPage', () => {
     resetAuthStore()
     setTokens(mockTokens.access_token)
     localStorage.removeItem('devtracker_refresh_token')
-    useAuthStore.setState({ user: mockUser, isAuthenticated: true, isInitializing: false, isLoading: false })
+    useAuthStore.setState({
+      user: mockUser,
+      isAuthenticated: true,
+      isInitializing: false,
+      isLoading: false,
+    })
   })
 
   afterEach(() => {
@@ -67,7 +77,7 @@ describe('QuotasPage', () => {
   describe('loading state', () => {
     it('renders loading skeleton while data is being fetched', async () => {
       server.use(
-        http.get(`/api/v1/surveys/${SURVEY_ID}/quotas`, () => new Promise<never>(() => {})),
+        http.get(`/api/v1/surveys/${SURVEY_ID}/quotas`, () => new Promise<never>(() => {}))
       )
 
       renderQuotas()
@@ -162,9 +172,9 @@ describe('QuotasPage', () => {
         http.get(`/api/v1/surveys/${SURVEY_ID}/quotas`, () =>
           HttpResponse.json(
             { items: [], total: 0, page: 1, per_page: 10, total_pages: 1 },
-            { status: 200 },
-          ),
-        ),
+            { status: 200 }
+          )
+        )
       )
 
       renderQuotas()
@@ -243,9 +253,9 @@ describe('QuotasPage', () => {
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
             },
-            { status: 201 },
+            { status: 201 }
           )
-        }),
+        })
       )
 
       renderQuotas()
@@ -323,7 +333,9 @@ describe('QuotasPage', () => {
       })
 
       expect(screen.getByTestId('quota-form-error')).toBeInTheDocument()
-      expect(screen.getByTestId('quota-form-error').textContent).toMatch(/limit must be a positive integer/i)
+      expect(screen.getByTestId('quota-form-error').textContent).toMatch(
+        /limit must be a positive integer/i
+      )
     })
   })
 
@@ -391,7 +403,7 @@ describe('QuotasPage', () => {
         http.delete(`/api/v1/surveys/${SURVEY_ID}/quotas/:quotaId`, () => {
           deleteCalled = true
           return new HttpResponse(null, { status: 204 })
-        }),
+        })
       )
 
       renderQuotas()
@@ -421,7 +433,7 @@ describe('QuotasPage', () => {
         http.delete(`/api/v1/surveys/${SURVEY_ID}/quotas/:quotaId`, ({ params }) => {
           deletedId = params.quotaId as string
           return new HttpResponse(null, { status: 204 })
-        }),
+        })
       )
 
       renderQuotas()
@@ -460,13 +472,16 @@ describe('QuotasPage', () => {
           patchBody = body
           const quota = mockQuotas.find((q) => q.id === params.quotaId)
           if (!quota) {
-            return HttpResponse.json({ detail: { code: 'NOT_FOUND', message: 'Not found' } }, { status: 404 })
+            return HttpResponse.json(
+              { detail: { code: 'NOT_FOUND', message: 'Not found' } },
+              { status: 404 }
+            )
           }
           return HttpResponse.json(
             { ...quota, ...body, updated_at: new Date().toISOString() },
-            { status: 200 },
+            { status: 200 }
           )
-        }),
+        })
       )
 
       renderQuotas()
@@ -520,9 +535,9 @@ describe('QuotasPage', () => {
         http.get(`/api/v1/surveys/${SURVEY_ID}/quotas`, () =>
           HttpResponse.json(
             { detail: { code: 'INTERNAL_SERVER_ERROR', message: 'Internal server error' } },
-            { status: 500 },
-          ),
-        ),
+            { status: 500 }
+          )
+        )
       )
 
       renderQuotas()

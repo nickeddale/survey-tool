@@ -37,7 +37,12 @@ function validate(value: string, isRequired: boolean): string[] {
 // Component
 // ---------------------------------------------------------------------------
 
-export function BooleanInput({ value, onChange, question, errors: externalErrors }: BooleanInputProps) {
+export function BooleanInput({
+  value,
+  onChange,
+  question,
+  errors: externalErrors,
+}: BooleanInputProps) {
   const s = (question.settings ?? {}) as Partial<BooleanSettings>
   const trueLabel = s.true_label ?? 'Yes'
   const falseLabel = s.false_label ?? 'No'
@@ -70,7 +75,10 @@ export function BooleanInput({ value, onChange, question, errors: externalErrors
     const isChecked = value === 'true'
     return (
       <div className="space-y-1" data-testid={`boolean-input-${question.id}`}>
-        <label className="flex items-center gap-3 cursor-pointer" data-testid="boolean-toggle-label">
+        <label
+          className="flex items-center gap-3 cursor-pointer"
+          data-testid="boolean-toggle-label"
+        >
           <button
             type="button"
             role="switch"
@@ -117,7 +125,10 @@ export function BooleanInput({ value, onChange, question, errors: externalErrors
           className="flex items-center gap-4"
           data-testid="boolean-radio-group"
         >
-          <label className="flex items-center gap-2 cursor-pointer text-sm" data-testid="boolean-radio-true-label">
+          <label
+            className="flex items-center gap-2 cursor-pointer text-sm"
+            data-testid="boolean-radio-true-label"
+          >
             <input
               type="radio"
               name={inputId}
@@ -129,7 +140,10 @@ export function BooleanInput({ value, onChange, question, errors: externalErrors
             />
             {trueLabel}
           </label>
-          <label className="flex items-center gap-2 cursor-pointer text-sm" data-testid="boolean-radio-false-label">
+          <label
+            className="flex items-center gap-2 cursor-pointer text-sm"
+            data-testid="boolean-radio-false-label"
+          >
             <input
               type="radio"
               name={inputId}
@@ -153,7 +167,10 @@ export function BooleanInput({ value, onChange, question, errors: externalErrors
   // ------------------------------------------------------------------
   return (
     <div className="space-y-1" data-testid={`boolean-input-${question.id}`}>
-      <label className="flex items-center gap-2 cursor-pointer text-sm" data-testid="boolean-checkbox-label">
+      <label
+        className="flex items-center gap-2 cursor-pointer text-sm"
+        data-testid="boolean-checkbox-label"
+      >
         <input
           id={inputId}
           type="checkbox"

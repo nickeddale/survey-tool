@@ -104,8 +104,13 @@ export function QuestionPreview({ question, interactive = false }: QuestionPrevi
       {/* Question header */}
       <div className="space-y-1">
         <div className="flex items-start gap-1">
-          <p className="text-sm font-medium text-foreground leading-snug" data-testid="preview-title">
-            {question.title || <span className="text-muted-foreground italic">Untitled question</span>}
+          <p
+            className="text-sm font-medium text-foreground leading-snug"
+            data-testid="preview-title"
+          >
+            {question.title || (
+              <span className="text-muted-foreground italic">Untitled question</span>
+            )}
           </p>
           {question.is_required && (
             <span

@@ -248,7 +248,9 @@ function QuestionInput({ question, value, errors, onChange }: QuestionInputProps
         />
       )
     case 'expression':
-      return <ExpressionDisplay question={question} value={value as string | number | null ?? null} />
+      return (
+        <ExpressionDisplay question={question} value={(value as string | number | null) ?? null} />
+      )
     case 'html':
       return <HtmlContent question={question} />
     default:
@@ -298,7 +300,9 @@ function GroupForm({ group, answers, errors, onChange }: GroupFormProps) {
                   className="text-sm font-medium text-foreground leading-snug"
                   data-testid="form-question-title"
                 >
-                  {question.title || <span className="text-muted-foreground italic">Untitled question</span>}
+                  {question.title || (
+                    <span className="text-muted-foreground italic">Untitled question</span>
+                  )}
                 </p>
                 {question.is_required && (
                   <span
@@ -365,7 +369,10 @@ export function SurveyForm({
     <div className="flex flex-col h-full" data-testid="survey-form">
       {/* Progress bar */}
       {totalPages > 1 && (
-        <div className="px-8 pt-4 max-w-2xl w-full mx-auto shrink-0" data-testid="form-progress-container">
+        <div
+          className="px-8 pt-4 max-w-2xl w-full mx-auto shrink-0"
+          data-testid="form-progress-container"
+        >
           <ProgressBar current={currentPage + 1} total={totalPages} />
         </div>
       )}
@@ -421,19 +428,17 @@ export function SurveyForm({
         )}
 
         {isLastPage || !onePagePerGroup ? (
-          <Button
-            onClick={onSubmit}
-            disabled={isSubmitting}
-            data-testid="form-submit-button"
-          >
-            {isSubmitting ? 'Submitting…' : <>Submit <ArrowRight size={14} /></>}
+          <Button onClick={onSubmit} disabled={isSubmitting} data-testid="form-submit-button">
+            {isSubmitting ? (
+              'Submitting…'
+            ) : (
+              <>
+                Submit <ArrowRight size={14} />
+              </>
+            )}
           </Button>
         ) : (
-          <Button
-            onClick={onNext}
-            disabled={isSubmitting}
-            data-testid="form-next-button"
-          >
+          <Button onClick={onNext} disabled={isSubmitting} data-testid="form-next-button">
             Next <ArrowRight size={14} />
           </Button>
         )}

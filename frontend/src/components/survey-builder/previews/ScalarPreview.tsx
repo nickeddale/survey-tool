@@ -3,7 +3,12 @@
  */
 
 import type { BuilderQuestion } from '../../../store/builderStore'
-import type { NumericSettings, RatingSettings, BooleanSettings, DateSettings } from '../../../types/questionSettings'
+import type {
+  NumericSettings,
+  RatingSettings,
+  BooleanSettings,
+  DateSettings,
+} from '../../../types/questionSettings'
 
 export interface QuestionPreviewProps {
   question: BuilderQuestion
@@ -59,8 +64,24 @@ function SmileyIcon({ filled }: { filled: boolean }) {
     >
       <circle cx="12" cy="12" r="10" />
       <path d="M8 14s1.5 2 4 2 4-2 4-2" className="stroke-current fill-none" />
-      <line x1="9" y1="9" x2="9.01" y2="9" className="stroke-current" strokeWidth="2" strokeLinecap="round" />
-      <line x1="15" y1="9" x2="15.01" y2="9" className="stroke-current" strokeWidth="2" strokeLinecap="round" />
+      <line
+        x1="9"
+        y1="9"
+        x2="9.01"
+        y2="9"
+        className="stroke-current"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <line
+        x1="15"
+        y1="9"
+        x2="15.01"
+        y2="9"
+        className="stroke-current"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
     </svg>
   )
 }
@@ -84,9 +105,7 @@ export function ScalarPreview({ question }: QuestionPreviewProps) {
 
     return (
       <div className="flex items-center gap-2" data-testid="preview-numeric">
-        {s.prefix && (
-          <span className="text-sm text-muted-foreground font-medium">{s.prefix}</span>
-        )}
+        {s.prefix && <span className="text-sm text-muted-foreground font-medium">{s.prefix}</span>}
         <input
           type="number"
           className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm
@@ -99,9 +118,7 @@ export function ScalarPreview({ question }: QuestionPreviewProps) {
           aria-label="Numeric answer"
           data-testid="preview-numeric-input"
         />
-        {s.suffix && (
-          <span className="text-sm text-muted-foreground font-medium">{s.suffix}</span>
-        )}
+        {s.suffix && <span className="text-sm text-muted-foreground font-medium">{s.suffix}</span>}
       </div>
     )
   }
@@ -155,11 +172,21 @@ export function ScalarPreview({ question }: QuestionPreviewProps) {
       return (
         <div className="space-y-2 pointer-events-none" data-testid="preview-boolean">
           <label className="flex items-center gap-2 text-sm">
-            <input type="radio" name={`bool-preview-${question.id}`} className="opacity-60" disabled />
+            <input
+              type="radio"
+              name={`bool-preview-${question.id}`}
+              className="opacity-60"
+              disabled
+            />
             <span>{trueLabel}</span>
           </label>
           <label className="flex items-center gap-2 text-sm">
-            <input type="radio" name={`bool-preview-${question.id}`} className="opacity-60" disabled />
+            <input
+              type="radio"
+              name={`bool-preview-${question.id}`}
+              className="opacity-60"
+              disabled
+            />
             <span>{falseLabel}</span>
           </label>
         </div>
@@ -194,9 +221,7 @@ export function ScalarPreview({ question }: QuestionPreviewProps) {
           data-testid="preview-date-input"
         />
         {s.date_format && (
-          <p className="text-xs text-muted-foreground mt-1">
-            Format: {s.date_format}
-          </p>
+          <p className="text-xs text-muted-foreground mt-1">Format: {s.date_format}</p>
         )}
       </div>
     )

@@ -295,7 +295,6 @@ export const mockTokens = {
   expires_in: 1800,
 }
 
-
 export const mockNewTokens = {
   access_token:
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDEiLCJleHAiOjk5OTk5OTk5OTksImlhdCI6Mn0.dummy',
@@ -402,9 +401,7 @@ export const mockQuotas = [
     limit: 50,
     current_count: 50,
     action: 'hide_question',
-    conditions: [
-      { question_id: 'q1', operator: 'eq', value: 'male' },
-    ],
+    conditions: [{ question_id: 'q1', operator: 'eq', value: 'male' }],
     is_active: false,
     created_at: '2024-01-11T10:00:00Z',
     updated_at: '2024-01-11T10:00:00Z',
@@ -486,7 +483,7 @@ export const handlers = [
     }
     return HttpResponse.json(
       { detail: { code: 'UNAUTHORIZED', message: 'Invalid email or password' } },
-      { status: 401 },
+      { status: 401 }
     )
   }),
 
@@ -496,7 +493,7 @@ export const handlers = [
     if (body.email === 'existing@example.com') {
       return HttpResponse.json(
         { detail: { code: 'CONFLICT', message: 'A user with this email already exists' } },
-        { status: 409 },
+        { status: 409 }
       )
     }
     return HttpResponse.json(mockUser, { status: 201 })
@@ -510,7 +507,7 @@ export const handlers = [
     if (!getAccessToken()) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'No valid refresh token' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     return HttpResponse.json(mockNewTokens, { status: 200 })
@@ -527,7 +524,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     return HttpResponse.json(mockUser, { status: 200 })
@@ -539,7 +536,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const url = new URL(request.url)
@@ -570,7 +567,7 @@ export const handlers = [
         per_page: perPage,
         total_pages: totalPages,
       },
-      { status: 200 },
+      { status: 200 }
     )
   }),
 
@@ -581,7 +578,7 @@ export const handlers = [
     }
     return HttpResponse.json(
       { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
-      { status: 404 },
+      { status: 404 }
     )
   }),
 
@@ -591,7 +588,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     // Return mockSurveyFull if id matches, otherwise build full response from mockSurveys
@@ -602,7 +599,7 @@ export const handlers = [
     if (!survey) {
       return HttpResponse.json(
         { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
-        { status: 404 },
+        { status: 404 }
       )
     }
     return HttpResponse.json({ ...survey, groups: [], questions: [], options: [] }, { status: 200 })
@@ -614,18 +611,22 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
-    const survey = mockSurveys.find((s) => s.id === params.id) ??
+    const survey =
+      mockSurveys.find((s) => s.id === params.id) ??
       (params.id === mockSurveyFull.id ? mockSurveyFull : null)
     if (!survey) {
       return HttpResponse.json(
         { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
-        { status: 404 },
+        { status: 404 }
       )
     }
-    return HttpResponse.json({ ...survey, status: 'active', updated_at: new Date().toISOString() }, { status: 200 })
+    return HttpResponse.json(
+      { ...survey, status: 'active', updated_at: new Date().toISOString() },
+      { status: 200 }
+    )
   }),
 
   // POST /api/v1/surveys/:id/close
@@ -634,18 +635,22 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
-    const survey = mockSurveys.find((s) => s.id === params.id) ??
+    const survey =
+      mockSurveys.find((s) => s.id === params.id) ??
       (params.id === mockSurveyFull.id ? mockSurveyFull : null)
     if (!survey) {
       return HttpResponse.json(
         { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
-        { status: 404 },
+        { status: 404 }
       )
     }
-    return HttpResponse.json({ ...survey, status: 'closed', updated_at: new Date().toISOString() }, { status: 200 })
+    return HttpResponse.json(
+      { ...survey, status: 'closed', updated_at: new Date().toISOString() },
+      { status: 200 }
+    )
   }),
 
   // POST /api/v1/surveys/:id/archive
@@ -654,18 +659,22 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
-    const survey = mockSurveys.find((s) => s.id === params.id) ??
+    const survey =
+      mockSurveys.find((s) => s.id === params.id) ??
       (params.id === mockSurveyFull.id ? mockSurveyFull : null)
     if (!survey) {
       return HttpResponse.json(
         { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
-        { status: 404 },
+        { status: 404 }
       )
     }
-    return HttpResponse.json({ ...survey, status: 'archived', updated_at: new Date().toISOString() }, { status: 200 })
+    return HttpResponse.json(
+      { ...survey, status: 'archived', updated_at: new Date().toISOString() },
+      { status: 200 }
+    )
   }),
 
   // POST /api/v1/surveys/:id/clone
@@ -674,15 +683,16 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
-    const survey = mockSurveys.find((s) => s.id === params.id) ??
+    const survey =
+      mockSurveys.find((s) => s.id === params.id) ??
       (params.id === mockSurveyFull.id ? mockSurveyFull : null)
     if (!survey) {
       return HttpResponse.json(
         { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
-        { status: 404 },
+        { status: 404 }
       )
     }
     const cloned = {
@@ -702,15 +712,16 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
-    const survey = mockSurveys.find((s) => s.id === params.id) ??
+    const survey =
+      mockSurveys.find((s) => s.id === params.id) ??
       (params.id === mockSurveyFull.id ? mockSurveyFull : null)
     if (!survey) {
       return HttpResponse.json(
         { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
-        { status: 404 },
+        { status: 404 }
       )
     }
     const json = JSON.stringify(survey, null, 2)
@@ -726,14 +737,14 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const body = (await request.json()) as Record<string, unknown>
     if (!body.title) {
       return HttpResponse.json(
         { detail: { code: 'VALIDATION_ERROR', message: 'Title is required' } },
-        { status: 422 },
+        { status: 422 }
       )
     }
     const newSurvey = {
@@ -758,14 +769,14 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const survey = mockSurveys.find((s) => s.id === params.id)
     if (!survey) {
       return HttpResponse.json(
         { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
-        { status: 404 },
+        { status: 404 }
       )
     }
     const body = (await request.json()) as Record<string, unknown>
@@ -774,26 +785,29 @@ export const handlers = [
   }),
 
   // POST /api/v1/surveys/:surveyId/questions/:questionId/options
-  http.post(`${BASE}/surveys/:surveyId/questions/:questionId/options`, async ({ request, params }) => {
-    const authHeader = request.headers.get('Authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return HttpResponse.json(
-        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
-      )
+  http.post(
+    `${BASE}/surveys/:surveyId/questions/:questionId/options`,
+    async ({ request, params }) => {
+      const authHeader = request.headers.get('Authorization')
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return HttpResponse.json(
+          { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+          { status: 401 }
+        )
+      }
+      const body = (await request.json()) as Record<string, unknown>
+      const newOption = {
+        id: `opt-${Date.now()}`,
+        question_id: params.questionId as string,
+        code: body.code as string,
+        title: body.title as string,
+        sort_order: (body.sort_order as number) ?? 1,
+        assessment_value: (body.assessment_value as number) ?? 0,
+        created_at: new Date().toISOString(),
+      }
+      return HttpResponse.json(newOption, { status: 201 })
     }
-    const body = (await request.json()) as Record<string, unknown>
-    const newOption = {
-      id: `opt-${Date.now()}`,
-      question_id: params.questionId as string,
-      code: body.code as string,
-      title: body.title as string,
-      sort_order: (body.sort_order as number) ?? 1,
-      assessment_value: (body.assessment_value as number) ?? 0,
-      created_at: new Date().toISOString(),
-    }
-    return HttpResponse.json(newOption, { status: 201 })
-  }),
+  ),
 
   // PATCH /api/v1/surveys/:surveyId/questions/:questionId/options/reorder
   http.patch(`${BASE}/surveys/:surveyId/questions/:questionId/options/reorder`, ({ request }) => {
@@ -801,46 +815,52 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     return new HttpResponse(null, { status: 204 })
   }),
 
   // PATCH /api/v1/surveys/:surveyId/questions/:questionId/options/:optionId
-  http.patch(`${BASE}/surveys/:surveyId/questions/:questionId/options/:optionId`, async ({ request, params }) => {
-    const authHeader = request.headers.get('Authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return HttpResponse.json(
-        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
-      )
+  http.patch(
+    `${BASE}/surveys/:surveyId/questions/:questionId/options/:optionId`,
+    async ({ request, params }) => {
+      const authHeader = request.headers.get('Authorization')
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return HttpResponse.json(
+          { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+          { status: 401 }
+        )
+      }
+      const body = (await request.json()) as Record<string, unknown>
+      const updatedOption = {
+        id: params.optionId as string,
+        question_id: params.questionId as string,
+        code: 'A1',
+        title: 'Updated',
+        sort_order: 1,
+        assessment_value: 0,
+        created_at: '2024-01-08T10:00:00Z',
+        ...body,
+      }
+      return HttpResponse.json(updatedOption, { status: 200 })
     }
-    const body = (await request.json()) as Record<string, unknown>
-    const updatedOption = {
-      id: params.optionId as string,
-      question_id: params.questionId as string,
-      code: 'A1',
-      title: 'Updated',
-      sort_order: 1,
-      assessment_value: 0,
-      created_at: '2024-01-08T10:00:00Z',
-      ...body,
-    }
-    return HttpResponse.json(updatedOption, { status: 200 })
-  }),
+  ),
 
   // DELETE /api/v1/surveys/:surveyId/questions/:questionId/options/:optionId
-  http.delete(`${BASE}/surveys/:surveyId/questions/:questionId/options/:optionId`, ({ request }) => {
-    const authHeader = request.headers.get('Authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return HttpResponse.json(
-        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
-      )
+  http.delete(
+    `${BASE}/surveys/:surveyId/questions/:questionId/options/:optionId`,
+    ({ request }) => {
+      const authHeader = request.headers.get('Authorization')
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return HttpResponse.json(
+          { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+          { status: 401 }
+        )
+      }
+      return new HttpResponse(null, { status: 204 })
     }
-    return new HttpResponse(null, { status: 204 })
-  }),
+  ),
 
   // PATCH /api/v1/surveys/:id/groups/:groupId/questions/reorder
   http.patch(`${BASE}/surveys/:surveyId/groups/:groupId/questions/reorder`, ({ request }) => {
@@ -848,7 +868,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     return new HttpResponse(null, { status: 204 })
@@ -860,7 +880,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     return new HttpResponse(null, { status: 204 })
@@ -872,7 +892,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     return new HttpResponse(null, { status: 204 })
@@ -884,7 +904,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const body = (await request.json()) as Record<string, unknown>
@@ -907,15 +927,17 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const body = (await request.json()) as { group_ids?: string[] }
     const groupIds = body.group_ids ?? []
-    const reordered = groupIds.map((id, index) => {
-      const existing = mockSurveyFull.groups.find((g) => g.id === id)
-      return existing ? { ...existing, sort_order: index + 1 } : null
-    }).filter(Boolean)
+    const reordered = groupIds
+      .map((id, index) => {
+        const existing = mockSurveyFull.groups.find((g) => g.id === id)
+        return existing ? { ...existing, sort_order: index + 1 } : null
+      })
+      .filter(Boolean)
     return HttpResponse.json(reordered, { status: 200 })
   }),
 
@@ -925,14 +947,14 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const group = mockSurveyFull.groups.find((g) => g.id === params.groupId)
     if (!group) {
       return HttpResponse.json(
         { detail: { code: 'NOT_FOUND', message: 'Group not found' } },
-        { status: 404 },
+        { status: 404 }
       )
     }
     const body = (await request.json()) as Record<string, unknown>
@@ -946,40 +968,43 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     return new HttpResponse(null, { status: 204 })
   }),
 
   // PATCH /api/v1/surveys/:surveyId/groups/:groupId/questions/:questionId
-  http.patch(`${BASE}/surveys/:surveyId/groups/:groupId/questions/:questionId`, async ({ request, params }) => {
-    const authHeader = request.headers.get('Authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return HttpResponse.json(
-        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
-      )
-    }
-    // Find the question in mockSurveyFull
-    let foundQuestion = null
-    for (const group of mockSurveyFull.groups) {
-      const q = group.questions.find((q) => q.id === params.questionId)
-      if (q) {
-        foundQuestion = q
-        break
+  http.patch(
+    `${BASE}/surveys/:surveyId/groups/:groupId/questions/:questionId`,
+    async ({ request, params }) => {
+      const authHeader = request.headers.get('Authorization')
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return HttpResponse.json(
+          { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+          { status: 401 }
+        )
       }
+      // Find the question in mockSurveyFull
+      let foundQuestion = null
+      for (const group of mockSurveyFull.groups) {
+        const q = group.questions.find((q) => q.id === params.questionId)
+        if (q) {
+          foundQuestion = q
+          break
+        }
+      }
+      if (!foundQuestion) {
+        return HttpResponse.json(
+          { detail: { code: 'NOT_FOUND', message: 'Question not found' } },
+          { status: 404 }
+        )
+      }
+      const body = (await request.json()) as Record<string, unknown>
+      const updated = { ...foundQuestion, ...body, updated_at: new Date().toISOString() }
+      return HttpResponse.json(updated, { status: 200 })
     }
-    if (!foundQuestion) {
-      return HttpResponse.json(
-        { detail: { code: 'NOT_FOUND', message: 'Question not found' } },
-        { status: 404 },
-      )
-    }
-    const body = (await request.json()) as Record<string, unknown>
-    const updated = { ...foundQuestion, ...body, updated_at: new Date().toISOString() }
-    return HttpResponse.json(updated, { status: 200 })
-  }),
+  ),
 
   // POST /api/v1/surveys/:surveyId/logic/validate-expression
   http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async ({ request }) => {
@@ -998,7 +1023,7 @@ export const handlers = [
         errors,
         warnings: [] as Array<{ message: string; position: number; code: string }>,
       },
-      { status: 200 },
+      { status: 200 }
     )
   }),
 
@@ -1012,7 +1037,7 @@ export const handlers = [
           result: null,
           errors: [{ message: 'Expression cannot be empty', position: 0, code: 'SYNTAX_ERROR' }],
         },
-        { status: 200 },
+        { status: 200 }
       )
     }
     // Default mock: return true when expression is non-empty (tests override this as needed)
@@ -1021,7 +1046,7 @@ export const handlers = [
         result: true,
         errors: [] as Array<{ message: string; position: number; code: string }>,
       },
-      { status: 200 },
+      { status: 200 }
     )
   }),
 
@@ -1031,14 +1056,11 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const body = (await request.json()) as { name?: string }
-    return HttpResponse.json(
-      { ...mockUser, name: body.name ?? mockUser.name },
-      { status: 200 },
-    )
+    return HttpResponse.json({ ...mockUser, name: body.name ?? mockUser.name }, { status: 200 })
   }),
 
   // ---------------------------------------------------------------------------
@@ -1057,7 +1079,7 @@ export const handlers = [
         piped_texts: {},
         next_question_id: null,
       },
-      { status: 200 },
+      { status: 200 }
     )
   }),
 
@@ -1095,7 +1117,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const url = new URL(request.url)
@@ -1106,7 +1128,10 @@ export const handlers = [
     const totalPages = Math.max(1, Math.ceil(total / perPage))
     const start = (page - 1) * perPage
     const items = surveyQuotas.slice(start, start + perPage)
-    return HttpResponse.json({ items, total, page, per_page: perPage, total_pages: totalPages }, { status: 200 })
+    return HttpResponse.json(
+      { items, total, page, per_page: perPage, total_pages: totalPages },
+      { status: 200 }
+    )
   }),
 
   // GET /api/v1/surveys/:surveyId/quotas/:quotaId
@@ -1115,14 +1140,14 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const quota = mockQuotas.find((q) => q.id === params.quotaId && q.survey_id === params.surveyId)
     if (!quota) {
       return HttpResponse.json(
         { detail: { code: 'NOT_FOUND', message: 'Quota not found' } },
-        { status: 404 },
+        { status: 404 }
       )
     }
     return HttpResponse.json(quota, { status: 200 })
@@ -1134,7 +1159,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const body = (await request.json()) as Record<string, unknown>
@@ -1159,14 +1184,14 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const quota = mockQuotas.find((q) => q.id === params.quotaId)
     if (!quota) {
       return HttpResponse.json(
         { detail: { code: 'NOT_FOUND', message: 'Quota not found' } },
-        { status: 404 },
+        { status: 404 }
       )
     }
     const body = (await request.json()) as Record<string, unknown>
@@ -1180,7 +1205,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     return new HttpResponse(null, { status: 204 })
@@ -1196,7 +1221,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const url = new URL(request.url)
@@ -1207,7 +1232,10 @@ export const handlers = [
     const totalPages = Math.max(1, Math.ceil(total / perPage))
     const start = (page - 1) * perPage
     const items = surveyAssessments.slice(start, start + perPage)
-    return HttpResponse.json({ items, total, page, per_page: perPage, total_pages: totalPages }, { status: 200 })
+    return HttpResponse.json(
+      { items, total, page, per_page: perPage, total_pages: totalPages },
+      { status: 200 }
+    )
   }),
 
   // GET /api/v1/surveys/:surveyId/assessments/:assessmentId
@@ -1216,14 +1244,16 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
-    const assessment = mockAssessments.find((a) => a.id === params.assessmentId && a.survey_id === params.surveyId)
+    const assessment = mockAssessments.find(
+      (a) => a.id === params.assessmentId && a.survey_id === params.surveyId
+    )
     if (!assessment) {
       return HttpResponse.json(
         { detail: { code: 'NOT_FOUND', message: 'Assessment not found' } },
-        { status: 404 },
+        { status: 404 }
       )
     }
     return HttpResponse.json(assessment, { status: 200 })
@@ -1235,7 +1265,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const body = (await request.json()) as Record<string, unknown>
@@ -1260,14 +1290,14 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const assessment = mockAssessments.find((a) => a.id === params.assessmentId)
     if (!assessment) {
       return HttpResponse.json(
         { detail: { code: 'NOT_FOUND', message: 'Assessment not found' } },
-        { status: 404 },
+        { status: 404 }
       )
     }
     const body = (await request.json()) as Record<string, unknown>
@@ -1281,7 +1311,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     return new HttpResponse(null, { status: 204 })
@@ -1297,7 +1327,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const url = new URL(request.url)
@@ -1307,7 +1337,10 @@ export const handlers = [
     const totalPages = Math.max(1, Math.ceil(total / perPage))
     const start = (page - 1) * perPage
     const items = mockWebhooks.slice(start, start + perPage)
-    return HttpResponse.json({ items, total, page, per_page: perPage, total_pages: totalPages }, { status: 200 })
+    return HttpResponse.json(
+      { items, total, page, per_page: perPage, total_pages: totalPages },
+      { status: 200 }
+    )
   }),
 
   // GET /api/v1/webhooks/:webhookId
@@ -1316,14 +1349,14 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const webhook = mockWebhooks.find((w) => w.id === params.webhookId)
     if (!webhook) {
       return HttpResponse.json(
         { detail: { code: 'NOT_FOUND', message: 'Webhook not found' } },
-        { status: 404 },
+        { status: 404 }
       )
     }
     return HttpResponse.json(webhook, { status: 200 })
@@ -1335,7 +1368,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const body = (await request.json()) as Record<string, unknown>
@@ -1359,14 +1392,14 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const webhook = mockWebhooks.find((w) => w.id === params.webhookId)
     if (!webhook) {
       return HttpResponse.json(
         { detail: { code: 'NOT_FOUND', message: 'Webhook not found' } },
-        { status: 404 },
+        { status: 404 }
       )
     }
     const body = (await request.json()) as Record<string, unknown>
@@ -1380,7 +1413,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     return new HttpResponse(null, { status: 204 })
@@ -1392,14 +1425,14 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const webhook = mockWebhooks.find((w) => w.id === params.webhookId)
     if (!webhook) {
       return HttpResponse.json(
         { detail: { code: 'NOT_FOUND', message: 'Webhook not found' } },
-        { status: 404 },
+        { status: 404 }
       )
     }
     return HttpResponse.json({ success: true, status_code: 200, error: null }, { status: 200 })
@@ -1415,7 +1448,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const url = new URL(request.url)
@@ -1440,7 +1473,7 @@ export const handlers = [
 
     return HttpResponse.json(
       { items: pageItems, total, page, per_page: perPage, pages },
-      { status: 200 },
+      { status: 200 }
     )
   }),
 
@@ -1450,7 +1483,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const body = (await request.json()) as Record<string, unknown>
@@ -1476,7 +1509,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     const body = (await request.json()) as { items: Record<string, unknown>[] }
@@ -1497,27 +1530,30 @@ export const handlers = [
   }),
 
   // PATCH /api/v1/surveys/:surveyId/participants/:participantId
-  http.patch(`${BASE}/surveys/:surveyId/participants/:participantId`, async ({ request, params }) => {
-    const authHeader = request.headers.get('Authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return HttpResponse.json(
-        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+  http.patch(
+    `${BASE}/surveys/:surveyId/participants/:participantId`,
+    async ({ request, params }) => {
+      const authHeader = request.headers.get('Authorization')
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return HttpResponse.json(
+          { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+          { status: 401 }
+        )
+      }
+      const participant = mockParticipants.find(
+        (p) => p.id === params.participantId && p.survey_id === params.surveyId
       )
+      if (!participant) {
+        return HttpResponse.json(
+          { detail: { code: 'NOT_FOUND', message: 'Participant not found' } },
+          { status: 404 }
+        )
+      }
+      const body = (await request.json()) as Record<string, unknown>
+      const updated = { ...participant, ...body }
+      return HttpResponse.json(updated, { status: 200 })
     }
-    const participant = mockParticipants.find(
-      (p) => p.id === params.participantId && p.survey_id === params.surveyId,
-    )
-    if (!participant) {
-      return HttpResponse.json(
-        { detail: { code: 'NOT_FOUND', message: 'Participant not found' } },
-        { status: 404 },
-      )
-    }
-    const body = (await request.json()) as Record<string, unknown>
-    const updated = { ...participant, ...body }
-    return HttpResponse.json(updated, { status: 200 })
-  }),
+  ),
 
   // DELETE /api/v1/surveys/:surveyId/participants/:participantId
   http.delete(`${BASE}/surveys/:surveyId/participants/:participantId`, ({ request }) => {
@@ -1525,7 +1561,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     return new HttpResponse(null, { status: 204 })
@@ -1541,7 +1577,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     return HttpResponse.json(mockApiKeys, { status: 200 })
@@ -1553,10 +1589,14 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
-    const body = (await request.json()) as { name?: string; scopes?: string[] | null; expires_at?: string | null }
+    const body = (await request.json()) as {
+      name?: string
+      scopes?: string[] | null
+      expires_at?: string | null
+    }
     const newKey = {
       id: `key-new-${Date.now()}`,
       name: body.name ?? 'New Key',
@@ -1576,7 +1616,7 @@ export const handlers = [
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
         { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 },
+        { status: 401 }
       )
     }
     return new HttpResponse(null, { status: 204 })

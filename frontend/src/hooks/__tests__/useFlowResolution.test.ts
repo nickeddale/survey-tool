@@ -32,14 +32,16 @@ afterEach(() => {
 // Helper
 // ---------------------------------------------------------------------------
 
-function makeResolveFlowResponse(overrides: Partial<{
-  visible_questions: string[]
-  hidden_questions: string[]
-  visible_groups: string[]
-  hidden_groups: string[]
-  piped_texts: Record<string, string>
-  next_question_id: string | null
-}> = {}) {
+function makeResolveFlowResponse(
+  overrides: Partial<{
+    visible_questions: string[]
+    hidden_questions: string[]
+    visible_groups: string[]
+    hidden_groups: string[]
+    piped_texts: Record<string, string>
+    next_question_id: string | null
+  }> = {}
+) {
   return {
     visible_questions: overrides.visible_questions ?? [],
     hidden_questions: overrides.hidden_questions ?? [],
@@ -81,10 +83,7 @@ describe('computeInitialHiddenQuestions', () => {
   })
 
   it('hides questions with a non-empty relevance expression', () => {
-    const questions = [
-      makeQuestion('q-1', "{Q1} != ''"),
-      makeQuestion('q-2', '1 == 1'),
-    ]
+    const questions = [makeQuestion('q-1', "{Q1} != ''"), makeQuestion('q-2', '1 == 1')]
     const result = computeInitialHiddenQuestions(questions)
     expect(result.has('q-1')).toBe(true)
     expect(result.has('q-2')).toBe(true)
@@ -123,9 +122,7 @@ describe('computeInitialHiddenQuestions', () => {
 
 describe('useFlowResolution — initial state', () => {
   it('starts with empty sets and no resolving when surveyId is undefined', () => {
-    const { result } = renderHook(() =>
-      useFlowResolution(undefined, {}),
-    )
+    const { result } = renderHook(() => useFlowResolution(undefined, {}))
     expect(result.current.visibleQuestions.size).toBe(0)
     expect(result.current.hiddenQuestions.size).toBe(0)
     expect(result.current.visibleGroups.size).toBe(0)
@@ -136,9 +133,7 @@ describe('useFlowResolution — initial state', () => {
   })
 
   it('starts with isResolving=true immediately when surveyId is provided', () => {
-    const { result } = renderHook(() =>
-      useFlowResolution(SURVEY_ID, {}),
-    )
+    const { result } = renderHook(() => useFlowResolution(SURVEY_ID, {}))
 
     // isResolving is set to true before the debounce fires
     expect(result.current.isResolving).toBe(true)
@@ -151,9 +146,7 @@ describe('useFlowResolution — initial state', () => {
       makeQuestion('q-empty-relevance', ''),
     ]
 
-    const { result } = renderHook(() =>
-      useFlowResolution(undefined, {}, questions),
-    )
+    const { result } = renderHook(() => useFlowResolution(undefined, {}, questions))
 
     // Questions with relevance should be hidden immediately
     expect(result.current.hiddenQuestions.has('q-with-relevance')).toBe(true)
@@ -175,23 +168,24 @@ describe('useFlowResolution — initial state', () => {
             hidden_questions: [],
             visible_questions: ['q-with-relevance', 'q-no-relevance'],
           }),
-          { status: 200 },
-        ),
-      ),
+          { status: 200 }
+        )
+      )
     )
 
-    const { result } = renderHook(() =>
-      useFlowResolution(SURVEY_ID, {}, questions),
-    )
+    const { result } = renderHook(() => useFlowResolution(SURVEY_ID, {}, questions))
 
     // Before API resolves, pre-hidden question should be hidden
     expect(result.current.hiddenQuestions.has('q-with-relevance')).toBe(true)
 
     // After API resolves, state should reflect the server response
-    await waitFor(() => {
-      expect(result.current.hiddenQuestions.has('q-with-relevance')).toBe(false)
-      expect(result.current.visibleQuestions.has('q-with-relevance')).toBe(true)
-    }, { timeout: 1000 })
+    await waitFor(
+      () => {
+        expect(result.current.hiddenQuestions.has('q-with-relevance')).toBe(false)
+        expect(result.current.visibleQuestions.has('q-with-relevance')).toBe(true)
+      },
+      { timeout: 1000 }
+    )
   })
 })
 
@@ -206,7 +200,7 @@ describe('useFlowResolution — debounce', () => {
       http.post(`${BASE}/surveys/${SURVEY_ID}/logic/resolve-flow`, () => {
         callCount++
         return HttpResponse.json(makeResolveFlowResponse(), { status: 200 })
-      }),
+      })
     )
 
     renderHook(() => useFlowResolution(SURVEY_ID, {}))
@@ -220,13 +214,13 @@ describe('useFlowResolution — debounce', () => {
       http.post(`${BASE}/surveys/${SURVEY_ID}/logic/resolve-flow`, () => {
         callCount++
         return HttpResponse.json(makeResolveFlowResponse(), { status: 200 })
-      }),
+      })
     )
 
     let answers: AnswerMap = {}
     const { rerender } = renderHook(
       ({ ans }: { ans: AnswerMap }) => useFlowResolution(SURVEY_ID, ans),
-      { initialProps: { ans: answers } },
+      { initialProps: { ans: answers } }
     )
 
     // Rapidly change answers multiple times within debounce window
@@ -243,7 +237,7 @@ describe('useFlowResolution — debounce', () => {
 
     const callsAfterSettling = callCount
     // Give more time to ensure no extra calls fire
-    await new Promise(r => setTimeout(r, 400))
+    await new Promise((r) => setTimeout(r, 400))
     expect(callCount).toBeLessThanOrEqual(callsAfterSettling + 1)
   })
 })
@@ -261,18 +255,21 @@ describe('useFlowResolution — API response', () => {
             hidden_questions: ['q-1', 'q-2'],
             visible_questions: ['q-3'],
           }),
-          { status: 200 },
-        ),
-      ),
+          { status: 200 }
+        )
+      )
     )
 
     const { result } = renderHook(() => useFlowResolution(SURVEY_ID, {}))
 
-    await waitFor(() => {
-      expect(result.current.hiddenQuestions.has('q-1')).toBe(true)
-      expect(result.current.hiddenQuestions.has('q-2')).toBe(true)
-      expect(result.current.visibleQuestions.has('q-3')).toBe(true)
-    }, { timeout: 1000 })
+    await waitFor(
+      () => {
+        expect(result.current.hiddenQuestions.has('q-1')).toBe(true)
+        expect(result.current.hiddenQuestions.has('q-2')).toBe(true)
+        expect(result.current.visibleQuestions.has('q-3')).toBe(true)
+      },
+      { timeout: 1000 }
+    )
   })
 
   it('updates hiddenGroups from API response', async () => {
@@ -283,17 +280,20 @@ describe('useFlowResolution — API response', () => {
             hidden_groups: ['g-2'],
             visible_groups: ['g-1'],
           }),
-          { status: 200 },
-        ),
-      ),
+          { status: 200 }
+        )
+      )
     )
 
     const { result } = renderHook(() => useFlowResolution(SURVEY_ID, {}))
 
-    await waitFor(() => {
-      expect(result.current.hiddenGroups.has('g-2')).toBe(true)
-      expect(result.current.visibleGroups.has('g-1')).toBe(true)
-    }, { timeout: 1000 })
+    await waitFor(
+      () => {
+        expect(result.current.hiddenGroups.has('g-2')).toBe(true)
+        expect(result.current.visibleGroups.has('g-1')).toBe(true)
+      },
+      { timeout: 1000 }
+    )
   })
 
   it('updates pipedTexts from API response', async () => {
@@ -303,56 +303,67 @@ describe('useFlowResolution — API response', () => {
           makeResolveFlowResponse({
             piped_texts: { 'q-1': 'Hello, Alice!', 'q-2': 'Your score is 95' },
           }),
-          { status: 200 },
-        ),
-      ),
+          { status: 200 }
+        )
+      )
     )
 
     const { result } = renderHook(() => useFlowResolution(SURVEY_ID, {}))
 
-    await waitFor(() => {
-      expect(result.current.pipedTexts['q-1']).toBe('Hello, Alice!')
-      expect(result.current.pipedTexts['q-2']).toBe('Your score is 95')
-    }, { timeout: 1000 })
+    await waitFor(
+      () => {
+        expect(result.current.pipedTexts['q-1']).toBe('Hello, Alice!')
+        expect(result.current.pipedTexts['q-2']).toBe('Your score is 95')
+      },
+      { timeout: 1000 }
+    )
   })
 
   it('updates nextQuestionId from API response', async () => {
     server.use(
       http.post(`${BASE}/surveys/${SURVEY_ID}/logic/resolve-flow`, () =>
-        HttpResponse.json(
-          makeResolveFlowResponse({ next_question_id: 'q-skip-to' }),
-          { status: 200 },
-        ),
-      ),
+        HttpResponse.json(makeResolveFlowResponse({ next_question_id: 'q-skip-to' }), {
+          status: 200,
+        })
+      )
     )
 
     const { result } = renderHook(() => useFlowResolution(SURVEY_ID, {}))
 
-    await waitFor(() => {
-      expect(result.current.nextQuestionId).toBe('q-skip-to')
-    }, { timeout: 1000 })
+    await waitFor(
+      () => {
+        expect(result.current.nextQuestionId).toBe('q-skip-to')
+      },
+      { timeout: 1000 }
+    )
   })
 
   it('sets isResolving=false after successful API call', async () => {
     const { result } = renderHook(() => useFlowResolution(SURVEY_ID, {}))
 
-    await waitFor(() => {
-      expect(result.current.isResolving).toBe(false)
-    }, { timeout: 1000 })
+    await waitFor(
+      () => {
+        expect(result.current.isResolving).toBe(false)
+      },
+      { timeout: 1000 }
+    )
   })
 
   it('sets isResolving=false after API error (swallows errors silently)', async () => {
     server.use(
       http.post(`${BASE}/surveys/${SURVEY_ID}/logic/resolve-flow`, () =>
-        HttpResponse.json({ detail: { code: 'SERVER_ERROR', message: 'Oops' } }, { status: 500 }),
-      ),
+        HttpResponse.json({ detail: { code: 'SERVER_ERROR', message: 'Oops' } }, { status: 500 })
+      )
     )
 
     const { result } = renderHook(() => useFlowResolution(SURVEY_ID, {}))
 
-    await waitFor(() => {
-      expect(result.current.isResolving).toBe(false)
-    }, { timeout: 1000 })
+    await waitFor(
+      () => {
+        expect(result.current.isResolving).toBe(false)
+      },
+      { timeout: 1000 }
+    )
 
     // Previous state should be retained (empty sets)
     expect(result.current.hiddenQuestions.size).toBe(0)
@@ -364,15 +375,18 @@ describe('useFlowResolution — API response', () => {
       http.post(`${BASE}/surveys/${SURVEY_ID}/logic/resolve-flow`, async ({ request }) => {
         capturedBody = await request.json()
         return HttpResponse.json(makeResolveFlowResponse(), { status: 200 })
-      }),
+      })
     )
 
     const answers: AnswerMap = { 'q-1': 'Alice', 'q-2': 'Yes' }
     renderHook(() => useFlowResolution(SURVEY_ID, answers))
 
-    await waitFor(() => {
-      expect(capturedBody).not.toBeNull()
-    }, { timeout: 1000 })
+    await waitFor(
+      () => {
+        expect(capturedBody).not.toBeNull()
+      },
+      { timeout: 1000 }
+    )
 
     const body = capturedBody as { answers: Array<{ question_id: string; value: unknown }> }
     expect(body.answers).toContainEqual({ question_id: 'q-1', value: 'Alice' })
@@ -391,7 +405,7 @@ describe('useFlowResolution — surveyId gating', () => {
       http.post(`${BASE}/surveys/${SURVEY_ID}/logic/resolve-flow`, () => {
         callCount++
         return HttpResponse.json(makeResolveFlowResponse(), { status: 200 })
-      }),
+      })
     )
 
     renderHook(() => useFlowResolution(undefined, { 'q-1': 'value' }))
@@ -408,7 +422,7 @@ describe('useFlowResolution — surveyId gating', () => {
       http.post(`${BASE}/surveys//logic/resolve-flow`, () => {
         callCount++
         return HttpResponse.json(makeResolveFlowResponse(), { status: 200 })
-      }),
+      })
     )
 
     renderHook(() => useFlowResolution('', { 'q-1': 'value' }))
@@ -428,7 +442,9 @@ describe('useFlowResolution — cleanup', () => {
     const { result, unmount } = renderHook(() => useFlowResolution(SURVEY_ID, {}))
 
     // Unmount before debounce fires
-    act(() => { unmount() })
+    act(() => {
+      unmount()
+    })
 
     // Should not throw or cause errors
     await new Promise((r) => setTimeout(r, 500))

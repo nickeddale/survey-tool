@@ -37,7 +37,14 @@ interface ToggleRowProps {
   'data-testid'?: string
 }
 
-function ToggleRow({ id, label, checked, onChange, disabled, 'data-testid': testId }: ToggleRowProps) {
+function ToggleRow({
+  id,
+  label,
+  checked,
+  onChange,
+  disabled,
+  'data-testid': testId,
+}: ToggleRowProps) {
   return (
     <div className="flex items-center gap-2">
       <input
@@ -48,7 +55,9 @@ function ToggleRow({ id, label, checked, onChange, disabled, 'data-testid': test
         disabled={disabled}
         data-testid={testId}
       />
-      <label htmlFor={id} className="text-sm">{label}</label>
+      <label htmlFor={id} className="text-sm">
+        {label}
+      </label>
     </div>
   )
 }
@@ -64,7 +73,9 @@ const inputClass =
 interface ScalarSettingsFormProps {
   type: 'numeric' | 'rating' | 'boolean' | 'date'
   settings: NumericSettings | RatingSettings | BooleanSettings | DateSettings
-  onChange: (updates: Partial<NumericSettings & RatingSettings & BooleanSettings & DateSettings>) => void
+  onChange: (
+    updates: Partial<NumericSettings & RatingSettings & BooleanSettings & DateSettings>
+  ) => void
   readOnly?: boolean
 }
 
@@ -72,7 +83,12 @@ interface ScalarSettingsFormProps {
 // Component
 // ---------------------------------------------------------------------------
 
-export function ScalarSettingsForm({ type, settings, onChange, readOnly = false }: ScalarSettingsFormProps) {
+export function ScalarSettingsForm({
+  type,
+  settings,
+  onChange,
+  readOnly = false,
+}: ScalarSettingsFormProps) {
   const s = settings as NumericSettings & RatingSettings & BooleanSettings & DateSettings
 
   // ---- Numeric ----
@@ -275,7 +291,9 @@ export function ScalarSettingsForm({ type, settings, onChange, readOnly = false 
           <select
             className={inputClass}
             value={(s as BooleanSettings).render_as ?? 'toggle'}
-            onChange={(e) => onChange({ render_as: e.target.value as BooleanSettings['render_as'] })}
+            onChange={(e) =>
+              onChange({ render_as: e.target.value as BooleanSettings['render_as'] })
+            }
             disabled={readOnly}
             data-testid="scalar-setting-render-as"
           >

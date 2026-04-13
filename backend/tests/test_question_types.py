@@ -377,11 +377,11 @@ def test_huge_text_settings_rows_zero():
 
 
 # ---------------------------------------------------------------------------
-# 1b. Misc types (scale, yes_no, time, datetime, file_upload, number)
+# 1b. Misc types (scale, yes_no, time, datetime, file_upload)
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("qtype", ["scale", "yes_no", "time", "datetime", "file_upload", "number"])
+@pytest.mark.parametrize("qtype", ["scale", "yes_no", "time", "datetime", "file_upload"])
 def test_misc_type_config_valid_no_settings(qtype):
     """Misc types with no settings should produce no errors."""
     errors = validate_question_config(qtype, settings=None, validation=None)
@@ -900,7 +900,7 @@ def test_html_config_content_not_string():
 @pytest.mark.parametrize("qtype", [
     "short_text", "long_text", "huge_text", "email", "phone", "url",
     "numeric", "rating", "boolean", "date",
-    "scale", "yes_no", "time", "datetime", "file_upload", "number",
+    "scale", "yes_no", "time", "datetime", "file_upload",
     "expression", "html",
 ])
 def test_none_settings_always_valid(qtype):
@@ -1641,38 +1641,38 @@ def test_file_upload_answer_required_empty_string():
 
 
 def test_number_answer_valid():
-    q = make_question("number")
+    q = make_question("numeric")
     errors = validate_answer({"value": 42}, q)
     assert errors == []
 
 
 def test_number_answer_below_min():
-    q = make_question("number", validation={"min": 0})
+    q = make_question("numeric", validation={"min": 0})
     errors = validate_answer({"value": -1}, q)
     assert len(errors) > 0
 
 
 def test_number_answer_above_max():
-    q = make_question("number", validation={"max": 100})
+    q = make_question("numeric", validation={"max": 100})
     errors = validate_answer({"value": 200}, q)
     assert len(errors) > 0
 
 
 def test_number_answer_not_a_number():
-    q = make_question("number")
+    q = make_question("numeric")
     errors = validate_answer({"value": "ten"}, q)
     assert len(errors) > 0
 
 
 def test_number_answer_bool_not_valid():
     """Boolean should not be treated as a number."""
-    q = make_question("number")
+    q = make_question("numeric")
     errors = validate_answer({"value": True}, q)
     assert len(errors) > 0
 
 
 def test_number_answer_required_null():
-    q = make_question("number", is_required=True)
+    q = make_question("numeric", is_required=True)
     errors = validate_answer({"value": None}, q)
     assert len(errors) > 0
 
@@ -1927,7 +1927,7 @@ def test_question_validation_error_has_field_and_message():
     "single_choice", "dropdown", "multiple_choice",
     "matrix", "matrix_dropdown", "matrix_dynamic",
     "ranking", "image_picker",
-    "scale", "yes_no", "time", "datetime", "file_upload", "number",
+    "scale", "yes_no", "time", "datetime", "file_upload",
     "expression", "html",
 ])
 async def test_create_question_all_types_no_settings(client: AsyncClient, qtype: str):

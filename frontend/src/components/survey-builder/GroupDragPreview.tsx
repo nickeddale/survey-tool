@@ -35,10 +35,7 @@ export function GroupDragPreview({ group }: GroupDragPreviewProps) {
       {group.questions.length > 0 && (
         <div className="px-3 py-2 space-y-1 max-h-40 overflow-hidden">
           {group.questions.slice(0, 3).map((q) => (
-            <div
-              key={q.id}
-              className="flex items-center gap-1.5 text-xs text-muted-foreground"
-            >
+            <div key={q.id} className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <span className="font-mono bg-muted px-1 py-0.5 rounded">{q.code}</span>
               <span className="truncate">{q.title}</span>
             </div>

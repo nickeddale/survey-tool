@@ -56,11 +56,17 @@ export class ErrorBoundary extends Component<Props, State> {
           className="flex min-h-screen flex-col items-center justify-center gap-4 p-8 text-center"
           data-testid="error-boundary-fallback"
         >
-          <h1 className="text-2xl font-semibold text-destructive" data-testid="error-boundary-heading">
+          <h1
+            className="text-2xl font-semibold text-destructive"
+            data-testid="error-boundary-heading"
+          >
             Something went wrong
           </h1>
           {this.state.error && (
-            <p className="max-w-md text-sm text-muted-foreground" data-testid="error-boundary-message">
+            <p
+              className="max-w-md text-sm text-muted-foreground"
+              data-testid="error-boundary-message"
+            >
               {this.state.error.message}
             </p>
           )}

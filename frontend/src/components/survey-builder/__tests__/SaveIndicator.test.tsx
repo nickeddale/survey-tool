@@ -19,7 +19,7 @@ function renderIndicator(onRetry?: () => void) {
   return render(
     <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <SaveIndicator onRetry={onRetry} />
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 

@@ -12,8 +12,8 @@ export function UnavailableScreen({ status }: { status: string }) {
           {status === 'closed'
             ? 'This survey has been closed and is no longer accepting responses.'
             : status === 'archived'
-            ? 'This survey has been archived and is no longer available.'
-            : 'This survey is not currently available.'}
+              ? 'This survey has been archived and is no longer available.'
+              : 'This survey is not currently available.'}
         </p>
       </div>
     </div>

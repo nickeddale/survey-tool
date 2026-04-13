@@ -60,14 +60,14 @@ describe('ExpressionDisplay — rendering', () => {
   it('renders placeholder text when value is null', () => {
     render(<ExpressionDisplay value={null} question={makeQuestion()} />)
     expect(screen.getByTestId('expression-display-value')).toHaveTextContent(
-      'Expression result will appear here',
+      'Expression result will appear here'
     )
   })
 
   it('renders placeholder text when value is empty string', () => {
     render(<ExpressionDisplay value="" question={makeQuestion()} />)
     expect(screen.getByTestId('expression-display-value')).toHaveTextContent(
-      'Expression result will appear here',
+      'Expression result will appear here'
     )
   })
 
@@ -101,7 +101,9 @@ describe('ExpressionDisplay — display formats', () => {
     render(
       <ExpressionDisplay
         value={75}
-        question={makeQuestion({ settings: makeSettings({ display_format: 'percent', decimal_places: 0 }) })}
+        question={makeQuestion({
+          settings: makeSettings({ display_format: 'percent', decimal_places: 0 }),
+        })}
       />
     )
     expect(screen.getByTestId('expression-display-value')).toHaveTextContent('75%')
@@ -139,12 +141,7 @@ describe('ExpressionDisplay — accessibility', () => {
   })
 
   it('has aria-label equal to question title', () => {
-    render(
-      <ExpressionDisplay
-        value="test"
-        question={makeQuestion({ title: 'My Expression' })}
-      />
-    )
+    render(<ExpressionDisplay value="test" question={makeQuestion({ title: 'My Expression' })} />)
     expect(screen.getByLabelText('My Expression')).toBeInTheDocument()
   })
 

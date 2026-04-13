@@ -36,7 +36,14 @@ interface ToggleRowProps {
   'data-testid'?: string
 }
 
-function ToggleRow({ id, label, checked, onChange, disabled, 'data-testid': testId }: ToggleRowProps) {
+function ToggleRow({
+  id,
+  label,
+  checked,
+  onChange,
+  disabled,
+  'data-testid': testId,
+}: ToggleRowProps) {
   return (
     <div className="flex items-center gap-2">
       <input
@@ -47,7 +54,9 @@ function ToggleRow({ id, label, checked, onChange, disabled, 'data-testid': test
         disabled={disabled}
         data-testid={testId}
       />
-      <label htmlFor={id} className="text-sm">{label}</label>
+      <label htmlFor={id} className="text-sm">
+        {label}
+      </label>
     </div>
   )
 }
@@ -71,7 +80,12 @@ interface ChoiceSettingsFormProps {
 // Component
 // ---------------------------------------------------------------------------
 
-export function ChoiceSettingsForm({ type, settings, onChange, readOnly = false }: ChoiceSettingsFormProps) {
+export function ChoiceSettingsForm({
+  type,
+  settings,
+  onChange,
+  readOnly = false,
+}: ChoiceSettingsFormProps) {
   const s = settings as RadioSettings & DropdownSettings & CheckboxSettings
 
   return (

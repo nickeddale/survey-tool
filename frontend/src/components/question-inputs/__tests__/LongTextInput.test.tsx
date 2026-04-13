@@ -70,9 +70,14 @@ describe('LongTextInput — rendering', () => {
   })
 
   it('shows placeholder text', () => {
-    const question = makeQuestion({ settings: makeSettings({ placeholder: 'Write your answer here' }) })
+    const question = makeQuestion({
+      settings: makeSettings({ placeholder: 'Write your answer here' }),
+    })
     render(<LongTextInput value="" onChange={vi.fn()} question={question} />)
-    expect(screen.getByTestId('long-text-input')).toHaveAttribute('placeholder', 'Write your answer here')
+    expect(screen.getByTestId('long-text-input')).toHaveAttribute(
+      'placeholder',
+      'Write your answer here'
+    )
   })
 
   it('reflects the current value', () => {
@@ -114,7 +119,9 @@ describe('LongTextInput — character counter', () => {
   it('updates counter as user types', async () => {
     const user = userEvent.setup()
     let val = ''
-    const onChange = vi.fn((v: string) => { val = v })
+    const onChange = vi.fn((v: string) => {
+      val = v
+    })
     const question = makeQuestion({ settings: makeSettings({ max_length: 100 }) })
     const { rerender } = render(
       <LongTextInput value={val} onChange={onChange} question={question} />
@@ -199,7 +206,13 @@ describe('LongTextInput — max_length validation', () => {
     const user = userEvent.setup()
     const question = makeQuestion({ settings: makeSettings({ max_length: 10 }) })
 
-    render(<LongTextInput value="This is too long for the limit" onChange={vi.fn()} question={question} />)
+    render(
+      <LongTextInput
+        value="This is too long for the limit"
+        onChange={vi.fn()}
+        question={question}
+      />
+    )
 
     await act(async () => {
       await user.click(screen.getByTestId('long-text-input'))
@@ -219,7 +232,12 @@ describe('LongTextInput — external errors prop', () => {
   it('displays external errors', () => {
     const question = makeQuestion({ settings: makeSettings() })
     render(
-      <LongTextInput value="" onChange={vi.fn()} question={question} errors={['Answer is required']} />
+      <LongTextInput
+        value=""
+        onChange={vi.fn()}
+        question={question}
+        errors={['Answer is required']}
+      />
     )
     expect(screen.getByTestId('validation-errors')).toHaveTextContent('Answer is required')
   })
@@ -238,19 +256,18 @@ describe('LongTextInput — accessibility', () => {
 
   it('sets aria-invalid=true when errors exist', () => {
     const question = makeQuestion({ settings: makeSettings() })
-    render(
-      <LongTextInput value="" onChange={vi.fn()} question={question} errors={['Required']} />
-    )
+    render(<LongTextInput value="" onChange={vi.fn()} question={question} errors={['Required']} />)
     expect(screen.getByTestId('long-text-input')).toHaveAttribute('aria-invalid', 'true')
   })
 
   it('sets aria-describedby pointing to error container', () => {
     const question = makeQuestion({ id: 'q-long-abc', settings: makeSettings() })
-    render(
-      <LongTextInput value="" onChange={vi.fn()} question={question} errors={['Required']} />
-    )
+    render(<LongTextInput value="" onChange={vi.fn()} question={question} errors={['Required']} />)
     const textarea = screen.getByTestId('long-text-input')
     expect(textarea).toHaveAttribute('aria-describedby', 'question-q-long-abc-error')
-    expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-long-abc-error')
+    expect(screen.getByTestId('validation-errors')).toHaveAttribute(
+      'id',
+      'question-q-long-abc-error'
+    )
   })
 })

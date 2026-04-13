@@ -59,7 +59,9 @@ function makeFile(name: string, type: string, sizeBytes: number): File {
 
 describe('FileUploadInput — rendering', () => {
   it('renders container with question id in testid', () => {
-    render(<FileUploadInput value={[]} onChange={vi.fn()} question={makeQuestion({ id: 'q-xyz' })} />)
+    render(
+      <FileUploadInput value={[]} onChange={vi.fn()} question={makeQuestion({ id: 'q-xyz' })} />
+    )
     expect(screen.getByTestId('file-upload-input-q-xyz')).toBeInTheDocument()
   })
 
@@ -199,7 +201,10 @@ describe('FileUploadInput — file type validation', () => {
       <FileUploadInput
         value={[file]}
         onChange={vi.fn()}
-        question={makeQuestion({ id: 'q-val', settings: makeSettings({ allowed_types: ['image/*'] }) })}
+        question={makeQuestion({
+          id: 'q-val',
+          settings: makeSettings({ allowed_types: ['image/*'] }),
+        })}
         errors={['"document.exe" is not an allowed file type.']}
       />
     )
@@ -308,7 +313,8 @@ describe('FileUploadInput — FilePreview URL memory leak', () => {
     const file1 = makeFile('photo1.jpg', 'image/jpeg', 1024)
     const file2 = makeFile('photo2.jpg', 'image/jpeg', 1024)
 
-    URL.createObjectURL = vi.fn()
+    URL.createObjectURL = vi
+      .fn()
       .mockReturnValueOnce('blob:mock-url-1')
       .mockReturnValueOnce('blob:mock-url-2')
 
@@ -317,9 +323,7 @@ describe('FileUploadInput — FilePreview URL memory leak', () => {
     )
     expect(URL.createObjectURL).toHaveBeenCalledWith(file1)
 
-    rerender(
-      <FileUploadInput value={[file2]} onChange={vi.fn()} question={makeQuestion()} />
-    )
+    rerender(<FileUploadInput value={[file2]} onChange={vi.fn()} question={makeQuestion()} />)
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock-url-1')
     expect(URL.createObjectURL).toHaveBeenCalledWith(file2)
   })
@@ -355,12 +359,7 @@ describe('FileUploadInput — accessibility', () => {
 
   it('sets aria-invalid=true when errors present', () => {
     render(
-      <FileUploadInput
-        value={[]}
-        onChange={vi.fn()}
-        question={makeQuestion()}
-        errors={['Error']}
-      />
+      <FileUploadInput value={[]} onChange={vi.fn()} question={makeQuestion()} errors={['Error']} />
     )
     expect(screen.getByTestId('file-upload-dropzone')).toHaveAttribute('aria-invalid', 'true')
   })
@@ -376,19 +375,14 @@ describe('FileUploadInput — accessibility', () => {
     )
     expect(screen.getByTestId('file-upload-dropzone')).toHaveAttribute(
       'aria-describedby',
-      'question-q-test-error',
+      'question-q-test-error'
     )
     expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')
   })
 
   it('error list has role=alert', () => {
     render(
-      <FileUploadInput
-        value={[]}
-        onChange={vi.fn()}
-        question={makeQuestion()}
-        errors={['Error']}
-      />
+      <FileUploadInput value={[]} onChange={vi.fn()} question={makeQuestion()} errors={['Error']} />
     )
     expect(screen.getByTestId('validation-errors')).toHaveAttribute('role', 'alert')
   })

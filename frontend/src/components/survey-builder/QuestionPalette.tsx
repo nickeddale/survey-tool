@@ -43,7 +43,9 @@ export function QuestionPalette({ readOnly, onAddQuestion }: QuestionPaletteProp
       data-testid="question-palette"
     >
       <div className="px-3 py-3 border-b border-border">
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Question Types</p>
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+          Question Types
+        </p>
       </div>
       <div className="p-2 space-y-1">
         {QUESTION_TYPES.map(({ type, label, icon: Icon }) => (
@@ -51,9 +53,10 @@ export function QuestionPalette({ readOnly, onAddQuestion }: QuestionPaletteProp
             key={type}
             type="button"
             className={`w-full flex items-center gap-2 px-2 py-2 rounded-md text-sm text-left transition-colors
-              ${readOnly
-                ? 'text-muted-foreground cursor-not-allowed opacity-50'
-                : 'hover:bg-muted text-foreground cursor-pointer'
+              ${
+                readOnly
+                  ? 'text-muted-foreground cursor-not-allowed opacity-50'
+                  : 'hover:bg-muted text-foreground cursor-pointer'
               }`}
             disabled={readOnly}
             aria-label={`Add ${label} question`}

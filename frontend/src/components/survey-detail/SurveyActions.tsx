@@ -1,14 +1,4 @@
-import {
-  ArrowLeft,
-  Pencil,
-  Copy,
-  Download,
-  Trash2,
-  List,
-  BarChart2,
-  Users,
-  Mail,
-} from 'lucide-react'
+import { ArrowLeft, Pencil, Copy, Download, Trash2, List, BarChart2, Users, Mail } from 'lucide-react'
 import { Button } from '../ui/button'
 import type { ModalType } from './types'
 
@@ -49,7 +39,14 @@ export function SurveyHeader({
   )
 }
 
-export function SurveyActions({ surveyId, surveyStatus, onNavigate, onOpenModal, onExport, onBack: _onBack }: SurveyActionsProps) {
+export function SurveyActions({
+  surveyId,
+  surveyStatus,
+  onNavigate,
+  onOpenModal,
+  onExport,
+  onBack: _onBack,
+}: SurveyActionsProps) {
   return (
     <div className="flex flex-wrap items-center gap-2 mb-6">
       {/* Status transition actions */}

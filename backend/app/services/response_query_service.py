@@ -21,7 +21,7 @@ from app.utils.errors import NotFoundError
 # Question type categories for statistics computation
 _CHOICE_TYPES = {"single_choice", "dropdown", "image_picker", "yes_no"}
 _MULTI_CHOICE_TYPES = {"multiple_choice"}
-_NUMERIC_TYPES = {"number", "numeric", "scale"}
+_NUMERIC_TYPES = {"numeric", "scale"}
 _RATING_TYPES = {"rating"}
 
 # ---------------------------------------------------------------------------

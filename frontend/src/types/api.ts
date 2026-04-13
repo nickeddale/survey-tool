@@ -20,8 +20,7 @@ export class ApiError extends Error {
   detail: ApiErrorDetail | string
 
   constructor(status: number, detail: ApiErrorDetail | string) {
-    const message =
-      typeof detail === 'string' ? detail : detail.message
+    const message = typeof detail === 'string' ? detail : detail.message
     super(message)
     this.name = 'ApiError'
     this.status = status

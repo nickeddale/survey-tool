@@ -52,9 +52,7 @@ const mockExistingQuota: QuotaResponse = {
   limit: 100,
   current_count: 30,
   action: 'terminate',
-  conditions: [
-    { question_id: 'q1', operator: 'gt', value: 35 },
-  ],
+  conditions: [{ question_id: 'q1', operator: 'gt', value: 35 }],
   is_active: true,
   created_at: '2024-01-01T00:00:00Z',
   updated_at: '2024-01-01T00:00:00Z',
@@ -78,7 +76,7 @@ describe('QuotaForm', () => {
           quota={null}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       expect(screen.getByRole('heading', { name: 'Create Quota' })).toBeInTheDocument()
@@ -93,7 +91,7 @@ describe('QuotaForm', () => {
           quota={null}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       const nameInput = screen.getByTestId('quota-name-input') as HTMLInputElement
@@ -113,7 +111,7 @@ describe('QuotaForm', () => {
           quota={null}
           onSubmit={vi.fn()}
           onCancel={onCancel}
-        />,
+        />
       )
 
       await act(async () => {
@@ -134,7 +132,7 @@ describe('QuotaForm', () => {
           quota={null}
           onSubmit={onSubmit}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -160,7 +158,7 @@ describe('QuotaForm', () => {
           limit: 150,
           action: 'terminate',
           is_active: true,
-        }),
+        })
       )
     })
 
@@ -175,7 +173,7 @@ describe('QuotaForm', () => {
           quota={null}
           onSubmit={onSubmit}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -200,7 +198,7 @@ describe('QuotaForm', () => {
           quota={null}
           onSubmit={onSubmit}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -224,7 +222,7 @@ describe('QuotaForm', () => {
           quota={null}
           onSubmit={onSubmit}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -246,7 +244,7 @@ describe('QuotaForm', () => {
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
           error="Server error occurred"
-        />,
+        />
       )
 
       expect(screen.getByTestId('quota-form-error')).toBeInTheDocument()
@@ -262,7 +260,7 @@ describe('QuotaForm', () => {
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
           isLoading={true}
-        />,
+        />
       )
 
       expect(screen.getByTestId('quota-form-submit')).toHaveTextContent('Saving...')
@@ -283,7 +281,7 @@ describe('QuotaForm', () => {
           quota={mockExistingQuota}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       expect(screen.getByText('Edit Quota')).toBeInTheDocument()
@@ -298,7 +296,7 @@ describe('QuotaForm', () => {
           quota={mockExistingQuota}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       const nameInput = screen.getByTestId('quota-name-input') as HTMLInputElement
@@ -313,7 +311,7 @@ describe('QuotaForm', () => {
           quota={mockExistingQuota}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       const limitInput = screen.getByTestId('quota-limit-input') as HTMLInputElement
@@ -328,7 +326,7 @@ describe('QuotaForm', () => {
           quota={mockExistingQuota}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       const actionSelect = screen.getByTestId('quota-action-select') as HTMLSelectElement
@@ -343,7 +341,7 @@ describe('QuotaForm', () => {
           quota={mockExistingQuota}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       const checkbox = screen.getByTestId('quota-active-checkbox') as HTMLInputElement
@@ -358,7 +356,7 @@ describe('QuotaForm', () => {
           quota={mockExistingQuota}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       // One condition row from mockExistingQuota.conditions
@@ -381,7 +379,7 @@ describe('QuotaForm', () => {
           quota={null}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -401,7 +399,7 @@ describe('QuotaForm', () => {
           quota={null}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       // Add a condition first
@@ -430,7 +428,7 @@ describe('QuotaForm', () => {
           quota={null}
           onSubmit={onSubmit}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -462,7 +460,7 @@ describe('QuotaForm', () => {
           quota={null}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       // No questions visible until a condition is added — but we can check ConditionBuilder

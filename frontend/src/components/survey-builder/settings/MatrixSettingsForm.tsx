@@ -36,7 +36,14 @@ interface ToggleRowProps {
   'data-testid'?: string
 }
 
-function ToggleRow({ id, label, checked, onChange, disabled, 'data-testid': testId }: ToggleRowProps) {
+function ToggleRow({
+  id,
+  label,
+  checked,
+  onChange,
+  disabled,
+  'data-testid': testId,
+}: ToggleRowProps) {
   return (
     <div className="flex items-center gap-2">
       <input
@@ -47,7 +54,9 @@ function ToggleRow({ id, label, checked, onChange, disabled, 'data-testid': test
         disabled={disabled}
         data-testid={testId}
       />
-      <label htmlFor={id} className="text-sm">{label}</label>
+      <label htmlFor={id} className="text-sm">
+        {label}
+      </label>
     </div>
   )
 }
@@ -63,7 +72,9 @@ const inputClass =
 interface MatrixSettingsFormProps {
   type: 'matrix' | 'matrix_dropdown' | 'matrix_dynamic'
   settings: MatrixSettings | MatrixDropdownSettings | MatrixDynamicSettings
-  onChange: (updates: Partial<MatrixSettings & MatrixDropdownSettings & MatrixDynamicSettings>) => void
+  onChange: (
+    updates: Partial<MatrixSettings & MatrixDropdownSettings & MatrixDynamicSettings>
+  ) => void
   readOnly?: boolean
 }
 
@@ -71,7 +82,12 @@ interface MatrixSettingsFormProps {
 // Component
 // ---------------------------------------------------------------------------
 
-export function MatrixSettingsForm({ type, settings, onChange, readOnly = false }: MatrixSettingsFormProps) {
+export function MatrixSettingsForm({
+  type,
+  settings,
+  onChange,
+  readOnly = false,
+}: MatrixSettingsFormProps) {
   const s = settings as MatrixSettings & MatrixDropdownSettings & MatrixDynamicSettings
 
   return (
@@ -118,7 +134,9 @@ export function MatrixSettingsForm({ type, settings, onChange, readOnly = false 
           <select
             className={inputClass}
             value={s.cell_type ?? 'dropdown'}
-            onChange={(e) => onChange({ cell_type: e.target.value as MatrixDropdownSettings['cell_type'] })}
+            onChange={(e) =>
+              onChange({ cell_type: e.target.value as MatrixDropdownSettings['cell_type'] })
+            }
             disabled={readOnly}
             data-testid="matrix-setting-cell-type"
           >

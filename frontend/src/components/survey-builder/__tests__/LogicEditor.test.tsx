@@ -53,7 +53,7 @@ function renderEditor(
     onChange?: (v: string) => void
     disabled?: boolean
     currentQuestionCode?: string
-  } = {},
+  } = {}
 ) {
   const { value = '', onChange = vi.fn(), disabled = false, currentQuestionCode } = props
   return render(
@@ -65,7 +65,7 @@ function renderEditor(
       value={value}
       onChange={onChange}
       disabled={disabled}
-    />,
+    />
   )
 }
 
@@ -149,7 +149,7 @@ describe('LogicEditor — loading state', () => {
       http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async () => {
         const result = await validationPromise
         return HttpResponse.json(result, { status: 200 })
-      }),
+      })
     )
 
     renderEditor()
@@ -188,7 +188,7 @@ describe('LogicEditor — valid state', () => {
     server.use(
       http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async () => {
         return HttpResponse.json(makeValidResult(), { status: 200 })
-      }),
+      })
     )
 
     renderEditor()
@@ -214,7 +214,7 @@ describe('LogicEditor — valid state', () => {
     server.use(
       http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async () => {
         return HttpResponse.json(makeValidResult(['Q1']), { status: 200 })
-      }),
+      })
     )
 
     renderEditor()
@@ -240,7 +240,7 @@ describe('LogicEditor — valid state', () => {
     server.use(
       http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async () => {
         return HttpResponse.json(makeValidResult(['Q1']), { status: 200 })
-      }),
+      })
     )
 
     renderEditor()
@@ -266,7 +266,7 @@ describe('LogicEditor — error state', () => {
     server.use(
       http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async () => {
         return HttpResponse.json(makeErrorResult(), { status: 200 })
-      }),
+      })
     )
 
     renderEditor()
@@ -295,7 +295,7 @@ describe('LogicEditor — error state', () => {
     server.use(
       http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async () => {
         return HttpResponse.json(makeErrorResult(), { status: 200 })
-      }),
+      })
     )
 
     renderEditor()
@@ -324,7 +324,7 @@ describe('LogicEditor — warning state', () => {
     server.use(
       http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async () => {
         return HttpResponse.json(makeWarningResult(), { status: 200 })
-      }),
+      })
     )
 
     renderEditor()
@@ -354,7 +354,7 @@ describe('LogicEditor — Test Expression panel', () => {
     server.use(
       http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async () => {
         return HttpResponse.json(makeValidResult(['Q1']), { status: 200 })
-      }),
+      })
     )
 
     renderEditor()
@@ -384,7 +384,7 @@ describe('LogicEditor — Test Expression panel', () => {
     server.use(
       http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async () => {
         return HttpResponse.json(makeValidResult(['Q1']), { status: 200 })
-      }),
+      })
     )
 
     renderEditor()
@@ -431,7 +431,7 @@ describe('LogicEditor — mock response shape assertion', () => {
         }
         capturedResponse = response
         return HttpResponse.json(response, { status: 200 })
-      }),
+      })
     )
 
     renderEditor()
@@ -471,7 +471,7 @@ describe('LogicEditor — question_code in request payload', () => {
       http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async ({ request }) => {
         capturedBody = (await request.json()) as Record<string, unknown>
         return HttpResponse.json(makeValidResult(), { status: 200 })
-      }),
+      })
     )
 
     renderEditor({ currentQuestionCode: 'Q1' })
@@ -501,7 +501,7 @@ describe('LogicEditor — question_code in request payload', () => {
       http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async ({ request }) => {
         capturedBody = (await request.json()) as Record<string, unknown>
         return HttpResponse.json(makeValidResult(), { status: 200 })
-      }),
+      })
     )
 
     renderEditor()
@@ -532,7 +532,7 @@ describe('LogicEditor — debounce timing', () => {
       http.post(`${BASE}/surveys/:surveyId/logic/validate-expression`, async () => {
         callCount++
         return HttpResponse.json(makeValidResult(), { status: 200 })
-      }),
+      })
     )
 
     renderEditor()
@@ -557,7 +557,7 @@ describe('LogicEditor — debounce timing', () => {
       () => {
         expect(callCount).toBeGreaterThan(0)
       },
-      { timeout: 2000 },
+      { timeout: 2000 }
     )
   })
 })

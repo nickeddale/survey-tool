@@ -34,15 +34,15 @@ function ResponsesPage() {
   const { id: surveyId } = useParams<{ id: string }>()
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const [activeView, setActiveView] = useState<ActiveView>(
-    () => (searchParams.get('view') === 'statistics' ? 'statistics' : 'responses'),
+  const [activeView, setActiveView] = useState<ActiveView>(() =>
+    searchParams.get('view') === 'statistics' ? 'statistics' : 'responses'
   )
   const [page, setPage] = useState<number>(() => {
     const p = parseInt(searchParams.get('page') ?? '1', 10)
     return isNaN(p) || p < 1 ? 1 : p
   })
   const [statusFilter, setStatusFilter] = useState<string>(
-    () => searchParams.get('status') ?? 'all',
+    () => searchParams.get('status') ?? 'all'
   )
 
   const [responses, setResponses] = useState<ResponseSummary[]>([])
@@ -57,11 +57,14 @@ function ResponsesPage() {
   // Load survey questions for export column selection
   useEffect(() => {
     if (!surveyId) return
-    surveyService.getSurvey(surveyId).then((survey) => {
-      setQuestions(survey.questions ?? [])
-    }).catch(() => {
-      // Non-critical — export dialog will show no columns
-    })
+    surveyService
+      .getSurvey(surveyId)
+      .then((survey) => {
+        setQuestions(survey.questions ?? [])
+      })
+      .catch(() => {
+        // Non-critical — export dialog will show no columns
+      })
   }, [surveyId])
 
   // Sync state to URL params
@@ -88,7 +91,10 @@ function ResponsesPage() {
         }
         if (statusFilter && statusFilter !== 'all') params.status = statusFilter
 
-        const data = await responseService.listResponses(surveyId!, params as Parameters<typeof responseService.listResponses>[1])
+        const data = await responseService.listResponses(
+          surveyId!,
+          params as Parameters<typeof responseService.listResponses>[1]
+        )
         if (!cancelled) {
           setResponses(data.items)
           setTotal(data.total)
@@ -122,7 +128,7 @@ function ResponsesPage() {
     (response: ResponseSummary) => {
       navigate(`/surveys/${surveyId}/responses/${response.id}`)
     },
-    [surveyId, navigate],
+    [surveyId, navigate]
   )
 
   // ---------------------------------------------------------------------------
@@ -206,16 +212,17 @@ function ResponsesPage() {
       </div>
 
       {/* Statistics view */}
-      {activeView === 'statistics' && surveyId && (
-        <StatisticsDashboard surveyId={surveyId} />
-      )}
+      {activeView === 'statistics' && surveyId && <StatisticsDashboard surveyId={surveyId} />}
 
       {/* Responses view */}
       {activeView === 'responses' && (
         <>
           {/* Error alert */}
           {error && (
-            <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+            <div
+              className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+              role="alert"
+            >
               {error}
             </div>
           )}
@@ -242,11 +249,7 @@ function ResponsesPage() {
           </div>
 
           {/* Table */}
-          <ResponseTable
-            responses={responses}
-            isLoading={isLoading}
-            onView={handleView}
-          />
+          <ResponseTable responses={responses} isLoading={isLoading} onView={handleView} />
 
           {/* Pagination */}
           {!isLoading && totalPages > 1 && (

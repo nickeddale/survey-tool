@@ -3,7 +3,11 @@
  */
 
 import type { BuilderQuestion } from '../../../store/builderStore'
-import type { ShortTextSettings, LongTextSettings, HugeTextSettings } from '../../../types/questionSettings'
+import type {
+  ShortTextSettings,
+  LongTextSettings,
+  HugeTextSettings,
+} from '../../../types/questionSettings'
 
 export interface QuestionPreviewProps {
   question: BuilderQuestion

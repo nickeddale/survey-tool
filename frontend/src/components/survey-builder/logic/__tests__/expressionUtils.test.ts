@@ -4,12 +4,17 @@ import {
   serializeGroup,
   serializeRootGroup,
   parseExpression,
-  makeEmptyCondition,
 } from '../expressionUtils'
 import type { ConditionGroup, ConditionRow } from '../types'
 
 function makeCondition(questionCode: string, operator: string, value: string): ConditionRow {
-  return { type: 'condition', id: 'test', questionCode, operator: operator as any, value }
+  return {
+    type: 'condition' as const,
+    id: 'test',
+    questionCode,
+    operator: operator as ConditionRow['operator'],
+    value,
+  }
 }
 
 function makeGroup(logic: 'and' | 'or', items: (ConditionRow | ConditionGroup)[]): ConditionGroup {
@@ -23,7 +28,7 @@ describe('serializeCondition', () => {
 
   it('serializes contains with lowercase keyword', () => {
     expect(serializeCondition(makeCondition('Q1', 'contains', 'hello'))).toBe(
-      "{Q1} contains 'hello'",
+      "{Q1} contains 'hello'"
     )
   })
 
@@ -68,18 +73,12 @@ describe('serializeGroup', () => {
   })
 
   it('does NOT use uppercase AND', () => {
-    const group = makeGroup('and', [
-      makeCondition('Q1', '==', 'a'),
-      makeCondition('Q2', '==', 'b'),
-    ])
+    const group = makeGroup('and', [makeCondition('Q1', '==', 'a'), makeCondition('Q2', '==', 'b')])
     expect(serializeGroup(group)).not.toContain('AND')
   })
 
   it('does NOT use uppercase OR', () => {
-    const group = makeGroup('or', [
-      makeCondition('Q1', '==', 'a'),
-      makeCondition('Q2', '==', 'b'),
-    ])
+    const group = makeGroup('or', [makeCondition('Q1', '==', 'a'), makeCondition('Q2', '==', 'b')])
     expect(serializeGroup(group)).not.toContain('OR')
   })
 })
@@ -121,10 +120,7 @@ describe('serializeRootGroup', () => {
   })
 
   it('does NOT use uppercase OR', () => {
-    const group = makeGroup('or', [
-      makeCondition('Q1', '==', 'a'),
-      makeCondition('Q2', '==', 'b'),
-    ])
+    const group = makeGroup('or', [makeCondition('Q1', '==', 'a'), makeCondition('Q2', '==', 'b')])
     expect(serializeRootGroup(group)).not.toContain('OR')
   })
 })

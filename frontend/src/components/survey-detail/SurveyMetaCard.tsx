@@ -66,42 +66,56 @@ export function SurveyMetaCard({
       <CardContent className="space-y-4">
         {description && (
           <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Description</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+              Description
+            </p>
             <p className="text-sm text-foreground">{description}</p>
           </div>
         )}
 
         {welcomeMessage && (
           <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Welcome Message</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+              Welcome Message
+            </p>
             <p className="text-sm text-foreground">{welcomeMessage}</p>
           </div>
         )}
 
         {endMessage && (
           <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">End Message</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+              End Message
+            </p>
             <p className="text-sm text-foreground">{endMessage}</p>
           </div>
         )}
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
           <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Language</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+              Language
+            </p>
             <p className="text-sm text-foreground">
               {LANGUAGE_LABELS[defaultLanguage] ?? defaultLanguage}
             </p>
           </div>
           <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Questions</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+              Questions
+            </p>
             <p className="text-sm text-foreground">{totalQuestions}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Created</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+              Created
+            </p>
             <p className="text-sm text-foreground">{formattedDate(createdAt)}</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Last Updated</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+              Last Updated
+            </p>
             <p className="text-sm text-foreground">{formattedDate(updatedAt)}</p>
           </div>
         </div>

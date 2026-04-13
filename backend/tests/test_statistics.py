@@ -409,7 +409,7 @@ async def test_statistics_numeric_question_aggregates(client: AsyncClient):
     survey_id = await create_survey(client, headers)
     group_id = await add_group(client, headers, survey_id)
     q_id = await add_question(
-        client, headers, survey_id, group_id, title="Q Number", question_type="number"
+        client, headers, survey_id, group_id, title="Q Number", question_type="numeric"
     )
     await activate_survey(client, headers, survey_id)
 
@@ -423,7 +423,7 @@ async def test_statistics_numeric_question_aggregates(client: AsyncClient):
 
     data = resp.json()
     q_stats = data["questions"][0]
-    assert q_stats["question_type"] == "number"
+    assert q_stats["question_type"] == "numeric"
     stats = q_stats["stats"]
     assert stats["response_count"] == 3
     assert abs(stats["mean"] - 20.0) < 0.01
@@ -439,7 +439,7 @@ async def test_statistics_numeric_question_no_responses_returns_nulls(client: As
     survey_id = await create_survey(client, headers)
     group_id = await add_group(client, headers, survey_id)
     q_id = await add_question(
-        client, headers, survey_id, group_id, title="Q Number", question_type="number"
+        client, headers, survey_id, group_id, title="Q Number", question_type="numeric"
     )
     await activate_survey(client, headers, survey_id)
 
@@ -472,7 +472,7 @@ async def test_statistics_multiple_question_types(client: AsyncClient):
     group_id = await add_group(client, headers, survey_id)
     q_text = await add_question(client, headers, survey_id, group_id, title="Text Q", question_type="short_text")
     q_rating = await add_question(client, headers, survey_id, group_id, title="Rating Q", question_type="rating")
-    q_num = await add_question(client, headers, survey_id, group_id, title="Num Q", question_type="number")
+    q_num = await add_question(client, headers, survey_id, group_id, title="Num Q", question_type="numeric")
     await activate_survey(client, headers, survey_id)
 
     # Submit 1 response with answers for all questions
@@ -495,4 +495,4 @@ async def test_statistics_multiple_question_types(client: AsyncClient):
     types_found = {q["question_type"] for q in data["questions"]}
     assert "short_text" in types_found
     assert "rating" in types_found
-    assert "number" in types_found
+    assert "numeric" in types_found

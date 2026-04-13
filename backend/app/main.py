@@ -409,6 +409,19 @@ async def request_validation_error_handler(
     request: Request, exc: RequestValidationError
 ) -> JSONResponse:
     """FastAPI validation errors (Pydantic) → 400 VALIDATION_ERROR."""
+    errors = exc.errors()
+    # value_error comes from field_validator raising ValueError (e.g. SSRF checks).
+    # Extract the actual validator message so callers receive actionable feedback.
+    value_errors = [e for e in errors if e.get("type") == "value_error"]
+    if value_errors:
+        message = value_errors[0].get("msg", "Request validation failed")
+        if message.startswith("Value error, "):
+            message = message[len("Value error, "):]
+        return _make_error_response(
+            status.HTTP_400_BAD_REQUEST,
+            "VALIDATION_ERROR",
+            message,
+        )
     return _make_error_response(
         status.HTTP_400_BAD_REQUEST,
         "VALIDATION_ERROR",

@@ -395,9 +395,9 @@ async def test_full_journey_all_question_types(client: AsyncClient):
         client, headers, survey_id, group_id, "yes_no", "YESNO", "Yes/No question"
     )
 
-    # Number/ranking types
-    question_ids["number"] = await create_question(
-        client, headers, survey_id, group_id, "number", "NUMFIELD", "Number field question"
+    # Numeric/ranking types
+    question_ids["numeric_2"] = await create_question(
+        client, headers, survey_id, group_id, "numeric", "NUMFIELD", "Numeric field question"
     )
 
     # Expression/HTML types
@@ -425,7 +425,7 @@ async def test_full_journey_all_question_types(client: AsyncClient):
         {"question_id": question_ids["time"], "value": "14:30"},
         {"question_id": question_ids["scale"], "value": 7},
         {"question_id": question_ids["yes_no"], "value": "yes"},
-        {"question_id": question_ids["number"], "value": 100},
+        {"question_id": question_ids["numeric_2"], "value": 100},
     ]
 
     resp = await client.post(
@@ -449,7 +449,7 @@ async def test_full_journey_all_question_types(client: AsyncClient):
     # Step 8: Submit a second response via API key auth
     key_resp = await client.post(
         KEYS_URL,
-        json={"name": "E2E Key", "scopes": []},
+        json={"name": "E2E Key", "scopes": ["responses:read"]},
         headers=headers,
     )
     assert key_resp.status_code == 201

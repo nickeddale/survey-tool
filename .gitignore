@@ -8,3 +8,5 @@ node_modules/
 dist/
 .pytest_cache/
 .mypy_cache/
+.claude/
+.playwright-mcp/

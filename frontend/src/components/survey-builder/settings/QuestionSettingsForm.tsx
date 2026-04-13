@@ -25,7 +25,12 @@ interface QuestionSettingsFormProps {
 // Component
 // ---------------------------------------------------------------------------
 
-export function QuestionSettingsForm({ type, settings, onChange, readOnly = false }: QuestionSettingsFormProps) {
+export function QuestionSettingsForm({
+  type,
+  settings,
+  onChange,
+  readOnly = false,
+}: QuestionSettingsFormProps) {
   // Text types
   if (type === 'short_text' || type === 'long_text' || type === 'huge_text') {
     return (

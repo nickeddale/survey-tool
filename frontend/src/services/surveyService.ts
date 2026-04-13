@@ -1,6 +1,22 @@
 import axios from 'axios'
 import apiClient from './apiClient'
-import type { SurveyResponse, SurveyFullResponse, SurveyListResponse, SurveyCreatePayload, SurveyUpdatePayload, AnswerOptionResponse, QuestionResponse, QuestionUpdatePayload, QuestionCreatePayload, QuestionGroupResponse, QuestionGroupCreatePayload, QuestionGroupUpdatePayload, GroupReorderPayload, ValidateExpressionResult, EvaluateExpressionResult } from '../types/survey'
+import type {
+  SurveyResponse,
+  SurveyFullResponse,
+  SurveyListResponse,
+  SurveyCreatePayload,
+  SurveyUpdatePayload,
+  AnswerOptionResponse,
+  QuestionResponse,
+  QuestionUpdatePayload,
+  QuestionCreatePayload,
+  QuestionGroupResponse,
+  QuestionGroupCreatePayload,
+  QuestionGroupUpdatePayload,
+  GroupReorderPayload,
+  ValidateExpressionResult,
+  EvaluateExpressionResult,
+} from '../types/survey'
 
 export interface TranslationsUpdatePayload {
   lang: string
@@ -91,7 +107,10 @@ class SurveyService {
   }
 
   async cloneSurvey(id: string, title?: string): Promise<SurveyResponse> {
-    const response = await apiClient.post<SurveyResponse>(`/surveys/${id}/clone`, title ? { title } : {})
+    const response = await apiClient.post<SurveyResponse>(
+      `/surveys/${id}/clone`,
+      title ? { title } : {}
+    )
     return response.data
   }
 
@@ -117,11 +136,11 @@ class SurveyService {
   async createQuestion(
     surveyId: string,
     groupId: string,
-    data: QuestionCreatePayload,
+    data: QuestionCreatePayload
   ): Promise<QuestionResponse> {
     const response = await apiClient.post<QuestionResponse>(
       `/surveys/${surveyId}/groups/${groupId}/questions`,
-      data,
+      data
     )
     return response.data
   }
@@ -130,19 +149,22 @@ class SurveyService {
     surveyId: string,
     groupId: string,
     questionId: string,
-    data: QuestionUpdatePayload,
+    data: QuestionUpdatePayload
   ): Promise<QuestionResponse> {
     const response = await apiClient.patch<QuestionResponse>(
       `/surveys/${surveyId}/groups/${groupId}/questions/${questionId}`,
-      data,
+      data
     )
     return response.data
   }
 
-  async createGroup(surveyId: string, data: QuestionGroupCreatePayload): Promise<QuestionGroupResponse> {
+  async createGroup(
+    surveyId: string,
+    data: QuestionGroupCreatePayload
+  ): Promise<QuestionGroupResponse> {
     const response = await apiClient.post<QuestionGroupResponse>(
       `/surveys/${surveyId}/groups`,
-      data,
+      data
     )
     return response.data
   }
@@ -150,11 +172,11 @@ class SurveyService {
   async updateGroup(
     surveyId: string,
     groupId: string,
-    data: QuestionGroupUpdatePayload,
+    data: QuestionGroupUpdatePayload
   ): Promise<QuestionGroupResponse> {
     const response = await apiClient.patch<QuestionGroupResponse>(
       `/surveys/${surveyId}/groups/${groupId}`,
-      data,
+      data
     )
     return response.data
   }
@@ -163,10 +185,13 @@ class SurveyService {
     await apiClient.delete(`/surveys/${surveyId}/groups/${groupId}`)
   }
 
-  async reorderGroups(surveyId: string, data: GroupReorderPayload): Promise<QuestionGroupResponse[]> {
+  async reorderGroups(
+    surveyId: string,
+    data: GroupReorderPayload
+  ): Promise<QuestionGroupResponse[]> {
     const response = await apiClient.patch<QuestionGroupResponse[]>(
       `/surveys/${surveyId}/groups/reorder`,
-      data,
+      data
     )
     return response.data
   }
@@ -186,11 +211,11 @@ class SurveyService {
   async createOption(
     surveyId: string,
     questionId: string,
-    data: AnswerOptionCreatePayload,
+    data: AnswerOptionCreatePayload
   ): Promise<AnswerOptionResponse> {
     const response = await apiClient.post<AnswerOptionResponse>(
       `/surveys/${surveyId}/questions/${questionId}/options`,
-      data,
+      data
     )
     return response.data
   }
@@ -199,11 +224,11 @@ class SurveyService {
     surveyId: string,
     questionId: string,
     optionId: string,
-    data: AnswerOptionUpdatePayload,
+    data: AnswerOptionUpdatePayload
   ): Promise<AnswerOptionResponse> {
     const response = await apiClient.patch<AnswerOptionResponse>(
       `/surveys/${surveyId}/questions/${questionId}/options/${optionId}`,
-      data,
+      data
     )
     return response.data
   }
@@ -224,11 +249,11 @@ class SurveyService {
 
   async updateSurveyTranslations(
     surveyId: string,
-    data: TranslationsUpdatePayload,
+    data: TranslationsUpdatePayload
   ): Promise<SurveyResponse> {
     const response = await apiClient.patch<SurveyResponse>(
       `/surveys/${surveyId}/translations`,
-      data,
+      data
     )
     return response.data
   }
@@ -236,11 +261,11 @@ class SurveyService {
   async updateGroupTranslations(
     surveyId: string,
     groupId: string,
-    data: TranslationsUpdatePayload,
+    data: TranslationsUpdatePayload
   ): Promise<QuestionGroupResponse> {
     const response = await apiClient.patch<QuestionGroupResponse>(
       `/surveys/${surveyId}/groups/${groupId}/translations`,
-      data,
+      data
     )
     return response.data
   }
@@ -249,11 +274,11 @@ class SurveyService {
     surveyId: string,
     groupId: string,
     questionId: string,
-    data: TranslationsUpdatePayload,
+    data: TranslationsUpdatePayload
   ): Promise<QuestionResponse> {
     const response = await apiClient.patch<QuestionResponse>(
       `/surveys/${surveyId}/groups/${groupId}/questions/${questionId}/translations`,
-      data,
+      data
     )
     return response.data
   }
@@ -262,33 +287,33 @@ class SurveyService {
     surveyId: string,
     questionId: string,
     optionId: string,
-    data: TranslationsUpdatePayload,
+    data: TranslationsUpdatePayload
   ): Promise<AnswerOptionResponse> {
     const response = await apiClient.patch<AnswerOptionResponse>(
       `/surveys/${surveyId}/questions/${questionId}/options/${optionId}/translations`,
-      data,
+      data
     )
     return response.data
   }
 
   async validateExpression(
     surveyId: string,
-    data: ValidateExpressionPayload,
+    data: ValidateExpressionPayload
   ): Promise<ValidateExpressionResult> {
     const response = await apiClient.post<ValidateExpressionResult>(
       `/surveys/${surveyId}/logic/validate-expression`,
-      data,
+      data
     )
     return response.data
   }
 
   async evaluateExpression(
     surveyId: string,
-    data: EvaluateExpressionPayload,
+    data: EvaluateExpressionPayload
   ): Promise<EvaluateExpressionResult> {
     const response = await apiClient.post<EvaluateExpressionResult>(
       `/surveys/${surveyId}/logic/evaluate-expression`,
-      data,
+      data
     )
     return response.data
   }

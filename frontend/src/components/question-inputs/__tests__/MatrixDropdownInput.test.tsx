@@ -90,7 +90,9 @@ function makeSettings(overrides: Partial<MatrixDropdownSettings> = {}): MatrixDr
 
 describe('MatrixDropdownInput — rendering', () => {
   it('renders container with question id in testid', () => {
-    render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={makeQuestion({ id: 'q-abc' })} />)
+    render(
+      <MatrixDropdownInput value={{}} onChange={vi.fn()} question={makeQuestion({ id: 'q-abc' })} />
+    )
     expect(screen.getByTestId('matrix-dropdown-input-q-abc')).toBeInTheDocument()
   })
 
@@ -153,7 +155,9 @@ describe('MatrixDropdownInput — rendering', () => {
 
   it('has an overflow-x-auto scroll container', () => {
     const question = makeQuestion()
-    const { container } = render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} />)
+    const { container } = render(
+      <MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} />
+    )
     expect(container.querySelector('.overflow-x-auto')).toBeInTheDocument()
   })
 })
@@ -304,7 +308,13 @@ describe('MatrixDropdownInput — is_all_rows_required validation', () => {
       settings: makeSettings({ is_all_rows_required: true }),
       subquestions,
     })
-    render(<MatrixDropdownInput value={{ SQ001: 'A1', SQ002: 'A2' }} onChange={vi.fn()} question={question} />)
+    render(
+      <MatrixDropdownInput
+        value={{ SQ001: 'A1', SQ002: 'A2' }}
+        onChange={vi.fn()}
+        question={question}
+      />
+    )
 
     fireEvent.blur(screen.getByTestId('matrix-dropdown-input-q-mdd-1'))
 
@@ -320,7 +330,12 @@ describe('MatrixDropdownInput — external errors prop', () => {
   it('displays external errors immediately without blur', () => {
     const question = makeQuestion()
     render(
-      <MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} errors={['Server error']} />
+      <MatrixDropdownInput
+        value={{}}
+        onChange={vi.fn()}
+        question={question}
+        errors={['Server error']}
+      />
     )
     expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error')
   })
@@ -339,13 +354,27 @@ describe('MatrixDropdownInput — accessibility', () => {
 
   it('sets aria-invalid=true when errors present', () => {
     const question = makeQuestion()
-    render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} errors={['Required']} />)
+    render(
+      <MatrixDropdownInput
+        value={{}}
+        onChange={vi.fn()}
+        question={question}
+        errors={['Required']}
+      />
+    )
     expect(screen.getByRole('table')).toHaveAttribute('aria-invalid', 'true')
   })
 
   it('sets aria-describedby pointing to error container when errors present', () => {
     const question = makeQuestion({ id: 'q-test' })
-    render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} errors={['Required']} />)
+    render(
+      <MatrixDropdownInput
+        value={{}}
+        onChange={vi.fn()}
+        question={question}
+        errors={['Required']}
+      />
+    )
     const table = screen.getByRole('table')
     expect(table).toHaveAttribute('aria-describedby', 'question-q-test-error')
     expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')
@@ -353,7 +382,9 @@ describe('MatrixDropdownInput — accessibility', () => {
 
   it('error list has role=alert and aria-live=assertive', () => {
     const question = makeQuestion()
-    render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} errors={['Error']} />)
+    render(
+      <MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} errors={['Error']} />
+    )
     const errorList = screen.getByTestId('validation-errors')
     expect(errorList).toHaveAttribute('role', 'alert')
     expect(errorList).toHaveAttribute('aria-live', 'assertive')

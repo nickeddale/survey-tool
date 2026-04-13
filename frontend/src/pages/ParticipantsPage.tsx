@@ -11,7 +11,9 @@ import type {
 import { ApiError } from '../types/api'
 import { Button } from '../components/ui/button'
 import { Card, CardContent } from '../components/ui/card'
-import ParticipantTable, { ParticipantTableSkeleton } from '../components/participants/ParticipantTable'
+import ParticipantTable, {
+  ParticipantTableSkeleton,
+} from '../components/participants/ParticipantTable'
 import ParticipantForm from '../components/participants/ParticipantForm'
 import CsvImportDialog from '../components/participants/CsvImportDialog'
 
@@ -50,10 +52,7 @@ function ConfirmDeleteModal({
     >
       <Card className="max-w-md w-full mx-4 shadow-lg">
         <CardContent className="p-6">
-          <h2
-            id="delete-participant-title"
-            className="text-lg font-semibold text-foreground mb-2"
-          >
+          <h2 id="delete-participant-title" className="text-lg font-semibold text-foreground mb-2">
             Delete Participant
           </h2>
           <p className="text-sm text-muted-foreground mb-4">
@@ -107,10 +106,7 @@ function ImportResultsModal({ created, onClose }: ImportResultsModalProps) {
     >
       <Card className="max-w-md w-full mx-4 shadow-lg">
         <CardContent className="p-6">
-          <h2
-            id="import-results-title"
-            className="text-lg font-semibold text-foreground mb-2"
-          >
+          <h2 id="import-results-title" className="text-lg font-semibold text-foreground mb-2">
             Import Complete
           </h2>
           <p className="text-sm text-muted-foreground mb-4">
@@ -243,7 +239,7 @@ function ParticipantsPage() {
         } else {
           const created = await participantService.createParticipant(
             surveyId,
-            data as ParticipantCreate,
+            data as ParticipantCreate
           )
           // Show token once — keep form open in token display mode
           setCreatedToken(created.token)
@@ -259,7 +255,7 @@ function ParticipantsPage() {
         setFormLoading(false)
       }
     },
-    [surveyId, editingParticipant, loadParticipants],
+    [surveyId, editingParticipant, loadParticipants]
   )
 
   function handleTokenAcknowledged() {
@@ -403,10 +399,7 @@ function ParticipantsPage() {
       )}
 
       {importResults && (
-        <ImportResultsModal
-          created={importResults}
-          onClose={() => setImportResults(null)}
-        />
+        <ImportResultsModal created={importResults} onClose={() => setImportResults(null)} />
       )}
 
       {/* Header */}
@@ -438,7 +431,10 @@ function ParticipantsPage() {
 
       {/* Global error */}
       {error && (
-        <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+        <div
+          className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+          role="alert"
+        >
           {error}
         </div>
       )}
@@ -523,14 +519,18 @@ function ParticipantsPage() {
         {/* Survey link info */}
         <div className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground">
           <Link size={13} />
-          Survey link: <code className="font-mono bg-muted px-1 rounded">/s/{surveyId}?token=...</code>
+          Survey link:{' '}
+          <code className="font-mono bg-muted px-1 rounded">/s/{surveyId}?token=...</code>
         </div>
       </div>
 
       {/* Content */}
       {isLoading ? (
         <ParticipantTableSkeleton />
-      ) : participants.length === 0 && !emailSearch && filterCompleted === undefined && filterValid === undefined ? (
+      ) : participants.length === 0 &&
+        !emailSearch &&
+        filterCompleted === undefined &&
+        filterValid === undefined ? (
         <div
           className="text-center py-16 bg-card border border-border rounded-lg"
           data-testid="empty-state"
@@ -543,7 +543,10 @@ function ParticipantsPage() {
       ) : (
         <>
           {participants.length === 0 ? (
-            <div className="text-center py-10 text-muted-foreground text-sm" data-testid="no-results">
+            <div
+              className="text-center py-10 text-muted-foreground text-sm"
+              data-testid="no-results"
+            >
               No participants match the current filters.
             </div>
           ) : (

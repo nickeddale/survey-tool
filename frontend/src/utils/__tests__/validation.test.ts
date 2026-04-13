@@ -33,7 +33,7 @@ import type {
 
 function makeQuestion(
   questionType: string,
-  overrides: Partial<BuilderQuestion> = {},
+  overrides: Partial<BuilderQuestion> = {}
 ): BuilderQuestion {
   return {
     id: 'q-1',
@@ -259,7 +259,12 @@ describe('validateAnswer — huge_text', () => {
   })
 
   it('strips HTML tags for character count when rich_text=true', () => {
-    const settings: HugeTextSettings = { placeholder: null, max_length: 10, rows: 10, rich_text: true }
+    const settings: HugeTextSettings = {
+      placeholder: null,
+      max_length: 10,
+      rows: 10,
+      rich_text: true,
+    }
     const q = makeQuestion('huge_text', { settings })
     // HTML is short but plain text is short too — should be valid
     const result = validateAnswer(q, '<p>Hello</p>')
@@ -267,14 +272,24 @@ describe('validateAnswer — huge_text', () => {
   })
 
   it('returns required error when rich text is empty HTML', () => {
-    const settings: HugeTextSettings = { placeholder: null, max_length: 50000, rows: 10, rich_text: true }
+    const settings: HugeTextSettings = {
+      placeholder: null,
+      max_length: 50000,
+      rows: 10,
+      rich_text: true,
+    }
     const q = makeQuestion('huge_text', { is_required: true, settings })
     // <p></p> strips to empty string
     expect(validateAnswer(q, '<p></p>').valid).toBe(false)
   })
 
   it('returns max_length error on plain text length when rich_text=true', () => {
-    const settings: HugeTextSettings = { placeholder: null, max_length: 5, rows: 10, rich_text: true }
+    const settings: HugeTextSettings = {
+      placeholder: null,
+      max_length: 5,
+      rows: 10,
+      rich_text: true,
+    }
     const q = makeQuestion('huge_text', { settings })
     // <p>toolongvalue</p> → plaintext = 'toolongvalue' (12 chars > 5)
     const result = validateAnswer(q, '<p>toolongvalue</p>')
@@ -347,8 +362,14 @@ describe('validateAnswer — checkbox', () => {
 
   it('returns min_choices error when below minimum', () => {
     const settings: CheckboxSettings = {
-      min_choices: 2, max_choices: null, has_other: false, other_text: 'Other',
-      randomize: false, columns: 1, select_all: false, select_all_text: 'Select all',
+      min_choices: 2,
+      max_choices: null,
+      has_other: false,
+      other_text: 'Other',
+      randomize: false,
+      columns: 1,
+      select_all: false,
+      select_all_text: 'Select all',
     }
     const q = makeQuestion('checkbox', { settings })
     const result = validateAnswer(q, ['opt-1'])
@@ -358,8 +379,14 @@ describe('validateAnswer — checkbox', () => {
 
   it('returns max_choices error when above maximum', () => {
     const settings: CheckboxSettings = {
-      min_choices: null, max_choices: 2, has_other: false, other_text: 'Other',
-      randomize: false, columns: 1, select_all: false, select_all_text: 'Select all',
+      min_choices: null,
+      max_choices: 2,
+      has_other: false,
+      other_text: 'Other',
+      randomize: false,
+      columns: 1,
+      select_all: false,
+      select_all_text: 'Select all',
     }
     const q = makeQuestion('checkbox', { settings })
     const result = validateAnswer(q, ['opt-1', 'opt-2', 'opt-3'])
@@ -369,8 +396,14 @@ describe('validateAnswer — checkbox', () => {
 
   it('excludes __other__ sentinel from real count', () => {
     const settings: CheckboxSettings = {
-      min_choices: null, max_choices: 2, has_other: true, other_text: 'Other',
-      randomize: false, columns: 1, select_all: false, select_all_text: 'Select all',
+      min_choices: null,
+      max_choices: 2,
+      has_other: true,
+      other_text: 'Other',
+      randomize: false,
+      columns: 1,
+      select_all: false,
+      select_all_text: 'Select all',
     }
     const q = makeQuestion('checkbox', { settings })
     // 2 real options + __other__ sentinel = 3 items but only 2 real
@@ -381,8 +414,14 @@ describe('validateAnswer — checkbox', () => {
   it('returns no error when min_choices not yet reached but count is 0', () => {
     // min_choices only triggers if realCount > 0
     const settings: CheckboxSettings = {
-      min_choices: 2, max_choices: null, has_other: false, other_text: 'Other',
-      randomize: false, columns: 1, select_all: false, select_all_text: 'Select all',
+      min_choices: 2,
+      max_choices: null,
+      has_other: false,
+      other_text: 'Other',
+      randomize: false,
+      columns: 1,
+      select_all: false,
+      select_all_text: 'Select all',
     }
     const q = makeQuestion('checkbox', { is_required: false, settings })
     const result = validateAnswer(q, [])
@@ -439,8 +478,12 @@ describe('validateAnswer — image_picker', () => {
 
   it('returns min_choices error for multi-select below min', () => {
     const settings: ImagePickerSettings = {
-      multi_select: true, min_choices: 2, max_choices: null,
-      image_width: 200, image_height: 150, show_labels: true,
+      multi_select: true,
+      min_choices: 2,
+      max_choices: null,
+      image_width: 200,
+      image_height: 150,
+      show_labels: true,
     }
     const q = makeQuestion('image_picker', { settings })
     const result = validateAnswer(q, ['img-1'])
@@ -450,8 +493,12 @@ describe('validateAnswer — image_picker', () => {
 
   it('returns max_choices error for multi-select above max', () => {
     const settings: ImagePickerSettings = {
-      multi_select: true, min_choices: null, max_choices: 2,
-      image_width: 200, image_height: 150, show_labels: true,
+      multi_select: true,
+      min_choices: null,
+      max_choices: 2,
+      image_width: 200,
+      image_height: 150,
+      show_labels: true,
     }
     const q = makeQuestion('image_picker', { settings })
     const result = validateAnswer(q, ['img-1', 'img-2', 'img-3'])
@@ -461,8 +508,12 @@ describe('validateAnswer — image_picker', () => {
 
   it('ignores min/max for single-select', () => {
     const settings: ImagePickerSettings = {
-      multi_select: false, min_choices: 2, max_choices: 1,
-      image_width: 200, image_height: 150, show_labels: true,
+      multi_select: false,
+      min_choices: 2,
+      max_choices: 1,
+      image_width: 200,
+      image_height: 150,
+      show_labels: true,
     }
     const q = makeQuestion('image_picker', { settings })
     // Single-select: no min/max validation
@@ -481,13 +532,21 @@ describe('validateAnswer — matrix', () => {
   ]
 
   it('returns valid when all rows answered and is_all_rows_required=true', () => {
-    const settings: MatrixSettings = { alternate_rows: true, is_all_rows_required: true, randomize_rows: false }
+    const settings: MatrixSettings = {
+      alternate_rows: true,
+      is_all_rows_required: true,
+      randomize_rows: false,
+    }
     const q = makeQuestion('matrix', { settings, subquestions })
     expect(validateAnswer(q, { SQ1: 'opt-A', SQ2: 'opt-B' }).valid).toBe(true)
   })
 
   it('returns error when some rows unanswered and is_all_rows_required=true', () => {
-    const settings: MatrixSettings = { alternate_rows: true, is_all_rows_required: true, randomize_rows: false }
+    const settings: MatrixSettings = {
+      alternate_rows: true,
+      is_all_rows_required: true,
+      randomize_rows: false,
+    }
     const q = makeQuestion('matrix', { settings, subquestions })
     const result = validateAnswer(q, { SQ1: 'opt-A' })
     expect(result.valid).toBe(false)
@@ -495,7 +554,11 @@ describe('validateAnswer — matrix', () => {
   })
 
   it('returns valid when rows unanswered and is_all_rows_required=false', () => {
-    const settings: MatrixSettings = { alternate_rows: true, is_all_rows_required: false, randomize_rows: false }
+    const settings: MatrixSettings = {
+      alternate_rows: true,
+      is_all_rows_required: false,
+      randomize_rows: false,
+    }
     const q = makeQuestion('matrix', { settings, subquestions })
     expect(validateAnswer(q, { SQ1: 'opt-A' }).valid).toBe(true)
   })
@@ -520,7 +583,10 @@ describe('validateAnswer — matrix_dropdown', () => {
 
   it('returns valid when all rows answered', () => {
     const settings: MatrixDropdownSettings = {
-      alternate_rows: true, is_all_rows_required: true, randomize_rows: false, cell_type: 'dropdown',
+      alternate_rows: true,
+      is_all_rows_required: true,
+      randomize_rows: false,
+      cell_type: 'dropdown',
     }
     const q = makeQuestion('matrix_dropdown', { settings, subquestions })
     expect(validateAnswer(q, { SQ1: 'opt-A', SQ2: 'opt-B' }).valid).toBe(true)
@@ -528,7 +594,10 @@ describe('validateAnswer — matrix_dropdown', () => {
 
   it('returns error when rows unanswered and is_all_rows_required=true', () => {
     const settings: MatrixDropdownSettings = {
-      alternate_rows: true, is_all_rows_required: true, randomize_rows: false, cell_type: 'dropdown',
+      alternate_rows: true,
+      is_all_rows_required: true,
+      randomize_rows: false,
+      cell_type: 'dropdown',
     }
     const q = makeQuestion('matrix_dropdown', { settings, subquestions })
     const result = validateAnswer(q, { SQ1: 'opt-A' })
@@ -579,7 +648,14 @@ describe('validateAnswer — numeric', () => {
   })
 
   it('returns min error when value below min', () => {
-    const settings: NumericSettings = { min: 10, max: null, decimal_places: 0, placeholder: null, prefix: null, suffix: null }
+    const settings: NumericSettings = {
+      min: 10,
+      max: null,
+      decimal_places: 0,
+      placeholder: null,
+      prefix: null,
+      suffix: null,
+    }
     const q = makeQuestion('numeric', { settings })
     const result = validateAnswer(q, '5')
     expect(result.valid).toBe(false)
@@ -587,7 +663,14 @@ describe('validateAnswer — numeric', () => {
   })
 
   it('returns max error when value above max', () => {
-    const settings: NumericSettings = { min: null, max: 100, decimal_places: 0, placeholder: null, prefix: null, suffix: null }
+    const settings: NumericSettings = {
+      min: null,
+      max: 100,
+      decimal_places: 0,
+      placeholder: null,
+      prefix: null,
+      suffix: null,
+    }
     const q = makeQuestion('numeric', { settings })
     const result = validateAnswer(q, '150')
     expect(result.valid).toBe(false)
@@ -595,7 +678,14 @@ describe('validateAnswer — numeric', () => {
   })
 
   it('returns error for too many decimal places', () => {
-    const settings: NumericSettings = { min: null, max: null, decimal_places: 2, placeholder: null, prefix: null, suffix: null }
+    const settings: NumericSettings = {
+      min: null,
+      max: null,
+      decimal_places: 2,
+      placeholder: null,
+      prefix: null,
+      suffix: null,
+    }
     const q = makeQuestion('numeric', { settings })
     const result = validateAnswer(q, '3.14159')
     expect(result.valid).toBe(false)
@@ -603,19 +693,40 @@ describe('validateAnswer — numeric', () => {
   })
 
   it('returns valid for number at exactly min', () => {
-    const settings: NumericSettings = { min: 10, max: null, decimal_places: 0, placeholder: null, prefix: null, suffix: null }
+    const settings: NumericSettings = {
+      min: 10,
+      max: null,
+      decimal_places: 0,
+      placeholder: null,
+      prefix: null,
+      suffix: null,
+    }
     const q = makeQuestion('numeric', { settings })
     expect(validateAnswer(q, '10').valid).toBe(true)
   })
 
   it('returns valid for number at exactly max', () => {
-    const settings: NumericSettings = { min: null, max: 100, decimal_places: 0, placeholder: null, prefix: null, suffix: null }
+    const settings: NumericSettings = {
+      min: null,
+      max: 100,
+      decimal_places: 0,
+      placeholder: null,
+      prefix: null,
+      suffix: null,
+    }
     const q = makeQuestion('numeric', { settings })
     expect(validateAnswer(q, '100').valid).toBe(true)
   })
 
   it('uses singular decimal place message for decimal_places=1', () => {
-    const settings: NumericSettings = { min: null, max: null, decimal_places: 1, placeholder: null, prefix: null, suffix: null }
+    const settings: NumericSettings = {
+      min: null,
+      max: null,
+      decimal_places: 1,
+      placeholder: null,
+      prefix: null,
+      suffix: null,
+    }
     const q = makeQuestion('numeric', { settings })
     const result = validateAnswer(q, '3.14')
     expect(result.errors[0].message).toContain('1 decimal place')
@@ -705,7 +816,11 @@ describe('validateAnswer — date', () => {
 
   it('returns min_date error when date is before min', () => {
     const settings: DateSettings = {
-      min_date: '2024-01-01', max_date: null, include_time: false, date_format: 'YYYY-MM-DD', placeholder: null,
+      min_date: '2024-01-01',
+      max_date: null,
+      include_time: false,
+      date_format: 'YYYY-MM-DD',
+      placeholder: null,
     }
     const q = makeQuestion('date', { settings })
     const result = validateAnswer(q, '2023-12-31')
@@ -715,7 +830,11 @@ describe('validateAnswer — date', () => {
 
   it('returns max_date error when date is after max', () => {
     const settings: DateSettings = {
-      min_date: null, max_date: '2024-12-31', include_time: false, date_format: 'YYYY-MM-DD', placeholder: null,
+      min_date: null,
+      max_date: '2024-12-31',
+      include_time: false,
+      date_format: 'YYYY-MM-DD',
+      placeholder: null,
     }
     const q = makeQuestion('date', { settings })
     const result = validateAnswer(q, '2025-01-01')
@@ -725,7 +844,11 @@ describe('validateAnswer — date', () => {
 
   it('returns valid for date exactly at min_date', () => {
     const settings: DateSettings = {
-      min_date: '2024-01-01', max_date: null, include_time: false, date_format: 'YYYY-MM-DD', placeholder: null,
+      min_date: '2024-01-01',
+      max_date: null,
+      include_time: false,
+      date_format: 'YYYY-MM-DD',
+      placeholder: null,
     }
     const q = makeQuestion('date', { settings })
     expect(validateAnswer(q, '2024-01-01').valid).toBe(true)
@@ -755,14 +878,22 @@ describe('validateAnswer — file_upload', () => {
   })
 
   it('returns valid for allowed file type', () => {
-    const settings: FileUploadSettings = { max_size_mb: 10, allowed_types: ['image/*'], max_files: 1 }
+    const settings: FileUploadSettings = {
+      max_size_mb: 10,
+      allowed_types: ['image/*'],
+      max_files: 1,
+    }
     const q = makeQuestion('file_upload', { settings })
     const file = makeFile('photo.jpg', 'image/jpeg', 1024)
     expect(validateAnswer(q, [file]).valid).toBe(true)
   })
 
   it('returns error for disallowed file type', () => {
-    const settings: FileUploadSettings = { max_size_mb: 10, allowed_types: ['image/*'], max_files: 1 }
+    const settings: FileUploadSettings = {
+      max_size_mb: 10,
+      allowed_types: ['image/*'],
+      max_files: 1,
+    }
     const q = makeQuestion('file_upload', { settings })
     const file = makeFile('doc.pdf', 'application/pdf', 1024)
     const result = validateAnswer(q, [file])

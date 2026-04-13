@@ -108,7 +108,7 @@ echo $TOKEN
 ### 3. Create an API key
 
 ```bash
-API_KEY=$(curl -s -X POST http://localhost:8000/api/auth/api-keys \
+API_KEY=$(curl -s -X POST http://localhost:8000/api/auth/keys \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{

@@ -25,12 +25,17 @@ function renderSettings() {
           <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </AuthProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
 function resetAuthStore() {
-  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
+  useAuthStore.setState({
+    user: null,
+    isAuthenticated: false,
+    isInitializing: false,
+    isLoading: false,
+  })
 }
 
 // ---------------------------------------------------------------------------
@@ -43,7 +48,12 @@ describe('SettingsPage', () => {
     localStorage.clear()
     resetAuthStore()
     setTokens(mockTokens.access_token)
-    useAuthStore.setState({ user: mockUser, isAuthenticated: true, isInitializing: false, isLoading: false })
+    useAuthStore.setState({
+      user: mockUser,
+      isAuthenticated: true,
+      isInitializing: false,
+      isLoading: false,
+    })
   })
 
   afterEach(() => {
@@ -90,9 +100,7 @@ describe('SettingsPage', () => {
 
   describe('API keys loading state', () => {
     it('renders loading skeleton while fetching keys', async () => {
-      server.use(
-        http.get('/api/v1/auth/keys', () => new Promise<never>(() => {})),
-      )
+      server.use(http.get('/api/v1/auth/keys', () => new Promise<never>(() => {})))
 
       renderSettings()
 
@@ -168,9 +176,7 @@ describe('SettingsPage', () => {
 
   describe('API keys empty state', () => {
     it('renders empty state when no keys exist', async () => {
-      server.use(
-        http.get('/api/v1/auth/keys', () => HttpResponse.json([], { status: 200 })),
-      )
+      server.use(http.get('/api/v1/auth/keys', () => HttpResponse.json([], { status: 200 })))
 
       renderSettings()
 
@@ -252,7 +258,9 @@ describe('SettingsPage', () => {
       })
 
       // After toggle, the full key text should be visible
-      expect(screen.getByTestId('created-key-value')).toHaveTextContent('sk_live_mock_full_api_key_abc123xyz456def789ghi0jkl')
+      expect(screen.getByTestId('created-key-value')).toHaveTextContent(
+        'sk_live_mock_full_api_key_abc123xyz456def789ghi0jkl'
+      )
     })
 
     it('clears one-time key display when dismissed', async () => {
@@ -298,9 +306,9 @@ describe('SettingsPage', () => {
               expires_at: null,
               created_at: new Date().toISOString(),
             },
-            { status: 201 },
+            { status: 201 }
           )
-        }),
+        })
       )
 
       renderSettings()
@@ -328,9 +336,9 @@ describe('SettingsPage', () => {
         http.post('/api/v1/auth/keys', () =>
           HttpResponse.json(
             { detail: { code: 'INTERNAL_SERVER_ERROR', message: 'Server error' } },
-            { status: 500 },
-          ),
-        ),
+            { status: 500 }
+          )
+        )
       )
 
       renderSettings()
@@ -380,7 +388,7 @@ describe('SettingsPage', () => {
         http.delete('/api/v1/auth/keys/:keyId', () => {
           deleteCalled = true
           return new HttpResponse(null, { status: 204 })
-        }),
+        })
       )
 
       renderSettings()
@@ -411,7 +419,7 @@ describe('SettingsPage', () => {
         http.delete('/api/v1/auth/keys/:keyId', ({ params }) => {
           deletedKeyId = params.keyId as string
           return new HttpResponse(null, { status: 204 })
-        }),
+        })
       )
 
       renderSettings()
@@ -448,9 +456,9 @@ describe('SettingsPage', () => {
         http.get('/api/v1/auth/keys', () =>
           HttpResponse.json(
             { detail: { code: 'INTERNAL_SERVER_ERROR', message: 'Internal server error' } },
-            { status: 500 },
-          ),
-        ),
+            { status: 500 }
+          )
+        )
       )
 
       renderSettings()
@@ -541,7 +549,9 @@ describe('SettingsPage', () => {
         expect(screen.getByTestId('profile-success')).toBeInTheDocument()
       })
 
-      expect(screen.getByTestId('profile-success')).toHaveTextContent(/profile updated successfully/i)
+      expect(screen.getByTestId('profile-success')).toHaveTextContent(
+        /profile updated successfully/i
+      )
     })
 
     it('sends correct payload to PATCH /auth/me', async () => {
@@ -551,8 +561,11 @@ describe('SettingsPage', () => {
       server.use(
         http.patch('/api/v1/auth/me', async ({ request }) => {
           capturedBody = (await request.json()) as Record<string, unknown>
-          return HttpResponse.json({ ...mockUser, name: capturedBody.name as string }, { status: 200 })
-        }),
+          return HttpResponse.json(
+            { ...mockUser, name: capturedBody.name as string },
+            { status: 200 }
+          )
+        })
       )
 
       renderSettings()
@@ -586,9 +599,9 @@ describe('SettingsPage', () => {
         http.patch('/api/v1/auth/me', () =>
           HttpResponse.json(
             { detail: { code: 'INTERNAL_SERVER_ERROR', message: 'Server error' } },
-            { status: 500 },
-          ),
-        ),
+            { status: 500 }
+          )
+        )
       )
 
       renderSettings()
@@ -636,7 +649,9 @@ describe('SettingsPage', () => {
         await user.click(screen.getByTestId('password-save-button'))
       })
 
-      expect(screen.getByTestId('password-error')).toHaveTextContent(/current password is required/i)
+      expect(screen.getByTestId('password-error')).toHaveTextContent(
+        /current password is required/i
+      )
     })
 
     it('shows error when new passwords do not match', async () => {
@@ -668,7 +683,9 @@ describe('SettingsPage', () => {
         expect(screen.getByTestId('password-success')).toBeInTheDocument()
       })
 
-      expect(screen.getByTestId('password-success')).toHaveTextContent(/password changed successfully/i)
+      expect(screen.getByTestId('password-success')).toHaveTextContent(
+        /password changed successfully/i
+      )
     })
   })
 })

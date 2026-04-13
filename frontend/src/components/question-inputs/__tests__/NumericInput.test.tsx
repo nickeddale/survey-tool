@@ -233,7 +233,12 @@ describe('NumericInput — decimal places validation', () => {
 describe('NumericInput — external errors prop', () => {
   it('displays external errors immediately without blur', () => {
     render(
-      <NumericInput value="" onChange={vi.fn()} question={makeQuestion()} errors={['Server error']} />
+      <NumericInput
+        value=""
+        onChange={vi.fn()}
+        question={makeQuestion()}
+        errors={['Server error']}
+      />
     )
     expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error')
   })
@@ -258,9 +263,7 @@ describe('NumericInput — accessibility', () => {
 
   it('sets aria-describedby pointing to error container when errors present', () => {
     const question = makeQuestion({ id: 'q-test' })
-    render(
-      <NumericInput value="" onChange={vi.fn()} question={question} errors={['Required']} />
-    )
+    render(<NumericInput value="" onChange={vi.fn()} question={question} errors={['Required']} />)
     const input = screen.getByTestId('numeric-input')
     expect(input).toHaveAttribute('aria-describedby', 'question-q-test-error')
     expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')

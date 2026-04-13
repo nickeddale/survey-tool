@@ -26,7 +26,7 @@ beforeEach(() => {
 
 function makeQuestion(
   questionType: string,
-  overrides: Partial<BuilderQuestion> = {},
+  overrides: Partial<BuilderQuestion> = {}
 ): BuilderQuestion {
   return {
     id: 'q-1',
@@ -172,9 +172,7 @@ describe('useValidation — validateAll', () => {
 
   it('returns true when all questions are valid', () => {
     const { result } = renderHook(() => useValidation())
-    const questions = [
-      makeQuestion('short_text', { id: 'q-1', is_required: true }),
-    ]
+    const questions = [makeQuestion('short_text', { id: 'q-1', is_required: true })]
 
     let valid: boolean
     act(() => {

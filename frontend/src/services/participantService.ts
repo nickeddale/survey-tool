@@ -19,40 +19,40 @@ export interface ParticipantFetchParams {
 class ParticipantService {
   async listParticipants(
     surveyId: string,
-    params: ParticipantFetchParams = {},
+    params: ParticipantFetchParams = {}
   ): Promise<ParticipantListResponse> {
     const response = await apiClient.get<ParticipantListResponse>(
       `/surveys/${surveyId}/participants`,
-      { params },
+      { params }
     )
     return response.data
   }
 
   async getParticipant(surveyId: string, participantId: string): Promise<ParticipantResponse> {
     const response = await apiClient.get<ParticipantResponse>(
-      `/surveys/${surveyId}/participants/${participantId}`,
+      `/surveys/${surveyId}/participants/${participantId}`
     )
     return response.data
   }
 
   async createParticipant(
     surveyId: string,
-    data: ParticipantCreate,
+    data: ParticipantCreate
   ): Promise<ParticipantCreateResponse> {
     const response = await apiClient.post<ParticipantCreateResponse>(
       `/surveys/${surveyId}/participants`,
-      data,
+      data
     )
     return response.data
   }
 
   async createParticipantsBatch(
     surveyId: string,
-    data: ParticipantBatchCreate,
+    data: ParticipantBatchCreate
   ): Promise<ParticipantCreateResponse[]> {
     const response = await apiClient.post<ParticipantCreateResponse[]>(
       `/surveys/${surveyId}/participants/batch`,
-      data,
+      data
     )
     return response.data
   }
@@ -60,11 +60,11 @@ class ParticipantService {
   async updateParticipant(
     surveyId: string,
     participantId: string,
-    data: ParticipantUpdate,
+    data: ParticipantUpdate
   ): Promise<ParticipantResponse> {
     const response = await apiClient.patch<ParticipantResponse>(
       `/surveys/${surveyId}/participants/${participantId}`,
-      data,
+      data
     )
     return response.data
   }
