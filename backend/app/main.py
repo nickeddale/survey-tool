@@ -20,6 +20,7 @@ from app.api.answer_options import router as answer_options_router
 from app.api.assessments import router as assessments_router
 from app.api.auth import router as auth_router
 from app.api.email_invitations import router as email_invitations_router
+from app.api.email_tracking import router as email_tracking_router
 from app.api.webhooks import router as webhooks_router
 from app.api.logic import router as logic_router
 from app.api.participants import router as participants_router
@@ -164,6 +165,13 @@ _OPENAPI_TAGS = [
             "Send and manage email invitations for surveys. Supports single and batch sending, "
             "automatic participant creation, and tracking of invitation status. "
             "Failed invitations can be resent."
+        ),
+    },
+    {
+        "name": "email-tracking",
+        "description": (
+            "Email open and click tracking endpoints. Embedded in HTML emails as a tracking "
+            "pixel (open) and click-through redirect. No authentication required."
         ),
     },
 ]
@@ -465,6 +473,7 @@ app.include_router(quotas_router, prefix="/api/v1")
 app.include_router(assessments_router, prefix="/api/v1")
 app.include_router(webhooks_router, prefix="/api/v1")
 app.include_router(email_invitations_router, prefix="/api/v1")
+app.include_router(email_tracking_router, prefix="/api/v1")
 
 
 @app.get("/health")

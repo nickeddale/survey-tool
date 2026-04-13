@@ -91,6 +91,9 @@ class Settings(BaseSettings):
     # Frontend
     frontend_url: str = "http://localhost:3000"
 
+    # Backend (used for email tracking pixel and click-through URLs)
+    backend_url: str = "http://localhost:8000"
+
     @property
     def cors_origins_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]

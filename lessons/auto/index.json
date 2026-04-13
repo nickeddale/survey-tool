@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-13T18:12:41.461Z",
+  "lastUpdated": "2026-04-13T18:22:43.123Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4485,6 +4485,28 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "ticketId": "ISS-234",
+      "title": "Email delivery tracking with open and click tracking",
+      "date": "2026-04-13",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4703,7 +4725,8 @@
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
-      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md"
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4900,7 +4923,8 @@
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
-      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md"
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5052,7 +5076,8 @@
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
-      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md"
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5263,7 +5288,8 @@
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
-      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md"
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5529,7 +5555,8 @@
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
-      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md"
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5741,7 +5768,8 @@
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
-      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md"
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5844,7 +5872,8 @@
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
       "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
       "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md",
-      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md"
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5932,7 +5961,8 @@
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
-      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md"
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6091,7 +6121,8 @@
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
-      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md"
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6292,7 +6323,8 @@
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
-      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md"
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -6429,7 +6461,8 @@
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
       "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
       "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
-      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md"
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
