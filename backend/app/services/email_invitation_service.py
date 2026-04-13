@@ -6,7 +6,8 @@ email dispatch via email_service, and invitation record management.
 
 import secrets
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+from typing import Optional
 
 from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -337,6 +338,96 @@ async def get_invitation_stats(
         "click_rate": click_rate,
         "breakdown": type_counts,
     }
+
+
+async def send_reminders(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+    days_since_invite: Optional[int] = None,
+    max_reminders: Optional[int] = None,
+    survey_title: str = "",
+    survey_description: Optional[str] = None,
+) -> dict:
+    """Send reminder emails to incomplete participants with linked invitations.
+
+    Finds participants where:
+    - completed=False
+    - They have at least one sent email invitation (original invite)
+    - (optional) Their original invite was sent >= days_since_invite days ago
+    - (optional) They have received fewer than max_reminders reminders
+
+    Creates new EmailInvitation records with invitation_type='reminder' and
+    increments reminder_count on their original invite record.
+
+    Returns summary: {sent, skipped, failed}
+    """
+    # Find all 'sent' original invitations (type='invite') for this survey
+    # grouped by participant — we want the earliest invite per participant.
+    now = datetime.now(timezone.utc)
+
+    original_invite_conditions = [
+        EmailInvitation.survey_id == survey_id,
+        EmailInvitation.invitation_type == "invite",
+        EmailInvitation.status == "sent",
+        EmailInvitation.participant_id.isnot(None),
+    ]
+
+    if days_since_invite is not None:
+        cutoff = now - timedelta(days=days_since_invite)
+        original_invite_conditions.append(EmailInvitation.sent_at <= cutoff)
+
+    invites_result = await session.execute(
+        select(EmailInvitation)
+        .where(and_(*original_invite_conditions))
+        .order_by(EmailInvitation.sent_at.asc())
+    )
+    original_invites = list(invites_result.scalars().all())
+
+    # De-duplicate: keep only the earliest invite per participant
+    seen_participants: dict[uuid.UUID, EmailInvitation] = {}
+    for inv in original_invites:
+        pid = inv.participant_id
+        if pid is not None and pid not in seen_participants:
+            seen_participants[pid] = inv
+
+    sent = 0
+    skipped = 0
+    failed = 0
+
+    for participant_id, original_invite in seen_participants.items():
+        # Check max_reminders cap
+        if max_reminders is not None and original_invite.reminder_count >= max_reminders:
+            skipped += 1
+            continue
+
+        # Load the participant to check completed status
+        part_result = await session.execute(
+            select(Participant).where(Participant.id == participant_id)
+        )
+        participant = part_result.scalar_one_or_none()
+        if participant is None or participant.completed:
+            skipped += 1
+            continue
+
+        # Send the reminder
+        try:
+            await send_invitation(
+                session=session,
+                survey_id=survey_id,
+                recipient_email=original_invite.recipient_email,
+                recipient_name=original_invite.recipient_name,
+                invitation_type="reminder",
+                survey_title=survey_title,
+                survey_description=survey_description,
+            )
+            # Increment reminder_count on the original invite
+            original_invite.reminder_count += 1
+            await session.flush()
+            sent += 1
+        except Exception:
+            failed += 1
+
+    return {"sent": sent, "skipped": skipped, "failed": failed}
 
 
 async def delete_invitation(

@@ -6,6 +6,8 @@ import type {
   EmailInvitationListResponse,
   EmailInvitationStats,
   EmailInvitationBatchResponse,
+  SendRemindersRequest,
+  SendRemindersResponse,
 } from '../types/survey'
 
 export interface EmailInvitationFetchParams {
@@ -18,47 +20,47 @@ export interface EmailInvitationFetchParams {
 class EmailInvitationService {
   async listInvitations(
     surveyId: string,
-    params: EmailInvitationFetchParams = {},
+    params: EmailInvitationFetchParams = {}
   ): Promise<EmailInvitationListResponse> {
     const response = await apiClient.get<EmailInvitationListResponse>(
       `/surveys/${surveyId}/invitations`,
-      { params },
+      { params }
     )
     return response.data
   }
 
   async getInvitation(surveyId: string, invitationId: string): Promise<EmailInvitationResponse> {
     const response = await apiClient.get<EmailInvitationResponse>(
-      `/surveys/${surveyId}/invitations/${invitationId}`,
+      `/surveys/${surveyId}/invitations/${invitationId}`
     )
     return response.data
   }
 
   async sendInvitation(
     surveyId: string,
-    data: EmailInvitationCreate,
+    data: EmailInvitationCreate
   ): Promise<EmailInvitationResponse> {
     const response = await apiClient.post<EmailInvitationResponse>(
       `/surveys/${surveyId}/invitations`,
-      data,
+      data
     )
     return response.data
   }
 
   async sendBatchInvitations(
     surveyId: string,
-    data: EmailInvitationBatchCreate,
+    data: EmailInvitationBatchCreate
   ): Promise<EmailInvitationBatchResponse> {
     const response = await apiClient.post<EmailInvitationBatchResponse>(
       `/surveys/${surveyId}/invitations/batch`,
-      data,
+      data
     )
     return response.data
   }
 
   async resendInvitation(surveyId: string, invitationId: string): Promise<EmailInvitationResponse> {
     const response = await apiClient.post<EmailInvitationResponse>(
-      `/surveys/${surveyId}/invitations/${invitationId}/resend`,
+      `/surveys/${surveyId}/invitations/${invitationId}/resend`
     )
     return response.data
   }
@@ -69,7 +71,18 @@ class EmailInvitationService {
 
   async getStats(surveyId: string): Promise<EmailInvitationStats> {
     const response = await apiClient.get<EmailInvitationStats>(
-      `/surveys/${surveyId}/invitations/stats`,
+      `/surveys/${surveyId}/invitations/stats`
+    )
+    return response.data
+  }
+
+  async sendReminders(
+    surveyId: string,
+    params: SendRemindersRequest = {}
+  ): Promise<SendRemindersResponse> {
+    const response = await apiClient.post<SendRemindersResponse>(
+      `/surveys/${surveyId}/invitations/send-reminders`,
+      params
     )
     return response.data
   }

@@ -33,7 +33,7 @@ function renderPage(surveyId = SURVEY_ID) {
           <Route path="/surveys/:id" element={<LocationDisplay />} />
         </Routes>
       </AuthProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
@@ -77,7 +77,7 @@ describe('EmailInvitationsPage', () => {
   describe('loading state', () => {
     it('renders loading skeleton while fetching', async () => {
       server.use(
-        http.get(`/api/v1/surveys/${SURVEY_ID}/invitations`, () => new Promise<never>(() => {})),
+        http.get(`/api/v1/surveys/${SURVEY_ID}/invitations`, () => new Promise<never>(() => {}))
       )
 
       renderPage()
@@ -146,8 +146,8 @@ describe('EmailInvitationsPage', () => {
     it('renders empty state when no invitations and no filters', async () => {
       server.use(
         http.get(`/api/v1/surveys/${SURVEY_ID}/invitations`, () =>
-          HttpResponse.json({ items: [], total: 0, page: 1, per_page: 20, total_pages: 1 }),
-        ),
+          HttpResponse.json({ items: [], total: 0, page: 1, per_page: 20, total_pages: 1 })
+        )
       )
 
       renderPage()
@@ -253,7 +253,9 @@ describe('EmailInvitationsPage', () => {
       renderPage()
 
       await waitFor(() => {
-        expect(screen.getByTestId(`delete-button-${mockEmailInvitations[0].id}`)).toBeInTheDocument()
+        expect(
+          screen.getByTestId(`delete-button-${mockEmailInvitations[0].id}`)
+        ).toBeInTheDocument()
       })
 
       await user.click(screen.getByTestId(`delete-button-${mockEmailInvitations[0].id}`))
@@ -268,7 +270,9 @@ describe('EmailInvitationsPage', () => {
       renderPage()
 
       await waitFor(() => {
-        expect(screen.getByTestId(`delete-button-${mockEmailInvitations[0].id}`)).toBeInTheDocument()
+        expect(
+          screen.getByTestId(`delete-button-${mockEmailInvitations[0].id}`)
+        ).toBeInTheDocument()
       })
 
       await user.click(screen.getByTestId(`delete-button-${mockEmailInvitations[0].id}`))
@@ -283,7 +287,9 @@ describe('EmailInvitationsPage', () => {
       renderPage()
 
       await waitFor(() => {
-        expect(screen.getByTestId(`delete-button-${mockEmailInvitations[0].id}`)).toBeInTheDocument()
+        expect(
+          screen.getByTestId(`delete-button-${mockEmailInvitations[0].id}`)
+        ).toBeInTheDocument()
       })
 
       await user.click(screen.getByTestId(`delete-button-${mockEmailInvitations[0].id}`))
@@ -327,8 +333,11 @@ describe('EmailInvitationsPage', () => {
     it('renders error message when API fails', async () => {
       server.use(
         http.get(`/api/v1/surveys/${SURVEY_ID}/invitations`, () =>
-          HttpResponse.json({ detail: { code: 'SERVER_ERROR', message: 'Server error' } }, { status: 500 }),
-        ),
+          HttpResponse.json(
+            { detail: { code: 'SERVER_ERROR', message: 'Server error' } },
+            { status: 500 }
+          )
+        )
       )
 
       renderPage()
@@ -357,6 +366,130 @@ describe('EmailInvitationsPage', () => {
       await waitFor(() => {
         expect(screen.getByTestId('location')).toHaveTextContent(`/surveys/${SURVEY_ID}`)
       })
+    })
+  })
+
+  // -------------------------------------------------------------------------
+  // Send Reminders
+  // -------------------------------------------------------------------------
+
+  describe('send reminders', () => {
+    it('renders Send Reminders button', async () => {
+      renderPage()
+
+      await waitFor(() => {
+        expect(screen.getByTestId('send-reminders-button')).toBeInTheDocument()
+      })
+    })
+
+    it('opens reminder dialog when Send Reminders button clicked', async () => {
+      const user = userEvent.setup()
+      renderPage()
+
+      await waitFor(() => {
+        expect(screen.getByTestId('send-reminders-button')).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByTestId('send-reminders-button'))
+
+      expect(screen.getByTestId('send-reminders-dialog')).toBeInTheDocument()
+    })
+
+    it('closes reminder dialog on cancel', async () => {
+      const user = userEvent.setup()
+      renderPage()
+
+      await waitFor(() => {
+        expect(screen.getByTestId('send-reminders-button')).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByTestId('send-reminders-button'))
+      expect(screen.getByTestId('send-reminders-dialog')).toBeInTheDocument()
+
+      await user.click(screen.getByRole('button', { name: /cancel/i }))
+      expect(screen.queryByTestId('send-reminders-dialog')).not.toBeInTheDocument()
+    })
+
+    it('dialog contains days_since_invite and max_reminders inputs', async () => {
+      const user = userEvent.setup()
+      renderPage()
+
+      await waitFor(() => {
+        expect(screen.getByTestId('send-reminders-button')).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByTestId('send-reminders-button'))
+
+      expect(screen.getByTestId('days-since-invite-input')).toBeInTheDocument()
+      expect(screen.getByTestId('max-reminders-input')).toBeInTheDocument()
+    })
+
+    it('sends reminders and shows result summary on success', async () => {
+      const user = userEvent.setup()
+      renderPage()
+
+      await waitFor(() => {
+        expect(screen.getByTestId('send-reminders-button')).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByTestId('send-reminders-button'))
+      await user.click(screen.getByTestId('send-reminders-confirm'))
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('send-reminders-dialog')).not.toBeInTheDocument()
+      })
+
+      await waitFor(() => {
+        expect(screen.getByTestId('reminder-results-modal')).toBeInTheDocument()
+      })
+
+      expect(screen.getByTestId('reminder-results-modal')).toHaveTextContent('2')
+    })
+
+    it('closes reminder results modal on done', async () => {
+      const user = userEvent.setup()
+      renderPage()
+
+      await waitFor(() => {
+        expect(screen.getByTestId('send-reminders-button')).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByTestId('send-reminders-button'))
+      await user.click(screen.getByTestId('send-reminders-confirm'))
+
+      await waitFor(() => {
+        expect(screen.getByTestId('reminder-results-modal')).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByTestId('reminder-results-close'))
+      expect(screen.queryByTestId('reminder-results-modal')).not.toBeInTheDocument()
+    })
+
+    it('shows error message when send reminders fails', async () => {
+      server.use(
+        http.post(`/api/v1/surveys/${SURVEY_ID}/invitations/send-reminders`, () =>
+          HttpResponse.json(
+            { detail: { code: 'SERVER_ERROR', message: 'Failed to send reminders' } },
+            { status: 500 }
+          )
+        )
+      )
+
+      const user = userEvent.setup()
+      renderPage()
+
+      await waitFor(() => {
+        expect(screen.getByTestId('send-reminders-button')).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByTestId('send-reminders-button'))
+      await user.click(screen.getByTestId('send-reminders-confirm'))
+
+      await waitFor(() => {
+        expect(screen.getByRole('alert')).toBeInTheDocument()
+      })
+
+      expect(screen.getByTestId('send-reminders-dialog')).toBeInTheDocument()
     })
   })
 })

@@ -732,3 +732,226 @@ async def test_list_invitations_api_key_missing_scope_returns_403(client: AsyncC
         headers={"X-API-Key": api_key},
     )
     assert resp.status_code == 403
+
+
+# ---------------------------------------------------------------------------
+# Send reminders tests
+# ---------------------------------------------------------------------------
+
+
+def reminders_url(survey_id: str) -> str:
+    return f"/api/v1/surveys/{survey_id}/email-invitations/send-reminders"
+
+
+@pytest.mark.asyncio
+async def test_send_reminders_no_eligible_participants_returns_empty_summary(
+    client: AsyncClient,
+):
+    """When no participants have been invited, send-reminders returns zeros."""
+    headers = await auth_headers(client, "rem_empty@example.com")
+    survey_id = await create_survey(client, headers)
+
+    resp = await client.post(reminders_url(survey_id), json={}, headers=headers)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["sent"] == 0
+    assert data["skipped"] == 0
+    assert data["failed"] == 0
+
+
+@pytest.mark.asyncio
+async def test_send_reminders_sends_to_incomplete_participant(client: AsyncClient):
+    """Reminders are sent to incomplete participants with sent invitations."""
+    headers = await auth_headers(client, "rem_incomplete@example.com")
+    survey_id = await create_survey(client, headers)
+
+    with patch("app.services.email_invitation_service.email_service.send_email", new_callable=AsyncMock):
+        # Send original invite (participant will be created as incomplete)
+        await client.post(
+            invitations_url(survey_id),
+            json={"recipient_email": "incomplete@example.com"},
+            headers=headers,
+        )
+
+        resp = await client.post(reminders_url(survey_id), json={}, headers=headers)
+
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["sent"] == 1
+    assert data["skipped"] == 0
+    assert data["failed"] == 0
+
+
+@pytest.mark.asyncio
+async def test_send_reminders_skips_completed_participants(
+    client: AsyncClient, session: AsyncSession
+):
+    """Reminders are NOT sent to participants who have completed the survey."""
+    from app.models.participant import Participant
+
+    headers = await auth_headers(client, "rem_completed@example.com")
+    survey_id = await create_survey(client, headers)
+
+    with patch("app.services.email_invitation_service.email_service.send_email", new_callable=AsyncMock):
+        await client.post(
+            invitations_url(survey_id),
+            json={"recipient_email": "completed@example.com"},
+            headers=headers,
+        )
+
+    # Mark participant as completed
+    result = await session.execute(
+        select(Participant).where(Participant.email == "completed@example.com")
+    )
+    participant = result.scalar_one()
+    participant.completed = True
+    await session.commit()
+
+    with patch("app.services.email_invitation_service.email_service.send_email", new_callable=AsyncMock):
+        resp = await client.post(reminders_url(survey_id), json={}, headers=headers)
+
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["sent"] == 0
+    assert data["skipped"] == 1
+
+
+@pytest.mark.asyncio
+async def test_send_reminders_respects_max_reminders_cap(client: AsyncClient):
+    """Participants who have received >= max_reminders reminders are skipped."""
+    headers = await auth_headers(client, "rem_cap@example.com")
+    survey_id = await create_survey(client, headers)
+
+    with patch("app.services.email_invitation_service.email_service.send_email", new_callable=AsyncMock):
+        # Send original invite
+        await client.post(
+            invitations_url(survey_id),
+            json={"recipient_email": "cappable@example.com"},
+            headers=headers,
+        )
+
+        # Send 1 reminder (sets reminder_count to 1)
+        resp1 = await client.post(
+            reminders_url(survey_id), json={"max_reminders": 1}, headers=headers
+        )
+        assert resp1.json()["sent"] == 1
+
+        # Second attempt with max_reminders=1 should skip (reminder_count is now 1)
+        resp2 = await client.post(
+            reminders_url(survey_id), json={"max_reminders": 1}, headers=headers
+        )
+
+    assert resp2.status_code == 200
+    data = resp2.json()
+    assert data["sent"] == 0
+    assert data["skipped"] == 1
+
+
+@pytest.mark.asyncio
+async def test_send_reminders_increments_reminder_count(
+    client: AsyncClient, session: AsyncSession
+):
+    """Each successful reminder send increments reminder_count on the original invite."""
+    from app.models.email_invitation import EmailInvitation
+
+    headers = await auth_headers(client, "rem_count@example.com")
+    survey_id = await create_survey(client, headers)
+
+    with patch("app.services.email_invitation_service.email_service.send_email", new_callable=AsyncMock):
+        await client.post(
+            invitations_url(survey_id),
+            json={"recipient_email": "countable@example.com"},
+            headers=headers,
+        )
+
+        await client.post(reminders_url(survey_id), json={}, headers=headers)
+
+    # Check the original invite's reminder_count
+    result = await session.execute(
+        select(EmailInvitation).where(
+            EmailInvitation.recipient_email == "countable@example.com",
+            EmailInvitation.invitation_type == "invite",
+        )
+    )
+    invite = result.scalar_one()
+    assert invite.reminder_count == 1
+
+
+@pytest.mark.asyncio
+async def test_send_reminders_filters_by_days_since_invite(client: AsyncClient):
+    """Participants whose invite was sent within days_since_invite days are skipped."""
+    headers = await auth_headers(client, "rem_days@example.com")
+    survey_id = await create_survey(client, headers)
+
+    with patch("app.services.email_invitation_service.email_service.send_email", new_callable=AsyncMock):
+        await client.post(
+            invitations_url(survey_id),
+            json={"recipient_email": "toorecent@example.com"},
+            headers=headers,
+        )
+
+        # Require invite to be >= 30 days old — since it was just sent, should be skipped
+        resp = await client.post(
+            reminders_url(survey_id), json={"days_since_invite": 30}, headers=headers
+        )
+
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["sent"] == 0
+    assert data["skipped"] == 0  # not skipped (just not eligible — no rows matched the filter)
+    assert data["failed"] == 0
+
+
+@pytest.mark.asyncio
+async def test_send_reminders_returns_correct_counts_multiple_participants(client: AsyncClient, session: AsyncSession):
+    """Batch reminders return accurate sent/skipped/failed counts."""
+    from app.models.participant import Participant
+
+    headers = await auth_headers(client, "rem_multi@example.com")
+    survey_id = await create_survey(client, headers)
+
+    with patch("app.services.email_invitation_service.email_service.send_email", new_callable=AsyncMock):
+        for email in ["p1@example.com", "p2@example.com", "p3@example.com"]:
+            await client.post(
+                invitations_url(survey_id),
+                json={"recipient_email": email},
+                headers=headers,
+            )
+
+    # Mark p3 as completed
+    result = await session.execute(
+        select(Participant).where(Participant.email == "p3@example.com")
+    )
+    p3 = result.scalar_one()
+    p3.completed = True
+    await session.commit()
+
+    with patch("app.services.email_invitation_service.email_service.send_email", new_callable=AsyncMock):
+        resp = await client.post(reminders_url(survey_id), json={}, headers=headers)
+
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["sent"] == 2
+    assert data["skipped"] == 1
+    assert data["failed"] == 0
+
+
+@pytest.mark.asyncio
+async def test_send_reminders_other_user_survey_returns_404(client: AsyncClient):
+    """Users cannot send reminders for surveys they don't own."""
+    headers1 = await auth_headers(client, "rem_iso1@example.com")
+    headers2 = await auth_headers(client, "rem_iso2@example.com")
+    survey_id = await create_survey(client, headers1)
+
+    resp = await client.post(reminders_url(survey_id), json={}, headers=headers2)
+    assert resp.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_send_reminders_unauthenticated_returns_401_or_403(client: AsyncClient):
+    """Unauthenticated requests to send-reminders return 401 or 403."""
+    headers = await auth_headers(client, "rem_unauth@example.com")
+    survey_id = await create_survey(client, headers)
+
+    resp = await client.post(reminders_url(survey_id), json={})
+    assert resp.status_code in (401, 403)

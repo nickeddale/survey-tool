@@ -592,3 +592,14 @@ export interface EmailInvitationBatchResponse {
   failed: number
   skipped: number
 }
+
+export interface SendRemindersRequest {
+  days_since_invite?: number | null
+  max_reminders?: number | null
+}
+
+export interface SendRemindersResponse {
+  sent: number
+  skipped: number
+  failed: number
+}
