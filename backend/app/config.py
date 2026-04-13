@@ -78,6 +78,16 @@ class Settings(BaseSettings):
     # Logging
     log_level: str = "INFO"
 
+    # SMTP / Email
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from_email: str = ""
+    smtp_from_name: str = "Survey Tool"
+    smtp_use_tls: bool = True
+    smtp_enabled: bool = False
+
     @property
     def cors_origins_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
