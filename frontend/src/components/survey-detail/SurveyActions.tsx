@@ -7,6 +7,7 @@ import {
   List,
   BarChart2,
   Users,
+  Mail,
 } from 'lucide-react'
 import { Button } from '../ui/button'
 import type { ModalType } from './types'
@@ -120,6 +121,16 @@ export function SurveyActions({ surveyId, surveyStatus, onNavigate, onOpenModal,
       >
         <Users size={14} />
         Participants
+      </Button>
+
+      <Button
+        variant="outline"
+        onClick={() => onNavigate(`/surveys/${surveyId}/email-invitations`)}
+        aria-label="Manage email invitations"
+        data-testid="manage-email-invitations-button"
+      >
+        <Mail size={14} />
+        Invitations
       </Button>
 
       {surveyStatus === 'draft' && (
