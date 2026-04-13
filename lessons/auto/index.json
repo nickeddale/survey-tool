@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-13T17:55:41.866Z",
+  "lastUpdated": "2026-04-13T18:04:39.231Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4442,6 +4442,27 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
+      "ticketId": "ISS-232",
+      "title": "Email Invitation CRUD API endpoints",
+      "date": "2026-04-13",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4658,7 +4679,8 @@
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
       "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
-      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md"
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4853,7 +4875,8 @@
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
       "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
-      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md"
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5003,7 +5026,8 @@
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
       "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
-      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md"
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5212,7 +5236,8 @@
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
       "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
-      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md"
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5476,7 +5501,8 @@
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
       "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
-      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md"
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5686,7 +5712,8 @@
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
       "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
-      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md"
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5874,7 +5901,8 @@
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
-      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md"
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6031,7 +6059,8 @@
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
       "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
-      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md"
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6230,7 +6259,8 @@
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
-      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md"
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -6365,7 +6395,8 @@
       "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md",
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
-      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md"
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
