@@ -1,7 +1,7 @@
 """Rename question type 'number' to 'numeric'.
 
-Revision ID: 0023
-Revises: 0022
+Revision ID: 0024
+Revises: 0023
 Create Date: 2026-04-12 00:00:00.000000
 """
 
@@ -9,8 +9,8 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "0023"
-down_revision = "0022"
+revision = "0024"
+down_revision = "0023"
 branch_labels = None
 depends_on = None
 
@@ -83,14 +83,15 @@ def _constraint_values(types: tuple) -> str:
 
 
 def upgrade() -> None:
+    # Drop the check constraint FIRST so the UPDATE is not blocked by it.
+    op.drop_constraint("ck_questions_question_type", "questions", type_="check")
     # Rename any existing rows using the old type name.
     op.execute(
         sa.text(
             "UPDATE questions SET question_type = 'numeric' WHERE question_type = 'number'"
         )
     )
-    # Drop and recreate the check constraint with 'numeric' in place of 'number'.
-    op.drop_constraint("ck_questions_question_type", "questions", type_="check")
+    # Recreate the check constraint with 'numeric' in place of 'number'.
     op.create_check_constraint(
         "ck_questions_question_type",
         "questions",
@@ -99,6 +100,8 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    # Drop the new constraint first so the UPDATE is not blocked by it.
+    op.drop_constraint("ck_questions_question_type", "questions", type_="check")
     # Reverse the data rename.
     op.execute(
         sa.text(
@@ -106,7 +109,6 @@ def downgrade() -> None:
         )
     )
     # Restore the constraint with 'number'.
-    op.drop_constraint("ck_questions_question_type", "questions", type_="check")
     op.create_check_constraint(
         "ck_questions_question_type",
         "questions",

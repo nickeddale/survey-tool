@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-14T20:17:10.382Z",
+  "lastUpdated": "2026-04-14T20:22:50.312Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4703,6 +4703,28 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "ticketId": "ISS-246",
+      "title": "Email invitations: Duplicate Alembic migration revision IDs (0014, 0023)",
+      "date": "2026-04-14",
+      "categories": [
+        "testing",
+        "database",
+        "ui",
+        "refactoring",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4932,7 +4954,8 @@
       "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
       "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
-      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md"
+      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5297,7 +5320,8 @@
       "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
       "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
-      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md"
+      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5516,7 +5540,8 @@
       "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md",
       "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
-      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md"
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5577,7 +5602,8 @@
       "2026-04-10-iss-212-csv-export-endpoint-timeout-p9560s-at-5-vus.md",
       "2026-04-10-iss-213-statistics-endpoint-slow-p95145s-for-500-response.md",
       "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md",
-      "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md"
+      "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
     ],
     "bug-fix": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5792,7 +5818,8 @@
       "2026-04-14-iss-242-email-invitations-pagination-field-name-mismatch-p.md",
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
       "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
-      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md"
+      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6013,7 +6040,8 @@
       "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
       "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
-      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md"
+      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6118,7 +6146,8 @@
       "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md",
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
       "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
-      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md"
+      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6210,7 +6239,8 @@
       "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
       "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
       "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
-      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md"
+      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6373,7 +6403,8 @@
       "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
       "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
       "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
-      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md"
+      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6582,7 +6613,8 @@
       "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
       "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
-      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md"
+      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -6722,7 +6754,8 @@
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
       "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
       "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
-      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md"
+      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
