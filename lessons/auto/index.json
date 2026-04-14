@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-14T19:13:06.484Z",
+  "lastUpdated": "2026-04-14T19:17:41.383Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4669,6 +4669,24 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
+      "ticketId": "ISS-244",
+      "title": "Email invitations: Email search input not passed to API",
+      "date": "2026-04-14",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4896,7 +4914,8 @@
       "2026-04-13-iss-239-frontend-test-suite-for-email-invitation-component.md",
       "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md",
       "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
-      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md"
+      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5100,7 +5119,8 @@
       "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
       "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md",
       "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
-      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md"
+      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5258,7 +5278,8 @@
       "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
       "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
       "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
-      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md"
+      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5476,7 +5497,8 @@
       "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
       "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md",
       "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
-      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md"
+      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5750,7 +5772,8 @@
       "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md",
       "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
       "2026-04-14-iss-242-email-invitations-pagination-field-name-mismatch-p.md",
-      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md"
+      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5969,7 +5992,8 @@
       "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
       "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md",
       "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
-      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md"
+      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6536,7 +6560,8 @@
       "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
       "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
       "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
-      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md"
+      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
