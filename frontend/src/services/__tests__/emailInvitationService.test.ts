@@ -257,10 +257,10 @@ describe('emailInvitationService', () => {
   describe('getStats()', () => {
     it('returns delivery statistics for a survey', async () => {
       const result = await emailInvitationService.getStats(SURVEY_ID)
-      expect(typeof result.total_sent).toBe('number')
-      expect(typeof result.total_delivered).toBe('number')
-      expect(typeof result.total_bounced).toBe('number')
-      expect(typeof result.total_failed).toBe('number')
+      expect(typeof result.sent).toBe('number')
+      expect(typeof result.delivered).toBe('number')
+      expect(typeof result.bounced).toBe('number')
+      expect(typeof result.failed).toBe('number')
       expect(typeof result.open_rate).toBe('number')
       expect(typeof result.click_rate).toBe('number')
     })
@@ -269,7 +269,7 @@ describe('emailInvitationService', () => {
       const result = await emailInvitationService.getStats(SURVEY_ID)
       const surveyInvitations = mockEmailInvitations.filter((i) => i.survey_id === SURVEY_ID)
       const expectedSent = surveyInvitations.filter((i) => i.sent_at).length
-      expect(result.total_sent).toBe(expectedSent)
+      expect(result.sent).toBe(expectedSent)
     })
 
     it('throws ApiError on 401', async () => {

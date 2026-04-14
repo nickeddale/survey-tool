@@ -71,10 +71,10 @@ function EmailStatsCards({ stats, isLoading }: EmailStatsCardsProps) {
       className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6"
       data-testid="stats-cards"
     >
-      <MetricCard label="Sent" value={stats.total_sent} testId="stat-total-sent" />
-      <MetricCard label="Delivered" value={stats.total_delivered} testId="stat-total-delivered" />
-      <MetricCard label="Bounced" value={stats.total_bounced} testId="stat-total-bounced" />
-      <MetricCard label="Failed" value={stats.total_failed} testId="stat-total-failed" />
+      <MetricCard label="Sent" value={stats.sent} testId="stat-total-sent" />
+      <MetricCard label="Delivered" value={stats.delivered} testId="stat-total-delivered" />
+      <MetricCard label="Bounced" value={stats.bounced} testId="stat-total-bounced" />
+      <MetricCard label="Failed" value={stats.failed} testId="stat-total-failed" />
       <MetricCard label="Open Rate" value={formatRate(stats.open_rate)} testId="stat-open-rate" />
       <MetricCard
         label="Click Rate"

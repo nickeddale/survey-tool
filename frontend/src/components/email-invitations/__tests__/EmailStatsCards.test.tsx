@@ -4,10 +4,10 @@ import EmailStatsCards from '../EmailStatsCards'
 import type { EmailInvitationStats } from '../../../types/survey'
 
 const mockStats: EmailInvitationStats = {
-  total_sent: 10,
-  total_delivered: 8,
-  total_bounced: 1,
-  total_failed: 1,
+  sent: 10,
+  delivered: 8,
+  bounced: 1,
+  failed: 1,
   open_rate: 0.5,
   click_rate: 0.25,
 }
