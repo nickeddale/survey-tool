@@ -20,7 +20,7 @@ from email.mime.text import MIMEText
 
 import aiosmtplib
 
-from app.config import settings
+from app.config import _NON_PRODUCTION_ENVS, settings
 from app.utils.ssrf_protection import is_safe_url
 
 logger = logging.getLogger(__name__)
@@ -58,18 +58,28 @@ async def send_email(
         )
         return
 
-    # SSRF host validation — construct a synthetic URL for the checker
-    synthetic_url = f"smtp://{settings.smtp_host}"
-    if not is_safe_url(synthetic_url):
-        logger.warning(
-            "Email send blocked by SSRF protection: host=%s subject=%r to=%s",
+    # SSRF host validation — construct a synthetic URL for the checker.
+    # In development/test environments the configured smtp_host is trusted
+    # (e.g. Mailpit in Docker resolves to a 172.16.0.0/12 bridge IP that would
+    # otherwise be blocked). Production environments always enforce the check.
+    if settings.environment in _NON_PRODUCTION_ENVS:
+        logger.debug(
+            "SSRF check skipped for configured smtp_host in %s environment: host=%s",
+            settings.environment,
             settings.smtp_host,
-            subject,
-            recipients,
         )
-        raise ValueError(
-            f"SMTP host '{settings.smtp_host}' blocked by SSRF protection"
-        )
+    else:
+        synthetic_url = f"smtp://{settings.smtp_host}"
+        if not is_safe_url(synthetic_url):
+            logger.warning(
+                "Email send blocked by SSRF protection: host=%s subject=%r to=%s",
+                settings.smtp_host,
+                subject,
+                recipients,
+            )
+            raise ValueError(
+                f"SMTP host '{settings.smtp_host}' blocked by SSRF protection"
+            )
 
     # Build the MIME message
     msg = MIMEMultipart("alternative")
