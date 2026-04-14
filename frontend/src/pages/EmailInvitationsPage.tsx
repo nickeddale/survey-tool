@@ -374,7 +374,7 @@ function EmailInvitationsPage() {
       const data = await emailInvitationService.listInvitations(surveyId, params)
       setInvitations(data.items)
       setTotal(data.total)
-      setTotalPages(Math.max(1, data.total_pages))
+      setTotalPages(Math.max(1, data.pages))
     } catch (err) {
       if (err instanceof ApiError) {
         setError(err.message)

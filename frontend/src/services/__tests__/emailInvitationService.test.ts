@@ -44,7 +44,7 @@ describe('emailInvitationService', () => {
         http.get(`${BASE}/surveys/${SURVEY_ID}/email-invitations`, ({ request }) => {
           capturedUrl = request.url
           return HttpResponse.json(
-            { items: [], total: 0, page: 1, per_page: 20, total_pages: 1 },
+            { items: [], total: 0, page: 1, per_page: 20, pages: 1 },
             { status: 200 }
           )
         })
@@ -60,7 +60,7 @@ describe('emailInvitationService', () => {
         http.get(`${BASE}/surveys/${SURVEY_ID}/email-invitations`, ({ request }) => {
           capturedUrl = request.url
           return HttpResponse.json(
-            { items: [], total: 0, page: 1, per_page: 20, total_pages: 1 },
+            { items: [], total: 0, page: 1, per_page: 20, pages: 1 },
             { status: 200 }
           )
         })
