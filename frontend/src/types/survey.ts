@@ -579,10 +579,10 @@ export interface EmailInvitationListResponse {
 }
 
 export interface EmailInvitationStats {
-  total_sent: number
-  total_delivered: number
-  total_bounced: number
-  total_failed: number
+  sent: number
+  delivered: number
+  bounced: number
+  failed: number
   open_rate: number
   click_rate: number
 }

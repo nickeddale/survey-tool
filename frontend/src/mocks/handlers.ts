@@ -1642,10 +1642,10 @@ export const handlers = [
     const totalClicked = surveyInvitations.filter((i) => i.clicked_at).length
     return HttpResponse.json(
       {
-        total_sent: totalSent,
-        total_delivered: totalDelivered,
-        total_bounced: 0,
-        total_failed: 0,
+        sent: totalSent,
+        delivered: totalDelivered,
+        bounced: 0,
+        failed: 0,
         open_rate: totalSent > 0 ? totalOpened / totalSent : 0,
         click_rate: totalSent > 0 ? totalClicked / totalSent : 0,
       },
