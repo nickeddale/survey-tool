@@ -25,6 +25,7 @@ def _make_settings(**overrides):
     s.smtp_from_email = overrides.get("smtp_from_email", "noreply@example.com")
     s.smtp_from_name = overrides.get("smtp_from_name", "Survey Tool")
     s.smtp_use_tls = overrides.get("smtp_use_tls", True)
+    s.environment = overrides.get("environment", "production")
     return s
 
 
@@ -135,6 +136,43 @@ async def test_send_email_localhost_blocked():
             await send_email(to="u@test.com", subject="s", html_body="b")
 
         mock_send.assert_not_called()
+
+
+async def test_send_email_dev_environment_skips_ssrf_check():
+    """In development environment, Docker bridge IPs are not blocked by SSRF protection."""
+    mock_settings = _make_settings(smtp_host="172.17.0.2", environment="development")
+    with (
+        patch.object(email_module, "settings", mock_settings),
+        patch("aiosmtplib.send", new_callable=AsyncMock) as mock_send,
+    ):
+        await send_email(to="u@test.com", subject="s", html_body="b")
+
+    mock_send.assert_called_once()
+
+
+async def test_send_email_test_environment_skips_ssrf_check():
+    """In test environment, Docker bridge IPs are not blocked by SSRF protection."""
+    mock_settings = _make_settings(smtp_host="172.17.0.2", environment="test")
+    with (
+        patch.object(email_module, "settings", mock_settings),
+        patch("aiosmtplib.send", new_callable=AsyncMock) as mock_send,
+    ):
+        await send_email(to="u@test.com", subject="s", html_body="b")
+
+    mock_send.assert_called_once()
+
+
+async def test_send_email_production_environment_still_blocks_ssrf():
+    """In production environment, Docker bridge IPs are still blocked by SSRF protection."""
+    mock_settings = _make_settings(smtp_host="172.17.0.2", environment="production")
+    with (
+        patch.object(email_module, "settings", mock_settings),
+        patch("aiosmtplib.send", new_callable=AsyncMock) as mock_send,
+    ):
+        with pytest.raises(ValueError, match="SSRF"):
+            await send_email(to="u@test.com", subject="s", html_body="b")
+
+    mock_send.assert_not_called()
 
 
 # ---------------------------------------------------------------------------
