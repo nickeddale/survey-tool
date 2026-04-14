@@ -236,7 +236,7 @@ async def list_invitations(
     if status is not None:
         conditions.append(EmailInvitation.status == status)
     if recipient_email is not None:
-        conditions.append(EmailInvitation.recipient_email == recipient_email)
+        conditions.append(EmailInvitation.recipient_email.ilike(f"%{recipient_email}%"))
     if invitation_type is not None:
         conditions.append(EmailInvitation.invitation_type == invitation_type)
 

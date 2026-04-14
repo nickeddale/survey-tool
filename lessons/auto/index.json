@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-14T19:17:41.383Z",
+  "lastUpdated": "2026-04-14T20:17:10.382Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4687,6 +4687,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
+      "ticketId": "ISS-245",
+      "title": "Email invitations: Email search uses exact match instead of partial/substring match",
+      "date": "2026-04-14",
+      "categories": [
+        "testing",
+        "database",
+        "bug-fix",
+        "feature",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4915,7 +4931,8 @@
       "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md",
       "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
-      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md"
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
+      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5279,7 +5296,8 @@
       "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
       "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
-      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md"
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
+      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5773,7 +5791,8 @@
       "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
       "2026-04-14-iss-242-email-invitations-pagination-field-name-mismatch-p.md",
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
-      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md"
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
+      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5993,7 +6012,8 @@
       "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md",
       "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
-      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md"
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
+      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6561,7 +6581,8 @@
       "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
       "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
-      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md"
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
+      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",

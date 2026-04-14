@@ -393,6 +393,43 @@ async def test_list_invitations_filter_by_email(client: AsyncClient):
     assert data["total"] == 1
     assert data["items"][0]["recipient_email"] == "specific@example.com"
 
+    # Partial match: searching by substring should also return the matching invitation
+    resp = await client.get(
+        f"{invitations_url(survey_id)}?recipient_email=specific",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["total"] == 1
+    assert data["items"][0]["recipient_email"] == "specific@example.com"
+
+
+@pytest.mark.asyncio
+async def test_list_invitations_filter_by_email_partial(client: AsyncClient):
+    headers = await auth_headers(client, "filt_email_partial@example.com")
+    survey_id = await create_survey(client, headers)
+
+    with patch("app.services.email_invitation_service.email_service.send_email", new_callable=AsyncMock):
+        await client.post(
+            invitations_url(survey_id),
+            json={"recipient_email": "specific@example.com"},
+            headers=headers,
+        )
+        await client.post(
+            invitations_url(survey_id),
+            json={"recipient_email": "other@example.com"},
+            headers=headers,
+        )
+
+    resp = await client.get(
+        f"{invitations_url(survey_id)}?recipient_email=specific",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["total"] == 1
+    assert data["items"][0]["recipient_email"] == "specific@example.com"
+
 
 @pytest.mark.asyncio
 async def test_list_invitations_filter_by_type(client: AsyncClient):
