@@ -370,6 +370,7 @@ function EmailInvitationsPage() {
       const params: Record<string, unknown> = { page, per_page: PER_PAGE }
       if (filterStatus) params.status = filterStatus
       if (filterType) params.invitation_type = filterType
+      if (emailSearch) params.recipient_email = emailSearch
 
       const data = await emailInvitationService.listInvitations(surveyId, params)
       setInvitations(data.items)
@@ -384,7 +385,7 @@ function EmailInvitationsPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [surveyId, page, filterStatus, filterType])
+  }, [surveyId, page, filterStatus, filterType, emailSearch])
 
   useEffect(() => {
     loadInvitations()
@@ -667,7 +668,7 @@ function EmailInvitationsPage() {
             <input
               type="text"
               value={emailSearch}
-              onChange={(e) => setEmailSearch(e.target.value)}
+              onChange={(e) => { setEmailSearch(e.target.value); setPage(1) }}
               placeholder="Search by email"
               className="pl-8 pr-3 py-1.5 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring w-52"
               data-testid="email-search-input"
