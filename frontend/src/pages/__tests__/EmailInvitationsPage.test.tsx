@@ -77,7 +77,7 @@ describe('EmailInvitationsPage', () => {
   describe('loading state', () => {
     it('renders loading skeleton while fetching', async () => {
       server.use(
-        http.get(`/api/v1/surveys/${SURVEY_ID}/invitations`, () => new Promise<never>(() => {}))
+        http.get(`/api/v1/surveys/${SURVEY_ID}/email-invitations`, () => new Promise<never>(() => {}))
       )
 
       renderPage()
@@ -145,7 +145,7 @@ describe('EmailInvitationsPage', () => {
   describe('empty state', () => {
     it('renders empty state when no invitations and no filters', async () => {
       server.use(
-        http.get(`/api/v1/surveys/${SURVEY_ID}/invitations`, () =>
+        http.get(`/api/v1/surveys/${SURVEY_ID}/email-invitations`, () =>
           HttpResponse.json({ items: [], total: 0, page: 1, per_page: 20, total_pages: 1 })
         )
       )
@@ -332,7 +332,7 @@ describe('EmailInvitationsPage', () => {
   describe('error state', () => {
     it('renders error message when API fails', async () => {
       server.use(
-        http.get(`/api/v1/surveys/${SURVEY_ID}/invitations`, () =>
+        http.get(`/api/v1/surveys/${SURVEY_ID}/email-invitations`, () =>
           HttpResponse.json(
             { detail: { code: 'SERVER_ERROR', message: 'Server error' } },
             { status: 500 }
@@ -467,7 +467,7 @@ describe('EmailInvitationsPage', () => {
 
     it('shows error message when send reminders fails', async () => {
       server.use(
-        http.post(`/api/v1/surveys/${SURVEY_ID}/invitations/send-reminders`, () =>
+        http.post(`/api/v1/surveys/${SURVEY_ID}/email-invitations/send-reminders`, () =>
           HttpResponse.json(
             { detail: { code: 'SERVER_ERROR', message: 'Failed to send reminders' } },
             { status: 500 }

@@ -41,7 +41,7 @@ describe('emailInvitationService', () => {
     it('sends status filter param to API', async () => {
       let capturedUrl = ''
       server.use(
-        http.get(`${BASE}/surveys/${SURVEY_ID}/invitations`, ({ request }) => {
+        http.get(`${BASE}/surveys/${SURVEY_ID}/email-invitations`, ({ request }) => {
           capturedUrl = request.url
           return HttpResponse.json(
             { items: [], total: 0, page: 1, per_page: 20, total_pages: 1 },
@@ -57,7 +57,7 @@ describe('emailInvitationService', () => {
     it('sends invitation_type filter param to API', async () => {
       let capturedUrl = ''
       server.use(
-        http.get(`${BASE}/surveys/${SURVEY_ID}/invitations`, ({ request }) => {
+        http.get(`${BASE}/surveys/${SURVEY_ID}/email-invitations`, ({ request }) => {
           capturedUrl = request.url
           return HttpResponse.json(
             { items: [], total: 0, page: 1, per_page: 20, total_pages: 1 },
@@ -72,7 +72,7 @@ describe('emailInvitationService', () => {
 
     it('throws ApiError on 401', async () => {
       server.use(
-        http.get(`${BASE}/surveys/${SURVEY_ID}/invitations`, () =>
+        http.get(`${BASE}/surveys/${SURVEY_ID}/email-invitations`, () =>
           HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
             { status: 401 }
@@ -127,7 +127,7 @@ describe('emailInvitationService', () => {
       let capturedBody: Record<string, unknown> | null = null
 
       server.use(
-        http.post(`${BASE}/surveys/${SURVEY_ID}/invitations`, async ({ request }) => {
+        http.post(`${BASE}/surveys/${SURVEY_ID}/email-invitations`, async ({ request }) => {
           capturedBody = (await request.json()) as Record<string, unknown>
           return HttpResponse.json(
             {
@@ -186,7 +186,7 @@ describe('emailInvitationService', () => {
       let capturedBody: Record<string, unknown> | null = null
 
       server.use(
-        http.post(`${BASE}/surveys/${SURVEY_ID}/invitations/batch`, async ({ request }) => {
+        http.post(`${BASE}/surveys/${SURVEY_ID}/email-invitations/batch`, async ({ request }) => {
           capturedBody = (await request.json()) as Record<string, unknown>
           return HttpResponse.json({ sent: 1, failed: 0, skipped: 0 }, { status: 201 })
         })
@@ -235,7 +235,7 @@ describe('emailInvitationService', () => {
 
     it('throws ApiError on 401', async () => {
       server.use(
-        http.delete(`${BASE}/surveys/${SURVEY_ID}/invitations/:invitationId`, () =>
+        http.delete(`${BASE}/surveys/${SURVEY_ID}/email-invitations/:invitationId`, () =>
           HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
             { status: 401 }
@@ -274,7 +274,7 @@ describe('emailInvitationService', () => {
 
     it('throws ApiError on 401', async () => {
       server.use(
-        http.get(`${BASE}/surveys/${SURVEY_ID}/invitations/stats`, () =>
+        http.get(`${BASE}/surveys/${SURVEY_ID}/email-invitations/stats`, () =>
           HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
             { status: 401 }

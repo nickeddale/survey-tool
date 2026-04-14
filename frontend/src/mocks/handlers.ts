@@ -1626,8 +1626,8 @@ export const handlers = [
   // Email Invitation endpoints
   // ---------------------------------------------------------------------------
 
-  // GET /api/v1/surveys/:surveyId/invitations/stats
-  http.get(`${BASE}/surveys/:surveyId/invitations/stats`, ({ request, params }) => {
+  // GET /api/v1/surveys/:surveyId/email-invitations/stats
+  http.get(`${BASE}/surveys/:surveyId/email-invitations/stats`, ({ request, params }) => {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
@@ -1653,8 +1653,8 @@ export const handlers = [
     )
   }),
 
-  // GET /api/v1/surveys/:surveyId/invitations
-  http.get(`${BASE}/surveys/:surveyId/invitations`, ({ request, params }) => {
+  // GET /api/v1/surveys/:surveyId/email-invitations
+  http.get(`${BASE}/surveys/:surveyId/email-invitations`, ({ request, params }) => {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
@@ -1687,8 +1687,8 @@ export const handlers = [
     )
   }),
 
-  // GET /api/v1/surveys/:surveyId/invitations/:invitationId
-  http.get(`${BASE}/surveys/:surveyId/invitations/:invitationId`, ({ request, params }) => {
+  // GET /api/v1/surveys/:surveyId/email-invitations/:invitationId
+  http.get(`${BASE}/surveys/:surveyId/email-invitations/:invitationId`, ({ request, params }) => {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
@@ -1708,8 +1708,8 @@ export const handlers = [
     return HttpResponse.json(invitation, { status: 200 })
   }),
 
-  // POST /api/v1/surveys/:surveyId/invitations/batch
-  http.post(`${BASE}/surveys/:surveyId/invitations/batch`, async ({ request }) => {
+  // POST /api/v1/surveys/:surveyId/email-invitations/batch
+  http.post(`${BASE}/surveys/:surveyId/email-invitations/batch`, async ({ request }) => {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
@@ -1721,8 +1721,8 @@ export const handlers = [
     return HttpResponse.json({ sent: body.items.length, failed: 0, skipped: 0 }, { status: 201 })
   }),
 
-  // POST /api/v1/surveys/:surveyId/invitations
-  http.post(`${BASE}/surveys/:surveyId/invitations`, async ({ request, params }) => {
+  // POST /api/v1/surveys/:surveyId/email-invitations
+  http.post(`${BASE}/surveys/:surveyId/email-invitations`, async ({ request, params }) => {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
@@ -1750,8 +1750,8 @@ export const handlers = [
     return HttpResponse.json(newInvitation, { status: 201 })
   }),
 
-  // POST /api/v1/surveys/:surveyId/invitations/:invitationId/resend
-  http.post(`${BASE}/surveys/:surveyId/invitations/:invitationId/resend`, ({ request, params }) => {
+  // POST /api/v1/surveys/:surveyId/email-invitations/:invitationId/resend
+  http.post(`${BASE}/surveys/:surveyId/email-invitations/:invitationId/resend`, ({ request, params }) => {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
@@ -1774,8 +1774,8 @@ export const handlers = [
     )
   }),
 
-  // DELETE /api/v1/surveys/:surveyId/invitations/:invitationId
-  http.delete(`${BASE}/surveys/:surveyId/invitations/:invitationId`, ({ request }) => {
+  // DELETE /api/v1/surveys/:surveyId/email-invitations/:invitationId
+  http.delete(`${BASE}/surveys/:surveyId/email-invitations/:invitationId`, ({ request }) => {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
@@ -1786,8 +1786,8 @@ export const handlers = [
     return new HttpResponse(null, { status: 204 })
   }),
 
-  // POST /api/v1/surveys/:surveyId/invitations/send-reminders
-  http.post(`${BASE}/surveys/:surveyId/invitations/send-reminders`, ({ request }) => {
+  // POST /api/v1/surveys/:surveyId/email-invitations/send-reminders
+  http.post(`${BASE}/surveys/:surveyId/email-invitations/send-reminders`, ({ request }) => {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return HttpResponse.json(
