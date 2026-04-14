@@ -71,10 +71,18 @@ export function EmailInvitationTableSkeleton() {
                 <Skeleton className="h-4 w-36 mb-1" />
                 <Skeleton className="h-3 w-24" />
               </td>
-              <td className="px-4 py-3"><Skeleton className="h-5 w-16" /></td>
-              <td className="px-4 py-3"><Skeleton className="h-5 w-20" /></td>
-              <td className="px-4 py-3"><Skeleton className="h-4 w-32" /></td>
-              <td className="px-4 py-3"><Skeleton className="h-8 w-20" /></td>
+              <td className="px-4 py-3">
+                <Skeleton className="h-5 w-16" />
+              </td>
+              <td className="px-4 py-3">
+                <Skeleton className="h-5 w-20" />
+              </td>
+              <td className="px-4 py-3">
+                <Skeleton className="h-4 w-32" />
+              </td>
+              <td className="px-4 py-3">
+                <Skeleton className="h-8 w-20" />
+              </td>
             </tr>
           ))}
         </tbody>
@@ -101,7 +109,10 @@ function EmailInvitationTable({
   resendingId,
 }: EmailInvitationTableProps) {
   return (
-    <div className="rounded-lg border border-border overflow-hidden overflow-x-auto" data-testid="invitation-table">
+    <div
+      className="rounded-lg border border-border overflow-hidden overflow-x-auto"
+      data-testid="invitation-table"
+    >
       <table className="w-full text-sm">
         <thead className="bg-muted/50">
           <tr>

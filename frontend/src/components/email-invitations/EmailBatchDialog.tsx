@@ -85,9 +85,7 @@ function EmailBatchDialog({ surveyId, onComplete, onCancel }: EmailBatchDialogPr
     setError(null)
 
     try {
-      const items = preview
-        .map(rowToInvitationItem)
-        .filter((item) => item.email)
+      const items = preview.map(rowToInvitationItem).filter((item) => item.email)
       const result = await emailInvitationService.sendBatchInvitations(surveyId, {
         items,
         subject: subject.trim() || undefined,
@@ -116,17 +114,13 @@ function EmailBatchDialog({ surveyId, onComplete, onCancel }: EmailBatchDialogPr
     >
       <Card className="max-w-2xl w-full mx-4 shadow-lg max-h-[90vh] overflow-y-auto">
         <CardContent className="p-6">
-          <h2
-            id="batch-dialog-title"
-            className="text-lg font-semibold text-foreground mb-2"
-          >
+          <h2 id="batch-dialog-title" className="text-lg font-semibold text-foreground mb-2">
             Send Batch Invitations
           </h2>
           <p className="text-sm text-muted-foreground mb-4">
             Upload a CSV file with an{' '}
-            <code className="font-mono text-xs bg-muted px-1 rounded">email</code> column.
-            Optional column:{' '}
-            <code className="font-mono text-xs bg-muted px-1 rounded">name</code>.
+            <code className="font-mono text-xs bg-muted px-1 rounded">email</code> column. Optional
+            column: <code className="font-mono text-xs bg-muted px-1 rounded">name</code>.
           </p>
 
           {/* Subject override */}

@@ -190,6 +190,32 @@ async def send_reminders(
 
 
 @router.get(
+    "/{survey_id}/email-invitations/stats",
+    status_code=status.HTTP_200_OK,
+    summary="Email invitation aggregate statistics",
+    description=(
+        "Return aggregate delivery statistics for all email invitations for a survey. "
+        "Includes total sent, delivered, bounced, failed, open rate, click rate, "
+        "and a breakdown by invitation_type."
+    ),
+)
+async def get_invitation_stats(
+    survey_id: str,
+    current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:read")),
+    session: AsyncSession = Depends(get_db),
+) -> dict:
+    """Return aggregate email invitation statistics for a survey."""
+    parsed_survey_id = _parse_survey_id(survey_id)
+    await _get_survey_or_404(session, parsed_survey_id, current_user.id)
+
+    return await email_invitation_service.get_invitation_stats(
+        session=session,
+        survey_id=parsed_survey_id,
+    )
+
+
+@router.get(
     "/{survey_id}/email-invitations/{invitation_id}",
     response_model=EmailInvitationResponse,
     status_code=status.HTTP_200_OK,
@@ -239,32 +265,6 @@ async def delete_invitation(
     await email_invitation_service.delete_invitation(
         session=session,
         invitation_id=parsed_invitation_id,
-        survey_id=parsed_survey_id,
-    )
-
-
-@router.get(
-    "/{survey_id}/email-invitations/stats",
-    status_code=status.HTTP_200_OK,
-    summary="Email invitation aggregate statistics",
-    description=(
-        "Return aggregate delivery statistics for all email invitations for a survey. "
-        "Includes total sent, delivered, bounced, failed, open rate, click rate, "
-        "and a breakdown by invitation_type."
-    ),
-)
-async def get_invitation_stats(
-    survey_id: str,
-    current_user: User = Depends(get_current_user),
-    _scope: None = Depends(require_scope("surveys:read")),
-    session: AsyncSession = Depends(get_db),
-) -> dict:
-    """Return aggregate email invitation statistics for a survey."""
-    parsed_survey_id = _parse_survey_id(survey_id)
-    await _get_survey_or_404(session, parsed_survey_id, current_user.id)
-
-    return await email_invitation_service.get_invitation_stats(
-        session=session,
         survey_id=parsed_survey_id,
     )
 

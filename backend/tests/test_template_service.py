@@ -28,6 +28,8 @@ BASE_CONTEXT = {
     "sender_name": "Survey Tool",
     "recipient_name": "Alice",
     "custom_message": None,
+    "tracking_open_url": "http://localhost:8000/api/v1/email/track/open/test-uuid",
+    "tracking_click_url": "http://localhost:8000/api/v1/email/track/click/test-uuid",
 }
 
 

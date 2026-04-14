@@ -65,11 +65,7 @@ describe('EmailInvitationTableSkeleton', () => {
 describe('EmailInvitationTable', () => {
   it('renders table with invitations', () => {
     render(
-      <EmailInvitationTable
-        invitations={mockInvitations}
-        onResend={vi.fn()}
-        onDelete={vi.fn()}
-      />,
+      <EmailInvitationTable invitations={mockInvitations} onResend={vi.fn()} onDelete={vi.fn()} />
     )
 
     expect(screen.getByTestId('invitation-table')).toBeInTheDocument()
@@ -79,22 +75,14 @@ describe('EmailInvitationTable', () => {
 
   it('renders recipient name when provided', () => {
     render(
-      <EmailInvitationTable
-        invitations={mockInvitations}
-        onResend={vi.fn()}
-        onDelete={vi.fn()}
-      />,
+      <EmailInvitationTable invitations={mockInvitations} onResend={vi.fn()} onDelete={vi.fn()} />
     )
     expect(screen.getByText('Alice')).toBeInTheDocument()
   })
 
   it('renders correct status badges with color classes', () => {
     render(
-      <EmailInvitationTable
-        invitations={mockInvitations}
-        onResend={vi.fn()}
-        onDelete={vi.fn()}
-      />,
+      <EmailInvitationTable invitations={mockInvitations} onResend={vi.fn()} onDelete={vi.fn()} />
     )
 
     const deliveredBadge = screen.getByTestId('status-badge-delivered')
@@ -112,11 +100,7 @@ describe('EmailInvitationTable', () => {
 
   it('shows resend button only for failed and bounced invitations', () => {
     render(
-      <EmailInvitationTable
-        invitations={mockInvitations}
-        onResend={vi.fn()}
-        onDelete={vi.fn()}
-      />,
+      <EmailInvitationTable invitations={mockInvitations} onResend={vi.fn()} onDelete={vi.fn()} />
     )
 
     // delivered invitation should NOT have resend button
@@ -134,11 +118,7 @@ describe('EmailInvitationTable', () => {
     const user = userEvent.setup()
 
     render(
-      <EmailInvitationTable
-        invitations={mockInvitations}
-        onResend={onResend}
-        onDelete={vi.fn()}
-      />,
+      <EmailInvitationTable invitations={mockInvitations} onResend={onResend} onDelete={vi.fn()} />
     )
 
     await user.click(screen.getByTestId('resend-button-inv-2'))
@@ -150,11 +130,7 @@ describe('EmailInvitationTable', () => {
     const user = userEvent.setup()
 
     render(
-      <EmailInvitationTable
-        invitations={mockInvitations}
-        onResend={vi.fn()}
-        onDelete={onDelete}
-      />,
+      <EmailInvitationTable invitations={mockInvitations} onResend={vi.fn()} onDelete={onDelete} />
     )
 
     await user.click(screen.getByTestId('delete-button-inv-1'))
@@ -168,7 +144,7 @@ describe('EmailInvitationTable', () => {
         onResend={vi.fn()}
         onDelete={vi.fn()}
         resendingId="inv-2"
-      />,
+      />
     )
 
     expect(screen.getByTestId('resend-button-inv-2')).toBeDisabled()
@@ -180,7 +156,7 @@ describe('EmailInvitationTable', () => {
         invitations={[mockInvitations[1]]}
         onResend={vi.fn()}
         onDelete={vi.fn()}
-      />,
+      />
     )
 
     expect(screen.getByText('—')).toBeInTheDocument()
@@ -188,11 +164,7 @@ describe('EmailInvitationTable', () => {
 
   it('renders table headers', () => {
     render(
-      <EmailInvitationTable
-        invitations={mockInvitations}
-        onResend={vi.fn()}
-        onDelete={vi.fn()}
-      />,
+      <EmailInvitationTable invitations={mockInvitations} onResend={vi.fn()} onDelete={vi.fn()} />
     )
 
     expect(screen.getByText('Recipient')).toBeInTheDocument()

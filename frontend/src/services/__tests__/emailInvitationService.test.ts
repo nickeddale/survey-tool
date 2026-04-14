@@ -24,7 +24,7 @@ describe('emailInvitationService', () => {
     it('returns a paginated list of invitations for a survey', async () => {
       const result = await emailInvitationService.listInvitations(SURVEY_ID)
       expect(result.items).toHaveLength(
-        mockEmailInvitations.filter((i) => i.survey_id === SURVEY_ID).length,
+        mockEmailInvitations.filter((i) => i.survey_id === SURVEY_ID).length
       )
       expect(result.total).toBeGreaterThanOrEqual(2)
     })
@@ -45,9 +45,9 @@ describe('emailInvitationService', () => {
           capturedUrl = request.url
           return HttpResponse.json(
             { items: [], total: 0, page: 1, per_page: 20, total_pages: 1 },
-            { status: 200 },
+            { status: 200 }
           )
-        }),
+        })
       )
 
       await emailInvitationService.listInvitations(SURVEY_ID, { status: 'delivered' })
@@ -61,9 +61,9 @@ describe('emailInvitationService', () => {
           capturedUrl = request.url
           return HttpResponse.json(
             { items: [], total: 0, page: 1, per_page: 20, total_pages: 1 },
-            { status: 200 },
+            { status: 200 }
           )
-        }),
+        })
       )
 
       await emailInvitationService.listInvitations(SURVEY_ID, { invitation_type: 'reminder' })
@@ -75,9 +75,9 @@ describe('emailInvitationService', () => {
         http.get(`${BASE}/surveys/${SURVEY_ID}/email-invitations`, () =>
           HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-            { status: 401 },
-          ),
-        ),
+            { status: 401 }
+          )
+        )
       )
 
       clearTokens()
@@ -101,7 +101,7 @@ describe('emailInvitationService', () => {
 
     it('throws ApiError on 404 for unknown invitation', async () => {
       await expect(
-        emailInvitationService.getInvitation(SURVEY_ID, 'non-existent-id'),
+        emailInvitationService.getInvitation(SURVEY_ID, 'non-existent-id')
       ).rejects.toMatchObject({ status: 404 })
     })
   })
@@ -146,9 +146,9 @@ describe('emailInvitationService', () => {
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
             },
-            { status: 201 },
+            { status: 201 }
           )
-        }),
+        })
       )
 
       await emailInvitationService.sendInvitation(SURVEY_ID, {
@@ -189,7 +189,7 @@ describe('emailInvitationService', () => {
         http.post(`${BASE}/surveys/${SURVEY_ID}/email-invitations/batch`, async ({ request }) => {
           capturedBody = (await request.json()) as Record<string, unknown>
           return HttpResponse.json({ sent: 1, failed: 0, skipped: 0 }, { status: 201 })
-        }),
+        })
       )
 
       await emailInvitationService.sendBatchInvitations(SURVEY_ID, {
@@ -198,9 +198,7 @@ describe('emailInvitationService', () => {
       })
 
       expect(capturedBody).not.toBeNull()
-      expect((capturedBody!.items as Array<{ email: string }>)[0].email).toBe(
-        'single@example.com',
-      )
+      expect((capturedBody!.items as Array<{ email: string }>)[0].email).toBe('single@example.com')
       expect(capturedBody!.subject).toBe('Batch subject')
     })
   })
@@ -219,7 +217,7 @@ describe('emailInvitationService', () => {
 
     it('throws ApiError on 404 for unknown invitation', async () => {
       await expect(
-        emailInvitationService.resendInvitation(SURVEY_ID, 'non-existent-id'),
+        emailInvitationService.resendInvitation(SURVEY_ID, 'non-existent-id')
       ).rejects.toMatchObject({ status: 404 })
     })
   })
@@ -231,7 +229,7 @@ describe('emailInvitationService', () => {
   describe('deleteInvitation()', () => {
     it('deletes an invitation without returning data', async () => {
       await expect(
-        emailInvitationService.deleteInvitation(SURVEY_ID, INVITATION_ID),
+        emailInvitationService.deleteInvitation(SURVEY_ID, INVITATION_ID)
       ).resolves.toBeUndefined()
     })
 
@@ -240,14 +238,14 @@ describe('emailInvitationService', () => {
         http.delete(`${BASE}/surveys/${SURVEY_ID}/email-invitations/:invitationId`, () =>
           HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-            { status: 401 },
-          ),
-        ),
+            { status: 401 }
+          )
+        )
       )
 
       clearTokens()
       await expect(
-        emailInvitationService.deleteInvitation(SURVEY_ID, INVITATION_ID),
+        emailInvitationService.deleteInvitation(SURVEY_ID, INVITATION_ID)
       ).rejects.toMatchObject({ status: 401 })
     })
   })
@@ -279,9 +277,9 @@ describe('emailInvitationService', () => {
         http.get(`${BASE}/surveys/${SURVEY_ID}/email-invitations/stats`, () =>
           HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-            { status: 401 },
-          ),
-        ),
+            { status: 401 }
+          )
+        )
       )
 
       clearTokens()
