@@ -146,7 +146,7 @@ describe('EmailInvitationsPage', () => {
     it('renders empty state when no invitations and no filters', async () => {
       server.use(
         http.get(`/api/v1/surveys/${SURVEY_ID}/email-invitations`, () =>
-          HttpResponse.json({ items: [], total: 0, page: 1, per_page: 20, total_pages: 1 })
+          HttpResponse.json({ items: [], total: 0, page: 1, per_page: 20, pages: 1 })
         )
       )
 

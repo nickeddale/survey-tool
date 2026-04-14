@@ -575,7 +575,7 @@ export interface EmailInvitationListResponse {
   total: number
   page: number
   per_page: number
-  total_pages: number
+  pages: number
 }
 
 export interface EmailInvitationStats {

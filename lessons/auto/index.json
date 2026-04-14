@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-14T19:02:06.770Z",
+  "lastUpdated": "2026-04-14T19:07:55.455Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4634,6 +4634,21 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-14-iss-242-email-invitations-pagination-field-name-mismatch-p.md",
+      "ticketId": "ISS-242",
+      "title": "Email invitations: Pagination field name mismatch - pages vs total_pages",
+      "date": "2026-04-14",
+      "categories": [
+        "frontend",
+        "api-contract",
+        "pagination",
+        "bug-fix"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "low"
     }
   ],
   "categoryIndex": {
@@ -5709,7 +5724,8 @@
       "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
       "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
       "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md",
-      "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md"
+      "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
+      "2026-04-14-iss-242-email-invitations-pagination-field-name-mismatch-p.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6645,7 +6661,8 @@
       "2026-04-09-iss-200-test-expression-evaluator-always-returns-true-rega.md",
       "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md",
       "2026-04-13-iss-236-frontend-email-invitations-management-page.md",
-      "2026-04-13-iss-239-frontend-test-suite-for-email-invitation-component.md"
+      "2026-04-13-iss-239-frontend-test-suite-for-email-invitation-component.md",
+      "2026-04-14-iss-242-email-invitations-pagination-field-name-mismatch-p.md"
     ],
     "vitest": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
@@ -6788,6 +6805,12 @@
     ],
     "ui-patterns": [
       "2026-04-13-iss-236-frontend-email-invitations-management-page.md"
+    ],
+    "api-contract": [
+      "2026-04-14-iss-242-email-invitations-pagination-field-name-mismatch-p.md"
+    ],
+    "pagination": [
+      "2026-04-14-iss-242-email-invitations-pagination-field-name-mismatch-p.md"
     ]
   },
   "fileIndex": {

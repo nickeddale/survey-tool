@@ -1682,7 +1682,7 @@ export const handlers = [
     const pageItems = items.slice(start, start + perPage)
 
     return HttpResponse.json(
-      { items: pageItems, total, page, per_page: perPage, total_pages: totalPages },
+      { items: pageItems, total, page, per_page: perPage, pages: totalPages },
       { status: 200 }
     )
   }),
