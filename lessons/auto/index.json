@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-13T19:24:08.664Z",
+  "lastUpdated": "2026-04-14T18:55:17.957Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4600,6 +4600,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md",
+      "ticketId": "ISS-240",
+      "title": "Email invitations: Frontend API URL path mismatch causes all calls to 404",
+      "date": "2026-04-14",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4824,7 +4840,8 @@
       "2026-04-13-iss-236-frontend-email-invitations-management-page.md",
       "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
       "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
-      "2026-04-13-iss-239-frontend-test-suite-for-email-invitation-component.md"
+      "2026-04-13-iss-239-frontend-test-suite-for-email-invitation-component.md",
+      "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5025,7 +5042,8 @@
       "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
       "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
       "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
-      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md"
+      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
+      "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5396,7 +5414,8 @@
       "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
       "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
       "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
-      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md"
+      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
+      "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5666,7 +5685,8 @@
       "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
       "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
       "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
-      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md"
+      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
+      "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5882,7 +5902,8 @@
       "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
       "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
       "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
-      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md"
+      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
+      "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
