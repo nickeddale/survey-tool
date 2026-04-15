@@ -70,7 +70,7 @@ const inputClass =
 // ---------------------------------------------------------------------------
 
 interface MatrixSettingsFormProps {
-  type: 'matrix' | 'matrix_dropdown' | 'matrix_dynamic'
+  type: 'matrix' | 'matrix_single' | 'matrix_multiple' | 'matrix_dropdown' | 'matrix_dynamic'
   settings: MatrixSettings | MatrixDropdownSettings | MatrixDynamicSettings
   onChange: (
     updates: Partial<MatrixSettings & MatrixDropdownSettings & MatrixDynamicSettings>
@@ -92,8 +92,8 @@ export function MatrixSettingsForm({
 
   return (
     <div className="space-y-3" data-testid="matrix-settings-form">
-      {/* alternate_rows — matrix and matrix_dropdown */}
-      {(type === 'matrix' || type === 'matrix_dropdown') && (
+      {/* alternate_rows — all except matrix_dynamic */}
+      {type !== 'matrix_dynamic' && (
         <ToggleRow
           id="setting-alternate-rows"
           label="Alternate row colors"
@@ -104,8 +104,8 @@ export function MatrixSettingsForm({
         />
       )}
 
-      {/* is_all_rows_required — matrix and matrix_dropdown */}
-      {(type === 'matrix' || type === 'matrix_dropdown') && (
+      {/* is_all_rows_required — all except matrix_dynamic */}
+      {type !== 'matrix_dynamic' && (
         <ToggleRow
           id="setting-all-rows-required"
           label="All rows required"
@@ -116,8 +116,8 @@ export function MatrixSettingsForm({
         />
       )}
 
-      {/* randomize_rows — matrix and matrix_dropdown */}
-      {(type === 'matrix' || type === 'matrix_dropdown') && (
+      {/* randomize_rows — all except matrix_dynamic */}
+      {type !== 'matrix_dynamic' && (
         <ToggleRow
           id="setting-randomize-rows"
           label="Randomize row order"
@@ -128,14 +128,28 @@ export function MatrixSettingsForm({
         />
       )}
 
-      {/* cell_type — matrix_dropdown and matrix_dynamic */}
+      {/* transpose — all except matrix_dynamic */}
+      {type !== 'matrix_dynamic' && (
+        <ToggleRow
+          id="setting-transpose"
+          label="Transpose (swap rows and columns)"
+          checked={s.transpose ?? false}
+          onChange={(checked) => onChange({ transpose: checked })}
+          disabled={readOnly}
+          data-testid="matrix-setting-transpose"
+        />
+      )}
+
+      {/* cell_type — matrix_dropdown and matrix_dynamic only */}
       {(type === 'matrix_dropdown' || type === 'matrix_dynamic') && (
         <FieldRow label="Default Cell Type">
           <select
             className={inputClass}
             value={s.cell_type ?? 'dropdown'}
             onChange={(e) =>
-              onChange({ cell_type: e.target.value as MatrixDropdownSettings['cell_type'] })
+              onChange({
+                cell_type: e.target.value as 'dropdown' | 'text' | 'checkbox' | 'radio',
+              })
             }
             disabled={readOnly}
             data-testid="matrix-setting-cell-type"

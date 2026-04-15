@@ -1751,28 +1751,31 @@ export const handlers = [
   }),
 
   // POST /api/v1/surveys/:surveyId/email-invitations/:invitationId/resend
-  http.post(`${BASE}/surveys/:surveyId/email-invitations/:invitationId/resend`, ({ request, params }) => {
-    const authHeader = request.headers.get('Authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  http.post(
+    `${BASE}/surveys/:surveyId/email-invitations/:invitationId/resend`,
+    ({ request, params }) => {
+      const authHeader = request.headers.get('Authorization')
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return HttpResponse.json(
+          { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+          { status: 401 }
+        )
+      }
+      const invitation = mockEmailInvitations.find(
+        (i) => i.id === params.invitationId && i.survey_id === params.surveyId
+      )
+      if (!invitation) {
+        return HttpResponse.json(
+          { detail: { code: 'NOT_FOUND', message: 'Invitation not found' } },
+          { status: 404 }
+        )
+      }
       return HttpResponse.json(
-        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
-        { status: 401 }
+        { ...invitation, status: 'sent', sent_at: new Date().toISOString() },
+        { status: 200 }
       )
     }
-    const invitation = mockEmailInvitations.find(
-      (i) => i.id === params.invitationId && i.survey_id === params.surveyId
-    )
-    if (!invitation) {
-      return HttpResponse.json(
-        { detail: { code: 'NOT_FOUND', message: 'Invitation not found' } },
-        { status: 404 }
-      )
-    }
-    return HttpResponse.json(
-      { ...invitation, status: 'sent', sent_at: new Date().toISOString() },
-      { status: 200 }
-    )
-  }),
+  ),
 
   // DELETE /api/v1/surveys/:surveyId/email-invitations/:invitationId
   http.delete(`${BASE}/surveys/:surveyId/email-invitations/:invitationId`, ({ request }) => {

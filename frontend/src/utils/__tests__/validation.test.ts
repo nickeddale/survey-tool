@@ -536,6 +536,7 @@ describe('validateAnswer — matrix', () => {
       alternate_rows: true,
       is_all_rows_required: true,
       randomize_rows: false,
+      transpose: false,
     }
     const q = makeQuestion('matrix', { settings, subquestions })
     expect(validateAnswer(q, { SQ1: 'opt-A', SQ2: 'opt-B' }).valid).toBe(true)
@@ -546,6 +547,7 @@ describe('validateAnswer — matrix', () => {
       alternate_rows: true,
       is_all_rows_required: true,
       randomize_rows: false,
+      transpose: false,
     }
     const q = makeQuestion('matrix', { settings, subquestions })
     const result = validateAnswer(q, { SQ1: 'opt-A' })
@@ -558,6 +560,7 @@ describe('validateAnswer — matrix', () => {
       alternate_rows: true,
       is_all_rows_required: false,
       randomize_rows: false,
+      transpose: false,
     }
     const q = makeQuestion('matrix', { settings, subquestions })
     expect(validateAnswer(q, { SQ1: 'opt-A' }).valid).toBe(true)
@@ -586,7 +589,9 @@ describe('validateAnswer — matrix_dropdown', () => {
       alternate_rows: true,
       is_all_rows_required: true,
       randomize_rows: false,
+      transpose: false,
       cell_type: 'dropdown',
+      column_types: null,
     }
     const q = makeQuestion('matrix_dropdown', { settings, subquestions })
     expect(validateAnswer(q, { SQ1: 'opt-A', SQ2: 'opt-B' }).valid).toBe(true)
@@ -597,7 +602,9 @@ describe('validateAnswer — matrix_dropdown', () => {
       alternate_rows: true,
       is_all_rows_required: true,
       randomize_rows: false,
+      transpose: false,
       cell_type: 'dropdown',
+      column_types: null,
     }
     const q = makeQuestion('matrix_dropdown', { settings, subquestions })
     const result = validateAnswer(q, { SQ1: 'opt-A' })

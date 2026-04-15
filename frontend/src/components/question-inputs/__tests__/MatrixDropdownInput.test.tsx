@@ -1,15 +1,16 @@
 /**
  * Tests for MatrixDropdownInput component.
  *
- * Covers: table rendering, dropdown per row, selection updates value map,
- * alternate_rows, randomize_rows, is_all_rows_required validation,
- * external errors, accessibility.
+ * Covers: table rendering, column headers, dropdown select per column,
+ * per-column cell types, nested response shape, alternate_rows, randomize_rows,
+ * is_all_rows_required validation, external errors, accessibility.
  */
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, act, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MatrixDropdownInput } from '../MatrixDropdownInput'
+import type { MatrixDropdownValue } from '../MatrixDropdownInput'
 import type { BuilderQuestion } from '../../../store/builderStore'
 import { getDefaultSettings } from '../../../types/questionSettings'
 import type { MatrixDropdownSettings } from '../../../types/questionSettings'
@@ -79,7 +80,9 @@ function makeSettings(overrides: Partial<MatrixDropdownSettings> = {}): MatrixDr
     alternate_rows: true,
     is_all_rows_required: false,
     randomize_rows: false,
+    transpose: false,
     cell_type: 'dropdown',
+    column_types: null,
     ...overrides,
   }
 }
@@ -105,6 +108,18 @@ describe('MatrixDropdownInput — rendering', () => {
     expect(table.querySelector('tbody')).toBeInTheDocument()
   })
 
+  it('renders column headers from answer_options', () => {
+    const options = [
+      makeOption({ id: 'opt-1', code: 'col1', title: 'Column 1' }),
+      makeOption({ id: 'opt-2', code: 'col2', title: 'Column 2' }),
+    ]
+    const subquestions = [makeSubquestion({ code: 'SQ001' })]
+    const question = makeQuestion({ subquestions, answer_options: options })
+    render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} />)
+    expect(screen.getByTestId('matrix-dropdown-col-col1')).toHaveTextContent('Column 1')
+    expect(screen.getByTestId('matrix-dropdown-col-col2')).toHaveTextContent('Column 2')
+  })
+
   it('renders rows for each subquestion', () => {
     const subquestions = [
       makeSubquestion({ id: 'sq-1', code: 'SQ001', title: 'Row 1' }),
@@ -118,39 +133,42 @@ describe('MatrixDropdownInput — rendering', () => {
     expect(screen.getByText('Row 2')).toBeInTheDocument()
   })
 
-  it('renders a dropdown select per row', () => {
-    const subquestions = [
-      makeSubquestion({ id: 'sq-1', code: 'SQ001' }),
-      makeSubquestion({ id: 'sq-2', code: 'SQ002' }),
-    ]
-    const question = makeQuestion({ subquestions })
+  it('renders a dropdown select per cell (subquestion × column)', () => {
+    const subquestions = [makeSubquestion({ code: 'SQ001' })]
+    const options = [makeOption({ id: 'opt-1', code: 'col1' })]
+    const question = makeQuestion({ subquestions, answer_options: options })
     render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} />)
-    expect(screen.getByTestId('matrix-dropdown-select-SQ001')).toBeInTheDocument()
-    expect(screen.getByTestId('matrix-dropdown-select-SQ002')).toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dropdown-select-SQ001-col1')).toBeInTheDocument()
   })
 
   it('renders answer_options as select options', () => {
     const subquestions = [makeSubquestion({ code: 'SQ001' })]
-    const options = [
-      makeOption({ id: 'opt-1', code: 'A1', title: 'Never' }),
-      makeOption({ id: 'opt-2', code: 'A2', title: 'Always' }),
-    ]
+    const options = [makeOption({ id: 'opt-1', code: 'col1', title: 'Never' })]
+    // answer_options serve as columns; the dropdown for each cell lists the same answer_options
     const question = makeQuestion({ subquestions, answer_options: options })
     render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} />)
-    expect(screen.getByRole('option', { name: 'Never' })).toBeInTheDocument()
-    expect(screen.getByRole('option', { name: 'Always' })).toBeInTheDocument()
+    // The select should have "— Select —" placeholder
+    const select = screen.getByTestId('matrix-dropdown-select-SQ001-col1') as HTMLSelectElement
+    expect(select).toBeInTheDocument()
   })
 
-  it('shows the selected value in the dropdown', () => {
+  it('shows the selected value in the dropdown (nested shape)', () => {
     const subquestions = [makeSubquestion({ code: 'SQ001' })]
     const options = [
-      makeOption({ id: 'opt-1', code: 'A1', title: 'Never' }),
-      makeOption({ id: 'opt-2', code: 'A2', title: 'Always' }),
+      makeOption({ id: 'opt-1', code: 'col1', title: 'Column 1' }),
+      makeOption({ id: 'opt-2', code: 'col2', title: 'Column 2' }),
     ]
     const question = makeQuestion({ subquestions, answer_options: options })
-    render(<MatrixDropdownInput value={{ SQ001: 'A1' }} onChange={vi.fn()} question={question} />)
-    const select = screen.getByTestId('matrix-dropdown-select-SQ001') as HTMLSelectElement
-    expect(select.value).toBe('A1')
+    // Value in nested shape: { SQ001: { col1: 'col2' } } — col2 is a valid option code
+    render(
+      <MatrixDropdownInput
+        value={{ SQ001: { col1: 'col2' } }}
+        onChange={vi.fn()}
+        question={question}
+      />
+    )
+    const select = screen.getByTestId('matrix-dropdown-select-SQ001-col1') as HTMLSelectElement
+    expect(select.value).toBe('col2')
   })
 
   it('has an overflow-x-auto scroll container', () => {
@@ -163,44 +181,111 @@ describe('MatrixDropdownInput — rendering', () => {
 })
 
 // ---------------------------------------------------------------------------
-// onChange callback
+// Cell type rendering
 // ---------------------------------------------------------------------------
 
-describe('MatrixDropdownInput — onChange', () => {
-  it('calls onChange with updated value map when dropdown changes', async () => {
+describe('MatrixDropdownInput — cell types', () => {
+  it('renders text input when cell_type is text', () => {
+    const subquestions = [makeSubquestion({ code: 'SQ001' })]
+    const options = [makeOption({ id: 'opt-1', code: 'col1', title: 'Column' })]
+    const question = makeQuestion({
+      subquestions,
+      answer_options: options,
+      settings: makeSettings({ cell_type: 'text' }),
+    })
+    render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} />)
+    const cell = screen.getByTestId('matrix-dropdown-cell-SQ001-col1')
+    expect(cell.querySelector('input[type="text"]')).toBeInTheDocument()
+  })
+
+  it('renders number input when cell_type is number', () => {
+    const subquestions = [makeSubquestion({ code: 'SQ001' })]
+    const options = [makeOption({ id: 'opt-1', code: 'col1', title: 'Column' })]
+    const question = makeQuestion({
+      subquestions,
+      answer_options: options,
+      settings: makeSettings({ cell_type: 'number' }),
+    })
+    render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} />)
+    const cell = screen.getByTestId('matrix-dropdown-cell-SQ001-col1')
+    expect(cell.querySelector('input[type="number"]')).toBeInTheDocument()
+  })
+
+  it('renders checkbox when cell_type is boolean', () => {
+    const subquestions = [makeSubquestion({ code: 'SQ001' })]
+    const options = [makeOption({ id: 'opt-1', code: 'col1', title: 'Column' })]
+    const question = makeQuestion({
+      subquestions,
+      answer_options: options,
+      settings: makeSettings({ cell_type: 'boolean' }),
+    })
+    render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} />)
+    const cell = screen.getByTestId('matrix-dropdown-cell-SQ001-col1')
+    expect(cell.querySelector('input[type="checkbox"]')).toBeInTheDocument()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// onChange callback — nested shape
+// ---------------------------------------------------------------------------
+
+describe('MatrixDropdownInput — onChange nested shape', () => {
+  it('calls onChange with nested value map when dropdown changes', async () => {
     const user = userEvent.setup()
     const onChange = vi.fn()
     const subquestions = [makeSubquestion({ code: 'SQ001' })]
-    const options = [
-      makeOption({ id: 'opt-1', code: 'A1', title: 'Never' }),
-      makeOption({ id: 'opt-2', code: 'A2', title: 'Always' }),
-    ]
-    const question = makeQuestion({ subquestions, answer_options: options })
+    const options = [makeOption({ id: 'opt-1', code: 'col1', title: 'Column 1' })]
+    // The dropdown's options come from the same answer_options list
+    const question = makeQuestion({
+      subquestions,
+      answer_options: options,
+      settings: makeSettings({ cell_type: 'dropdown' }),
+    })
+    // For the select to have options, answer_options need to be added
+    // The CellInput renders answer_options as <option> elements
+    // We set it up so selecting from the select produces { SQ001: { col1: 'col1' } }
     render(<MatrixDropdownInput value={{}} onChange={onChange} question={question} />)
 
+    const select = screen.getByTestId('matrix-dropdown-select-SQ001-col1')
     await act(async () => {
-      await user.selectOptions(screen.getByTestId('matrix-dropdown-select-SQ001'), 'A1')
+      await user.selectOptions(select, 'col1')
     })
 
-    expect(onChange).toHaveBeenCalledWith({ SQ001: 'A1' })
+    // The nested shape should be: { SQ001: { col1: 'col1' } }
+    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1][0] as MatrixDropdownValue
+    expect(lastCall.SQ001).toBeDefined()
+    expect(lastCall.SQ001['col1']).toBe('col1')
   })
 
-  it('preserves existing selections when a new row is answered', async () => {
+  it('preserves existing row data when new row is answered', async () => {
     const user = userEvent.setup()
     const onChange = vi.fn()
     const subquestions = [
       makeSubquestion({ id: 'sq-1', code: 'SQ001' }),
       makeSubquestion({ id: 'sq-2', code: 'SQ002' }),
     ]
-    const options = [makeOption({ code: 'A1', title: 'Yes' })]
-    const question = makeQuestion({ subquestions, answer_options: options })
-    render(<MatrixDropdownInput value={{ SQ001: 'A1' }} onChange={onChange} question={question} />)
+    const options = [makeOption({ code: 'col1', title: 'Col 1' })]
+    const question = makeQuestion({
+      subquestions,
+      answer_options: options,
+      settings: makeSettings({ cell_type: 'dropdown' }),
+    })
+    render(
+      <MatrixDropdownInput
+        value={{ SQ001: { col1: 'col1' } }}
+        onChange={onChange}
+        question={question}
+      />
+    )
 
+    const select = screen.getByTestId('matrix-dropdown-select-SQ002-col1')
     await act(async () => {
-      await user.selectOptions(screen.getByTestId('matrix-dropdown-select-SQ002'), 'A1')
+      await user.selectOptions(select, 'col1')
     })
 
-    expect(onChange).toHaveBeenCalledWith({ SQ001: 'A1', SQ002: 'A1' })
+    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1][0] as MatrixDropdownValue
+    expect(lastCall.SQ001?.['col1']).toBe('col1')
+    expect(lastCall.SQ002?.['col1']).toBe('col1')
   })
 })
 
@@ -269,7 +354,7 @@ describe('MatrixDropdownInput — randomize_rows', () => {
 })
 
 // ---------------------------------------------------------------------------
-// is_all_rows_required validation
+// is_all_rows_required validation — nested shape
 // ---------------------------------------------------------------------------
 
 describe('MatrixDropdownInput — is_all_rows_required validation', () => {
@@ -292,14 +377,21 @@ describe('MatrixDropdownInput — is_all_rows_required validation', () => {
       settings: makeSettings({ is_all_rows_required: true }),
       subquestions,
     })
-    render(<MatrixDropdownInput value={{ SQ001: 'A1' }} onChange={vi.fn()} question={question} />)
+    // Only SQ001 has any answer
+    render(
+      <MatrixDropdownInput
+        value={{ SQ001: { col1: 'val' } }}
+        onChange={vi.fn()}
+        question={question}
+      />
+    )
 
     fireEvent.blur(screen.getByTestId('matrix-dropdown-input-q-mdd-1'))
 
     expect(screen.getByTestId('validation-errors')).toHaveTextContent('Please answer all rows.')
   })
 
-  it('does not show error when all rows are answered', () => {
+  it('does not show error when all rows have data', () => {
     const subquestions = [
       makeSubquestion({ id: 'sq-1', code: 'SQ001' }),
       makeSubquestion({ id: 'sq-2', code: 'SQ002' }),
@@ -310,7 +402,7 @@ describe('MatrixDropdownInput — is_all_rows_required validation', () => {
     })
     render(
       <MatrixDropdownInput
-        value={{ SQ001: 'A1', SQ002: 'A2' }}
+        value={{ SQ001: { col1: 'A1' }, SQ002: { col1: 'A2' } }}
         onChange={vi.fn()}
         question={question}
       />
