@@ -269,17 +269,18 @@ function SurveyDetailPage() {
           </span>
         </h2>
 
+        {survey.status === 'draft' && (
+          <Button className="mb-3" onClick={() => navigate(`/surveys/${survey.id}/builder`)}>
+            Builder
+          </Button>
+        )}
+
         {survey.groups.length === 0 ? (
           <Card data-testid="no-groups-state">
             <CardContent className="text-center py-10">
               <p className="text-muted-foreground text-sm">
                 No question groups have been added to this survey.
               </p>
-              {survey.status === 'draft' && (
-                <Button className="mt-3" onClick={() => navigate(`/surveys/${survey.id}/builder`)}>
-                  Builder
-                </Button>
-              )}
             </CardContent>
           </Card>
         ) : (

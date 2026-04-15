@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-14T20:22:50.312Z",
+  "lastUpdated": "2026-04-15T19:16:42.632Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4725,6 +4725,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md",
+      "ticketId": "ISS-247",
+      "title": "Survey detail page: Builder link hidden when survey has question groups",
+      "date": "2026-04-15",
+      "categories": [
+        "testing",
+        "ui",
+        "bug-fix",
+        "feature",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4955,7 +4971,8 @@
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
       "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
       "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
-      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5541,7 +5558,8 @@
       "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
       "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
-      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5819,7 +5837,8 @@
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
       "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
       "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
-      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6041,7 +6060,8 @@
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
       "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
       "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
-      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6614,7 +6634,8 @@
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
       "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
       "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
-      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
