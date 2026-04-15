@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-15T19:57:45.073Z",
+  "lastUpdated": "2026-04-15T20:43:45.229Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4772,6 +4772,25 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
+      "ticketId": "ISS-251",
+      "title": "CI failure: test_matrix_dropdown_answer_valid fails after ISS-248 merge",
+      "date": "2026-04-15",
+      "categories": [
+        "testing",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -5005,7 +5024,8 @@
       "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
       "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md",
       "2026-04-15-iss-248-complete-tablematrix-question-type-implementation.md",
-      "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md"
+      "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md",
+      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5371,7 +5391,8 @@
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
       "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
       "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
-      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5593,7 +5614,8 @@
       "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
       "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
       "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md",
-      "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md"
+      "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md",
+      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5873,7 +5895,8 @@
       "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
       "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
       "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md",
-      "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md"
+      "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md",
+      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6097,7 +6120,8 @@
       "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
       "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
       "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md",
-      "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md"
+      "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md",
+      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6296,7 +6320,8 @@
       "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
       "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
-      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6460,7 +6485,8 @@
       "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
       "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
-      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6672,7 +6698,8 @@
       "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
       "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
       "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md",
-      "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md"
+      "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md",
+      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
