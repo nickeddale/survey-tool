@@ -63,5 +63,12 @@ services:
     depends_on:
       - backend
 
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "8026:8025"
+      - "1026:1025"
+
 volumes:
   postgres_data:
