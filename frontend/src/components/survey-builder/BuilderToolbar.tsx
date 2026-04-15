@@ -32,6 +32,7 @@ import {
   CheckSquare,
   List,
   Hash,
+  Grid3x3,
   Zap,
 } from 'lucide-react'
 import { useBuilderStore } from '../../store/builderStore'
@@ -75,6 +76,10 @@ const QUESTION_TYPES = [
   { type: 'multiple_choice', label: 'Multiple Choice', icon: CheckSquare },
   { type: 'dropdown', label: 'Dropdown', icon: List },
   { type: 'number', label: 'Number', icon: Hash },
+  { type: 'matrix_single', label: 'Matrix (Single)', icon: Grid3x3 },
+  { type: 'matrix_multiple', label: 'Matrix (Multi)', icon: Grid3x3 },
+  { type: 'matrix_dropdown', label: 'Matrix (Dropdown)', icon: Grid3x3 },
+  { type: 'matrix_dynamic', label: 'Matrix (Dynamic)', icon: Grid3x3 },
 ]
 
 // ---------------------------------------------------------------------------
