@@ -25,6 +25,7 @@ import {
   DropdownInput,
   CheckboxInput,
   MatrixInput,
+  MatrixMultipleInput,
   MatrixDropdownInput,
   MatrixDynamicInput,
   NumericInput,
@@ -37,6 +38,7 @@ import {
   ExpressionDisplay,
   HtmlContent,
 } from '../question-inputs'
+import type { MatrixDropdownValue } from '../question-inputs/MatrixDropdownInput'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -174,6 +176,7 @@ function QuestionInput({ question, value, errors, onChange }: QuestionInputProps
         />
       )
     case 'matrix':
+    case 'matrix_single':
       return (
         <MatrixInput
           question={question}
@@ -182,12 +185,21 @@ function QuestionInput({ question, value, errors, onChange }: QuestionInputProps
           errors={errors}
         />
       )
+    case 'matrix_multiple':
+      return (
+        <MatrixMultipleInput
+          question={question}
+          value={(value as unknown as Record<string, string[]>) ?? {}}
+          onChange={onChange as unknown as (v: Record<string, string[]>) => void}
+          errors={errors}
+        />
+      )
     case 'matrix_dropdown':
       return (
         <MatrixDropdownInput
           question={question}
-          value={(value as Record<string, string>) ?? {}}
-          onChange={onChange as (v: Record<string, string>) => void}
+          value={(value as unknown as MatrixDropdownValue) ?? {}}
+          onChange={onChange as unknown as (v: MatrixDropdownValue) => void}
           errors={errors}
         />
       )

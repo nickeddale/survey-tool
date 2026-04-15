@@ -668,7 +668,10 @@ function EmailInvitationsPage() {
             <input
               type="text"
               value={emailSearch}
-              onChange={(e) => { setEmailSearch(e.target.value); setPage(1) }}
+              onChange={(e) => {
+                setEmailSearch(e.target.value)
+                setPage(1)
+              }}
               placeholder="Search by email"
               className="pl-8 pr-3 py-1.5 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring w-52"
               data-testid="email-search-input"

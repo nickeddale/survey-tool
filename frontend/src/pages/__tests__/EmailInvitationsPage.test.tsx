@@ -77,7 +77,10 @@ describe('EmailInvitationsPage', () => {
   describe('loading state', () => {
     it('renders loading skeleton while fetching', async () => {
       server.use(
-        http.get(`/api/v1/surveys/${SURVEY_ID}/email-invitations`, () => new Promise<never>(() => {}))
+        http.get(
+          `/api/v1/surveys/${SURVEY_ID}/email-invitations`,
+          () => new Promise<never>(() => {})
+        )
       )
 
       renderPage()

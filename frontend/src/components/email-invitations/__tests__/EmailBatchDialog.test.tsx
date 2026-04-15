@@ -106,9 +106,9 @@ describe('EmailBatchDialog', () => {
       http.post(`/api/v1/surveys/${SURVEY_ID}/email-invitations/batch`, () =>
         HttpResponse.json(
           { detail: { code: 'SERVER_ERROR', message: 'Internal error' } },
-          { status: 500 },
-        ),
-      ),
+          { status: 500 }
+        )
+      )
     )
 
     const user = userEvent.setup()
