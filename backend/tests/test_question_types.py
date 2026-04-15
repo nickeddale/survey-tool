@@ -1462,7 +1462,7 @@ def test_matrix_dropdown_answer_valid():
     opts = [make_option("COL1")]
     sqs = [make_subquestion("SQ001")]
     q = make_question("matrix_dropdown", settings={})
-    errors = validate_answer({"value": {"SQ001": "COL1"}}, q, answer_options=opts, subquestions=sqs)
+    errors = validate_answer({"value": {"SQ001": {"COL1": "some_value"}}}, q, answer_options=opts, subquestions=sqs)
     assert errors == []
 
 
@@ -1470,7 +1470,7 @@ def test_matrix_dropdown_answer_all_rows_required():
     opts = [make_option("COL1")]
     sqs = [make_subquestion("SQ001"), make_subquestion("SQ002")]
     q = make_question("matrix_dropdown", settings={"is_all_rows_required": True})
-    errors = validate_answer({"value": {"SQ001": "COL1"}}, q, answer_options=opts, subquestions=sqs)
+    errors = validate_answer({"value": {"SQ001": {"COL1": "val"}}}, q, answer_options=opts, subquestions=sqs)
     assert len(errors) > 0
 
 
