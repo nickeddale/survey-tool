@@ -7,7 +7,7 @@
  * is planned for a future iteration).
  */
 
-import { Type, List, AlignLeft, CheckSquare, ToggleLeft, Hash } from 'lucide-react'
+import { Type, List, AlignLeft, CheckSquare, ToggleLeft, Hash, Grid3x3 } from 'lucide-react'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -20,6 +20,10 @@ export const QUESTION_TYPES = [
   { type: 'multiple_choice', label: 'Multiple Choice', icon: CheckSquare },
   { type: 'dropdown', label: 'Dropdown', icon: List },
   { type: 'number', label: 'Number', icon: Hash },
+  { type: 'matrix_single', label: 'Matrix (Single)', icon: Grid3x3 },
+  { type: 'matrix_multiple', label: 'Matrix (Multi)', icon: Grid3x3 },
+  { type: 'matrix_dropdown', label: 'Matrix (Dropdown)', icon: Grid3x3 },
+  { type: 'matrix_dynamic', label: 'Matrix (Dynamic)', icon: Grid3x3 },
 ]
 
 // ---------------------------------------------------------------------------
