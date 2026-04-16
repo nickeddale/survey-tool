@@ -220,6 +220,8 @@ async def update_survey_translations(
 ) -> Any:
     """Fetch survey, merge translations for lang, persist, and return updated survey.
 
+    Bypasses check_survey_editable() so translations can be updated on active surveys.
+
     Args:
         session: Active async database session.
         survey_id: UUID of the survey to update.
@@ -233,14 +235,17 @@ async def update_survey_translations(
     Raises:
         NotFoundError: If survey does not exist or is not owned by user.
     """
-    from app.services.survey_service import get_survey_by_id, update_survey
+    from app.services.survey_service import get_survey_by_id
 
     survey = await get_survey_by_id(session, survey_id, user_id)
     if survey is None:
         raise NotFoundError("Survey not found")
 
-    new_translations = merge_translations(survey.translations or {}, lang, field_values)
-    return await update_survey(session, survey, translations=new_translations)
+    survey.translations = merge_translations(survey.translations or {}, lang, field_values)
+    session.add(survey)
+    await session.flush()
+    await session.refresh(survey)
+    return survey
 
 
 async def update_group_translations(
@@ -252,6 +257,8 @@ async def update_group_translations(
     field_values: dict[str, Any],
 ) -> Any:
     """Fetch group, merge translations for lang, persist, and return updated group.
+
+    Bypasses check_survey_editable() so translations can be updated on active surveys.
 
     Args:
         session: Active async database session.
@@ -267,14 +274,17 @@ async def update_group_translations(
     Raises:
         NotFoundError: If group does not exist or is not owned by user.
     """
-    from app.services.question_group_service import get_group_by_id, update_group
+    from app.services.question_group_service import get_group_by_id
 
     group = await get_group_by_id(session, survey_id=survey_id, group_id=group_id, user_id=user_id)
     if group is None:
         raise NotFoundError("Group not found")
 
-    new_translations = merge_translations(group.translations or {}, lang, field_values)
-    return await update_group(session, group, translations=new_translations)
+    group.translations = merge_translations(group.translations or {}, lang, field_values)
+    session.add(group)
+    await session.flush()
+    await session.refresh(group)
+    return group
 
 
 async def update_question_translations(
@@ -287,6 +297,8 @@ async def update_question_translations(
     field_values: dict[str, Any],
 ) -> Any:
     """Fetch question, merge translations for lang, persist, and return updated question.
+
+    Bypasses check_survey_editable() so translations can be updated on active surveys.
 
     Args:
         session: Active async database session.
@@ -303,7 +315,7 @@ async def update_question_translations(
     Raises:
         NotFoundError: If question does not exist or is not owned by user.
     """
-    from app.services.question_service import get_question_by_id, update_question
+    from app.services.question_service import get_question_by_id
 
     question = await get_question_by_id(
         session,
@@ -315,8 +327,11 @@ async def update_question_translations(
     if question is None:
         raise NotFoundError("Question not found")
 
-    new_translations = merge_translations(question.translations or {}, lang, field_values)
-    return await update_question(session, question, translations=new_translations)
+    question.translations = merge_translations(question.translations or {}, lang, field_values)
+    session.add(question)
+    await session.flush()
+    await session.refresh(question)
+    return question
 
 
 async def update_answer_option_translations(
@@ -329,6 +344,8 @@ async def update_answer_option_translations(
     field_values: dict[str, Any],
 ) -> Any:
     """Fetch answer option, merge translations for lang, persist, and return updated option.
+
+    Bypasses check_survey_editable() so translations can be updated on active surveys.
 
     Args:
         session: Active async database session.
@@ -345,7 +362,7 @@ async def update_answer_option_translations(
     Raises:
         NotFoundError: If option does not exist or is not owned by user.
     """
-    from app.services.answer_option_service import get_answer_option_by_id, update_answer_option
+    from app.services.answer_option_service import get_answer_option_by_id
 
     option = await get_answer_option_by_id(
         session,
@@ -357,5 +374,8 @@ async def update_answer_option_translations(
     if option is None:
         raise NotFoundError("Answer option not found")
 
-    new_translations = merge_translations(option.translations or {}, lang, field_values)
-    return await update_answer_option(session, option, translations=new_translations)
+    option.translations = merge_translations(option.translations or {}, lang, field_values)
+    session.add(option)
+    await session.flush()
+    await session.refresh(option)
+    return option
