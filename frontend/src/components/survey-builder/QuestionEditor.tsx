@@ -32,7 +32,8 @@ const QUESTION_TYPE_OPTIONS = [
   { value: 'ranking', label: 'Ranking' },
   { value: 'image_picker', label: 'Image Picker' },
   // Matrix types
-  { value: 'matrix', label: 'Matrix' },
+  { value: 'matrix_single', label: 'Matrix (Single Choice)' },
+  { value: 'matrix_multiple', label: 'Matrix (Multiple Choice)' },
   { value: 'matrix_dropdown', label: 'Matrix Dropdown' },
   { value: 'matrix_dynamic', label: 'Matrix Dynamic' },
   // Scalar types
