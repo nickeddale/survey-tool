@@ -69,7 +69,7 @@ async def engine():
         await conn.exec_driver_sql(
             "DO $$ BEGIN"
             " IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'assessment_scope') THEN"
-            " CREATE TYPE assessment_scope AS ENUM ('total', 'group');"
+            " CREATE TYPE assessment_scope AS ENUM ('total', 'group', 'question');"
             " END IF; END $$"
         )
         await conn.exec_driver_sql(

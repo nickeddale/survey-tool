@@ -124,7 +124,9 @@ describe('QuestionPreview title and description', () => {
   it('displays the question description when present', () => {
     const question = makeQuestion({ description: 'Please enter your full name.' })
     render(<QuestionPreview question={question} />)
-    expect(screen.getByTestId('preview-description')).toHaveTextContent('Please enter your full name.')
+    expect(screen.getByTestId('preview-description')).toHaveTextContent(
+      'Please enter your full name.'
+    )
   })
 
   it('does not render description element when description is null', () => {
@@ -238,10 +240,7 @@ describe('ChoicePreview', () => {
     const question = makeQuestion({
       question_type: 'multiple_choice',
       settings: getDefaultSettings('multiple_choice'),
-      answer_options: [
-        makeOption('o1', 'Choice A'),
-        makeOption('o2', 'Choice B'),
-      ],
+      answer_options: [makeOption('o1', 'Choice A'), makeOption('o2', 'Choice B')],
     })
     render(<QuestionPreview question={question} />)
     const container = screen.getByTestId('preview-checkbox')
@@ -272,11 +271,13 @@ describe('ChoicePreview', () => {
   it('renders a disabled select for dropdown type', () => {
     const question = makeQuestion({
       question_type: 'dropdown',
-      settings: { placeholder: 'Pick one…', searchable: false, has_other: false, other_text: 'Other' },
-      answer_options: [
-        makeOption('o1', 'Alpha'),
-        makeOption('o2', 'Beta'),
-      ],
+      settings: {
+        placeholder: 'Pick one…',
+        searchable: false,
+        has_other: false,
+        other_text: 'Other',
+      },
+      answer_options: [makeOption('o1', 'Alpha'), makeOption('o2', 'Beta')],
     })
     render(<QuestionPreview question={question} />)
     const container = screen.getByTestId('preview-dropdown')
@@ -348,7 +349,11 @@ describe('MatrixPreview', () => {
   })
 
   it('renders matrix_dropdown with select cells', () => {
-    const subq: BuilderQuestion = makeQuestion({ id: 'sub-1', title: 'Row 1', settings: getDefaultSettings('short_text') })
+    const subq: BuilderQuestion = makeQuestion({
+      id: 'sub-1',
+      title: 'Row 1',
+      settings: getDefaultSettings('short_text'),
+    })
     const question = makeQuestion({
       question_type: 'matrix_dropdown',
       settings: { ...getDefaultSettings('matrix_dropdown'), cell_type: 'dropdown' },
@@ -366,9 +371,9 @@ describe('MatrixPreview', () => {
     const question = makeQuestion({
       question_type: 'matrix_dynamic',
       settings: {
-        row_count: 2,
-        min_row_count: 0,
-        max_row_count: null,
+        default_row_count: 2,
+        min_rows: 0,
+        max_rows: null,
         add_row_text: 'Add row',
         remove_row_text: 'Remove',
         cell_type: 'text',
@@ -390,7 +395,14 @@ describe('ScalarPreview', () => {
   it('renders disabled number input for numeric type', () => {
     const question = makeQuestion({
       question_type: 'numeric',
-      settings: { min: 0, max: 100, decimal_places: 2, placeholder: 'Enter number', prefix: '$', suffix: 'USD' },
+      settings: {
+        min: 0,
+        max: 100,
+        decimal_places: 2,
+        placeholder: 'Enter number',
+        prefix: '$',
+        suffix: 'USD',
+      },
     })
     render(<QuestionPreview question={question} />)
     const container = screen.getByTestId('preview-numeric')
@@ -427,7 +439,12 @@ describe('ScalarPreview', () => {
   it('renders boolean as radio buttons when render_as is radio', () => {
     const question = makeQuestion({
       question_type: 'boolean',
-      settings: { true_label: 'True', false_label: 'False', default_value: null, render_as: 'radio' },
+      settings: {
+        true_label: 'True',
+        false_label: 'False',
+        default_value: null,
+        render_as: 'radio',
+      },
     })
     render(<QuestionPreview question={question} />)
     const container = screen.getByTestId('preview-boolean')
@@ -438,7 +455,13 @@ describe('ScalarPreview', () => {
   it('renders date input for date type', () => {
     const question = makeQuestion({
       question_type: 'date',
-      settings: { min_date: null, max_date: null, include_time: false, date_format: 'YYYY-MM-DD', placeholder: null },
+      settings: {
+        min_date: null,
+        max_date: null,
+        include_time: false,
+        date_format: 'YYYY-MM-DD',
+        placeholder: null,
+      },
     })
     render(<QuestionPreview question={question} />)
     expect(screen.getByTestId('preview-date')).toBeInTheDocument()
@@ -449,7 +472,13 @@ describe('ScalarPreview', () => {
   it('renders datetime-local input when include_time is true', () => {
     const question = makeQuestion({
       question_type: 'date',
-      settings: { min_date: null, max_date: null, include_time: true, date_format: 'YYYY-MM-DD HH:mm', placeholder: null },
+      settings: {
+        min_date: null,
+        max_date: null,
+        include_time: true,
+        date_format: 'YYYY-MM-DD HH:mm',
+        placeholder: null,
+      },
     })
     render(<QuestionPreview question={question} />)
     expect(screen.getByTestId('preview-date-input')).toHaveAttribute('type', 'datetime-local')
@@ -465,7 +494,11 @@ describe('SpecialPreview', () => {
     const question = makeQuestion({
       question_type: 'ranking',
       settings: { randomize_initial_order: false },
-      answer_options: [makeOption('o1', 'First'), makeOption('o2', 'Second'), makeOption('o3', 'Third')],
+      answer_options: [
+        makeOption('o1', 'First'),
+        makeOption('o2', 'Second'),
+        makeOption('o3', 'Third'),
+      ],
     })
     render(<QuestionPreview question={question} />)
     const container = screen.getByTestId('preview-ranking')
@@ -482,7 +515,14 @@ describe('SpecialPreview', () => {
   it('renders image picker with option thumbnails', () => {
     const question = makeQuestion({
       question_type: 'image_picker',
-      settings: { multi_select: false, min_choices: null, max_choices: null, image_width: 200, image_height: 150, show_labels: true },
+      settings: {
+        multi_select: false,
+        min_choices: null,
+        max_choices: null,
+        image_width: 200,
+        image_height: 150,
+        show_labels: true,
+      },
       answer_options: [makeOption('o1', 'Image A'), makeOption('o2', 'Image B')],
     })
     render(<QuestionPreview question={question} />)
@@ -504,7 +544,12 @@ describe('SpecialPreview', () => {
   it('renders expression placeholder with expression code', () => {
     const question = makeQuestion({
       question_type: 'expression',
-      settings: { expression: 'Q1 + Q2', display_format: 'number', currency: null, decimal_places: 0 },
+      settings: {
+        expression: 'Q1 + Q2',
+        display_format: 'number',
+        currency: null,
+        decimal_places: 0,
+      },
     })
     render(<QuestionPreview question={question} />)
     expect(screen.getByTestId('preview-expression')).toBeInTheDocument()

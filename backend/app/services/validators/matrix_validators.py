@@ -1,8 +1,12 @@
-"""Validators for matrix question types: matrix, matrix_dropdown, matrix_dynamic."""
+"""Validators for matrix question types: matrix, matrix_single, matrix_multiple, matrix_dropdown, matrix_dynamic."""
 
 from typing import Any
 
 from app.utils.errors import UnprocessableError
+
+
+# Valid cell types for matrix_dropdown column_types
+_VALID_CELL_TYPES = frozenset({"text", "number", "boolean", "dropdown", "checkbox", "rating", "radio"})
 
 
 # ---------------------------------------------------------------------------
@@ -23,6 +27,9 @@ def _validate_common_matrix_settings(settings: dict[str, Any]) -> None:
     if "randomize_rows" in settings and not isinstance(settings["randomize_rows"], bool):
         raise UnprocessableError("settings.randomize_rows must be a boolean")
 
+    if "transpose" in settings and not isinstance(settings["transpose"], bool):
+        raise UnprocessableError("settings.transpose must be a boolean")
+
 
 def validate_matrix_settings(
     settings: dict[str, Any] | None,
@@ -39,6 +46,33 @@ def validate_matrix_settings(
 
     if not answer_options:
         raise UnprocessableError("matrix question requires at least one answer option (column)")
+
+    if settings is None:
+        return
+
+    _validate_common_matrix_settings(settings)
+
+
+def validate_matrix_multiple_settings(
+    settings: dict[str, Any] | None,
+    answer_options: list[Any],
+    subquestions: list[Any],
+) -> None:
+    """Validate settings for matrix_multiple questions.
+
+    Requires at least one subquestion (row) and one answer_option (column).
+    Optional fields: alternate_rows (bool), is_all_rows_required (bool),
+    randomize_rows (bool), transpose (bool).
+    """
+    if not subquestions:
+        raise UnprocessableError(
+            "matrix_multiple question requires at least one subquestion (row)"
+        )
+
+    if not answer_options:
+        raise UnprocessableError(
+            "matrix_multiple question requires at least one answer option (column)"
+        )
 
     if settings is None:
         return
@@ -85,6 +119,11 @@ def validate_matrix_dropdown_settings(
                 raise UnprocessableError(
                     f"settings.column_types['{col_code}'] must be a string (type name)"
                 )
+            if col_type not in _VALID_CELL_TYPES:
+                raise UnprocessableError(
+                    f"settings.column_types['{col_code}'] value '{col_type}' is not a valid cell type; "
+                    f"valid types: {', '.join(sorted(_VALID_CELL_TYPES))}"
+                )
 
 
 def validate_matrix_dynamic_settings(
@@ -94,16 +133,12 @@ def validate_matrix_dynamic_settings(
 ) -> None:
     """Validate settings for matrix_dynamic questions.
 
-    Requires at least one subquestion (row template) and one answer_option (column).
+    Requires at least one answer_option (column). Subquestions are not used —
+    rows are added dynamically by respondents at response time.
     Optional fields: min_rows (int >= 1), max_rows (int >= min_rows),
     add_row_text (str), remove_row_text (str),
     default_row_count (int within [min_rows, max_rows]).
     """
-    if not subquestions:
-        raise UnprocessableError(
-            "matrix_dynamic question requires at least one subquestion (row)"
-        )
-
     if not answer_options:
         raise UnprocessableError(
             "matrix_dynamic question requires at least one answer option (column)"
@@ -153,6 +188,50 @@ def validate_matrix_dynamic_settings(
 # ---------------------------------------------------------------------------
 
 
+def _validate_cell_value(sq_code: str, col_code: str, cell_type: str, cell_value: Any) -> None:
+    """Validate a single cell value against its declared column type."""
+    location = f"subquestion '{sq_code}', column '{col_code}'"
+    if cell_type == "text":
+        if not isinstance(cell_value, str):
+            raise UnprocessableError(f"Cell value for {location} must be a string (cell_type=text)")
+    elif cell_type == "number":
+        if not isinstance(cell_value, (int, float)) or isinstance(cell_value, bool):
+            raise UnprocessableError(
+                f"Cell value for {location} must be a number (cell_type=number)"
+            )
+    elif cell_type == "boolean":
+        if not isinstance(cell_value, bool):
+            raise UnprocessableError(
+                f"Cell value for {location} must be a boolean (cell_type=boolean)"
+            )
+    elif cell_type in ("dropdown", "radio"):
+        if not isinstance(cell_value, str):
+            raise UnprocessableError(
+                f"Cell value for {location} must be a string option code (cell_type={cell_type})"
+            )
+    elif cell_type == "checkbox":
+        if not isinstance(cell_value, list) or not all(isinstance(v, str) for v in cell_value):
+            raise UnprocessableError(
+                f"Cell value for {location} must be a list of strings (cell_type=checkbox)"
+            )
+    elif cell_type == "rating":
+        if isinstance(cell_value, bool):
+            raise UnprocessableError(
+                f"Cell value for {location} must be a number (cell_type=rating)"
+            )
+        if isinstance(cell_value, str):
+            try:
+                float(cell_value)
+            except ValueError:
+                raise UnprocessableError(
+                    f"Cell value for {location} must be a number (cell_type=rating)"
+                )
+        elif not isinstance(cell_value, (int, float)):
+            raise UnprocessableError(
+                f"Cell value for {location} must be a number (cell_type=rating)"
+            )
+
+
 def validate_matrix_answer(answer: dict[str, Any], question: Any, answer_options: list[Any], subquestions: list[Any]) -> None:
     """Validate a submitted answer for a matrix question.
 
@@ -189,13 +268,14 @@ def validate_matrix_answer(answer: dict[str, Any], question: Any, answer_options
         raise UnprocessableError("An answer is required for this question")
 
 
-def validate_matrix_dropdown_answer(
+def validate_matrix_multiple_answer(
     answer: dict[str, Any], question: Any, answer_options: list[Any], subquestions: list[Any]
 ) -> None:
-    """Validate a submitted answer for a matrix_dropdown question.
+    """Validate a submitted answer for a matrix_multiple question.
 
-    Same structure as matrix: {"value": {"SQ001": "col_value", ...}}.
-    Each column value is validated against the column_types from settings (if defined).
+    answer: {"value": {"SQ001": ["A1", "A2"], "SQ002": ["A3"]}}
+    Each key is a subquestion code; each value is a list of answer option codes.
+    is_all_rows_required enforces that every subquestion has at least one selection.
     """
     settings = question.settings or {}
     is_all_rows_required = settings.get("is_all_rows_required", False)
@@ -203,19 +283,75 @@ def validate_matrix_dropdown_answer(
     value = answer.get("value")
     if not isinstance(value, dict):
         raise UnprocessableError(
-            "matrix_dropdown answer 'value' must be a dict mapping subquestion codes to column values"
+            "matrix_multiple answer 'value' must be a dict mapping subquestion codes to lists of option codes"
         )
 
     subquestion_codes = {sq.code for sq in subquestions}
     option_codes = {opt.code for opt in answer_options}
 
-    for sq_code, col_value in value.items():
+    for sq_code, selections in value.items():
         if sq_code not in subquestion_codes:
             raise UnprocessableError(f"'{sq_code}' is not a valid subquestion code")
-        if col_value not in option_codes:
+        if not isinstance(selections, list):
             raise UnprocessableError(
-                f"'{col_value}' is not a valid answer option code for subquestion '{sq_code}'"
+                f"matrix_multiple answer value for subquestion '{sq_code}' must be a list of option codes"
             )
+        for opt_code in selections:
+            if opt_code not in option_codes:
+                raise UnprocessableError(
+                    f"'{opt_code}' is not a valid answer option code for subquestion '{sq_code}'"
+                )
+
+    if is_all_rows_required:
+        for sq_code in subquestion_codes:
+            if sq_code not in value or not value[sq_code]:
+                raise UnprocessableError(
+                    f"All rows are required; subquestion '{sq_code}' has no selection"
+                )
+
+    if question.is_required and not value:
+        raise UnprocessableError("An answer is required for this question")
+
+
+def validate_matrix_dropdown_answer(
+    answer: dict[str, Any], question: Any, answer_options: list[Any], subquestions: list[Any]
+) -> None:
+    """Validate a submitted answer for a matrix_dropdown question.
+
+    answer: {"value": {"SQ001": {"col1": "val1", "col2": "val2"}, ...}}
+    Each key is a subquestion code (row); each value is a dict mapping column codes to cell values.
+    Cell values are validated against column_types from settings when declared.
+    is_all_rows_required enforces that every subquestion has an answer.
+    """
+    settings = question.settings or {}
+    is_all_rows_required = settings.get("is_all_rows_required", False)
+    column_types: dict[str, str] = settings.get("column_types") or {}
+
+    value = answer.get("value")
+    if not isinstance(value, dict):
+        raise UnprocessableError(
+            "matrix_dropdown answer 'value' must be a dict mapping subquestion codes to column value dicts"
+        )
+
+    subquestion_codes = {sq.code for sq in subquestions}
+    option_codes = {opt.code for opt in answer_options}
+
+    for sq_code, col_values in value.items():
+        if sq_code not in subquestion_codes:
+            raise UnprocessableError(f"'{sq_code}' is not a valid subquestion code")
+        if not isinstance(col_values, dict):
+            raise UnprocessableError(
+                f"matrix_dropdown answer value for subquestion '{sq_code}' must be a dict mapping column codes to cell values"
+            )
+        for col_code, cell_value in col_values.items():
+            if col_code not in option_codes:
+                raise UnprocessableError(
+                    f"'{col_code}' is not a valid column code for subquestion '{sq_code}'"
+                )
+            # Cell-level type validation against declared column_types
+            cell_type = column_types.get(col_code)
+            if cell_type is not None:
+                _validate_cell_value(sq_code, col_code, cell_type, cell_value)
 
     if is_all_rows_required:
         for sq_code in subquestion_codes:
@@ -233,21 +369,21 @@ def validate_matrix_dynamic_answer(
 ) -> None:
     """Validate a submitted answer for a matrix_dynamic question.
 
-    answer: {"values": [{"col1": "val1", "col2": "val2"}, ...]}
+    answer: {"value": [{"col1": "val1", "col2": "val2"}, ...]}
     Each element is a row; each key is a column code (answer_option code), each value is a cell value.
-    settings.min_rows <= len(values) <= settings.max_rows.
+    settings.min_rows <= len(value) <= settings.max_rows.
     """
     settings = question.settings or {}
     min_rows = settings.get("min_rows", 0)
     max_rows = settings.get("max_rows")
 
-    values = answer.get("values")
+    values = answer.get("value")
     if not isinstance(values, list):
-        raise UnprocessableError("matrix_dynamic answer 'values' must be a list of row objects")
+        raise UnprocessableError("matrix_dynamic answer 'value' must be a list of row objects")
 
     for i, row in enumerate(values):
         if not isinstance(row, dict):
-            raise UnprocessableError(f"matrix_dynamic answer 'values[{i}]' must be a dict")
+            raise UnprocessableError(f"matrix_dynamic answer 'value[{i}]' must be a dict")
 
     if question.is_required and not values:
         raise UnprocessableError("An answer is required for this question")

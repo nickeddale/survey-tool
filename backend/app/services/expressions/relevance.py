@@ -57,6 +57,20 @@ __all__ = [
 _CACHE: Dict[tuple, "RelevanceResult"] = {}
 
 
+def _make_hashable(v: Any) -> Any:
+    """Recursively convert a value to a hashable form for use in cache keys.
+
+    - dicts become frozensets of (key, _make_hashable(value)) pairs
+    - lists become tuples of recursively converted items
+    - all other values are returned unchanged
+    """
+    if isinstance(v, dict):
+        return frozenset((k, _make_hashable(val)) for k, val in v.items())
+    elif isinstance(v, list):
+        return tuple(_make_hashable(item) for item in v)
+    return v
+
+
 # ---------------------------------------------------------------------------
 # Error types
 # ---------------------------------------------------------------------------
@@ -276,7 +290,8 @@ def evaluate_relevance(
     # Cache lookup
     # ------------------------------------------------------------------
     cache_key = (survey.id, frozenset(
-        (k, tuple(v) if isinstance(v, list) else v) for k, v in answers.items()
+        (k, _make_hashable(v))
+        for k, v in answers.items()
     ))
     if cache_key in _CACHE:
         return _CACHE[cache_key]

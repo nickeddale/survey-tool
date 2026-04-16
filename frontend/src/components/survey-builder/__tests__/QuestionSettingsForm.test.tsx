@@ -17,10 +17,7 @@ import { ChoiceSettingsForm } from '../settings/ChoiceSettingsForm'
 import { MatrixSettingsForm } from '../settings/MatrixSettingsForm'
 import { ScalarSettingsForm } from '../settings/ScalarSettingsForm'
 import { SpecialSettingsForm } from '../settings/SpecialSettingsForm'
-import {
-  getDefaultSettings,
-  getCompatibleSettings,
-} from '../../../types/questionSettings'
+import { getDefaultSettings, getCompatibleSettings } from '../../../types/questionSettings'
 import type {
   ShortTextSettings,
   RadioSettings,
@@ -48,11 +45,24 @@ afterEach(() => {
 
 describe('getDefaultSettings', () => {
   const allTypes = [
-    'short_text', 'long_text', 'huge_text',
-    'single_choice', 'dropdown', 'multiple_choice', 'ranking', 'image_picker',
-    'matrix', 'matrix_dropdown', 'matrix_dynamic',
-    'numeric', 'rating', 'boolean', 'date',
-    'file_upload', 'expression', 'html',
+    'short_text',
+    'long_text',
+    'huge_text',
+    'single_choice',
+    'dropdown',
+    'multiple_choice',
+    'ranking',
+    'image_picker',
+    'matrix',
+    'matrix_dropdown',
+    'matrix_dynamic',
+    'numeric',
+    'rating',
+    'boolean',
+    'date',
+    'file_upload',
+    'expression',
+    'html',
   ]
 
   it.each(allTypes)('returns an object for %s', (type) => {
@@ -69,7 +79,11 @@ describe('getDefaultSettings', () => {
   })
 
   it('long_text defaults are correct', () => {
-    const d = getDefaultSettings('long_text') as { placeholder: null; max_length: number; rows: number }
+    const d = getDefaultSettings('long_text') as {
+      placeholder: null
+      max_length: number
+      rows: number
+    }
     expect(d.max_length).toBe(5000)
     expect(d.rows).toBe(4)
   })
@@ -140,9 +154,9 @@ describe('getDefaultSettings', () => {
     expect(d.is_all_rows_required).toBe(false)
   })
 
-  it('matrix_dynamic defaults include row_count=1', () => {
+  it('matrix_dynamic defaults include default_row_count=1', () => {
     const d = getDefaultSettings('matrix_dynamic') as MatrixDynamicSettings
-    expect(d.row_count).toBe(1)
+    expect(d.default_row_count).toBe(1)
     expect(d.add_row_text).toBe('Add row')
   })
 })
@@ -164,7 +178,12 @@ describe('getCompatibleSettings', () => {
   })
 
   it('preserves has_other when switching between choice types', () => {
-    const oldSettings = { has_other: true, other_text: 'Custom other', randomize: false, columns: 2 }
+    const oldSettings = {
+      has_other: true,
+      other_text: 'Custom other',
+      randomize: false,
+      columns: 2,
+    }
     const result = getCompatibleSettings('single_choice', 'multiple_choice', oldSettings)
     expect(result.has_other).toBe(true)
     expect(result.other_text).toBe('Custom other')
@@ -194,7 +213,14 @@ describe('getCompatibleSettings', () => {
   })
 
   it('preserves min/max when switching between numeric and rating', () => {
-    const oldSettings = { min: 0, max: 100, decimal_places: 2, placeholder: null, prefix: null, suffix: null }
+    const oldSettings = {
+      min: 0,
+      max: 100,
+      decimal_places: 2,
+      placeholder: null,
+      prefix: null,
+      suffix: null,
+    }
     const result = getCompatibleSettings('numeric', 'rating', oldSettings)
     expect(result.min).toBe(0)
     expect(result.max).toBe(100)
@@ -218,7 +244,7 @@ describe('TextSettingsForm', () => {
         type="short_text"
         settings={getDefaultSettings('short_text') as ShortTextSettings}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('text-setting-placeholder')).toBeInTheDocument()
     expect(screen.getByTestId('text-setting-max-length')).toBeInTheDocument()
@@ -231,9 +257,11 @@ describe('TextSettingsForm', () => {
     render(
       <TextSettingsForm
         type="long_text"
-        settings={getDefaultSettings('long_text') as Parameters<typeof TextSettingsForm>[0]['settings']}
+        settings={
+          getDefaultSettings('long_text') as Parameters<typeof TextSettingsForm>[0]['settings']
+        }
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('text-setting-rows')).toBeInTheDocument()
     expect(screen.queryByTestId('text-setting-input-type')).not.toBeInTheDocument()
@@ -244,9 +272,11 @@ describe('TextSettingsForm', () => {
     render(
       <TextSettingsForm
         type="huge_text"
-        settings={getDefaultSettings('huge_text') as Parameters<typeof TextSettingsForm>[0]['settings']}
+        settings={
+          getDefaultSettings('huge_text') as Parameters<typeof TextSettingsForm>[0]['settings']
+        }
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('text-setting-rows')).toBeInTheDocument()
     expect(screen.getByTestId('text-setting-rich-text')).toBeInTheDocument()
@@ -261,14 +291,16 @@ describe('TextSettingsForm', () => {
         type="short_text"
         settings={getDefaultSettings('short_text') as ShortTextSettings}
         onChange={onChange}
-      />,
+      />
     )
 
     await act(async () => {
       await user.type(screen.getByTestId('text-setting-placeholder'), 'Test placeholder')
     })
 
-    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ placeholder: expect.any(String) }))
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ placeholder: expect.any(String) })
+    )
   })
 
   it('calls onChange when rich_text is toggled', async () => {
@@ -277,9 +309,11 @@ describe('TextSettingsForm', () => {
     render(
       <TextSettingsForm
         type="huge_text"
-        settings={getDefaultSettings('huge_text') as Parameters<typeof TextSettingsForm>[0]['settings']}
+        settings={
+          getDefaultSettings('huge_text') as Parameters<typeof TextSettingsForm>[0]['settings']
+        }
         onChange={onChange}
-      />,
+      />
     )
 
     await act(async () => {
@@ -301,7 +335,7 @@ describe('ChoiceSettingsForm', () => {
         type="single_choice"
         settings={getDefaultSettings('single_choice') as RadioSettings}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('choice-setting-has-other')).toBeInTheDocument()
     expect(screen.getByTestId('choice-setting-randomize')).toBeInTheDocument()
@@ -314,9 +348,11 @@ describe('ChoiceSettingsForm', () => {
     render(
       <ChoiceSettingsForm
         type="dropdown"
-        settings={getDefaultSettings('dropdown') as Parameters<typeof ChoiceSettingsForm>[0]['settings']}
+        settings={
+          getDefaultSettings('dropdown') as Parameters<typeof ChoiceSettingsForm>[0]['settings']
+        }
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('choice-setting-searchable')).toBeInTheDocument()
     expect(screen.getByTestId('choice-setting-placeholder')).toBeInTheDocument()
@@ -330,7 +366,7 @@ describe('ChoiceSettingsForm', () => {
         type="multiple_choice"
         settings={getDefaultSettings('multiple_choice') as CheckboxSettings}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('choice-setting-min-choices')).toBeInTheDocument()
     expect(screen.getByTestId('choice-setting-max-choices')).toBeInTheDocument()
@@ -340,10 +376,13 @@ describe('ChoiceSettingsForm', () => {
 
   it('shows other_text field when has_other is enabled', async () => {
     const user = userEvent.setup()
-    const settings: CheckboxSettings = { ...getDefaultSettings('multiple_choice') as CheckboxSettings, has_other: false }
+    const settings: CheckboxSettings = {
+      ...(getDefaultSettings('multiple_choice') as CheckboxSettings),
+      has_other: false,
+    }
     const onChange = vi.fn()
     const { rerender } = render(
-      <ChoiceSettingsForm type="multiple_choice" settings={settings} onChange={onChange} />,
+      <ChoiceSettingsForm type="multiple_choice" settings={settings} onChange={onChange} />
     )
 
     // Initially no other_text input
@@ -362,7 +401,7 @@ describe('ChoiceSettingsForm', () => {
         type="multiple_choice"
         settings={{ ...settings, has_other: true }}
         onChange={onChange}
-      />,
+      />
     )
 
     expect(screen.getByTestId('choice-setting-other-text')).toBeInTheDocument()
@@ -370,10 +409,13 @@ describe('ChoiceSettingsForm', () => {
 
   it('shows select_all_text when select_all is enabled', async () => {
     const user = userEvent.setup()
-    const settings: CheckboxSettings = { ...getDefaultSettings('multiple_choice') as CheckboxSettings, select_all: false }
+    const settings: CheckboxSettings = {
+      ...(getDefaultSettings('multiple_choice') as CheckboxSettings),
+      select_all: false,
+    }
     const onChange = vi.fn()
     const { rerender } = render(
-      <ChoiceSettingsForm type="multiple_choice" settings={settings} onChange={onChange} />,
+      <ChoiceSettingsForm type="multiple_choice" settings={settings} onChange={onChange} />
     )
 
     expect(screen.queryByTestId('choice-setting-select-all-text')).not.toBeInTheDocument()
@@ -387,7 +429,7 @@ describe('ChoiceSettingsForm', () => {
         type="multiple_choice"
         settings={{ ...settings, select_all: true }}
         onChange={onChange}
-      />,
+      />
     )
 
     expect(screen.getByTestId('choice-setting-select-all-text')).toBeInTheDocument()
@@ -405,7 +447,7 @@ describe('MatrixSettingsForm', () => {
         type="matrix"
         settings={getDefaultSettings('matrix') as MatrixSettings}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('matrix-setting-alternate-rows')).toBeInTheDocument()
     expect(screen.getByTestId('matrix-setting-all-rows-required')).toBeInTheDocument()
@@ -418,9 +460,13 @@ describe('MatrixSettingsForm', () => {
     render(
       <MatrixSettingsForm
         type="matrix_dropdown"
-        settings={getDefaultSettings('matrix_dropdown') as Parameters<typeof MatrixSettingsForm>[0]['settings']}
+        settings={
+          getDefaultSettings('matrix_dropdown') as Parameters<
+            typeof MatrixSettingsForm
+          >[0]['settings']
+        }
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('matrix-setting-cell-type')).toBeInTheDocument()
     expect(screen.queryByTestId('matrix-setting-row-count')).not.toBeInTheDocument()
@@ -432,7 +478,7 @@ describe('MatrixSettingsForm', () => {
         type="matrix_dynamic"
         settings={getDefaultSettings('matrix_dynamic') as MatrixDynamicSettings}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('matrix-setting-cell-type')).toBeInTheDocument()
     expect(screen.getByTestId('matrix-setting-row-count')).toBeInTheDocument()
@@ -456,7 +502,7 @@ describe('ScalarSettingsForm', () => {
         type="numeric"
         settings={getDefaultSettings('numeric') as NumericSettings}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('scalar-setting-min')).toBeInTheDocument()
     expect(screen.getByTestId('scalar-setting-max')).toBeInTheDocument()
@@ -471,7 +517,7 @@ describe('ScalarSettingsForm', () => {
         type="rating"
         settings={getDefaultSettings('rating') as RatingSettings}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('scalar-setting-icon')).toBeInTheDocument()
     expect(screen.getByTestId('scalar-setting-min')).toBeInTheDocument()
@@ -485,7 +531,7 @@ describe('ScalarSettingsForm', () => {
         type="boolean"
         settings={getDefaultSettings('boolean') as BooleanSettings}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('scalar-setting-true-label')).toBeInTheDocument()
     expect(screen.getByTestId('scalar-setting-false-label')).toBeInTheDocument()
@@ -499,7 +545,7 @@ describe('ScalarSettingsForm', () => {
         type="date"
         settings={getDefaultSettings('date') as DateSettings}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('scalar-setting-min-date')).toBeInTheDocument()
     expect(screen.getByTestId('scalar-setting-max-date')).toBeInTheDocument()
@@ -515,7 +561,7 @@ describe('ScalarSettingsForm', () => {
         type="rating"
         settings={getDefaultSettings('rating') as RatingSettings}
         onChange={onChange}
-      />,
+      />
     )
 
     await act(async () => {
@@ -537,7 +583,7 @@ describe('SpecialSettingsForm', () => {
         type="ranking"
         settings={getDefaultSettings('ranking') as RankingSettings}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('special-setting-randomize-initial-order')).toBeInTheDocument()
   })
@@ -548,7 +594,7 @@ describe('SpecialSettingsForm', () => {
         type="image_picker"
         settings={getDefaultSettings('image_picker') as ImagePickerSettings}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('special-setting-multi-select')).toBeInTheDocument()
     expect(screen.getByTestId('special-setting-image-width')).toBeInTheDocument()
@@ -559,10 +605,11 @@ describe('SpecialSettingsForm', () => {
   })
 
   it('shows min/max choices for image_picker when multi_select is true', () => {
-    const settings = { ...getDefaultSettings('image_picker') as ImagePickerSettings, multi_select: true }
-    render(
-      <SpecialSettingsForm type="image_picker" settings={settings} onChange={() => {}} />,
-    )
+    const settings = {
+      ...(getDefaultSettings('image_picker') as ImagePickerSettings),
+      multi_select: true,
+    }
+    render(<SpecialSettingsForm type="image_picker" settings={settings} onChange={() => {}} />)
     expect(screen.getByTestId('special-setting-min-choices')).toBeInTheDocument()
     expect(screen.getByTestId('special-setting-max-choices')).toBeInTheDocument()
   })
@@ -573,7 +620,7 @@ describe('SpecialSettingsForm', () => {
         type="file_upload"
         settings={getDefaultSettings('file_upload') as FileUploadSettings}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('special-setting-max-size-mb')).toBeInTheDocument()
     expect(screen.getByTestId('special-setting-max-files')).toBeInTheDocument()
@@ -586,17 +633,18 @@ describe('SpecialSettingsForm', () => {
         type="expression"
         settings={getDefaultSettings('expression') as ExpressionSettings}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('special-setting-expression')).toBeInTheDocument()
     expect(screen.getByTestId('special-setting-display-format')).toBeInTheDocument()
   })
 
   it('shows currency field for expression when format is currency', () => {
-    const settings = { ...getDefaultSettings('expression') as ExpressionSettings, display_format: 'currency' as const }
-    render(
-      <SpecialSettingsForm type="expression" settings={settings} onChange={() => {}} />,
-    )
+    const settings = {
+      ...(getDefaultSettings('expression') as ExpressionSettings),
+      display_format: 'currency' as const,
+    }
+    render(<SpecialSettingsForm type="expression" settings={settings} onChange={() => {}} />)
     expect(screen.getByTestId('special-setting-currency')).toBeInTheDocument()
     expect(screen.getByTestId('special-setting-decimal-places')).toBeInTheDocument()
   })
@@ -607,7 +655,7 @@ describe('SpecialSettingsForm', () => {
         type="html"
         settings={getDefaultSettings('html') as HtmlSettings}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('special-setting-html-content')).toBeInTheDocument()
   })
@@ -624,7 +672,7 @@ describe('QuestionSettingsForm', () => {
         type="short_text"
         settings={getDefaultSettings('short_text')}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('text-settings-form')).toBeInTheDocument()
   })
@@ -635,7 +683,7 @@ describe('QuestionSettingsForm', () => {
         type="single_choice"
         settings={getDefaultSettings('single_choice')}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('choice-settings-form')).toBeInTheDocument()
   })
@@ -646,7 +694,7 @@ describe('QuestionSettingsForm', () => {
         type="matrix"
         settings={getDefaultSettings('matrix')}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('matrix-settings-form')).toBeInTheDocument()
   })
@@ -657,18 +705,14 @@ describe('QuestionSettingsForm', () => {
         type="numeric"
         settings={getDefaultSettings('numeric')}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('scalar-settings-form')).toBeInTheDocument()
   })
 
   it('renders special settings form for html', () => {
     render(
-      <QuestionSettingsForm
-        type="html"
-        settings={getDefaultSettings('html')}
-        onChange={() => {}}
-      />,
+      <QuestionSettingsForm type="html" settings={getDefaultSettings('html')} onChange={() => {}} />
     )
     expect(screen.getByTestId('special-settings-form')).toBeInTheDocument()
   })
@@ -679,7 +723,7 @@ describe('QuestionSettingsForm', () => {
         type="unknown_type"
         settings={{} as Parameters<typeof QuestionSettingsForm>[0]['settings']}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('settings-form-no-settings')).toBeInTheDocument()
   })
@@ -690,7 +734,7 @@ describe('QuestionSettingsForm', () => {
         type="short_text"
         settings={getDefaultSettings('short_text')}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.getByTestId('text-settings-form')).toBeInTheDocument()
 
@@ -699,7 +743,7 @@ describe('QuestionSettingsForm', () => {
         type="single_choice"
         settings={getDefaultSettings('single_choice')}
         onChange={() => {}}
-      />,
+      />
     )
     expect(screen.queryByTestId('text-settings-form')).not.toBeInTheDocument()
     expect(screen.getByTestId('choice-settings-form')).toBeInTheDocument()

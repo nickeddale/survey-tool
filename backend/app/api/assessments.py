@@ -120,10 +120,14 @@ async def create_assessment(
         raise UnprocessableError("group_id is required when scope is 'group'.")
     if payload.scope != "group" and payload.group_id is not None:
         raise UnprocessableError("group_id must be null when scope is not 'group'.")
-    if payload.scope == "question" and payload.question_id is None:
-        raise UnprocessableError("question_id is required when scope is 'question'.")
-    if payload.scope != "question" and payload.question_id is not None:
-        raise UnprocessableError("question_id must be null when scope is not 'question'.")
+    if payload.scope in ("question", "subquestion") and payload.question_id is None:
+        raise UnprocessableError("question_id is required when scope is 'question' or 'subquestion'.")
+    if payload.scope not in ("question", "subquestion") and payload.question_id is not None:
+        raise UnprocessableError("question_id must be null when scope is not 'question' or 'subquestion'.")
+    if payload.scope == "subquestion" and payload.subquestion_id is None:
+        raise UnprocessableError("subquestion_id is required when scope is 'subquestion'.")
+    if payload.scope != "subquestion" and payload.subquestion_id is not None:
+        raise UnprocessableError("subquestion_id must be null when scope is not 'subquestion'.")
 
     assessment = Assessment(
         id=uuid.uuid4(),
@@ -132,6 +136,7 @@ async def create_assessment(
         scope=payload.scope,
         group_id=payload.group_id,
         question_id=payload.question_id,
+        subquestion_id=payload.subquestion_id,
         min_score=payload.min_score,
         max_score=payload.max_score,
         message=payload.message,
@@ -236,15 +241,20 @@ async def update_assessment(
     effective_scope = update_fields.get("scope", assessment.scope)
     effective_group_id = update_fields.get("group_id", assessment.group_id)
     effective_question_id = update_fields.get("question_id", assessment.question_id)
+    effective_subquestion_id = update_fields.get("subquestion_id", assessment.subquestion_id)
 
     if effective_scope == "group" and effective_group_id is None:
         raise UnprocessableError("group_id is required when scope is 'group'.")
     if effective_scope != "group" and effective_group_id is not None:
         raise UnprocessableError("group_id must be null when scope is not 'group'.")
-    if effective_scope == "question" and effective_question_id is None:
-        raise UnprocessableError("question_id is required when scope is 'question'.")
-    if effective_scope != "question" and effective_question_id is not None:
-        raise UnprocessableError("question_id must be null when scope is not 'question'.")
+    if effective_scope in ("question", "subquestion") and effective_question_id is None:
+        raise UnprocessableError("question_id is required when scope is 'question' or 'subquestion'.")
+    if effective_scope not in ("question", "subquestion") and effective_question_id is not None:
+        raise UnprocessableError("question_id must be null when scope is not 'question' or 'subquestion'.")
+    if effective_scope == "subquestion" and effective_subquestion_id is None:
+        raise UnprocessableError("subquestion_id is required when scope is 'subquestion'.")
+    if effective_scope != "subquestion" and effective_subquestion_id is not None:
+        raise UnprocessableError("subquestion_id must be null when scope is not 'subquestion'.")
 
     for field, value in update_fields.items():
         setattr(assessment, field, value)

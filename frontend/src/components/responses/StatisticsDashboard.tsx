@@ -67,7 +67,9 @@ function MetricCard({ label, value, subtitle, testId }: MetricCardProps) {
   return (
     <Card data-testid={testId}>
       <CardContent className="p-5">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">{label}</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+          {label}
+        </p>
         <p className="text-2xl font-bold text-foreground">{value}</p>
         {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
       </CardContent>
@@ -149,7 +151,10 @@ function NumericQuestionSummary({ stats }: { stats: NumericQuestionStats }) {
   return (
     <div className="grid grid-cols-3 gap-3 text-center" data-testid="numeric-stats">
       {[
-        { label: 'Mean', value: stats.mean !== null ? String(Math.round(stats.mean * 100) / 100) : '—' },
+        {
+          label: 'Mean',
+          value: stats.mean !== null ? String(Math.round(stats.mean * 100) / 100) : '—',
+        },
         { label: 'Min', value: stats.min !== null ? String(stats.min) : '—' },
         { label: 'Max', value: stats.max !== null ? String(stats.max) : '—' },
       ].map(({ label, value }) => (
@@ -168,7 +173,10 @@ function RatingQuestionSummary({ stats }: { stats: RatingQuestionStats }) {
     <div data-testid="rating-stats">
       {stats.average !== null && (
         <p className="text-sm text-muted-foreground mb-2">
-          Average: <span className="font-semibold text-foreground">{Math.round(stats.average * 10) / 10}</span>
+          Average:{' '}
+          <span className="font-semibold text-foreground">
+            {Math.round(stats.average * 10) / 10}
+          </span>
         </p>
       )}
       <div className="space-y-1.5">
@@ -210,9 +218,12 @@ function QuestionStatCard({ question }: { question: QuestionStatistics }) {
             {question.question_code}
           </span>
           <div className="min-w-0">
-            <CardTitle className="text-sm font-medium leading-snug">{question.question_title}</CardTitle>
+            <CardTitle className="text-sm font-medium leading-snug">
+              {question.question_title}
+            </CardTitle>
             <p className="text-xs text-muted-foreground mt-0.5">
-              {question.stats.response_count} response{question.stats.response_count !== 1 ? 's' : ''}
+              {question.stats.response_count} response
+              {question.stats.response_count !== 1 ? 's' : ''}
             </p>
           </div>
         </div>
@@ -296,7 +307,11 @@ function StatisticsDashboard({ surveyId }: StatisticsDashboardProps) {
 
   if (error) {
     return (
-      <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert" data-testid="statistics-error">
+      <div
+        className="p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+        role="alert"
+        data-testid="statistics-error"
+      >
         {error}
       </div>
     )

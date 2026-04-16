@@ -73,24 +73,14 @@ describe('WebhookForm', () => {
   describe('create mode (no webhook prop)', () => {
     it('renders create title', () => {
       render(
-        <WebhookForm
-          webhook={null}
-          surveys={mockSurveys}
-          onSubmit={vi.fn()}
-          onCancel={vi.fn()}
-        />,
+        <WebhookForm webhook={null} surveys={mockSurveys} onSubmit={vi.fn()} onCancel={vi.fn()} />
       )
       expect(screen.getByRole('heading', { name: 'Create Webhook' })).toBeInTheDocument()
     })
 
     it('renders empty URL field', () => {
       render(
-        <WebhookForm
-          webhook={null}
-          surveys={mockSurveys}
-          onSubmit={vi.fn()}
-          onCancel={vi.fn()}
-        />,
+        <WebhookForm webhook={null} surveys={mockSurveys} onSubmit={vi.fn()} onCancel={vi.fn()} />
       )
       const urlInput = screen.getByTestId('webhook-url-input') as HTMLInputElement
       expect(urlInput.value).toBe('')
@@ -98,12 +88,7 @@ describe('WebhookForm', () => {
 
     it('renders all 5 event checkboxes unchecked', () => {
       render(
-        <WebhookForm
-          webhook={null}
-          surveys={mockSurveys}
-          onSubmit={vi.fn()}
-          onCancel={vi.fn()}
-        />,
+        <WebhookForm webhook={null} surveys={mockSurveys} onSubmit={vi.fn()} onCancel={vi.fn()} />
       )
       const events = [
         'response.started',
@@ -120,12 +105,7 @@ describe('WebhookForm', () => {
 
     it('renders survey selector with "All surveys" default', () => {
       render(
-        <WebhookForm
-          webhook={null}
-          surveys={mockSurveys}
-          onSubmit={vi.fn()}
-          onCancel={vi.fn()}
-        />,
+        <WebhookForm webhook={null} surveys={mockSurveys} onSubmit={vi.fn()} onCancel={vi.fn()} />
       )
       const select = screen.getByTestId('webhook-survey-select') as HTMLSelectElement
       expect(select.value).toBe('')
@@ -134,12 +114,7 @@ describe('WebhookForm', () => {
 
     it('renders survey options in selector', () => {
       render(
-        <WebhookForm
-          webhook={null}
-          surveys={mockSurveys}
-          onSubmit={vi.fn()}
-          onCancel={vi.fn()}
-        />,
+        <WebhookForm webhook={null} surveys={mockSurveys} onSubmit={vi.fn()} onCancel={vi.fn()} />
       )
       expect(screen.getByText('Customer Satisfaction Survey')).toBeInTheDocument()
       expect(screen.getByText('Employee Feedback')).toBeInTheDocument()
@@ -147,12 +122,7 @@ describe('WebhookForm', () => {
 
     it('renders active checkbox checked by default', () => {
       render(
-        <WebhookForm
-          webhook={null}
-          surveys={mockSurveys}
-          onSubmit={vi.fn()}
-          onCancel={vi.fn()}
-        />,
+        <WebhookForm webhook={null} surveys={mockSurveys} onSubmit={vi.fn()} onCancel={vi.fn()} />
       )
       const checkbox = screen.getByTestId('webhook-active-checkbox') as HTMLInputElement
       expect(checkbox.checked).toBe(true)
@@ -160,12 +130,7 @@ describe('WebhookForm', () => {
 
     it('does not render secret masked field in create mode', () => {
       render(
-        <WebhookForm
-          webhook={null}
-          surveys={mockSurveys}
-          onSubmit={vi.fn()}
-          onCancel={vi.fn()}
-        />,
+        <WebhookForm webhook={null} surveys={mockSurveys} onSubmit={vi.fn()} onCancel={vi.fn()} />
       )
       expect(screen.queryByTestId('webhook-secret-masked')).not.toBeInTheDocument()
     })
@@ -173,12 +138,7 @@ describe('WebhookForm', () => {
     it('calls onCancel when cancel button is clicked', async () => {
       const onCancel = vi.fn()
       render(
-        <WebhookForm
-          webhook={null}
-          surveys={mockSurveys}
-          onSubmit={vi.fn()}
-          onCancel={onCancel}
-        />,
+        <WebhookForm webhook={null} surveys={mockSurveys} onSubmit={vi.fn()} onCancel={onCancel} />
       )
       const user = userEvent.setup()
       await act(async () => {
@@ -190,12 +150,7 @@ describe('WebhookForm', () => {
     it('submits with correct payload when form is valid', async () => {
       const onSubmit = vi.fn().mockResolvedValue(undefined)
       render(
-        <WebhookForm
-          webhook={null}
-          surveys={mockSurveys}
-          onSubmit={onSubmit}
-          onCancel={vi.fn()}
-        />,
+        <WebhookForm webhook={null} surveys={mockSurveys} onSubmit={onSubmit} onCancel={vi.fn()} />
       )
       const user = userEvent.setup()
 
@@ -215,12 +170,7 @@ describe('WebhookForm', () => {
 
     it('shows validation error for empty URL', async () => {
       render(
-        <WebhookForm
-          webhook={null}
-          surveys={mockSurveys}
-          onSubmit={vi.fn()}
-          onCancel={vi.fn()}
-        />,
+        <WebhookForm webhook={null} surveys={mockSurveys} onSubmit={vi.fn()} onCancel={vi.fn()} />
       )
       const user = userEvent.setup()
       await act(async () => {
@@ -231,29 +181,21 @@ describe('WebhookForm', () => {
 
     it('shows validation error for invalid URL', async () => {
       render(
-        <WebhookForm
-          webhook={null}
-          surveys={mockSurveys}
-          onSubmit={vi.fn()}
-          onCancel={vi.fn()}
-        />,
+        <WebhookForm webhook={null} surveys={mockSurveys} onSubmit={vi.fn()} onCancel={vi.fn()} />
       )
       const user = userEvent.setup()
       await act(async () => {
         await user.type(screen.getByTestId('webhook-url-input'), 'not-a-valid-url')
         await user.click(screen.getByTestId('webhook-form-submit'))
       })
-      expect(screen.getByTestId('webhook-form-error')).toHaveTextContent('Please enter a valid URL.')
+      expect(screen.getByTestId('webhook-form-error')).toHaveTextContent(
+        'Please enter a valid URL.'
+      )
     })
 
     it('shows validation error for no events selected', async () => {
       render(
-        <WebhookForm
-          webhook={null}
-          surveys={mockSurveys}
-          onSubmit={vi.fn()}
-          onCancel={vi.fn()}
-        />,
+        <WebhookForm webhook={null} surveys={mockSurveys} onSubmit={vi.fn()} onCancel={vi.fn()} />
       )
       const user = userEvent.setup()
       await act(async () => {
@@ -261,7 +203,7 @@ describe('WebhookForm', () => {
         await user.click(screen.getByTestId('webhook-form-submit'))
       })
       expect(screen.getByTestId('webhook-form-error')).toHaveTextContent(
-        'At least one event must be selected.',
+        'At least one event must be selected.'
       )
     })
 
@@ -273,7 +215,7 @@ describe('WebhookForm', () => {
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
           error="Server error occurred"
-        />,
+        />
       )
       expect(screen.getByTestId('webhook-form-error')).toHaveTextContent('Server error occurred')
     })
@@ -286,7 +228,7 @@ describe('WebhookForm', () => {
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
           isLoading={true}
-        />,
+        />
       )
       expect(screen.getByTestId('webhook-form-submit')).toHaveTextContent('Saving...')
       expect(screen.getByTestId('webhook-form-submit')).toBeDisabled()
@@ -306,7 +248,7 @@ describe('WebhookForm', () => {
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
           createdSecret="my-super-secret-key"
-        />,
+        />
       )
       expect(screen.getByTestId('webhook-secret-display')).toBeInTheDocument()
       expect(screen.getByTestId('webhook-secret-value')).toHaveTextContent('my-super-secret-key')
@@ -320,7 +262,7 @@ describe('WebhookForm', () => {
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
           createdSecret="my-super-secret-key"
-        />,
+        />
       )
       expect(screen.getByTestId('webhook-secret-copy')).toBeInTheDocument()
     })
@@ -333,7 +275,7 @@ describe('WebhookForm', () => {
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
           createdSecret="my-super-secret-key"
-        />,
+        />
       )
       expect(screen.queryByTestId('webhook-form-submit')).not.toBeInTheDocument()
     })
@@ -346,19 +288,14 @@ describe('WebhookForm', () => {
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
           createdSecret="my-super-secret-key"
-        />,
+        />
       )
       expect(screen.getByTestId('webhook-form-cancel')).toHaveTextContent('Done')
     })
 
     it('does not show secret display when createdSecret is null', () => {
       render(
-        <WebhookForm
-          webhook={null}
-          surveys={mockSurveys}
-          onSubmit={vi.fn()}
-          onCancel={vi.fn()}
-        />,
+        <WebhookForm webhook={null} surveys={mockSurveys} onSubmit={vi.fn()} onCancel={vi.fn()} />
       )
       expect(screen.queryByTestId('webhook-secret-display')).not.toBeInTheDocument()
     })
@@ -376,7 +313,7 @@ describe('WebhookForm', () => {
           surveys={mockSurveys}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
       expect(screen.getByText('Edit Webhook')).toBeInTheDocument()
     })
@@ -388,7 +325,7 @@ describe('WebhookForm', () => {
           surveys={mockSurveys}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
       const urlInput = screen.getByTestId('webhook-url-input') as HTMLInputElement
       expect(urlInput.value).toBe('https://example.com/webhook')
@@ -401,11 +338,17 @@ describe('WebhookForm', () => {
           surveys={mockSurveys}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
-      const completedCheckbox = screen.getByTestId('webhook-event-response.completed') as HTMLInputElement
-      const activatedCheckbox = screen.getByTestId('webhook-event-survey.activated') as HTMLInputElement
-      const startedCheckbox = screen.getByTestId('webhook-event-response.started') as HTMLInputElement
+      const completedCheckbox = screen.getByTestId(
+        'webhook-event-response.completed'
+      ) as HTMLInputElement
+      const activatedCheckbox = screen.getByTestId(
+        'webhook-event-survey.activated'
+      ) as HTMLInputElement
+      const startedCheckbox = screen.getByTestId(
+        'webhook-event-response.started'
+      ) as HTMLInputElement
       expect(completedCheckbox.checked).toBe(true)
       expect(activatedCheckbox.checked).toBe(true)
       expect(startedCheckbox.checked).toBe(false)
@@ -418,7 +361,7 @@ describe('WebhookForm', () => {
           surveys={mockSurveys}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
       const select = screen.getByTestId('webhook-survey-select') as HTMLSelectElement
       expect(select.value).toBe('survey-1')
@@ -431,7 +374,7 @@ describe('WebhookForm', () => {
           surveys={mockSurveys}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
       expect(screen.getByTestId('webhook-secret-masked')).toBeInTheDocument()
     })
@@ -443,7 +386,7 @@ describe('WebhookForm', () => {
           surveys={mockSurveys}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
       const checkbox = screen.getByTestId('webhook-active-checkbox') as HTMLInputElement
       expect(checkbox.checked).toBe(false)
@@ -457,7 +400,7 @@ describe('WebhookForm', () => {
           surveys={mockSurveys}
           onSubmit={onSubmit}
           onCancel={vi.fn()}
-        />,
+        />
       )
       const user = userEvent.setup()
       await act(async () => {
@@ -467,7 +410,7 @@ describe('WebhookForm', () => {
         expect.objectContaining({
           url: 'https://example.com/webhook',
           events: expect.arrayContaining(['response.completed', 'survey.activated']),
-        }),
+        })
       )
     })
   })

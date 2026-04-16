@@ -70,7 +70,9 @@ function makeSettings(overrides: Partial<ImagePickerSettings> = {}): ImagePicker
 
 describe('ImagePickerInput — rendering', () => {
   it('renders container with question id in testid', () => {
-    render(<ImagePickerInput value={[]} onChange={vi.fn()} question={makeQuestion({ id: 'q-abc' })} />)
+    render(
+      <ImagePickerInput value={[]} onChange={vi.fn()} question={makeQuestion({ id: 'q-abc' })} />
+    )
     expect(screen.getByTestId('image-picker-input-q-abc')).toBeInTheDocument()
   })
 
@@ -79,21 +81,44 @@ describe('ImagePickerInput — rendering', () => {
       makeOption({ id: 'opt-1', title: 'Cat' }),
       makeOption({ id: 'opt-2', title: 'Dog' }),
     ]
-    render(<ImagePickerInput value={[]} onChange={vi.fn()} question={makeQuestion({ answer_options: options })} />)
+    render(
+      <ImagePickerInput
+        value={[]}
+        onChange={vi.fn()}
+        question={makeQuestion({ answer_options: options })}
+      />
+    )
     expect(screen.getByTestId('image-picker-option-opt-1')).toBeInTheDocument()
     expect(screen.getByTestId('image-picker-option-opt-2')).toBeInTheDocument()
   })
 
   it('renders image when option has image_url', () => {
-    const options = [makeOption({ id: 'opt-1', image_url: 'https://example.com/cat.jpg', title: 'Cat' })]
-    render(<ImagePickerInput value={[]} onChange={vi.fn()} question={makeQuestion({ answer_options: options })} />)
+    const options = [
+      makeOption({ id: 'opt-1', image_url: 'https://example.com/cat.jpg', title: 'Cat' }),
+    ]
+    render(
+      <ImagePickerInput
+        value={[]}
+        onChange={vi.fn()}
+        question={makeQuestion({ answer_options: options })}
+      />
+    )
     expect(screen.getByTestId('image-picker-img-opt-1')).toBeInTheDocument()
-    expect(screen.getByTestId('image-picker-img-opt-1')).toHaveAttribute('src', 'https://example.com/cat.jpg')
+    expect(screen.getByTestId('image-picker-img-opt-1')).toHaveAttribute(
+      'src',
+      'https://example.com/cat.jpg'
+    )
   })
 
   it('renders placeholder when option has no image_url', () => {
     const options = [makeOption({ id: 'opt-1', image_url: null, title: 'Cat' })]
-    render(<ImagePickerInput value={[]} onChange={vi.fn()} question={makeQuestion({ answer_options: options })} />)
+    render(
+      <ImagePickerInput
+        value={[]}
+        onChange={vi.fn()}
+        question={makeQuestion({ answer_options: options })}
+      />
+    )
     expect(screen.getByTestId('image-picker-placeholder-opt-1')).toBeInTheDocument()
     expect(screen.getByText('No image')).toBeInTheDocument()
   })
@@ -104,7 +129,10 @@ describe('ImagePickerInput — rendering', () => {
       <ImagePickerInput
         value={[]}
         onChange={vi.fn()}
-        question={makeQuestion({ answer_options: options, settings: makeSettings({ show_labels: true }) })}
+        question={makeQuestion({
+          answer_options: options,
+          settings: makeSettings({ show_labels: true }),
+        })}
       />
     )
     expect(screen.getByTestId('image-picker-label-opt-1')).toBeInTheDocument()
@@ -117,7 +145,10 @@ describe('ImagePickerInput — rendering', () => {
       <ImagePickerInput
         value={[]}
         onChange={vi.fn()}
-        question={makeQuestion({ answer_options: options, settings: makeSettings({ show_labels: false }) })}
+        question={makeQuestion({
+          answer_options: options,
+          settings: makeSettings({ show_labels: false }),
+        })}
       />
     )
     expect(screen.queryByTestId('image-picker-label-opt-1')).not.toBeInTheDocument()
@@ -129,7 +160,10 @@ describe('ImagePickerInput — rendering', () => {
       <ImagePickerInput
         value={[]}
         onChange={vi.fn()}
-        question={makeQuestion({ answer_options: options, settings: makeSettings({ image_width: 300, image_height: 200 }) })}
+        question={makeQuestion({
+          answer_options: options,
+          settings: makeSettings({ image_width: 300, image_height: 200 }),
+        })}
       />
     )
     const btn = screen.getByTestId('image-picker-option-opt-1')
@@ -226,7 +260,10 @@ describe('ImagePickerInput — single-select', () => {
       <ImagePickerInput
         value={[]}
         onChange={vi.fn()}
-        question={makeQuestion({ answer_options: options, settings: makeSettings({ multi_select: false }) })}
+        question={makeQuestion({
+          answer_options: options,
+          settings: makeSettings({ multi_select: false }),
+        })}
       />
     )
     expect(screen.getByTestId('image-picker-option-opt-1')).toHaveAttribute('role', 'radio')
@@ -244,7 +281,10 @@ describe('ImagePickerInput — multi-select', () => {
       <ImagePickerInput
         value={[]}
         onChange={vi.fn()}
-        question={makeQuestion({ answer_options: options, settings: makeSettings({ multi_select: true }) })}
+        question={makeQuestion({
+          answer_options: options,
+          settings: makeSettings({ multi_select: true }),
+        })}
       />
     )
     expect(screen.getByTestId('image-picker-option-opt-1')).toHaveAttribute('role', 'checkbox')
@@ -261,7 +301,10 @@ describe('ImagePickerInput — multi-select', () => {
       <ImagePickerInput
         value={['opt-1']}
         onChange={onChange}
-        question={makeQuestion({ answer_options: options, settings: makeSettings({ multi_select: true }) })}
+        question={makeQuestion({
+          answer_options: options,
+          settings: makeSettings({ multi_select: true }),
+        })}
       />
     )
     await act(async () => {

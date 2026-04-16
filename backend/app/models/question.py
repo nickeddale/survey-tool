@@ -27,7 +27,7 @@ VALID_QUESTION_TYPES = (
     "time",
     "datetime",
     "file_upload",
-    "number",
+    "numeric",
     "email",
     "phone",
     "url",

@@ -130,7 +130,7 @@ describe('buildVisibleSurvey — piped text substitution', () => {
       NAME_title: 'What is your name?',
       GREETING_title: 'Hello Alice, how are you today?',
       GREETING_description: 'Tell us, Alice!',
-      'GREETING_OPT1_title': 'Option for Alice',
+      GREETING_OPT1_title: 'Option for Alice',
     }
 
     const result = buildVisibleSurvey(survey, new Set(), new Set(), pipedTexts)
@@ -223,7 +223,9 @@ describe('buildVisibleSurvey — visibility filtering', () => {
     const survey = makeSurvey()
     const originalTitle = survey.groups[0].questions[1].title
 
-    buildVisibleSurvey(survey, new Set(), new Set(), { GREETING_title: 'Hello Alice, how are you today?' })
+    buildVisibleSurvey(survey, new Set(), new Set(), {
+      GREETING_title: 'Hello Alice, how are you today?',
+    })
 
     expect(survey.groups[0].questions[1].title).toBe(originalTitle)
   })

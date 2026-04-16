@@ -35,7 +35,7 @@ function renderPage(surveyId = SURVEY_ID) {
       <Routes>
         <Route path="/s/:survey_id" element={<SurveyResponsePage />} />
       </Routes>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
@@ -57,9 +57,7 @@ afterEach(() => {
 
 describe('loading state', () => {
   it('renders loading skeleton while survey is being fetched', async () => {
-    server.use(
-      http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () => new Promise<never>(() => {})),
-    )
+    server.use(http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () => new Promise<never>(() => {})))
 
     renderPage()
 
@@ -84,16 +82,14 @@ describe('unavailable survey', () => {
       http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
         HttpResponse.json(
           { ...mockActiveSurveyFull, status: 'closed', groups: [], questions: [], options: [] },
-          { status: 200 },
-        ),
-      ),
+          { status: 200 }
+        )
+      )
     )
 
     renderPage()
 
-    await waitFor(() =>
-      expect(screen.getByTestId('survey-unavailable-screen')).toBeInTheDocument(),
-    )
+    await waitFor(() => expect(screen.getByTestId('survey-unavailable-screen')).toBeInTheDocument())
     expect(screen.getByTestId('unavailable-message')).toHaveTextContent(/closed/i)
   })
 
@@ -102,16 +98,14 @@ describe('unavailable survey', () => {
       http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
         HttpResponse.json(
           { ...mockActiveSurveyFull, status: 'draft', groups: [], questions: [], options: [] },
-          { status: 200 },
-        ),
-      ),
+          { status: 200 }
+        )
+      )
     )
 
     renderPage()
 
-    await waitFor(() =>
-      expect(screen.getByTestId('survey-unavailable-screen')).toBeInTheDocument(),
-    )
+    await waitFor(() => expect(screen.getByTestId('survey-unavailable-screen')).toBeInTheDocument())
   })
 
   it('shows unavailable message for an archived survey', async () => {
@@ -119,16 +113,14 @@ describe('unavailable survey', () => {
       http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
         HttpResponse.json(
           { ...mockActiveSurveyFull, status: 'archived', groups: [], questions: [], options: [] },
-          { status: 200 },
-        ),
-      ),
+          { status: 200 }
+        )
+      )
     )
 
     renderPage()
 
-    await waitFor(() =>
-      expect(screen.getByTestId('survey-unavailable-screen')).toBeInTheDocument(),
-    )
+    await waitFor(() => expect(screen.getByTestId('survey-unavailable-screen')).toBeInTheDocument())
     expect(screen.getByTestId('unavailable-message')).toHaveTextContent(/archived/i)
   })
 })
@@ -143,16 +135,14 @@ describe('load error', () => {
       http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
         HttpResponse.json(
           { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
-          { status: 404 },
-        ),
-      ),
+          { status: 404 }
+        )
+      )
     )
 
     renderPage()
 
-    await waitFor(() =>
-      expect(screen.getByTestId('response-load-error')).toBeInTheDocument(),
-    )
+    await waitFor(() => expect(screen.getByTestId('response-load-error')).toBeInTheDocument())
   })
 })
 
@@ -177,9 +167,11 @@ describe('welcome screen', () => {
   it('displays survey description when present', async () => {
     renderPage()
 
-    await waitFor(() => expect(screen.getByTestId('welcome-survey-description')).toBeInTheDocument())
+    await waitFor(() =>
+      expect(screen.getByTestId('welcome-survey-description')).toBeInTheDocument()
+    )
     expect(screen.getByTestId('welcome-survey-description')).toHaveTextContent(
-      mockActiveSurveyFull.description!,
+      mockActiveSurveyFull.description!
     )
   })
 
@@ -188,7 +180,7 @@ describe('welcome screen', () => {
 
     await waitFor(() => expect(screen.getByTestId('welcome-message')).toBeInTheDocument())
     expect(screen.getByTestId('welcome-message')).toHaveTextContent(
-      mockActiveSurveyFull.welcome_message!,
+      mockActiveSurveyFull.welcome_message!
     )
   })
 
@@ -222,7 +214,7 @@ describe('survey flow', () => {
       http.post(`${BASE}/surveys/${SURVEY_ID}/responses`, () => {
         createCalled = true
         return HttpResponse.json(mockResponseCreated, { status: 201 })
-      }),
+      })
     )
 
     renderPage()
@@ -241,7 +233,7 @@ describe('survey flow', () => {
     await user.click(screen.getByTestId('start-survey-button'))
 
     await waitFor(() =>
-      expect(localStorage.getItem(`survey_response_${SURVEY_ID}`)).toBe(mockResponseCreated.id),
+      expect(localStorage.getItem(`survey_response_${SURVEY_ID}`)).toBe(mockResponseCreated.id)
     )
   })
 
@@ -254,7 +246,7 @@ describe('survey flow', () => {
       http.post(`${BASE}/surveys/${SURVEY_ID}/responses`, () => {
         createCalled = true
         return HttpResponse.json(mockResponseCreated, { status: 201 })
-      }),
+      })
     )
 
     const user = userEvent.setup()
@@ -275,7 +267,9 @@ describe('survey flow', () => {
     await user.click(screen.getByTestId('start-survey-button'))
 
     await waitFor(() =>
-      expect(screen.getByTestId(`form-group-${mockActiveSurveyFull.groups[0].id}`)).toBeInTheDocument(),
+      expect(
+        screen.getByTestId(`form-group-${mockActiveSurveyFull.groups[0].id}`)
+      ).toBeInTheDocument()
     )
     expect(screen.getByText(mockActiveSurveyFull.groups[0].title)).toBeInTheDocument()
   })
@@ -298,7 +292,9 @@ describe('survey flow', () => {
 
     // Should advance to page 2 (Feedback group)
     await waitFor(() =>
-      expect(screen.getByTestId(`form-group-${mockActiveSurveyFull.groups[1].id}`)).toBeInTheDocument(),
+      expect(
+        screen.getByTestId(`form-group-${mockActiveSurveyFull.groups[1].id}`)
+      ).toBeInTheDocument()
     )
   })
 
@@ -317,7 +313,7 @@ describe('survey flow', () => {
 
     // Should still be on page 1 (first group still visible)
     expect(
-      screen.getByTestId(`form-group-${mockActiveSurveyFull.groups[0].id}`),
+      screen.getByTestId(`form-group-${mockActiveSurveyFull.groups[0].id}`)
     ).toBeInTheDocument()
   })
 
@@ -346,9 +342,7 @@ describe('survey flow', () => {
     await user.click(screen.getByTestId('form-next-button'))
 
     // Now on last page, should see Submit not Next
-    await waitFor(() =>
-      expect(screen.getByTestId('form-submit-button')).toBeInTheDocument(),
-    )
+    await waitFor(() => expect(screen.getByTestId('form-submit-button')).toBeInTheDocument())
     expect(screen.queryByTestId('form-next-button')).not.toBeInTheDocument()
   })
 
@@ -389,7 +383,7 @@ describe('survey flow', () => {
 
     await waitFor(() => expect(screen.getByTestId('thankyou-end-message')).toBeInTheDocument())
     expect(screen.getByTestId('thankyou-end-message')).toHaveTextContent(
-      mockActiveSurveyFull.end_message!,
+      mockActiveSurveyFull.end_message!
     )
   })
 
@@ -401,9 +395,7 @@ describe('survey flow', () => {
     await user.click(screen.getByTestId('start-survey-button'))
 
     // Store response ID set after start
-    await waitFor(() =>
-      expect(localStorage.getItem(`survey_response_${SURVEY_ID}`)).not.toBeNull(),
-    )
+    await waitFor(() => expect(localStorage.getItem(`survey_response_${SURVEY_ID}`)).not.toBeNull())
 
     await waitFor(() => expect(screen.getByTestId('survey-form')).toBeInTheDocument())
     await user.type(screen.getByTestId('short-text-input'), 'Test User')
@@ -430,7 +422,9 @@ describe('survey flow', () => {
 
     // Should be on page 2 now
     await waitFor(() =>
-      expect(screen.getByTestId(`form-group-${mockActiveSurveyFull.groups[1].id}`)).toBeInTheDocument(),
+      expect(
+        screen.getByTestId(`form-group-${mockActiveSurveyFull.groups[1].id}`)
+      ).toBeInTheDocument()
     )
 
     // Click Previous
@@ -438,7 +432,9 @@ describe('survey flow', () => {
 
     // Should be back to page 1
     await waitFor(() =>
-      expect(screen.getByTestId(`form-group-${mockActiveSurveyFull.groups[0].id}`)).toBeInTheDocument(),
+      expect(
+        screen.getByTestId(`form-group-${mockActiveSurveyFull.groups[0].id}`)
+      ).toBeInTheDocument()
     )
   })
 
@@ -451,8 +447,11 @@ describe('survey flow', () => {
         if (!body.status) {
           saveProgressCalled = true
         }
-        return HttpResponse.json({ ...mockResponseCreated, updated_at: new Date().toISOString() }, { status: 200 })
-      }),
+        return HttpResponse.json(
+          { ...mockResponseCreated, updated_at: new Date().toISOString() },
+          { status: 200 }
+        )
+      })
     )
 
     renderPage()
@@ -505,9 +504,9 @@ describe('single-page mode', () => {
       http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
         HttpResponse.json(
           { ...mockActiveSurveyFull, settings: { one_page_per_group: false } },
-          { status: 200 },
-        ),
-      ),
+          { status: 200 }
+        )
+      )
     )
 
     const user = userEvent.setup()
@@ -524,9 +523,9 @@ describe('single-page mode', () => {
       http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
         HttpResponse.json(
           { ...mockActiveSurveyFull, settings: { one_page_per_group: false } },
-          { status: 200 },
-        ),
-      ),
+          { status: 200 }
+        )
+      )
     )
 
     const user = userEvent.setup()
@@ -549,8 +548,8 @@ describe('single-page mode', () => {
 
     server.use(
       http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
-        HttpResponse.json(singleGroupSurvey, { status: 200 }),
-      ),
+        HttpResponse.json(singleGroupSurvey, { status: 200 })
+      )
     )
 
     const callOrder: string[] = []
@@ -563,10 +562,14 @@ describe('single-page mode', () => {
           callOrder.push('saveProgress')
         }
         return HttpResponse.json(
-          { ...mockResponseCreated, status: body.status === 'complete' ? 'complete' : 'incomplete', updated_at: new Date().toISOString() },
-          { status: 200 },
+          {
+            ...mockResponseCreated,
+            status: body.status === 'complete' ? 'complete' : 'incomplete',
+            updated_at: new Date().toISOString(),
+          },
+          { status: 200 }
         )
-      }),
+      })
     )
 
     const user = userEvent.setup()
@@ -600,9 +603,9 @@ describe('submit error', () => {
       http.patch(`${BASE}/surveys/${SURVEY_ID}/responses/:responseId`, () =>
         HttpResponse.json(
           { detail: { code: 'SERVER_ERROR', message: 'Internal server error' } },
-          { status: 500 },
-        ),
-      ),
+          { status: 500 }
+        )
+      )
     )
 
     const user = userEvent.setup()
@@ -635,9 +638,9 @@ describe('error state', () => {
       http.get(`${BASE}/surveys/nonexistent-id/public`, () =>
         HttpResponse.json(
           { detail: { code: 'NOT_FOUND', message: 'Survey not found' } },
-          { status: 404 },
-        ),
-      ),
+          { status: 404 }
+        )
+      )
     )
 
     renderPage('nonexistent-id')
@@ -656,7 +659,9 @@ describe('accessibility', () => {
     renderPage()
 
     await waitFor(() => expect(screen.getByTestId('start-survey-button')).toBeInTheDocument())
-    await act(async () => { await user.click(screen.getByTestId('start-survey-button')) })
+    await act(async () => {
+      await user.click(screen.getByTestId('start-survey-button'))
+    })
 
     await waitFor(() => expect(screen.getByTestId('survey-form')).toBeInTheDocument())
     // The first question (name) is required
@@ -703,7 +708,7 @@ describe('flow resolution — conditional display', () => {
   it('hides a question returned in hidden_questions by resolve-flow', async () => {
     server.use(
       http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
-        HttpResponse.json(surveyWithHiddenQ, { status: 200 }),
+        HttpResponse.json(surveyWithHiddenQ, { status: 200 })
       ),
       http.post(`${BASE}/surveys/${SURVEY_ID}/logic/resolve-flow`, () =>
         HttpResponse.json(
@@ -715,9 +720,9 @@ describe('flow resolution — conditional display', () => {
             piped_texts: {},
             next_question_id: null,
           },
-          { status: 200 },
-        ),
-      ),
+          { status: 200 }
+        )
+      )
     )
 
     const user = userEvent.setup()
@@ -729,9 +734,12 @@ describe('flow resolution — conditional display', () => {
     await waitFor(() => expect(screen.getByTestId('survey-form')).toBeInTheDocument())
 
     // Wait for resolve-flow to be called and state to update (debounce 300ms + API time)
-    await waitFor(() => {
-      expect(screen.queryByTestId('form-question-aq3')).not.toBeInTheDocument()
-    }, { timeout: 2000 })
+    await waitFor(
+      () => {
+        expect(screen.queryByTestId('form-question-aq3')).not.toBeInTheDocument()
+      },
+      { timeout: 2000 }
+    )
     // The visible question should still be present
     expect(screen.getByTestId('form-question-aq1')).toBeInTheDocument()
   })
@@ -748,9 +756,9 @@ describe('flow resolution — conditional display', () => {
             piped_texts: {},
             next_question_id: null,
           },
-          { status: 200 },
-        ),
-      ),
+          { status: 200 }
+        )
+      )
     )
 
     const user = userEvent.setup()
@@ -786,8 +794,8 @@ describe('flow resolution — conditional display', () => {
             piped_texts: { NAME_title: 'Hello, Alice! What is your name?' },
             next_question_id: null,
           },
-          { status: 200 },
-        ),
+          { status: 200 }
+        )
       ),
       // Serve a survey with a piped variable in question title
       http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
@@ -807,9 +815,9 @@ describe('flow resolution — conditional display', () => {
               mockActiveSurveyFull.groups[1],
             ],
           },
-          { status: 200 },
-        ),
-      ),
+          { status: 200 }
+        )
+      )
     )
 
     const user = userEvent.setup()
@@ -834,7 +842,7 @@ describe('flow resolution — conditional display', () => {
 
     server.use(
       http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
-        HttpResponse.json(surveyWithHiddenQ, { status: 200 }),
+        HttpResponse.json(surveyWithHiddenQ, { status: 200 })
       ),
       http.post(`${BASE}/surveys/${SURVEY_ID}/logic/resolve-flow`, async ({ request }) => {
         lastResolveBody = (await request.json()) as typeof lastResolveBody
@@ -847,9 +855,9 @@ describe('flow resolution — conditional display', () => {
             piped_texts: {},
             next_question_id: null,
           },
-          { status: 200 },
+          { status: 200 }
         )
-      }),
+      })
     )
 
     const user = userEvent.setup()
@@ -861,9 +869,12 @@ describe('flow resolution — conditional display', () => {
     await waitFor(() => expect(screen.getByTestId('survey-form')).toBeInTheDocument())
 
     // Wait for first resolve-flow to hide aq3 (debounce 300ms + API time)
-    await waitFor(() => {
-      expect(screen.queryByTestId('form-question-aq3')).not.toBeInTheDocument()
-    }, { timeout: 2000 })
+    await waitFor(
+      () => {
+        expect(screen.queryByTestId('form-question-aq3')).not.toBeInTheDocument()
+      },
+      { timeout: 2000 }
+    )
 
     // Type in aq1 (visible field) - use the container testid to scope the query
     const aq1Container = screen.getByTestId('short-text-input-aq1')
@@ -871,14 +882,20 @@ describe('flow resolution — conditional display', () => {
     await user.type(nameInput, 'Alice')
 
     // Wait for a resolve-flow call that includes aq1's answer
-    await waitFor(() => {
-      if (lastResolveBody) {
-        const hasAq1 = lastResolveBody.answers.some(
-          (a) => a.question_id === 'aq1' && typeof a.value === 'string' && (a.value as string).length > 0,
-        )
-        expect(hasAq1).toBe(true)
-      }
-    }, { timeout: 2000 })
+    await waitFor(
+      () => {
+        if (lastResolveBody) {
+          const hasAq1 = lastResolveBody.answers.some(
+            (a) =>
+              a.question_id === 'aq1' &&
+              typeof a.value === 'string' &&
+              (a.value as string).length > 0
+          )
+          expect(hasAq1).toBe(true)
+        }
+      },
+      { timeout: 2000 }
+    )
 
     // aq3 should still not be in the DOM (answer state for aq3 is preserved internally)
     expect(screen.queryByTestId('form-question-aq3')).not.toBeInTheDocument()
@@ -924,7 +941,7 @@ describe('flow resolution — conditional display', () => {
 
     server.use(
       http.get(`${BASE}/surveys/${SURVEY_ID}/public`, () =>
-        HttpResponse.json(surveyWithThreeGroups, { status: 200 }),
+        HttpResponse.json(surveyWithThreeGroups, { status: 200 })
       ),
       http.post(`${BASE}/surveys/${SURVEY_ID}/logic/resolve-flow`, () =>
         HttpResponse.json(
@@ -937,9 +954,9 @@ describe('flow resolution — conditional display', () => {
             // Skip from ag1 directly to ag3 (skipping ag2)
             next_question_id: 'aq3',
           },
-          { status: 200 },
-        ),
-      ),
+          { status: 200 }
+        )
+      )
     )
 
     const user = userEvent.setup()
@@ -952,10 +969,13 @@ describe('flow resolution — conditional display', () => {
 
     // Wait for the initial resolve-flow call to complete so nextQuestionId is populated
     // (debounce 300ms + API time = ~350ms)
-    await waitFor(() => {
-      // The hook should have resolved; we can detect this by ensuring the form is stable
-      expect(screen.getByTestId('form-question-aq1')).toBeInTheDocument()
-    }, { timeout: 2000 })
+    await waitFor(
+      () => {
+        // The hook should have resolved; we can detect this by ensuring the form is stable
+        expect(screen.getByTestId('form-question-aq1')).toBeInTheDocument()
+      },
+      { timeout: 2000 }
+    )
 
     // Small additional wait to ensure resolve-flow state is applied
     await new Promise((r) => setTimeout(r, 400))
@@ -971,9 +991,12 @@ describe('flow resolution — conditional display', () => {
     await user.click(screen.getByTestId('form-next-button'))
 
     // Should jump directly to ag3, skipping ag2
-    await waitFor(() => {
-      expect(screen.getByTestId('form-group-ag3')).toBeInTheDocument()
-    }, { timeout: 2000 })
+    await waitFor(
+      () => {
+        expect(screen.getByTestId('form-group-ag3')).toBeInTheDocument()
+      },
+      { timeout: 2000 }
+    )
     expect(screen.queryByTestId('form-group-ag2')).not.toBeInTheDocument()
   })
 })

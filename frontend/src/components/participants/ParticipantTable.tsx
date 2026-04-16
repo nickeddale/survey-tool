@@ -74,7 +74,9 @@ function ParticipantTable({
           <tr>
             <th className="text-left px-4 py-3 font-medium text-muted-foreground">Email</th>
             <th className="text-left px-4 py-3 font-medium text-muted-foreground">Token</th>
-            <th className="text-left px-4 py-3 font-medium text-muted-foreground">Uses Remaining</th>
+            <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+              Uses Remaining
+            </th>
             <th className="text-left px-4 py-3 font-medium text-muted-foreground">Valid From</th>
             <th className="text-left px-4 py-3 font-medium text-muted-foreground">Valid Until</th>
             <th className="text-left px-4 py-3 font-medium text-muted-foreground">Status</th>

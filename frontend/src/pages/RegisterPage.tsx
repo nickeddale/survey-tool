@@ -15,7 +15,12 @@ interface FieldErrors {
   confirmPassword?: string
 }
 
-function validate(name: string, email: string, password: string, confirmPassword: string): FieldErrors {
+function validate(
+  name: string,
+  email: string,
+  password: string,
+  confirmPassword: string
+): FieldErrors {
   const errors: FieldErrors = {}
   if (!name.trim()) {
     errors.name = 'Name is required'
@@ -85,7 +90,10 @@ function RegisterPage() {
         </CardHeader>
         <CardContent>
           {error && (
-            <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+            <div
+              className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+              role="alert"
+            >
               {error}
             </div>
           )}
@@ -99,7 +107,10 @@ function RegisterPage() {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
               />
-              <ValidationErrors errors={fieldErrors.name ? [fieldErrors.name] : []} id="register-name-error" />
+              <ValidationErrors
+                errors={fieldErrors.name ? [fieldErrors.name] : []}
+                id="register-name-error"
+              />
             </div>
             <div className="space-y-1">
               <Label htmlFor="email">Email</Label>
@@ -110,7 +121,10 @@ function RegisterPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
               />
-              <ValidationErrors errors={fieldErrors.email ? [fieldErrors.email] : []} id="register-email-error" />
+              <ValidationErrors
+                errors={fieldErrors.email ? [fieldErrors.email] : []}
+                id="register-email-error"
+              />
             </div>
             <div className="space-y-1">
               <Label htmlFor="password">Password</Label>
@@ -121,7 +135,10 @@ function RegisterPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
               />
-              <ValidationErrors errors={fieldErrors.password ? [fieldErrors.password] : []} id="register-password-error" />
+              <ValidationErrors
+                errors={fieldErrors.password ? [fieldErrors.password] : []}
+                id="register-password-error"
+              />
             </div>
             <div className="space-y-1">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
@@ -132,7 +149,10 @@ function RegisterPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
               />
-              <ValidationErrors errors={fieldErrors.confirmPassword ? [fieldErrors.confirmPassword] : []} id="register-confirm-password-error" />
+              <ValidationErrors
+                errors={fieldErrors.confirmPassword ? [fieldErrors.confirmPassword] : []}
+                id="register-confirm-password-error"
+              />
             </div>
             <Button type="submit" disabled={isSubmitting} className="w-full">
               {isSubmitting ? 'Creating account...' : 'Create Account'}

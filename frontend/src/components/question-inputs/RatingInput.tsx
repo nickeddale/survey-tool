@@ -28,7 +28,15 @@ export interface RatingInputProps {
 
 type IconName = RatingSettings['icon']
 
-function RatingIcon({ icon, filled, size = 24 }: { icon: IconName; filled: boolean; size?: number }) {
+function RatingIcon({
+  icon,
+  filled,
+  size = 24,
+}: {
+  icon: IconName
+  filled: boolean
+  size?: number
+}) {
   const className = filled ? 'fill-current text-yellow-500' : 'text-muted-foreground'
   const props = { size, className }
   switch (icon) {
@@ -60,7 +68,12 @@ function validate(value: string, isRequired: boolean): string[] {
 // Component
 // ---------------------------------------------------------------------------
 
-export function RatingInput({ value, onChange, question, errors: externalErrors }: RatingInputProps) {
+export function RatingInput({
+  value,
+  onChange,
+  question,
+  errors: externalErrors,
+}: RatingInputProps) {
   const s = (question.settings ?? {}) as Partial<RatingSettings>
   const min = s.min ?? 1
   const max = s.max ?? 5

@@ -76,19 +76,22 @@ export interface MatrixSettings {
   alternate_rows: boolean
   is_all_rows_required: boolean
   randomize_rows: boolean
+  transpose: boolean
 }
 
 export interface MatrixDropdownSettings {
   alternate_rows: boolean
   is_all_rows_required: boolean
   randomize_rows: boolean
-  cell_type: 'dropdown' | 'text' | 'checkbox' | 'radio'
+  transpose: boolean
+  cell_type: 'dropdown' | 'text' | 'checkbox' | 'radio' | 'number' | 'boolean' | 'rating'
+  column_types: Record<string, 'dropdown' | 'rating' | 'text' | 'number' | 'checkbox' | 'radio' | 'boolean'> | null
 }
 
 export interface MatrixDynamicSettings {
-  row_count: number
-  min_row_count: number
-  max_row_count: number | null
+  default_row_count: number
+  min_rows: number
+  max_rows: number | null
   add_row_text: string
   remove_row_text: string
   cell_type: 'dropdown' | 'text' | 'checkbox' | 'radio'
@@ -185,11 +188,26 @@ export function getDefaultSettings(type: string): QuestionSettings {
     case 'long_text':
       return { placeholder: null, max_length: 5000, rows: 4 } satisfies LongTextSettings
     case 'huge_text':
-      return { placeholder: null, max_length: 50000, rows: 10, rich_text: false } satisfies HugeTextSettings
+      return {
+        placeholder: null,
+        max_length: 50000,
+        rows: 10,
+        rich_text: false,
+      } satisfies HugeTextSettings
     case 'single_choice':
-      return { has_other: false, other_text: 'Other', randomize: false, columns: 1 } satisfies RadioSettings
+      return {
+        has_other: false,
+        other_text: 'Other',
+        randomize: false,
+        columns: 1,
+      } satisfies RadioSettings
     case 'dropdown':
-      return { placeholder: 'Select an option', searchable: false, has_other: false, other_text: 'Other' } satisfies DropdownSettings
+      return {
+        placeholder: 'Select an option',
+        searchable: false,
+        has_other: false,
+        other_text: 'Other',
+      } satisfies DropdownSettings
     case 'multiple_choice':
       return {
         min_choices: null,
@@ -213,19 +231,28 @@ export function getDefaultSettings(type: string): QuestionSettings {
         show_labels: true,
       } satisfies ImagePickerSettings
     case 'matrix':
-      return { alternate_rows: true, is_all_rows_required: false, randomize_rows: false } satisfies MatrixSettings
+    case 'matrix_single':
+    case 'matrix_multiple':
+      return {
+        alternate_rows: true,
+        is_all_rows_required: false,
+        randomize_rows: false,
+        transpose: false,
+      } satisfies MatrixSettings
     case 'matrix_dropdown':
       return {
         alternate_rows: true,
         is_all_rows_required: false,
         randomize_rows: false,
+        transpose: false,
         cell_type: 'dropdown',
+        column_types: null,
       } satisfies MatrixDropdownSettings
     case 'matrix_dynamic':
       return {
-        row_count: 1,
-        min_row_count: 0,
-        max_row_count: null,
+        default_row_count: 1,
+        min_rows: 0,
+        max_rows: null,
         add_row_text: 'Add row',
         remove_row_text: 'Remove',
         cell_type: 'text',
@@ -289,7 +316,7 @@ export function getDefaultSettings(type: string): QuestionSettings {
 export function getCompatibleSettings(
   oldType: string,
   newType: string,
-  oldSettings: Record<string, unknown> | null,
+  oldSettings: Record<string, unknown> | null
 ): Record<string, unknown> {
   const defaults = getDefaultSettings(newType) as unknown as Record<string, unknown>
   if (!oldSettings) return defaults
@@ -317,12 +344,20 @@ export function getCompatibleSettings(
     if ('columns' in oldSettings) merged['columns'] = oldSettings['columns']
   }
 
-  // alternate_rows / is_all_rows_required / randomize_rows shared across matrix types
-  const matrixTypes = new Set(['matrix', 'matrix_dropdown', 'matrix_dynamic'])
+  // alternate_rows / is_all_rows_required / randomize_rows / transpose shared across matrix types
+  const matrixTypes = new Set([
+    'matrix',
+    'matrix_single',
+    'matrix_multiple',
+    'matrix_dropdown',
+    'matrix_dynamic',
+  ])
   if (matrixTypes.has(oldType) && matrixTypes.has(newType)) {
     if ('alternate_rows' in oldSettings) merged['alternate_rows'] = oldSettings['alternate_rows']
-    if ('is_all_rows_required' in oldSettings) merged['is_all_rows_required'] = oldSettings['is_all_rows_required']
+    if ('is_all_rows_required' in oldSettings)
+      merged['is_all_rows_required'] = oldSettings['is_all_rows_required']
     if ('randomize_rows' in oldSettings) merged['randomize_rows'] = oldSettings['randomize_rows']
+    if ('transpose' in oldSettings) merged['transpose'] = oldSettings['transpose']
     if ('cell_type' in oldSettings) merged['cell_type'] = oldSettings['cell_type']
   }
 

@@ -200,9 +200,7 @@ function SurveyFormPage() {
             <p className="text-muted-foreground text-sm mb-4">
               The survey you are looking for does not exist or has been deleted.
             </p>
-            <Button onClick={() => navigate('/surveys')}>
-              Back to Surveys
-            </Button>
+            <Button onClick={() => navigate('/surveys')}>Back to Surveys</Button>
           </CardContent>
         </Card>
       </div>
@@ -228,35 +226,46 @@ function SurveyFormPage() {
           role="alert"
           data-testid="readonly-notice"
         >
-          This survey is in <strong>{survey.status}</strong> status and cannot be edited. Only draft surveys can be modified.
+          This survey is in <strong>{survey.status}</strong> status and cannot be edited. Only draft
+          surveys can be modified.
         </div>
 
         <Card data-testid="readonly-view">
           <CardContent className="p-6 space-y-4">
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Title</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                Title
+              </p>
               <p className="text-foreground">{survey.title}</p>
             </div>
             {survey.description && (
               <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Description</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                  Description
+                </p>
                 <p className="text-foreground">{survey.description}</p>
               </div>
             )}
             {survey.welcome_message && (
               <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Welcome Message</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                  Welcome Message
+                </p>
                 <p className="text-foreground">{survey.welcome_message}</p>
               </div>
             )}
             {survey.end_message && (
               <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">End Message</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                  End Message
+                </p>
                 <p className="text-foreground">{survey.end_message}</p>
               </div>
             )}
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Default Language</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                Default Language
+              </p>
               <p className="text-foreground">{survey.default_language}</p>
             </div>
           </CardContent>
@@ -285,7 +294,10 @@ function SurveyFormPage() {
       </div>
 
       {error && (
-        <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+        <div
+          className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+          role="alert"
+        >
           {error}
         </div>
       )}
@@ -306,7 +318,10 @@ function SurveyFormPage() {
                 placeholder="Enter survey title"
                 aria-required="true"
               />
-              <ValidationErrors errors={fieldErrors.title ? [fieldErrors.title] : []} id="survey-form-title-error" />
+              <ValidationErrors
+                errors={fieldErrors.title ? [fieldErrors.title] : []}
+                id="survey-form-title-error"
+              />
             </div>
 
             {/* Description */}

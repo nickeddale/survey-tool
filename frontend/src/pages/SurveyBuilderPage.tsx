@@ -14,14 +14,40 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate, UNSAFE_DataRouterContext } from 'react-router-dom'
 import surveyService from '../services/surveyService'
 import { useBuilderStore } from '../store/builderStore'
+import type { BuilderGroup, SelectedItem } from '../store/builderStore'
 import { ApiError } from '../types/api'
+import type { SurveyFullResponse } from '../types/survey'
 import { Button } from '../components/ui/button'
 import { BuilderToolbar } from '../components/survey-builder/BuilderToolbar'
 import { BuilderSkeleton } from '../components/survey-builder/BuilderSkeleton'
 import { QuestionPalette } from '../components/survey-builder/QuestionPalette'
 import { SurveyCanvas } from '../components/survey-builder/SurveyCanvas'
 import { PropertyEditor } from '../components/survey-builder/PropertyEditor'
+import { TranslationEditor } from '../components/survey-builder/TranslationEditor'
+import type { TranslationTarget } from '../components/survey-builder/TranslationEditor'
 import { NavigationBlocker } from '../components/survey-builder/NavigationBlocker'
+
+function buildTranslationTarget(
+  survey: SurveyFullResponse,
+  groups: BuilderGroup[],
+  selectedItem: SelectedItem
+): TranslationTarget {
+  if (selectedItem?.type === 'question') {
+    for (const g of groups) {
+      const q = g.questions.find((q) => q.id === selectedItem.id)
+      if (q) {
+        return { type: 'question', survey, group: g, question: q }
+      }
+    }
+  }
+  if (selectedItem?.type === 'group') {
+    const g = groups.find((g) => g.id === selectedItem.id)
+    if (g) {
+      return { type: 'group', survey, group: g }
+    }
+  }
+  return { type: 'survey', survey }
+}
 
 function SurveyBuilderPage() {
   const { id } = useParams<{ id: string }>()
@@ -46,11 +72,13 @@ function SurveyBuilderPage() {
     isTranslationMode,
     setTranslationMode,
     groups,
+    defaultLanguage,
     addQuestion,
   } = useBuilderStore()
 
   const readOnly = status !== '' && status !== 'draft'
   const [isPreviewMode, setIsPreviewMode] = useState(false)
+  const [surveyData, setSurveyData] = useState<SurveyFullResponse | null>(null)
   const undoRedoPendingRef = useRef(false)
   const hasUnsavedChanges = saveStatus === 'saving' || saveStatus === 'error'
 
@@ -105,10 +133,16 @@ function SurveyBuilderPage() {
       const isMeta = e.metaKey || e.ctrlKey
       if (isMeta && e.shiftKey && e.key === 'z') {
         e.preventDefault()
-        if (redoStack.length > 0) { undoRedoPendingRef.current = true; redo() }
+        if (redoStack.length > 0) {
+          undoRedoPendingRef.current = true
+          redo()
+        }
       } else if (isMeta && !e.shiftKey && e.key === 'z') {
         e.preventDefault()
-        if (undoStack.length > 0) { undoRedoPendingRef.current = true; undo() }
+        if (undoStack.length > 0) {
+          undoRedoPendingRef.current = true
+          undo()
+        }
       }
     }
 
@@ -129,7 +163,10 @@ function SurveyBuilderPage() {
   // Block browser close / tab refresh when there are unsaved changes
   useEffect(() => {
     function handleBeforeUnload(e: BeforeUnloadEvent) {
-      if (hasUnsavedChanges) { e.preventDefault(); e.returnValue = '' }
+      if (hasUnsavedChanges) {
+        e.preventDefault()
+        e.returnValue = ''
+      }
     }
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
@@ -145,10 +182,15 @@ function SurveyBuilderPage() {
       setError(null)
       try {
         const data = await surveyService.getSurvey(id!)
-        if (!cancelled) loadSurvey(data)
+        if (!cancelled) {
+          loadSurvey(data)
+          setSurveyData(data)
+        }
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof ApiError ? err.message : 'Failed to load survey. Please try again.')
+          setError(
+            err instanceof ApiError ? err.message : 'Failed to load survey. Please try again.'
+          )
         }
       } finally {
         if (!cancelled) setLoading(false)
@@ -156,18 +198,28 @@ function SurveyBuilderPage() {
     }
 
     load()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (isLoading) return <BuilderSkeleton />
 
   if (error || !surveyId) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen gap-4" data-testid="builder-error">
-        <div className="p-4 text-sm text-destructive bg-destructive/10 rounded-md max-w-md text-center" role="alert">
+      <div
+        className="flex flex-col items-center justify-center h-screen gap-4"
+        data-testid="builder-error"
+      >
+        <div
+          className="p-4 text-sm text-destructive bg-destructive/10 rounded-md max-w-md text-center"
+          role="alert"
+        >
           {error ?? 'Failed to load survey.'}
         </div>
-        <Button variant="outline" onClick={() => navigate('/surveys')}>Back to Surveys</Button>
+        <Button variant="outline" onClick={() => navigate('/surveys')}>
+          Back to Surveys
+        </Button>
       </div>
     )
   }
@@ -192,11 +244,18 @@ function SurveyBuilderPage() {
           onSelectItem={setSelectedItem}
           isPreviewMode={isPreviewMode}
         />
-        <PropertyEditor surveyId={surveyId ?? ''} readOnly={readOnly} selectedItem={selectedItem} />
+        {isTranslationMode && surveyData ? (
+          <TranslationEditor
+            surveyId={surveyId ?? ''}
+            target={buildTranslationTarget(surveyData, groups, selectedItem)}
+            defaultLanguage={defaultLanguage}
+            availableLanguages={[]}
+          />
+        ) : (
+          <PropertyEditor surveyId={surveyId ?? ''} readOnly={readOnly} selectedItem={selectedItem} />
+        )}
       </div>
-      {dataRouterContext && !readOnly && (
-        <NavigationBlocker shouldBlock={hasUnsavedChanges} />
-      )}
+      {dataRouterContext && !readOnly && <NavigationBlocker shouldBlock={hasUnsavedChanges} />}
     </div>
   )
 }

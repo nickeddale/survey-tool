@@ -32,8 +32,14 @@ describe('apiClient interceptors', () => {
       server.use(
         http.get(`${BASE}/auth/me`, ({ request }) => {
           capturedAuth = request.headers.get('Authorization')
-          return HttpResponse.json({ id: '1', email: 'a@b.com', name: null, is_active: true, created_at: '2024-01-01T00:00:00Z' })
-        }),
+          return HttpResponse.json({
+            id: '1',
+            email: 'a@b.com',
+            name: null,
+            is_active: true,
+            created_at: '2024-01-01T00:00:00Z',
+          })
+        })
       )
       setTokens(mockTokens.access_token)
       await apiClient.get('/auth/me')
@@ -46,9 +52,11 @@ describe('apiClient interceptors', () => {
         http.get(`${BASE}/open`, ({ request }) => {
           capturedAuth = request.headers.get('Authorization')
           return HttpResponse.json({})
-        }),
+        })
       )
-      await apiClient.get('/open').catch(() => {/* handler registered, may 404 */})
+      await apiClient.get('/open').catch(() => {
+        /* handler registered, may 404 */
+      })
       expect(capturedAuth).toBeNull()
     })
   })
@@ -61,9 +69,9 @@ describe('apiClient interceptors', () => {
         http.post(`${BASE}/auth/refresh`, () => {
           return HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'No refresh token' } },
-            { status: 401 },
+            { status: 401 }
           )
-        }),
+        })
       )
       try {
         await apiClient.get('/auth/me')
@@ -85,18 +93,21 @@ describe('apiClient interceptors', () => {
           if (callCount === 1) {
             return HttpResponse.json(
               { detail: { code: 'UNAUTHORIZED', message: 'Token expired' } },
-              { status: 401 },
+              { status: 401 }
             )
           }
           // Second call should have new token
           if (auth?.includes(mockNewTokens.access_token)) {
             return HttpResponse.json({ data: 'success' })
           }
-          return HttpResponse.json({ detail: { code: 'UNAUTHORIZED', message: 'Bad token' } }, { status: 401 })
+          return HttpResponse.json(
+            { detail: { code: 'UNAUTHORIZED', message: 'Bad token' } },
+            { status: 401 }
+          )
         }),
         http.post(`${BASE}/auth/refresh`, () => {
           return HttpResponse.json(mockNewTokens)
-        }),
+        })
       )
 
       setTokens(mockTokens.access_token)
@@ -112,15 +123,15 @@ describe('apiClient interceptors', () => {
         http.get(`${BASE}/protected`, () => {
           return HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Token expired' } },
-            { status: 401 },
+            { status: 401 }
           )
         }),
         http.post(`${BASE}/auth/refresh`, () => {
           return HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Invalid refresh token' } },
-            { status: 401 },
+            { status: 401 }
           )
-        }),
+        })
       )
 
       setTokens(mockTokens.access_token)
@@ -137,33 +148,30 @@ describe('apiClient interceptors', () => {
 
     it('only makes one refresh call when concurrent 401s arrive', async () => {
       let refreshCallCount = 0
-      let protectedCallCount = 0
+      let _protectedCallCount = 0
 
       server.use(
         http.get(`${BASE}/concurrent`, ({ request }) => {
-          protectedCallCount++
+          _protectedCallCount++
           const auth = request.headers.get('Authorization')
           if (auth?.includes(mockNewTokens.access_token)) {
             return HttpResponse.json({ data: 'ok' })
           }
           return HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Token expired' } },
-            { status: 401 },
+            { status: 401 }
           )
         }),
         http.post(`${BASE}/auth/refresh`, () => {
           refreshCallCount++
           return HttpResponse.json(mockNewTokens)
-        }),
+        })
       )
 
       setTokens(mockTokens.access_token)
 
       // Fire two requests simultaneously
-      await Promise.all([
-        apiClient.get('/concurrent'),
-        apiClient.get('/concurrent'),
-      ])
+      await Promise.all([apiClient.get('/concurrent'), apiClient.get('/concurrent')])
 
       // Only one refresh call should have been made
       expect(refreshCallCount).toBe(1)
@@ -176,9 +184,9 @@ describe('apiClient interceptors', () => {
         http.post(`${BASE}/auth/login`, () => {
           return HttpResponse.json(
             { detail: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' } },
-            { status: 401 },
+            { status: 401 }
           )
-        }),
+        })
       )
 
       try {
@@ -198,9 +206,9 @@ describe('apiClient interceptors', () => {
         http.post(`${BASE}/auth/register`, () => {
           return HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Unauthorized' } },
-            { status: 401 },
+            { status: 401 }
           )
-        }),
+        })
       )
 
       try {
@@ -222,12 +230,12 @@ describe('apiClient interceptors', () => {
           }
           return HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Token expired' } },
-            { status: 401 },
+            { status: 401 }
           )
         }),
         http.post(`${BASE}/auth/refresh`, () => {
           return HttpResponse.json(mockNewTokens)
-        }),
+        })
       )
 
       setTokens(mockTokens.access_token)
@@ -257,15 +265,15 @@ describe('apiClient interceptors', () => {
         http.get(`${BASE}/auth/me`, () => {
           return HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Token expired' } },
-            { status: 401 },
+            { status: 401 }
           )
         }),
         http.post(`${BASE}/auth/refresh`, () => {
           return HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Invalid refresh token' } },
-            { status: 401 },
+            { status: 401 }
           )
-        }),
+        })
       )
 
       setTokens(mockTokens.access_token)
@@ -289,15 +297,15 @@ describe('apiClient interceptors', () => {
         http.get(`${BASE}/auth/me`, () => {
           return HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Token expired' } },
-            { status: 401 },
+            { status: 401 }
           )
         }),
         http.post(`${BASE}/auth/refresh`, () => {
           return HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Invalid refresh token' } },
-            { status: 401 },
+            { status: 401 }
           )
-        }),
+        })
       )
 
       setTokens(mockTokens.access_token)
@@ -309,7 +317,6 @@ describe('apiClient interceptors', () => {
         expect(mockRedirect).not.toHaveBeenCalled()
       }
     })
-
   })
 
   describe('public survey route — no redirect on 401', () => {
@@ -336,15 +343,15 @@ describe('apiClient interceptors', () => {
         http.get(`${BASE}/surveys/abc-123/responses`, () => {
           return HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'No auth' } },
-            { status: 401 },
+            { status: 401 }
           )
         }),
         http.post(`${BASE}/auth/refresh`, () => {
           return HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'No refresh token' } },
-            { status: 401 },
+            { status: 401 }
           )
-        }),
+        })
       )
 
       setTokens(mockTokens.access_token)
@@ -368,15 +375,15 @@ describe('apiClient interceptors', () => {
         http.get(`${BASE}/surveys`, () => {
           return HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Token expired' } },
-            { status: 401 },
+            { status: 401 }
           )
         }),
         http.post(`${BASE}/auth/refresh`, () => {
           return HttpResponse.json(
             { detail: { code: 'UNAUTHORIZED', message: 'Invalid refresh token' } },
-            { status: 401 },
+            { status: 401 }
           )
-        }),
+        })
       )
 
       setTokens(mockTokens.access_token)
@@ -407,11 +414,11 @@ describe('apiClient interceptors', () => {
           if (refreshCallCount === 1) {
             return HttpResponse.json(
               { detail: { code: 'RATE_LIMITED', message: 'Too many requests' } },
-              { status: 429, headers: { 'Retry-After': '2' } },
+              { status: 429, headers: { 'Retry-After': '2' } }
             )
           }
           return HttpResponse.json(mockNewTokens)
-        }),
+        })
       )
 
       setTokens(mockTokens.access_token)
@@ -431,9 +438,9 @@ describe('apiClient interceptors', () => {
         http.post(`${BASE}/auth/refresh`, () => {
           return HttpResponse.json(
             { detail: { code: 'RATE_LIMITED', message: 'Too many requests' } },
-            { status: 429, headers: { 'Retry-After': '1' } },
+            { status: 429, headers: { 'Retry-After': '1' } }
           )
-        }),
+        })
       )
 
       setTokens(mockTokens.access_token)
@@ -451,9 +458,9 @@ describe('apiClient interceptors', () => {
         http.get(`${BASE}/surveys`, () => {
           return HttpResponse.json(
             { detail: { code: 'RATE_LIMITED', message: 'Too many requests' } },
-            { status: 429, headers: { 'Retry-After': '10' } },
+            { status: 429, headers: { 'Retry-After': '10' } }
           )
-        }),
+        })
       )
 
       setTokens(mockTokens.access_token)
@@ -476,9 +483,9 @@ describe('apiClient interceptors', () => {
         http.get(`${BASE}/not-found`, () => {
           return HttpResponse.json(
             { detail: { code: 'NOT_FOUND', message: 'Resource not found' } },
-            { status: 404 },
+            { status: 404 }
           )
-        }),
+        })
       )
 
       try {

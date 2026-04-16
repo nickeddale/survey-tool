@@ -12,6 +12,7 @@ assessment_scope = ENUM(
     "total",
     "group",
     "question",
+    "subquestion",
     name="assessment_scope",
     create_type=False,
 )
@@ -51,6 +52,12 @@ class Assessment(Base):
         nullable=True,
         index=True,
     )
+    subquestion_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("questions.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
     min_score: Mapped[float] = mapped_column(
         Numeric(precision=10, scale=2),
         nullable=False,
@@ -84,5 +91,11 @@ class Assessment(Base):
     )
     question = relationship(
         "Question",
+        foreign_keys="[Assessment.question_id]",
+        lazy="raise",
+    )
+    subquestion = relationship(
+        "Question",
+        foreign_keys="[Assessment.subquestion_id]",
         lazy="raise",
     )

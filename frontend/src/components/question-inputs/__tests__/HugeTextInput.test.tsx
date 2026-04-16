@@ -132,7 +132,10 @@ describe('HugeTextInput — plain textarea mode', () => {
   it('shows placeholder text', () => {
     const question = makeQuestion({ settings: makeSettings({ placeholder: 'Write in detail...' }) })
     render(<HugeTextInput value="" onChange={vi.fn()} question={question} />)
-    expect(screen.getByTestId('huge-text-textarea')).toHaveAttribute('placeholder', 'Write in detail...')
+    expect(screen.getByTestId('huge-text-textarea')).toHaveAttribute(
+      'placeholder',
+      'Write in detail...'
+    )
   })
 
   it('reflects the current value', () => {
@@ -185,7 +188,9 @@ describe('HugeTextInput — character counter', () => {
   })
 
   it('does not show counter when max_length is undefined (no key in settings)', () => {
-    const question = makeQuestion({ settings: { placeholder: null, rows: 10, rich_text: false } as HugeTextSettings })
+    const question = makeQuestion({
+      settings: { placeholder: null, rows: 10, rich_text: false } as HugeTextSettings,
+    })
     render(<HugeTextInput value="" onChange={vi.fn()} question={question} />)
     expect(screen.queryByTestId('huge-text-char-counter')).not.toBeInTheDocument()
   })
@@ -200,7 +205,9 @@ describe('HugeTextInput — character counter', () => {
   it('updates counter when textarea value changes', async () => {
     const user = userEvent.setup()
     let val = ''
-    const onChange = vi.fn((v: string) => { val = v })
+    const onChange = vi.fn((v: string) => {
+      val = v
+    })
     const question = makeQuestion({ settings: makeSettings({ max_length: 200 }) })
     const { rerender } = render(
       <HugeTextInput value={val} onChange={onChange} question={question} />
@@ -283,7 +290,10 @@ describe('HugeTextInput — required validation', () => {
 describe('HugeTextInput — required validation in rich text mode', () => {
   it('shows required error when rich text is empty on blur', async () => {
     const user = userEvent.setup()
-    const question = makeQuestion({ is_required: true, settings: makeSettings({ rich_text: true }) })
+    const question = makeQuestion({
+      is_required: true,
+      settings: makeSettings({ rich_text: true }),
+    })
 
     render(<HugeTextInput value="" onChange={vi.fn()} question={question} />)
 
@@ -326,7 +336,12 @@ describe('HugeTextInput — external errors', () => {
   it('displays external errors when provided', () => {
     const question = makeQuestion({ settings: makeSettings() })
     render(
-      <HugeTextInput value="" onChange={vi.fn()} question={question} errors={['Server validation failed']} />
+      <HugeTextInput
+        value=""
+        onChange={vi.fn()}
+        question={question}
+        errors={['Server validation failed']}
+      />
     )
     expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server validation failed')
   })
@@ -345,19 +360,18 @@ describe('HugeTextInput — accessibility', () => {
 
   it('sets aria-invalid=true when errors exist', () => {
     const question = makeQuestion({ settings: makeSettings() })
-    render(
-      <HugeTextInput value="" onChange={vi.fn()} question={question} errors={['Required']} />
-    )
+    render(<HugeTextInput value="" onChange={vi.fn()} question={question} errors={['Required']} />)
     expect(screen.getByTestId('huge-text-textarea')).toHaveAttribute('aria-invalid', 'true')
   })
 
   it('sets aria-describedby pointing to error container', () => {
     const question = makeQuestion({ id: 'q-huge-abc', settings: makeSettings() })
-    render(
-      <HugeTextInput value="" onChange={vi.fn()} question={question} errors={['Required']} />
-    )
+    render(<HugeTextInput value="" onChange={vi.fn()} question={question} errors={['Required']} />)
     const textarea = screen.getByTestId('huge-text-textarea')
     expect(textarea).toHaveAttribute('aria-describedby', 'question-q-huge-abc-error')
-    expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-huge-abc-error')
+    expect(screen.getByTestId('validation-errors')).toHaveAttribute(
+      'id',
+      'question-q-huge-abc-error'
+    )
   })
 })

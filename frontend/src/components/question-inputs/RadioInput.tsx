@@ -56,7 +56,12 @@ function getSessionSeed(questionId: string): number {
 // Validation helpers
 // ---------------------------------------------------------------------------
 
-function validate(value: string, otherText: string, isOther: boolean, isRequired: boolean): string[] {
+function validate(
+  value: string,
+  otherText: string,
+  isOther: boolean,
+  isRequired: boolean
+): string[] {
   const errs: string[] = []
   if (isRequired && value === '') {
     errs.push('This field is required.')
@@ -100,7 +105,9 @@ export function RadioInput({ value, onChange, question, errors: externalErrors }
   function handleRadioChange(optionValue: string) {
     onChange(optionValue)
     if (touched) {
-      setInternalErrors(validate(optionValue, otherText, optionValue === OTHER_VALUE, question.is_required))
+      setInternalErrors(
+        validate(optionValue, otherText, optionValue === OTHER_VALUE, question.is_required)
+      )
     }
   }
 

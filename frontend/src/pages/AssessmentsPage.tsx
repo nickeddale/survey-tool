@@ -63,10 +63,14 @@ function ConfirmDeleteModal({
             Delete Assessment
           </h2>
           <p className="text-sm text-muted-foreground mb-4">
-            Are you sure you want to delete &quot;{assessmentName}&quot;? This action cannot be undone.
+            Are you sure you want to delete &quot;{assessmentName}&quot;? This action cannot be
+            undone.
           </p>
           {error && (
-            <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+            <div
+              className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+              role="alert"
+            >
               {error}
             </div>
           )}
@@ -152,15 +156,20 @@ function AssessmentsPage() {
   useEffect(() => {
     if (!surveyId) return
     let cancelled = false
-    surveyService.getSurvey(surveyId).then((survey) => {
-      if (!cancelled) {
-        setGroups(survey.groups)
-        setQuestions(survey.questions)
-      }
-    }).catch(() => {
-      // Non-critical — group/question selectors just won't have options
-    })
-    return () => { cancelled = true }
+    surveyService
+      .getSurvey(surveyId)
+      .then((survey) => {
+        if (!cancelled) {
+          setGroups(survey.groups)
+          setQuestions(survey.questions)
+        }
+      })
+      .catch(() => {
+        // Non-critical — group/question selectors just won't have options
+      })
+    return () => {
+      cancelled = true
+    }
   }, [surveyId])
 
   // ---------------------------------------------------------------------------
@@ -208,7 +217,7 @@ function AssessmentsPage() {
         setFormLoading(false)
       }
     },
-    [surveyId, editingAssessment, loadAssessments],
+    [surveyId, editingAssessment, loadAssessments]
   )
 
   // ---------------------------------------------------------------------------
@@ -313,7 +322,10 @@ function AssessmentsPage() {
 
       {/* Global error */}
       {error && (
-        <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+        <div
+          className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+          role="alert"
+        >
           {error}
         </div>
       )}
@@ -340,9 +352,13 @@ function AssessmentsPage() {
                 <tr>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Name</th>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Scope</th>
-                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">Score Range</th>
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+                    Score Range
+                  </th>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Message</th>
-                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">Actions</th>
+                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">

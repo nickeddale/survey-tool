@@ -43,11 +43,7 @@ function matchesAllowedType(file: File, allowedTypes: string[]): boolean {
   })
 }
 
-function validateFiles(
-  files: File[],
-  allowedTypes: string[],
-  maxSizeMb: number,
-): string[] {
+function validateFiles(files: File[], allowedTypes: string[], maxSizeMb: number): string[] {
   const errs: string[] = []
   for (const file of files) {
     if (!matchesAllowedType(file, allowedTypes)) {
@@ -132,7 +128,12 @@ function FilePreview({ file, onRemove }: FilePreviewProps) {
 // Component
 // ---------------------------------------------------------------------------
 
-export function FileUploadInput({ value, onChange, question, errors: externalErrors }: FileUploadInputProps) {
+export function FileUploadInput({
+  value,
+  onChange,
+  question,
+  errors: externalErrors,
+}: FileUploadInputProps) {
   const s = (question.settings ?? {}) as Partial<FileUploadSettings>
   const allowedTypes = s.allowed_types ?? []
   const maxSizeMb = s.max_size_mb ?? 10
@@ -208,11 +209,7 @@ export function FileUploadInput({ value, onChange, question, errors: externalErr
   const acceptAttr = allowedTypes.length > 0 ? allowedTypes.join(',') : undefined
 
   return (
-    <div
-      className="space-y-3"
-      data-testid={`file-upload-input-${question.id}`}
-      onBlur={handleBlur}
-    >
+    <div className="space-y-3" data-testid={`file-upload-input-${question.id}`} onBlur={handleBlur}>
       {/* Drop zone */}
       <div
         role="button"
@@ -253,7 +250,9 @@ export function FileUploadInput({ value, onChange, question, errors: externalErr
         </svg>
         <p className="text-sm font-medium">Drop files here or click to upload</p>
         <p className="text-xs text-muted-foreground mt-1">
-          {allowedTypes.length > 0 ? `Accepted: ${allowedTypes.join(', ')}` : 'All file types accepted'}
+          {allowedTypes.length > 0
+            ? `Accepted: ${allowedTypes.join(', ')}`
+            : 'All file types accepted'}
           {` · Max ${maxSizeMb} MB`}
           {multiple ? ` · Up to ${maxFiles} files` : ''}
         </p>

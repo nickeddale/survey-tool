@@ -51,7 +51,12 @@ function validate(value: string, s: Partial<ShortTextSettings>, isRequired: bool
 // Component
 // ---------------------------------------------------------------------------
 
-export function ShortTextInput({ value, onChange, question, errors: externalErrors }: TextInputProps) {
+export function ShortTextInput({
+  value,
+  onChange,
+  question,
+  errors: externalErrors,
+}: TextInputProps) {
   const s = (question.settings ?? {}) as Partial<ShortTextSettings>
   const inputType = s.input_type ?? 'text'
   const maxLength = s.max_length ?? null

@@ -1,11 +1,12 @@
 """Scoring engine for survey assessments.
 
 Computes a total score for a response by summing the assessment_value of all
-selected answer options. Supports three scopes:
+selected answer options. Supports four scopes:
 
-    total    - sum over all questions in the survey
-    group    - sum only questions belonging to a specific question group
-    question - sum only the specified question
+    total       - sum over all questions in the survey
+    group       - sum only questions belonging to a specific question group
+    question    - sum only the specified question
+    subquestion - sum only the specified subquestion row (matrix types)
 
 Returns the computed score and all Assessment rules whose [min_score, max_score]
 range contains the computed score. Multiple rules may match (overlapping ranges).
@@ -18,13 +19,114 @@ from decimal import Decimal
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from app.models.answer_option import AnswerOption
 from app.models.assessment import Assessment
 from app.models.question import Question
 from app.models.response_answer import ResponseAnswer
 from app.schemas.assessment import AssessmentResponse, AssessmentScoreResponse
+
+
+SCORABLE_CELL_TYPES: frozenset[str] = frozenset({"dropdown", "radio", "rating", "checkbox"})
+
+
+def _extract_matrix_dropdown_codes(
+    val: dict,
+    question_id: uuid.UUID,
+    subquestion_id_map: dict[uuid.UUID, dict[str, uuid.UUID]],
+    settings_map: dict[uuid.UUID, dict],
+) -> list[tuple[str, uuid.UUID | None]]:
+    """Extract (option_code, subquestion_id) tuples from a matrix_dropdown answer.
+
+    matrix_dropdown answer format: {"SQ001": {"col1": "5", "col2": "text"}, ...}
+    Only columns whose type is in SCORABLE_CELL_TYPES contribute option codes.
+    """
+    column_types: dict[str, str] = (settings_map.get(question_id) or {}).get("column_types") or {}
+    sq_code_map = subquestion_id_map.get(question_id, {})
+    result: list[tuple[str, uuid.UUID | None]] = []
+    for sq_code, col_dict in val.items():
+        if not isinstance(col_dict, dict):
+            continue
+        sq_id = sq_code_map.get(sq_code)
+        for col_name, cell_value in col_dict.items():
+            col_type = column_types.get(col_name, "")
+            if col_type not in SCORABLE_CELL_TYPES:
+                continue
+            if cell_value is None:
+                continue
+            result.append((str(cell_value), sq_id))
+    return result
+
+
+def _extract_matrix_dynamic_codes(
+    val: list,
+    question_id: uuid.UUID,
+    settings_map: dict[uuid.UUID, dict],
+) -> list[tuple[str, None]]:
+    """Extract (option_code, None) tuples from a matrix_dynamic answer.
+
+    matrix_dynamic answer format: [{"col1": "Alice", "col2": "5"}, ...]
+    Rows are user-defined and have no subquestion IDs — always returns sq_id=None.
+    Only columns whose type is in SCORABLE_CELL_TYPES contribute option codes.
+    """
+    column_types: dict[str, str] = (settings_map.get(question_id) or {}).get("column_types") or {}
+    result: list[tuple[str, None]] = []
+    for row in val:
+        if not isinstance(row, dict):
+            continue
+        for col_name, cell_value in row.items():
+            col_type = column_types.get(col_name, "")
+            if col_type not in SCORABLE_CELL_TYPES:
+                continue
+            if cell_value is None:
+                continue
+            result.append((str(cell_value), None))
+    return result
+
+
+def _extract_matrix_single_codes(
+    val: dict,
+    question_id: uuid.UUID,
+    subquestion_id_map: dict[uuid.UUID, dict[str, uuid.UUID]],
+) -> list[tuple[str, uuid.UUID | None]]:
+    """Extract (option_code, subquestion_id) tuples from a matrix_single answer.
+
+    matrix_single answer format: {"SQ001": "A1", "SQ002": "A2"}
+    Each key is a subquestion code, each value is the selected option code.
+    """
+    sq_code_map = subquestion_id_map.get(question_id, {})
+    result: list[tuple[str, uuid.UUID | None]] = []
+    for sq_code, option_code in val.items():
+        if option_code is None:
+            continue
+        sq_id = sq_code_map.get(sq_code)
+        result.append((str(option_code), sq_id))
+    return result
+
+
+def _extract_matrix_multiple_codes(
+    val: dict,
+    question_id: uuid.UUID,
+    subquestion_id_map: dict[uuid.UUID, dict[str, uuid.UUID]],
+) -> list[tuple[str, uuid.UUID | None]]:
+    """Extract (option_code, subquestion_id) tuples from a matrix_multiple answer.
+
+    matrix_multiple answer format: {"SQ001": ["A1", "A2"], "SQ002": ["A3"]}
+    Each key is a subquestion code, each value is a list of selected option codes.
+    """
+    sq_code_map = subquestion_id_map.get(question_id, {})
+    result: list[tuple[str, uuid.UUID | None]] = []
+    for sq_code, option_codes in val.items():
+        if not option_codes:
+            continue
+        sq_id = sq_code_map.get(sq_code)
+        if isinstance(option_codes, list):
+            for option_code in option_codes:
+                if option_code is not None:
+                    result.append((str(option_code), sq_id))
+        else:
+            result.append((str(option_codes), sq_id))
+    return result
 
 
 async def compute_score(
@@ -36,12 +138,15 @@ async def compute_score(
 
     Steps:
         1. Load all ResponseAnswer rows for the response (answer_type='answer' only).
-        2. For each answer whose value is a list of option codes, load the matching
+        2. For each answer whose value is a list/string of option codes, load the matching
            AnswerOption rows and sum their assessment_value fields.
+           For matrix_single/matrix_multiple answers (dict values), unpack per-row codes
+           and track per-subquestion scores.
         3. Load all Assessment rules for the survey.
         4. For scope=total: use all questions' answer values.
            For scope=group: use only answers for questions in the specified group.
            For scope=question: use only answers for the specified question.
+           For scope=subquestion: use only the score for the specified subquestion.
         5. Return score and all matching rules (min_score <= score <= max_score).
 
     Args:
@@ -85,56 +190,111 @@ async def compute_score(
     question_group_map: dict[uuid.UUID, uuid.UUID] = {
         q.id: q.group_id for q in questions
     }
+    question_type_map: dict[uuid.UUID, str] = {
+        q.id: q.question_type for q in questions
+    }
 
-    # Build answer lookup: question_id -> list of selected option codes
-    answer_code_map: dict[uuid.UUID, list[str]] = {}
+    # Build question settings map for matrix_dropdown/matrix_dynamic scoring
+    question_settings_map: dict[uuid.UUID, dict] = {
+        q.id: (q.settings or {}) for q in questions
+    }
+
+    # Find matrix question IDs that need subquestion lookup
+    matrix_types = {"matrix_single", "matrix_multiple", "matrix_dropdown"}
+    matrix_qids = [q.id for q in questions if q.question_type in matrix_types]
+
+    # Load subquestions for matrix questions and build subquestion_id_map
+    # subquestion_id_map: parent_uuid -> {sq_code: sq_uuid}
+    subquestion_id_map: dict[uuid.UUID, dict[str, uuid.UUID]] = {}
+    if matrix_qids:
+        sq_result = await session.execute(
+            select(Question).where(Question.parent_id.in_(matrix_qids))
+        )
+        subquestions: list[Question] = list(sq_result.scalars().all())
+        for sq in subquestions:
+            if sq.parent_id not in subquestion_id_map:
+                subquestion_id_map[sq.parent_id] = {}
+            subquestion_id_map[sq.parent_id][sq.code] = sq.id
+
+    # Build answer lookup: question_id -> list of (option_code, subquestion_id_or_none)
+    # For non-matrix types, subquestion_id is None
+    answer_code_entries: dict[uuid.UUID, list[tuple[str, uuid.UUID | None]]] = {}
     for ra in response_answers:
         val = ra.value
         if val is None:
             continue
+        q_type = question_type_map.get(ra.question_id, "")
         if isinstance(val, list):
-            # Multi-select: list of codes
-            codes = [str(c) for c in val if c is not None]
+            if q_type == "matrix_dynamic":
+                entries = _extract_matrix_dynamic_codes(val, ra.question_id, question_settings_map)
+            else:
+                # Multi-select: list of codes (no subquestion)
+                entries = [(str(c), None) for c in val if c is not None]
         elif isinstance(val, str):
-            # Single select stored as string
-            codes = [val]
+            # Single select stored as string (no subquestion)
+            entries = [(val, None)]
         elif isinstance(val, dict):
-            # Some question types store code-keyed dicts; skip for scoring
-            continue
+            if q_type == "matrix_single":
+                entries = _extract_matrix_single_codes(val, ra.question_id, subquestion_id_map)
+            elif q_type == "matrix_multiple":
+                entries = _extract_matrix_multiple_codes(val, ra.question_id, subquestion_id_map)
+            elif q_type == "matrix_dropdown":
+                entries = _extract_matrix_dropdown_codes(
+                    val, ra.question_id, subquestion_id_map, question_settings_map
+                )
+            else:
+                # Other dict-valued question types — skip for scoring
+                continue
         else:
             # Numeric or boolean values — no option codes to look up
             continue
-        if codes:
-            answer_code_map[ra.question_id] = codes
+        if entries:
+            answer_code_entries[ra.question_id] = entries
 
     # Step 2b: Load all AnswerOption rows for the relevant questions that have codes
     total_score = Decimal("0")
     group_score_map: dict[uuid.UUID, Decimal] = {}  # group_id -> score
     question_score_map: dict[uuid.UUID, Decimal] = {}  # question_id -> score
+    subquestion_score_map: dict[uuid.UUID, Decimal] = {}  # subquestion_id -> score
 
-    if answer_code_map:
+    if answer_code_entries:
+        # Collect all unique codes across all questions
+        all_codes = [
+            code
+            for entries in answer_code_entries.values()
+            for code, _ in entries
+        ]
         ao_result = await session.execute(
             select(AnswerOption).where(
-                AnswerOption.question_id.in_(list(answer_code_map.keys())),
-                AnswerOption.code.in_(
-                    [code for codes in answer_code_map.values() for code in codes]
-                ),
+                AnswerOption.question_id.in_(list(answer_code_entries.keys())),
+                AnswerOption.code.in_(all_codes),
             )
         )
         answer_options: list[AnswerOption] = list(ao_result.scalars().all())
 
-        # Sum assessment_value for selected options
+        # Build a lookup for quick access: (question_id, code) -> AnswerOption
+        ao_lookup: dict[tuple[uuid.UUID, str], AnswerOption] = {}
         for ao in answer_options:
-            selected_codes = answer_code_map.get(ao.question_id, [])
-            if ao.code in selected_codes:
+            ao_lookup[(ao.question_id, ao.code)] = ao
+
+        # Sum assessment_value for selected options
+        for question_id, entries in answer_code_entries.items():
+            group_id = question_group_map.get(question_id)
+            for option_code, sq_id in entries:
+                ao = ao_lookup.get((question_id, option_code))
+                if ao is None:
+                    continue
                 av = Decimal(str(ao.assessment_value))
                 total_score += av
-                group_id = question_group_map.get(ao.question_id)
                 if group_id is not None:
                     group_score_map[group_id] = group_score_map.get(group_id, Decimal("0")) + av
-                question_score_map[ao.question_id] = (
-                    question_score_map.get(ao.question_id, Decimal("0")) + av
+                question_score_map[question_id] = (
+                    question_score_map.get(question_id, Decimal("0")) + av
                 )
+                if sq_id is not None:
+                    subquestion_score_map[sq_id] = (
+                        subquestion_score_map.get(sq_id, Decimal("0")) + av
+                    )
 
     # Step 3: Load all Assessment rules for this survey
     all_assessments = await _load_assessments(session, survey_id)
@@ -152,6 +312,10 @@ async def compute_score(
             if assessment.question_id is None:
                 continue
             score_for_rule = question_score_map.get(assessment.question_id, Decimal("0"))
+        elif assessment.scope == "subquestion":
+            if assessment.subquestion_id is None:
+                continue
+            score_for_rule = subquestion_score_map.get(assessment.subquestion_id, Decimal("0"))
         else:
             continue
 

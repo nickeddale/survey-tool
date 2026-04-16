@@ -33,12 +33,17 @@ function renderAssessments(surveyId = SURVEY_ID) {
           <Route path="/surveys/:id" element={<LocationDisplay />} />
         </Routes>
       </AuthProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
 function resetAuthStore() {
-  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
+  useAuthStore.setState({
+    user: null,
+    isAuthenticated: false,
+    isInitializing: false,
+    isLoading: false,
+  })
 }
 
 // ---------------------------------------------------------------------------
@@ -52,7 +57,12 @@ describe('AssessmentsPage', () => {
     resetAuthStore()
     setTokens(mockTokens.access_token)
     localStorage.removeItem('devtracker_refresh_token')
-    useAuthStore.setState({ user: mockUser, isAuthenticated: true, isInitializing: false, isLoading: false })
+    useAuthStore.setState({
+      user: mockUser,
+      isAuthenticated: true,
+      isInitializing: false,
+      isLoading: false,
+    })
   })
 
   afterEach(() => {
@@ -67,7 +77,7 @@ describe('AssessmentsPage', () => {
   describe('loading state', () => {
     it('renders loading skeleton while data is being fetched', async () => {
       server.use(
-        http.get(`/api/v1/surveys/${SURVEY_ID}/assessments`, () => new Promise<never>(() => {})),
+        http.get(`/api/v1/surveys/${SURVEY_ID}/assessments`, () => new Promise<never>(() => {}))
       )
 
       renderAssessments()
@@ -153,9 +163,9 @@ describe('AssessmentsPage', () => {
         http.get(`/api/v1/surveys/${SURVEY_ID}/assessments`, () =>
           HttpResponse.json(
             { items: [], total: 0, page: 1, per_page: 10, total_pages: 1 },
-            { status: 200 },
-          ),
-        ),
+            { status: 200 }
+          )
+        )
       )
 
       renderAssessments()
@@ -165,7 +175,9 @@ describe('AssessmentsPage', () => {
       })
 
       expect(screen.getByText(/no assessments have been configured/i)).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /create your first assessment/i })).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', { name: /create your first assessment/i })
+      ).toBeInTheDocument()
     })
   })
 
@@ -227,16 +239,16 @@ describe('AssessmentsPage', () => {
               survey_id: SURVEY_ID,
               name: body.name as string,
               scope: body.scope as string,
-              group_id: body.group_id as string | null ?? null,
+              group_id: (body.group_id as string | null) ?? null,
               min_score: body.min_score as number,
               max_score: body.max_score as number,
               message: body.message as string,
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
             },
-            { status: 201 },
+            { status: 201 }
           )
-        }),
+        })
       )
 
       renderAssessments()
@@ -311,7 +323,9 @@ describe('AssessmentsPage', () => {
       })
 
       expect(screen.getByTestId('assessment-form-error')).toBeInTheDocument()
-      expect(screen.getByTestId('assessment-form-error').textContent).toMatch(/min score.*max score/i)
+      expect(screen.getByTestId('assessment-form-error').textContent).toMatch(
+        /min score.*max score/i
+      )
     })
   })
 
@@ -376,7 +390,7 @@ describe('AssessmentsPage', () => {
         http.delete(`/api/v1/surveys/${SURVEY_ID}/assessments/:assessmentId`, () => {
           deleteCalled = true
           return new HttpResponse(null, { status: 204 })
-        }),
+        })
       )
 
       renderAssessments()
@@ -406,7 +420,7 @@ describe('AssessmentsPage', () => {
         http.delete(`/api/v1/surveys/${SURVEY_ID}/assessments/:assessmentId`, ({ params }) => {
           deletedId = params.assessmentId as string
           return new HttpResponse(null, { status: 204 })
-        }),
+        })
       )
 
       renderAssessments()
@@ -463,9 +477,9 @@ describe('AssessmentsPage', () => {
         http.get(`/api/v1/surveys/${SURVEY_ID}/assessments`, () =>
           HttpResponse.json(
             { detail: { code: 'INTERNAL_SERVER_ERROR', message: 'Internal server error' } },
-            { status: 500 },
-          ),
-        ),
+            { status: 500 }
+          )
+        )
       )
 
       renderAssessments()

@@ -24,7 +24,10 @@ function LocationDisplay() {
 
 function renderProtectedRoute(initialPath: string) {
   return render(
-    <MemoryRouter initialEntries={[initialPath]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <MemoryRouter
+      initialEntries={[initialPath]}
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
       <AuthProvider>
         <Routes>
           <Route element={<ProtectedRoute />}>
@@ -35,7 +38,7 @@ function renderProtectedRoute(initialPath: string) {
           <Route path="*" element={<LocationDisplay />} />
         </Routes>
       </AuthProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
@@ -48,15 +51,18 @@ describe('ProtectedRoute', () => {
     clearTokens()
     localStorage.clear()
     // Reset store but keep isInitializing: true so AuthProvider.initialize() drives the state
-    useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: true, isLoading: false })
+    useAuthStore.setState({
+      user: null,
+      isAuthenticated: false,
+      isInitializing: true,
+      isLoading: false,
+    })
   })
 
   it('shows loading spinner while isInitializing is true', async () => {
     // Make refresh endpoint hang so initialize() keeps isInitializing=true
     setTokens(mockTokens.access_token)
-    server.use(
-      http.post('/api/v1/auth/refresh', () => new Promise<never>(() => {})),
-    )
+    server.use(http.post('/api/v1/auth/refresh', () => new Promise<never>(() => {})))
 
     renderProtectedRoute('/dashboard')
     // isInitializing should be true immediately while the hung refresh is pending

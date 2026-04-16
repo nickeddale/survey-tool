@@ -12,6 +12,9 @@ Requires-Dist: pydantic-settings<3.0,>=2.2
 Requires-Dist: python-jose[cryptography]<4.0,>=3.3
 Requires-Dist: bcrypt<6.0,>=4.0
 Requires-Dist: slowapi>=0.1.9
+Requires-Dist: gunicorn<24.0,>=22.0
+Requires-Dist: regex>=2023.0
+Requires-Dist: aiosmtplib<4.0,>=3.0
 Provides-Extra: dev
 Requires-Dist: pytest<9.0,>=8.1; extra == "dev"
 Requires-Dist: pytest-asyncio<0.24,>=0.23; extra == "dev"

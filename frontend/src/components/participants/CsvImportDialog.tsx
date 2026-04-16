@@ -120,18 +120,16 @@ function CsvImportDialog({ surveyId, onComplete, onCancel }: CsvImportDialogProp
     >
       <Card className="max-w-2xl w-full mx-4 shadow-lg max-h-[90vh] overflow-y-auto">
         <CardContent className="p-6">
-          <h2
-            id="csv-import-title"
-            className="text-lg font-semibold text-foreground mb-2"
-          >
+          <h2 id="csv-import-title" className="text-lg font-semibold text-foreground mb-2">
             Import Participants from CSV
           </h2>
           <p className="text-sm text-muted-foreground mb-4">
-            Upload a CSV file with an <code className="font-mono text-xs bg-muted px-1 rounded">email</code> column.
-            Optional columns: <code className="font-mono text-xs bg-muted px-1 rounded">uses_remaining</code>,{' '}
-            <code className="font-mono text-xs bg-muted px-1 rounded">valid_from</code>,{' '}
-            <code className="font-mono text-xs bg-muted px-1 rounded">valid_until</code>.
-            Any other columns become attributes.
+            Upload a CSV file with an{' '}
+            <code className="font-mono text-xs bg-muted px-1 rounded">email</code> column. Optional
+            columns: <code className="font-mono text-xs bg-muted px-1 rounded">uses_remaining</code>
+            , <code className="font-mono text-xs bg-muted px-1 rounded">valid_from</code>,{' '}
+            <code className="font-mono text-xs bg-muted px-1 rounded">valid_until</code>. Any other
+            columns become attributes.
           </p>
 
           {/* File picker */}
@@ -189,7 +187,10 @@ function CsvImportDialog({ surveyId, onComplete, onCancel }: CsvImportDialogProp
                   <thead className="bg-muted/50 sticky top-0">
                     <tr>
                       {previewHeaders.map((h) => (
-                        <th key={h} className="text-left px-3 py-2 font-medium text-muted-foreground">
+                        <th
+                          key={h}
+                          className="text-left px-3 py-2 font-medium text-muted-foreground"
+                        >
                           {h}
                         </th>
                       ))}
@@ -231,7 +232,9 @@ function CsvImportDialog({ surveyId, onComplete, onCancel }: CsvImportDialogProp
               disabled={preview.length === 0 || isLoading}
               data-testid="csv-import-submit"
             >
-              {isLoading ? 'Importing...' : `Import ${preview.length > 0 ? preview.length : ''} Participants`}
+              {isLoading
+                ? 'Importing...'
+                : `Import ${preview.length > 0 ? preview.length : ''} Participants`}
             </Button>
           </div>
         </CardContent>

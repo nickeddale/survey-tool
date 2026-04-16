@@ -107,7 +107,9 @@ describe('ShortTextInput — character counter', () => {
 
   it('does not show counter when settings has no max_length (undefined)', () => {
     // Cast to Partial so max_length is undefined → counter hidden
-    const question = makeQuestion({ settings: { placeholder: null, input_type: 'text' } as ShortTextSettings })
+    const question = makeQuestion({
+      settings: { placeholder: null, input_type: 'text' } as ShortTextSettings,
+    })
     render(<ShortTextInput value="" onChange={vi.fn()} question={question} />)
     expect(screen.queryByTestId('short-text-char-counter')).not.toBeInTheDocument()
   })
@@ -115,7 +117,9 @@ describe('ShortTextInput — character counter', () => {
   it('updates counter when value changes', async () => {
     const user = userEvent.setup()
     let currentValue = 'Hi'
-    const onChange = vi.fn((v: string) => { currentValue = v })
+    const onChange = vi.fn((v: string) => {
+      currentValue = v
+    })
 
     const question = makeQuestion({ settings: makeSettings({ max_length: 50 }) })
     const { rerender } = render(
@@ -306,7 +310,12 @@ describe('ShortTextInput — external errors prop', () => {
   it('displays external errors when provided', () => {
     const question = makeQuestion({ settings: makeSettings() })
     render(
-      <ShortTextInput value="" onChange={vi.fn()} question={question} errors={['Server error occurred']} />
+      <ShortTextInput
+        value=""
+        onChange={vi.fn()}
+        question={question}
+        errors={['Server error occurred']}
+      />
     )
     expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error occurred')
   })
@@ -325,17 +334,13 @@ describe('ShortTextInput — accessibility', () => {
 
   it('sets aria-invalid=true when there are errors', async () => {
     const question = makeQuestion({ settings: makeSettings() })
-    render(
-      <ShortTextInput value="" onChange={vi.fn()} question={question} errors={['Required']} />
-    )
+    render(<ShortTextInput value="" onChange={vi.fn()} question={question} errors={['Required']} />)
     expect(screen.getByTestId('short-text-input')).toHaveAttribute('aria-invalid', 'true')
   })
 
   it('sets aria-describedby pointing to error container when there are errors', async () => {
     const question = makeQuestion({ id: 'q-test', settings: makeSettings() })
-    render(
-      <ShortTextInput value="" onChange={vi.fn()} question={question} errors={['Required']} />
-    )
+    render(<ShortTextInput value="" onChange={vi.fn()} question={question} errors={['Required']} />)
     const input = screen.getByTestId('short-text-input')
     expect(input).toHaveAttribute('aria-describedby', 'question-q-test-error')
     expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')

@@ -39,14 +39,7 @@ interface QuotaFormProps {
 // QuotaForm
 // ---------------------------------------------------------------------------
 
-function QuotaForm({
-  questions,
-  quota,
-  onSubmit,
-  onCancel,
-  isLoading,
-  error,
-}: QuotaFormProps) {
+function QuotaForm({ questions, quota, onSubmit, onCancel, isLoading, error }: QuotaFormProps) {
   const isEdit = Boolean(quota)
 
   const [name, setName] = useState(quota?.name ?? '')
@@ -54,7 +47,7 @@ function QuotaForm({
   const [action, setAction] = useState<QuotaAction>(quota?.action ?? 'terminate')
   const [isActive, setIsActive] = useState(quota?.is_active ?? true)
   const [conditions, setConditions] = useState<ConditionRow[]>(
-    quota ? quotaConditionsToConditionRows(quota.conditions) : [],
+    quota ? quotaConditionsToConditionRows(quota.conditions) : []
   )
   const [validationError, setValidationError] = useState<string | null>(null)
 
@@ -124,10 +117,7 @@ function QuotaForm({
     >
       <div className="bg-background rounded-lg shadow-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="p-6">
-          <h2
-            id="quota-form-title"
-            className="text-lg font-semibold text-foreground mb-4"
-          >
+          <h2 id="quota-form-title" className="text-lg font-semibold text-foreground mb-4">
             {isEdit ? 'Edit Quota' : 'Create Quota'}
           </h2>
 
@@ -218,19 +208,10 @@ function QuotaForm({
 
             {/* Actions */}
             <div className="flex gap-3 justify-end mt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-                disabled={isLoading}
-              >
+              <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                disabled={isLoading}
-                data-testid="quota-form-submit"
-              >
+              <Button type="submit" disabled={isLoading} data-testid="quota-form-submit">
                 {isLoading ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Quota'}
               </Button>
             </div>

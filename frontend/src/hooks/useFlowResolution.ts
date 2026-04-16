@@ -104,10 +104,9 @@ export function useFlowResolution(
 
   // Trigger effect only when the serialized answers content, surveyId, or lang actually changes.
   // We compute the key as a stable primitive that can safely be used as a dep.
-  const answersKey =
-    surveyId
-      ? JSON.stringify(Object.entries(answers).sort(([a], [b]) => a.localeCompare(b)))
-      : null
+  const answersKey = surveyId
+    ? JSON.stringify(Object.entries(answers).sort(([a], [b]) => a.localeCompare(b)))
+    : null
 
   useEffect(() => {
     if (!surveyId || answersKey === null) {

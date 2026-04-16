@@ -25,7 +25,12 @@ interface QuestionSettingsFormProps {
 // Component
 // ---------------------------------------------------------------------------
 
-export function QuestionSettingsForm({ type, settings, onChange, readOnly = false }: QuestionSettingsFormProps) {
+export function QuestionSettingsForm({
+  type,
+  settings,
+  onChange,
+  readOnly = false,
+}: QuestionSettingsFormProps) {
   // Text types
   if (type === 'short_text' || type === 'long_text' || type === 'huge_text') {
     return (
@@ -51,7 +56,13 @@ export function QuestionSettingsForm({ type, settings, onChange, readOnly = fals
   }
 
   // Matrix types
-  if (type === 'matrix' || type === 'matrix_dropdown' || type === 'matrix_dynamic') {
+  if (
+    type === 'matrix' ||
+    type === 'matrix_single' ||
+    type === 'matrix_multiple' ||
+    type === 'matrix_dropdown' ||
+    type === 'matrix_dynamic'
+  ) {
     return (
       <MatrixSettingsForm
         type={type}

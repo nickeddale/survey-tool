@@ -37,7 +37,13 @@ interface ConfirmRevokeModalProps {
   onCancel: () => void
 }
 
-function ConfirmRevokeModal({ keyName, isLoading, error, onConfirm, onCancel }: ConfirmRevokeModalProps) {
+function ConfirmRevokeModal({
+  keyName,
+  isLoading,
+  error,
+  onConfirm,
+  onCancel,
+}: ConfirmRevokeModalProps) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
@@ -52,10 +58,14 @@ function ConfirmRevokeModal({ keyName, isLoading, error, onConfirm, onCancel }: 
             Revoke API Key
           </h2>
           <p className="text-sm text-muted-foreground mb-4">
-            Are you sure you want to revoke &quot;{keyName}&quot;? This action cannot be undone and any integrations using this key will stop working.
+            Are you sure you want to revoke &quot;{keyName}&quot;? This action cannot be undone and
+            any integrations using this key will stop working.
           </p>
           {error && (
-            <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+            <div
+              className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+              role="alert"
+            >
               {error}
             </div>
           )}
@@ -279,7 +289,11 @@ function ApiKeysTab() {
       {/* Create key form */}
       <div className="mb-6">
         <h2 className="text-base font-semibold text-foreground mb-3">Create New API Key</h2>
-        <form onSubmit={handleCreate} className="flex gap-3 items-end" data-testid="create-key-form">
+        <form
+          onSubmit={handleCreate}
+          className="flex gap-3 items-end"
+          data-testid="create-key-form"
+        >
           <div className="flex-1">
             <Label htmlFor="new-key-name" className="text-sm mb-1 block">
               Key name
@@ -310,7 +324,11 @@ function ApiKeysTab() {
         <h2 className="text-base font-semibold text-foreground mb-3">Your API Keys</h2>
 
         {error && (
-          <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert" data-testid="api-keys-error">
+          <div
+            className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+            role="alert"
+            data-testid="api-keys-error"
+          >
             {error}
           </div>
         )}
@@ -331,11 +349,17 @@ function ApiKeysTab() {
               <thead className="bg-muted/50">
                 <tr>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Name</th>
-                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">Key prefix</th>
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+                    Key prefix
+                  </th>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Status</th>
-                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">Last used</th>
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+                    Last used
+                  </th>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Created</th>
-                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">Actions</th>
+                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -346,7 +370,10 @@ function ApiKeysTab() {
                     data-testid={`api-key-row-${key.id}`}
                   >
                     <td className="px-4 py-3 font-medium text-foreground">{key.name}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground" data-testid={`api-key-prefix-${key.id}`}>
+                    <td
+                      className="px-4 py-3 font-mono text-xs text-muted-foreground"
+                      data-testid={`api-key-prefix-${key.id}`}
+                    >
                       {key.key_prefix}...
                     </td>
                     <td className="px-4 py-3">
@@ -368,8 +395,12 @@ function ApiKeysTab() {
                         </Badge>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-sm text-muted-foreground">{formatDate(key.last_used_at)}</td>
-                    <td className="px-4 py-3 text-sm text-muted-foreground">{formatDate(key.created_at)}</td>
+                    <td className="px-4 py-3 text-sm text-muted-foreground">
+                      {formatDate(key.last_used_at)}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-muted-foreground">
+                      {formatDate(key.created_at)}
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end">
                         <Button

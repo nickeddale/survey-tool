@@ -21,7 +21,10 @@ function LocationDisplay() {
 
 function renderLoginPage(initialEntry = '/login') {
   return render(
-    <MemoryRouter initialEntries={[initialEntry]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <MemoryRouter
+      initialEntries={[initialEntry]}
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
@@ -30,12 +33,17 @@ function renderLoginPage(initialEntry = '/login') {
           <Route path="/surveys/:id" element={<LocationDisplay />} />
         </Routes>
       </AuthProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
 function resetAuthStore() {
-  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
+  useAuthStore.setState({
+    user: null,
+    isAuthenticated: false,
+    isInitializing: false,
+    isLoading: false,
+  })
 }
 
 // ---------------------------------------------------------------------------
@@ -122,9 +130,7 @@ describe('LoginPage', () => {
 
   describe('loading state', () => {
     it('disables the button and shows loading text while submitting', async () => {
-      server.use(
-        http.post('/api/v1/auth/login', () => new Promise<never>(() => {})),
-      )
+      server.use(http.post('/api/v1/auth/login', () => new Promise<never>(() => {})))
 
       const user = userEvent.setup()
       renderLoginPage()
@@ -283,9 +289,7 @@ describe('LoginPage', () => {
     })
 
     it('shows generic error message for non-ApiError failures', async () => {
-      server.use(
-        http.post('/api/v1/auth/login', () => HttpResponse.error()),
-      )
+      server.use(http.post('/api/v1/auth/login', () => HttpResponse.error()))
 
       const user = userEvent.setup()
       renderLoginPage()

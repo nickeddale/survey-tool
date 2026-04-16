@@ -125,11 +125,14 @@ describe('RatingInput — rendering', () => {
 // ---------------------------------------------------------------------------
 
 describe('RatingInput — icon types', () => {
-  it.each(['star', 'heart', 'thumb', 'smiley'] as const)('renders with %s icon type without errors', (icon) => {
-    const question = makeQuestion({ settings: makeSettings({ icon }) })
-    render(<RatingInput value="" onChange={vi.fn()} question={question} />)
-    expect(screen.getByTestId('rating-icons-group')).toBeInTheDocument()
-  })
+  it.each(['star', 'heart', 'thumb', 'smiley'] as const)(
+    'renders with %s icon type without errors',
+    (icon) => {
+      const question = makeQuestion({ settings: makeSettings({ icon }) })
+      render(<RatingInput value="" onChange={vi.fn()} question={question} />)
+      expect(screen.getByTestId('rating-icons-group')).toBeInTheDocument()
+    }
+  )
 })
 
 // ---------------------------------------------------------------------------
@@ -259,7 +262,12 @@ describe('RatingInput — required validation', () => {
 describe('RatingInput — external errors prop', () => {
   it('displays external errors immediately without blur', () => {
     render(
-      <RatingInput value="" onChange={vi.fn()} question={makeQuestion()} errors={['Server error']} />
+      <RatingInput
+        value=""
+        onChange={vi.fn()}
+        question={makeQuestion()}
+        errors={['Server error']}
+      />
     )
     expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error')
   })
@@ -284,9 +292,7 @@ describe('RatingInput — accessibility', () => {
 
   it('sets aria-describedby pointing to error container when errors present', () => {
     const question = makeQuestion({ id: 'q-test' })
-    render(
-      <RatingInput value="" onChange={vi.fn()} question={question} errors={['Required']} />
-    )
+    render(<RatingInput value="" onChange={vi.fn()} question={question} errors={['Required']} />)
     const group = screen.getByTestId('rating-icons-group')
     expect(group).toHaveAttribute('aria-describedby', 'question-q-test-error')
     expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')

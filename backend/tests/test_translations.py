@@ -462,3 +462,134 @@ class TestUpdateAnswerOptionTranslations:
             await update_answer_option_translations(
                 session, fake_ids[0], fake_ids[1], fake_ids[2], fake_ids[3], "fr", {"title": "Opt"}
             )
+
+
+# ===========================================================================
+# Integration tests: translation PATCH endpoints allowed on active surveys
+# ===========================================================================
+
+
+async def _create_active_survey_with_group_question_option(
+    client: AsyncClient,
+    headers: dict,
+) -> dict:
+    """Helper: create survey, add group/question/option, activate, return ids."""
+    survey_resp = await client.post(
+        SURVEYS_URL,
+        json={"title": "Active Survey", "default_language": "en"},
+        headers=headers,
+    )
+    assert survey_resp.status_code == 201
+    survey_id = survey_resp.json()["id"]
+
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": "Group 1"},
+        headers=headers,
+    )
+    assert group_resp.status_code == 201
+    group_id = group_resp.json()["id"]
+
+    q_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": "Question 1", "question_type": "single_choice"},
+        headers=headers,
+    )
+    assert q_resp.status_code == 201
+    question_id = q_resp.json()["id"]
+
+    opt_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/questions/{question_id}/options",
+        json={"title": "Option A"},
+        headers=headers,
+    )
+    assert opt_resp.status_code == 201
+    option_id = opt_resp.json()["id"]
+
+    activate_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/activate",
+        headers=headers,
+    )
+    assert activate_resp.status_code == 200
+    assert activate_resp.json()["status"] == "active"
+
+    return {
+        "survey_id": survey_id,
+        "group_id": group_id,
+        "question_id": question_id,
+        "option_id": option_id,
+    }
+
+
+@pytest.mark.asyncio
+async def test_patch_survey_translations_on_active_survey_returns_200(client: AsyncClient):
+    headers = await auth_headers(client)
+    ids = await _create_active_survey_with_group_question_option(client, headers)
+
+    resp = await client.patch(
+        f"{SURVEYS_URL}/{ids['survey_id']}/translations",
+        json={"lang": "fr", "translations": {"title": "Enquête Active"}},
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["translations"]["fr"]["title"] == "Enquête Active"
+
+
+@pytest.mark.asyncio
+async def test_patch_group_translations_on_active_survey_returns_200(client: AsyncClient):
+    headers = await auth_headers(client)
+    ids = await _create_active_survey_with_group_question_option(client, headers)
+
+    resp = await client.patch(
+        f"{SURVEYS_URL}/{ids['survey_id']}/groups/{ids['group_id']}/translations",
+        json={"lang": "fr", "translations": {"title": "Groupe FR"}},
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["translations"]["fr"]["title"] == "Groupe FR"
+
+
+@pytest.mark.asyncio
+async def test_patch_question_translations_on_active_survey_returns_200(client: AsyncClient):
+    headers = await auth_headers(client)
+    ids = await _create_active_survey_with_group_question_option(client, headers)
+
+    resp = await client.patch(
+        f"{SURVEYS_URL}/{ids['survey_id']}/groups/{ids['group_id']}/questions/{ids['question_id']}/translations",
+        json={"lang": "fr", "translations": {"title": "Question FR"}},
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["translations"]["fr"]["title"] == "Question FR"
+
+
+@pytest.mark.asyncio
+async def test_patch_answer_option_translations_on_active_survey_returns_200(client: AsyncClient):
+    headers = await auth_headers(client)
+    ids = await _create_active_survey_with_group_question_option(client, headers)
+
+    resp = await client.patch(
+        f"{SURVEYS_URL}/{ids['survey_id']}/questions/{ids['question_id']}/options/{ids['option_id']}/translations",
+        json={"lang": "fr", "translations": {"title": "Option FR"}},
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["translations"]["fr"]["title"] == "Option FR"
+
+
+@pytest.mark.asyncio
+async def test_patch_survey_structural_fields_on_active_survey_returns_422(client: AsyncClient):
+    """Confirm structural survey updates are still blocked on active surveys."""
+    headers = await auth_headers(client)
+    ids = await _create_active_survey_with_group_question_option(client, headers)
+
+    resp = await client.patch(
+        f"{SURVEYS_URL}/{ids['survey_id']}",
+        json={"title": "Modified Title"},
+        headers=headers,
+    )
+    assert resp.status_code == 422

@@ -236,9 +236,10 @@ async def _deliver_and_log(
     # hostname initially resolves to a public IP but later resolves to a private one.
     try:
         await resolve_and_validate_url(wh_url)
-    except ValueError as ssrf_exc:
+    except (ValueError, OSError) as ssrf_exc:
         logger.warning(
-            "Webhook delivery blocked by SSRF protection: webhook_id=%s url=%s reason=%s",
+            "Webhook delivery blocked by SSRF protection or DNS failure: "
+            "webhook_id=%s url=%s reason=%s",
             wh_id,
             wh_url,
             ssrf_exc,
@@ -251,7 +252,7 @@ async def _deliver_and_log(
             if log_row is not None:
                 log_row.status = "failed"
                 log_row.attempt_count = 0
-                log_row.last_error = f"SSRF protection: {ssrf_exc}"
+                log_row.last_error = str(ssrf_exc)
                 await session.commit()
         return
 

@@ -4,7 +4,13 @@
 
 import DOMPurify from 'dompurify'
 import type { BuilderQuestion } from '../../../store/builderStore'
-import type { RankingSettings, ImagePickerSettings, FileUploadSettings, ExpressionSettings, HtmlSettings } from '../../../types/questionSettings'
+import type {
+  RankingSettings,
+  ImagePickerSettings,
+  FileUploadSettings,
+  ExpressionSettings,
+  HtmlSettings,
+} from '../../../types/questionSettings'
 
 export interface QuestionPreviewProps {
   question: BuilderQuestion
@@ -26,8 +32,10 @@ export function SpecialPreview({ question }: QuestionPreviewProps) {
               key={opt.id}
               className="flex items-center gap-3 p-2 rounded-md border border-border bg-background opacity-70"
             >
-              <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full
-                bg-muted text-xs font-medium text-muted-foreground">
+              <span
+                className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full
+                bg-muted text-xs font-medium text-muted-foreground"
+              >
                 {idx + 1}
               </span>
               <span className="text-sm flex-1">{opt.title}</span>
@@ -57,10 +65,7 @@ export function SpecialPreview({ question }: QuestionPreviewProps) {
         ) : (
           <div className="flex flex-wrap gap-3 pointer-events-none">
             {answer_options.map((opt) => (
-              <div
-                key={opt.id}
-                className="flex flex-col items-center gap-1 opacity-70"
-              >
+              <div key={opt.id} className="flex flex-col items-center gap-1 opacity-70">
                 <div
                   className="rounded-md border-2 border-border bg-muted flex items-center justify-center"
                   style={{ width: Math.min(width, 160), height: Math.min(height, 120) }}
@@ -104,9 +109,7 @@ export function SpecialPreview({ question }: QuestionPreviewProps) {
         </p>
         <div className="mt-2 space-y-0.5">
           {allowedTypes.length > 0 && (
-            <p className="text-xs text-muted-foreground">
-              Accepted: {allowedTypes.join(', ')}
-            </p>
+            <p className="text-xs text-muted-foreground">Accepted: {allowedTypes.join(', ')}</p>
           )}
           <p className="text-xs text-muted-foreground">
             Max size: {maxSize} MB
@@ -146,7 +149,10 @@ export function SpecialPreview({ question }: QuestionPreviewProps) {
 
     if (!s.html_content) {
       return (
-        <div className="rounded-md border border-dashed border-border p-3 bg-muted/20 opacity-70" data-testid="preview-html">
+        <div
+          className="rounded-md border border-dashed border-border p-3 bg-muted/20 opacity-70"
+          data-testid="preview-html"
+        >
           <p className="text-xs text-muted-foreground italic">No HTML content defined.</p>
         </div>
       )
@@ -158,7 +164,6 @@ export function SpecialPreview({ question }: QuestionPreviewProps) {
       <div
         className="rounded-md border border-border p-3 bg-background pointer-events-none"
         data-testid="preview-html"
-        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: sanitized }}
       />
     )

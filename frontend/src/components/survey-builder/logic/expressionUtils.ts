@@ -40,7 +40,9 @@ export const BOOLEAN_OPERATORS: Array<{ value: OperatorType; label: string }> = 
   { value: '!=', label: 'not equals' },
 ]
 
-export function getOperatorsForType(questionType: string): Array<{ value: OperatorType; label: string }> {
+export function getOperatorsForType(
+  questionType: string
+): Array<{ value: OperatorType; label: string }> {
   if (['numeric', 'rating', 'date'].includes(questionType)) return NUMERIC_OPERATORS
   if (['radio', 'dropdown', 'checkbox', 'ranking', 'image_picker'].includes(questionType))
     return CHOICE_OPERATORS
@@ -190,8 +192,10 @@ export function parseCondition(expr: string): ConditionRow | null {
   let value = opMatch[2].trim()
 
   // Strip quotes from string values
-  if ((value.startsWith("'") && value.endsWith("'")) ||
-    (value.startsWith('"') && value.endsWith('"'))) {
+  if (
+    (value.startsWith("'") && value.endsWith("'")) ||
+    (value.startsWith('"') && value.endsWith('"'))
+  ) {
     value = value.slice(1, -1)
   }
 

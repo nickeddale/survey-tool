@@ -157,7 +157,10 @@ function ResponseDetailPage() {
 
       {/* Global error alert */}
       {error && (
-        <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+        <div
+          className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+          role="alert"
+        >
           {error}
         </div>
       )}

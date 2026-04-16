@@ -73,7 +73,11 @@ function getSessionSeed(questionId: string): number {
 // Validation
 // ---------------------------------------------------------------------------
 
-function validate(orderedIds: string[], allOptions: AnswerOptionResponse[], isRequired: boolean): string[] {
+function validate(
+  orderedIds: string[],
+  allOptions: AnswerOptionResponse[],
+  isRequired: boolean
+): string[] {
   const errs: string[] = []
   if (isRequired && orderedIds.length === 0) {
     errs.push('This field is required.')
@@ -98,7 +102,9 @@ interface SortableItemProps {
 }
 
 function SortableItem({ id, rank, label }: SortableItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  })
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -134,7 +140,10 @@ function SortableItem({ id, rank, label }: SortableItemProps) {
           <circle cx="11" cy="12" r="1.5" />
         </svg>
       </button>
-      <span className="w-6 text-center text-xs font-medium text-muted-foreground" aria-hidden="true">
+      <span
+        className="w-6 text-center text-xs font-medium text-muted-foreground"
+        aria-hidden="true"
+      >
         {rank}
       </span>
       <span className="flex-1">{label}</span>
@@ -146,7 +155,12 @@ function SortableItem({ id, rank, label }: SortableItemProps) {
 // Component
 // ---------------------------------------------------------------------------
 
-export function RankingInput({ value, onChange, question, errors: externalErrors }: RankingInputProps) {
+export function RankingInput({
+  value,
+  onChange,
+  question,
+  errors: externalErrors,
+}: RankingInputProps) {
   const s = (question.settings ?? {}) as Partial<RankingSettings>
   const randomizeInitial = s.randomize_initial_order ?? false
 
@@ -183,7 +197,7 @@ export function RankingInput({ value, onChange, question, errors: externalErrors
 
   const sensors = useSensors(
     useSensor(PointerSensor),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
   function handleDragEnd(event: DragEndEvent) {
@@ -205,11 +219,7 @@ export function RankingInput({ value, onChange, question, errors: externalErrors
   }
 
   return (
-    <div
-      className="space-y-2"
-      data-testid={`ranking-input-${question.id}`}
-      onBlur={handleBlur}
-    >
+    <div className="space-y-2" data-testid={`ranking-input-${question.id}`} onBlur={handleBlur}>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={orderedIds} strategy={verticalListSortingStrategy}>
           <ol
@@ -220,12 +230,7 @@ export function RankingInput({ value, onChange, question, errors: externalErrors
             data-testid="ranking-list"
           >
             {orderedIds.map((id, index) => (
-              <SortableItem
-                key={id}
-                id={id}
-                rank={index + 1}
-                label={optionMap[id] ?? id}
-              />
+              <SortableItem key={id} id={id} rank={index + 1} label={optionMap[id] ?? id} />
             ))}
           </ol>
         </SortableContext>

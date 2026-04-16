@@ -72,12 +72,22 @@ function TestWrapper() {
 beforeEach(async () => {
   clearTokens()
   localStorage.clear()
-  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
+  useAuthStore.setState({
+    user: null,
+    isAuthenticated: false,
+    isInitializing: false,
+    isLoading: false,
+  })
   useBuilderStore.getState().reset()
 
   setTokens(mockTokens.access_token)
   localStorage.removeItem('devtracker_refresh_token')
-  useAuthStore.setState({ user: mockUser, isAuthenticated: true, isInitializing: false, isLoading: false })
+  useAuthStore.setState({
+    user: mockUser,
+    isAuthenticated: true,
+    isInitializing: false,
+    isLoading: false,
+  })
 
   // Load survey with a group so the 'Add Question' button is visible
   useBuilderStore.getState().loadSurvey(mockSurveyFull)
@@ -182,7 +192,7 @@ describe('Add Question dropdown', () => {
       expect(surveyService.createQuestion).toHaveBeenCalledWith(
         SURVEY_ID,
         'g1',
-        expect.objectContaining({ question_type: 'short_text' }),
+        expect.objectContaining({ question_type: 'short_text' })
       )
     })
   })
@@ -229,7 +239,7 @@ describe('Add Question dropdown', () => {
 
     // Should not have navigated to dashboard
     const dashboardCalls = mockNavigate.mock.calls.filter(
-      (call) => call[0] === '/surveys' || call[0] === '/',
+      (call) => call[0] === '/surveys' || call[0] === '/'
     )
     expect(dashboardCalls).toHaveLength(0)
   })

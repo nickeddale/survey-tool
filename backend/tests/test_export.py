@@ -461,7 +461,6 @@ _ALL_QUESTION_TYPES = [
     "time",
     "datetime",
     "file_upload",
-    "number",
     "numeric",
     "email",
     "phone",
