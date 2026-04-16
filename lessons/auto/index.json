@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-16T13:19:34.170Z",
+  "lastUpdated": "2026-04-16T14:02:14.259Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4931,6 +4931,23 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md",
+      "ticketId": "ISS-261",
+      "title": "Backend: TypeError unhashable list in relevance cache key for matrix_multiple answers",
+      "date": "2026-04-16",
+      "categories": [
+        "testing",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "documentation"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -5170,7 +5187,8 @@
       "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md",
       "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
       "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
-      "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md"
+      "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
+      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5770,7 +5788,8 @@
       "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md",
       "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
       "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
-      "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md"
+      "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
+      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6058,7 +6077,8 @@
       "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
       "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
       "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
-      "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md"
+      "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
+      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6288,7 +6308,8 @@
       "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md",
       "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
       "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
-      "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md"
+      "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
+      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6394,7 +6415,8 @@
       "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
       "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
       "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
-      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md"
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6491,7 +6513,8 @@
       "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
       "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
       "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
-      "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md"
+      "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
+      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
