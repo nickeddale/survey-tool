@@ -32,6 +32,7 @@ from app.services.expressions.relevance import (
     _parse_variables,
     _detect_cycles,
     _eval_relevance,
+    _make_hashable,
 )
 from app.services.expressions import (
     evaluate_relevance as pkg_evaluate_relevance,
@@ -585,6 +586,53 @@ class TestEvalRelevance:
         assert _eval_relevance("{Q1} == null", {"Q1": ""}) is False
 
 
+class TestMakeHashable:
+    """Unit tests for the _make_hashable helper (ISS-261)."""
+
+    def test_primitive_string(self):
+        assert _make_hashable("hello") == "hello"
+
+    def test_primitive_int(self):
+        assert _make_hashable(42) == 42
+
+    def test_primitive_none(self):
+        assert _make_hashable(None) is None
+
+    def test_primitive_bool(self):
+        assert _make_hashable(True) is True
+
+    def test_flat_list(self):
+        result = _make_hashable(["A1", "A2"])
+        assert result == ("A1", "A2")
+        hash(result)  # must not raise
+
+    def test_flat_dict(self):
+        result = _make_hashable({"SQ001": "A1", "SQ002": "A2"})
+        assert isinstance(result, frozenset)
+        hash(result)  # must not raise
+        assert ("SQ001", "A1") in result
+
+    def test_dict_with_list_values_matrix_multiple(self):
+        """Core ISS-261 case: dict whose values are lists."""
+        v = {"SQ001": ["A1", "A2"], "SQ002": ["B1"]}
+        result = _make_hashable(v)
+        assert isinstance(result, frozenset)
+        hash(result)  # must not raise TypeError
+
+    def test_list_of_dicts_matrix_dynamic(self):
+        """Core ISS-261 case: list of dicts."""
+        v = [{"col1": "Alice", "col2": "28"}, {"col1": "Bob", "col2": "35"}]
+        result = _make_hashable(v)
+        assert isinstance(result, tuple)
+        hash(result)  # must not raise TypeError
+
+    def test_deeply_nested(self):
+        """Deeply nested: dict -> list -> dict."""
+        v = {"SQ001": [{"key": "val1"}, {"key": "val2"}]}
+        result = _make_hashable(v)
+        hash(result)  # must not raise
+
+
 # ---------------------------------------------------------------------------
 # ISS-208: Scenario 7.2 and 7.3 — relevance visibility with empty string
 # ---------------------------------------------------------------------------
@@ -781,4 +829,96 @@ def test_mixed_answer_types_no_error():
 
     # Must not raise
     result = evaluate_relevance(survey, answers=mixed_answers)
+    assert q.id in result.visible_question_ids
+
+
+# ---------------------------------------------------------------------------
+# ISS-261: nested structures (matrix_multiple / matrix_dynamic) must not
+# raise TypeError in cache key
+# ---------------------------------------------------------------------------
+
+
+def test_matrix_multiple_nested_list_values_no_type_error():
+    """matrix_multiple answers have shape {"SQ001": ["A1", "A2"]}.
+    The inner list is unhashable in frozenset without recursive conversion."""
+    clear_relevance_cache()
+
+    q = _make_question("Q1", relevance=None)
+    g = _make_group([q], relevance=None)
+    survey = _make_survey([g])
+
+    # matrix_multiple: sub-question keys map to lists of selected choices
+    matrix_multiple_answers = {"Q1": {"SQ001": ["A1", "A2"], "SQ002": ["B1"]}}
+
+    # Must not raise TypeError: unhashable type: 'list'
+    result = evaluate_relevance(survey, answers=matrix_multiple_answers)
+    assert q.id in result.visible_question_ids
+
+
+def test_matrix_multiple_cache_hit():
+    """Identical matrix_multiple answers produce a cache hit."""
+    clear_relevance_cache()
+
+    q = _make_question("Q1", relevance=None)
+    g = _make_group([q], relevance=None)
+    sid = uuid.uuid4()
+    survey = _make_survey([g], sid=sid)
+
+    answers = {"Q1": {"SQ001": ["A1", "A2"], "SQ002": ["B1"]}}
+
+    result1 = evaluate_relevance(survey, answers=answers)
+    result2 = evaluate_relevance(survey, answers=answers)
+
+    assert result1 is result2
+
+
+def test_matrix_dynamic_list_of_dicts_no_type_error():
+    """matrix_dynamic answers have shape [{"col1": "Alice", "col2": "28"}].
+    tuple(v) yields a tuple of dicts which are unhashable without recursive conversion."""
+    clear_relevance_cache()
+
+    q = _make_question("Q1", relevance=None)
+    g = _make_group([q], relevance=None)
+    survey = _make_survey([g])
+
+    # matrix_dynamic: list of row dicts
+    matrix_dynamic_answers = {
+        "Q1": [{"col1": "Alice", "col2": "28"}, {"col1": "Bob", "col2": "35"}]
+    }
+
+    # Must not raise TypeError: unhashable type: 'dict'
+    result = evaluate_relevance(survey, answers=matrix_dynamic_answers)
+    assert q.id in result.visible_question_ids
+
+
+def test_matrix_dynamic_cache_hit():
+    """Identical matrix_dynamic answers produce a cache hit."""
+    clear_relevance_cache()
+
+    q = _make_question("Q1", relevance=None)
+    g = _make_group([q], relevance=None)
+    sid = uuid.uuid4()
+    survey = _make_survey([g], sid=sid)
+
+    answers = {"Q1": [{"col1": "Alice", "col2": "28"}]}
+
+    result1 = evaluate_relevance(survey, answers=answers)
+    result2 = evaluate_relevance(survey, answers=answers)
+
+    assert result1 is result2
+
+
+def test_deeply_nested_answer_no_type_error():
+    """Deeply nested structures (dict of lists of dicts) hash without error."""
+    clear_relevance_cache()
+
+    q = _make_question("Q1", relevance=None)
+    g = _make_group([q], relevance=None)
+    survey = _make_survey([g])
+
+    deeply_nested = {
+        "Q1": {"SQ001": [{"key": "val1"}, {"key": "val2"}]}
+    }
+
+    result = evaluate_relevance(survey, answers=deeply_nested)
     assert q.id in result.visible_question_ids
