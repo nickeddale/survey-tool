@@ -5,8 +5,8 @@
  * user-added rows (not from subquestions). Each cell is a text input.
  * Supports:
  * - row_count: initial number of rows
- * - min_row_count: hide Remove button when at minimum
- * - max_row_count: hide Add button when at maximum (null = unlimited)
+ * - min_row_count: disable Remove button when at minimum
+ * - max_row_count: disable Add button when at maximum (null = unlimited)
  * - add_row_text: label for the Add Row button
  * - remove_row_text: label for the Remove Row button
  *
@@ -121,16 +121,15 @@ export function MatrixDynamicInput({
                   </td>
                 ))}
                 <td className="px-3 py-2 text-right">
-                  {canRemoveRow && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveRow(rowIdx)}
-                      className="text-xs text-destructive hover:underline"
-                      data-testid={`matrix-dynamic-remove-${rowIdx}`}
-                    >
-                      {removeRowText}
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveRow(rowIdx)}
+                    disabled={!canRemoveRow}
+                    className={`text-xs hover:underline ${canRemoveRow ? 'text-destructive' : 'text-muted-foreground cursor-not-allowed opacity-50'}`}
+                    data-testid={`matrix-dynamic-remove-${rowIdx}`}
+                  >
+                    {removeRowText}
+                  </button>
                 </td>
               </tr>
             ))}
@@ -138,16 +137,15 @@ export function MatrixDynamicInput({
         </table>
       </div>
 
-      {canAddRow && (
-        <button
-          type="button"
-          onClick={handleAddRow}
-          className="text-sm text-primary hover:underline"
-          data-testid="matrix-dynamic-add-row"
-        >
-          {addRowText}
-        </button>
-      )}
+      <button
+        type="button"
+        onClick={handleAddRow}
+        disabled={!canAddRow}
+        className={`text-sm hover:underline ${canAddRow ? 'text-primary' : 'text-muted-foreground cursor-not-allowed opacity-50'}`}
+        data-testid="matrix-dynamic-add-row"
+      >
+        {addRowText}
+      </button>
 
       <ValidationErrors errors={displayErrors} id={errorId} />
     </div>
