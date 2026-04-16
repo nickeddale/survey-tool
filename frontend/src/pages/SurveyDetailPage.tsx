@@ -50,69 +50,98 @@ function SurveyDetailPage() {
       }
     }
     load()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [id])
 
-  function openModal(type: ModalType) { setModalError(null); setActiveModal(type) }
-  function closeModal() { setActiveModal(null); setModalError(null) }
+  function openModal(type: ModalType) {
+    setModalError(null)
+    setActiveModal(type)
+  }
+  function closeModal() {
+    setActiveModal(null)
+    setModalError(null)
+  }
 
   const handleActivate = useCallback(async () => {
     if (!survey) return
-    setModalLoading(true); setModalError(null)
+    setModalLoading(true)
+    setModalError(null)
     try {
       const updated = await surveyService.activateSurvey(survey.id)
       setSurvey((prev) => (prev ? { ...prev, ...updated } : prev))
       closeModal()
     } catch (err) {
-      setModalError(err instanceof ApiError ? err.message : 'Failed to activate survey. Please try again.')
-    } finally { setModalLoading(false) }
+      setModalError(
+        err instanceof ApiError ? err.message : 'Failed to activate survey. Please try again.'
+      )
+    } finally {
+      setModalLoading(false)
+    }
   }, [survey])
 
   const handleClose = useCallback(async () => {
     if (!survey) return
-    setModalLoading(true); setModalError(null)
+    setModalLoading(true)
+    setModalError(null)
     try {
       const updated = await surveyService.closeSurvey(survey.id)
       setSurvey((prev) => (prev ? { ...prev, ...updated } : prev))
       closeModal()
     } catch (err) {
-      setModalError(err instanceof ApiError ? err.message : 'Failed to close survey. Please try again.')
-    } finally { setModalLoading(false) }
+      setModalError(
+        err instanceof ApiError ? err.message : 'Failed to close survey. Please try again.'
+      )
+    } finally {
+      setModalLoading(false)
+    }
   }, [survey])
 
   const handleArchive = useCallback(async () => {
     if (!survey) return
-    setModalLoading(true); setModalError(null)
+    setModalLoading(true)
+    setModalError(null)
     try {
       const updated = await surveyService.archiveSurvey(survey.id)
       setSurvey((prev) => (prev ? { ...prev, ...updated } : prev))
       closeModal()
     } catch (err) {
-      setModalError(err instanceof ApiError ? err.message : 'Failed to archive survey. Please try again.')
-    } finally { setModalLoading(false) }
+      setModalError(
+        err instanceof ApiError ? err.message : 'Failed to archive survey. Please try again.'
+      )
+    } finally {
+      setModalLoading(false)
+    }
   }, [survey])
 
   const handleDelete = useCallback(async () => {
     if (!survey) return
-    setModalLoading(true); setModalError(null)
+    setModalLoading(true)
+    setModalError(null)
     try {
       await surveyService.deleteSurvey(survey.id)
       navigate('/surveys')
     } catch (err) {
-      setModalError(err instanceof ApiError ? err.message : 'Failed to delete survey. Please try again.')
+      setModalError(
+        err instanceof ApiError ? err.message : 'Failed to delete survey. Please try again.'
+      )
       setModalLoading(false)
     }
   }, [survey, navigate])
 
   const handleClone = useCallback(async () => {
     if (!survey) return
-    setModalLoading(true); setModalError(null)
+    setModalLoading(true)
+    setModalError(null)
     try {
       const cloned = await surveyService.cloneSurvey(survey.id)
       closeModal()
       navigate(`/surveys/${cloned.id}`)
     } catch (err) {
-      setModalError(err instanceof ApiError ? err.message : 'Failed to clone survey. Please try again.')
+      setModalError(
+        err instanceof ApiError ? err.message : 'Failed to clone survey. Please try again.'
+      )
       setModalLoading(false)
     }
   }, [survey, navigate])
@@ -142,7 +171,12 @@ function SurveyDetailPage() {
     else if (activeModal === 'clone') handleClone()
   }
 
-  if (isLoading) return <div className="max-w-4xl mx-auto"><LoadingSkeleton /></div>
+  if (isLoading)
+    return (
+      <div className="max-w-4xl mx-auto">
+        <LoadingSkeleton />
+      </div>
+    )
 
   if (notFound) {
     return (
@@ -163,7 +197,11 @@ function SurveyDetailPage() {
   if (!survey) {
     return (
       <div className="max-w-2xl mx-auto">
-        {error && <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">{error}</div>}
+        {error && (
+          <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+            {error}
+          </div>
+        )}
       </div>
     )
   }
@@ -193,7 +231,12 @@ function SurveyDetailPage() {
       />
 
       {error && (
-        <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">{error}</div>
+        <div
+          className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+          role="alert"
+        >
+          {error}
+        </div>
       )}
 
       <SurveyActions
@@ -226,15 +269,18 @@ function SurveyDetailPage() {
           </span>
         </h2>
 
+        {survey.status === 'draft' && (
+          <Button className="mb-3" onClick={() => navigate(`/surveys/${survey.id}/builder`)}>
+            Builder
+          </Button>
+        )}
+
         {survey.groups.length === 0 ? (
           <Card data-testid="no-groups-state">
             <CardContent className="text-center py-10">
-              <p className="text-muted-foreground text-sm">No question groups have been added to this survey.</p>
-              {survey.status === 'draft' && (
-                <Button className="mt-3" onClick={() => navigate(`/surveys/${survey.id}/builder`)}>
-                  Builder
-                </Button>
-              )}
+              <p className="text-muted-foreground text-sm">
+                No question groups have been added to this survey.
+              </p>
             </CardContent>
           </Card>
         ) : (

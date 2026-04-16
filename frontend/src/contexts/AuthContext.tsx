@@ -5,8 +5,8 @@ import type { UserResponse, LoginRequest, UserCreate } from '../types/auth'
 export interface AuthContextValue {
   user: UserResponse | null
   isAuthenticated: boolean
-  isInitializing: boolean  // true only during cold-start token check
-  isLoading: boolean       // true during any in-flight auth action
+  isInitializing: boolean // true only during cold-start token check
+  isLoading: boolean // true during any in-flight auth action
   login: (credentials: LoginRequest) => Promise<void>
   register: (data: UserCreate) => Promise<UserResponse>
   logout: () => Promise<void>
@@ -41,7 +41,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [initialize])
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isInitializing, isLoading, login, register, logout }}>
+    <AuthContext.Provider
+      value={{ user, isAuthenticated, isInitializing, isLoading, login, register, logout }}
+    >
       {children}
     </AuthContext.Provider>
   )

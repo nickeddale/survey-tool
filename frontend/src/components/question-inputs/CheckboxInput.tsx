@@ -62,7 +62,7 @@ function validate(
   hasOtherSelected: boolean,
   isRequired: boolean,
   minChoices: number | null,
-  maxChoices: number | null,
+  maxChoices: number | null
 ): string[] {
   const errs: string[] = []
   const OTHER_VALUE = '__other__'
@@ -88,7 +88,12 @@ function validate(
 // Component
 // ---------------------------------------------------------------------------
 
-export function CheckboxInput({ value, onChange, question, errors: externalErrors }: CheckboxInputProps) {
+export function CheckboxInput({
+  value,
+  onChange,
+  question,
+  errors: externalErrors,
+}: CheckboxInputProps) {
   const s = (question.settings ?? {}) as Partial<CheckboxSettings>
   const columns = s.columns ?? 1
   const hasOther = s.has_other ?? false
@@ -120,7 +125,8 @@ export function CheckboxInput({ value, onChange, question, errors: externalError
 
   const allOptionIds = orderedOptions.map((o) => o.id)
   const regularSelected = value.filter((v) => v !== OTHER_VALUE)
-  const isAllSelected = allOptionIds.length > 0 && allOptionIds.every((id) => regularSelected.includes(id))
+  const isAllSelected =
+    allOptionIds.length > 0 && allOptionIds.every((id) => regularSelected.includes(id))
 
   function handleCheckboxChange(optionId: string, checked: boolean) {
     let next: string[]
@@ -132,7 +138,14 @@ export function CheckboxInput({ value, onChange, question, errors: externalError
     onChange(next)
     if (touched) {
       setInternalErrors(
-        validate(next, otherText, next.includes(OTHER_VALUE), question.is_required, minChoices, maxChoices),
+        validate(
+          next,
+          otherText,
+          next.includes(OTHER_VALUE),
+          question.is_required,
+          minChoices,
+          maxChoices
+        )
       )
     }
   }
@@ -148,7 +161,14 @@ export function CheckboxInput({ value, onChange, question, errors: externalError
     onChange(next)
     if (touched) {
       setInternalErrors(
-        validate(next, otherText, next.includes(OTHER_VALUE), question.is_required, minChoices, maxChoices),
+        validate(
+          next,
+          otherText,
+          next.includes(OTHER_VALUE),
+          question.is_required,
+          minChoices,
+          maxChoices
+        )
       )
     }
   }
@@ -158,7 +178,7 @@ export function CheckboxInput({ value, onChange, question, errors: externalError
     setOtherText(text)
     if (touched) {
       setInternalErrors(
-        validate(value, text, isOtherSelected, question.is_required, minChoices, maxChoices),
+        validate(value, text, isOtherSelected, question.is_required, minChoices, maxChoices)
       )
     }
   }
@@ -166,14 +186,17 @@ export function CheckboxInput({ value, onChange, question, errors: externalError
   function handleBlur() {
     setTouched(true)
     setInternalErrors(
-      validate(value, otherText, isOtherSelected, question.is_required, minChoices, maxChoices),
+      validate(value, otherText, isOtherSelected, question.is_required, minChoices, maxChoices)
     )
   }
 
   return (
     <div className="space-y-2" data-testid={`checkbox-input-${question.id}`} onBlur={handleBlur}>
       {selectAll && (
-        <label className="flex items-center gap-2 cursor-pointer text-sm font-medium" data-testid="checkbox-select-all-label">
+        <label
+          className="flex items-center gap-2 cursor-pointer text-sm font-medium"
+          data-testid="checkbox-select-all-label"
+        >
           <input
             type="checkbox"
             checked={isAllSelected}

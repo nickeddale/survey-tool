@@ -88,9 +88,7 @@ class WebhookResponse(BaseModel):
 
 
 class WebhookCreateResponse(WebhookResponse):
-    """Returned only on webhook creation — includes the plaintext signing secret."""
-
-    secret: str
+    """Returned on webhook creation. Secret is generated server-side and never exposed."""
 
 
 class WebhookListResponse(BaseModel):

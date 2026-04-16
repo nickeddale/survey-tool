@@ -71,7 +71,9 @@ function SurveyCard({ survey, onClick }: { survey: SurveyResponse; onClick: () =
           <StatusBadge status={survey.status} />
           <span className="text-sm font-medium text-foreground truncate">{survey.title}</span>
         </div>
-        <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0">{updatedDate}</span>
+        <span className="text-xs text-muted-foreground whitespace-nowrap shrink-0">
+          {updatedDate}
+        </span>
       </CardContent>
     </Card>
   )
@@ -132,7 +134,10 @@ function DashboardPage() {
       </div>
 
       {error && (
-        <div className="mb-6 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+        <div
+          className="mb-6 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+          role="alert"
+        >
           {error}
         </div>
       )}
@@ -161,15 +166,17 @@ function DashboardPage() {
                   <p className="text-muted-foreground text-sm mb-4">
                     You haven&apos;t created any surveys yet.
                   </p>
-                  <Button onClick={() => navigate('/surveys/new')}>
-                    Create your first survey
-                  </Button>
+                  <Button onClick={() => navigate('/surveys/new')}>Create your first survey</Button>
                 </CardContent>
               </Card>
             ) : (
               <div className="space-y-2">
                 {recentSurveys.map((survey) => (
-                  <SurveyCard key={survey.id} survey={survey} onClick={() => navigate(`/surveys/${survey.id}`)} />
+                  <SurveyCard
+                    key={survey.id}
+                    survey={survey}
+                    onClick={() => navigate(`/surveys/${survey.id}`)}
+                  />
                 ))}
               </div>
             )}

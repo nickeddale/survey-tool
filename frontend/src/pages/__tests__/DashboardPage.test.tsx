@@ -21,7 +21,10 @@ function LocationDisplay() {
 
 function renderDashboard() {
   return render(
-    <MemoryRouter initialEntries={['/dashboard']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <MemoryRouter
+      initialEntries={['/dashboard']}
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
       <AuthProvider>
         <Routes>
           <Route path="/dashboard" element={<DashboardPage />} />
@@ -29,12 +32,17 @@ function renderDashboard() {
           <Route path="/surveys/:id" element={<LocationDisplay />} />
         </Routes>
       </AuthProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
 function resetAuthStore() {
-  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
+  useAuthStore.setState({
+    user: null,
+    isAuthenticated: false,
+    isInitializing: false,
+    isLoading: false,
+  })
 }
 
 // ---------------------------------------------------------------------------
@@ -55,9 +63,7 @@ describe('DashboardPage', () => {
 
   describe('loading state', () => {
     it('renders loading skeleton while data is being fetched', async () => {
-      server.use(
-        http.get('/api/v1/surveys', () => new Promise<never>(() => {})),
-      )
+      server.use(http.get('/api/v1/surveys', () => new Promise<never>(() => {})))
 
       renderDashboard()
 
@@ -144,8 +150,8 @@ describe('DashboardPage', () => {
     it('renders empty state when user has no surveys', async () => {
       server.use(
         http.get('/api/v1/surveys', () =>
-          HttpResponse.json({ items: [], total: 0, page: 1, per_page: 100 }, { status: 200 }),
-        ),
+          HttpResponse.json({ items: [], total: 0, page: 1, per_page: 100 }, { status: 200 })
+        )
       )
 
       renderDashboard()
@@ -158,8 +164,8 @@ describe('DashboardPage', () => {
     it('shows stat cards with zeros in empty state', async () => {
       server.use(
         http.get('/api/v1/surveys', () =>
-          HttpResponse.json({ items: [], total: 0, page: 1, per_page: 100 }, { status: 200 }),
-        ),
+          HttpResponse.json({ items: [], total: 0, page: 1, per_page: 100 }, { status: 200 })
+        )
       )
 
       renderDashboard()
@@ -200,7 +206,9 @@ describe('DashboardPage', () => {
       })
 
       const user = userEvent.setup()
-      const surveyCard = screen.getByRole('button', { name: /open survey: customer satisfaction survey/i })
+      const surveyCard = screen.getByRole('button', {
+        name: /open survey: customer satisfaction survey/i,
+      })
       await act(async () => {
         await user.click(surveyCard)
       })
@@ -216,9 +224,9 @@ describe('DashboardPage', () => {
         http.get('/api/v1/surveys', () =>
           HttpResponse.json(
             { detail: { code: 'INTERNAL_SERVER_ERROR', message: 'Internal server error' } },
-            { status: 500 },
-          ),
-        ),
+            { status: 500 }
+          )
+        )
       )
 
       renderDashboard()
@@ -229,9 +237,7 @@ describe('DashboardPage', () => {
     })
 
     it('renders error alert when network fails', async () => {
-      server.use(
-        http.get('/api/v1/surveys', () => HttpResponse.error()),
-      )
+      server.use(http.get('/api/v1/surveys', () => HttpResponse.error()))
 
       renderDashboard()
 

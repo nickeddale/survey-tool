@@ -21,7 +21,10 @@ function LocationDisplay() {
 
 function renderSurveys(initialUrl = '/surveys') {
   return render(
-    <MemoryRouter initialEntries={[initialUrl]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <MemoryRouter
+      initialEntries={[initialUrl]}
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
       <AuthProvider>
         <Routes>
           <Route path="/surveys" element={<SurveysPage />} />
@@ -30,12 +33,17 @@ function renderSurveys(initialUrl = '/surveys') {
           <Route path="/surveys/:id/edit" element={<LocationDisplay />} />
         </Routes>
       </AuthProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
 function resetAuthStore() {
-  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
+  useAuthStore.setState({
+    user: null,
+    isAuthenticated: false,
+    isInitializing: false,
+    isLoading: false,
+  })
 }
 
 // ---------------------------------------------------------------------------
@@ -54,7 +62,12 @@ describe('SurveysPage', () => {
     setTokens(mockTokens.access_token)
     localStorage.removeItem('devtracker_refresh_token')
     // Pre-populate the auth store so components that check isAuthenticated work correctly
-    useAuthStore.setState({ user: mockUser, isAuthenticated: true, isInitializing: false, isLoading: false })
+    useAuthStore.setState({
+      user: mockUser,
+      isAuthenticated: true,
+      isInitializing: false,
+      isLoading: false,
+    })
   })
 
   afterEach(() => {
@@ -68,9 +81,7 @@ describe('SurveysPage', () => {
 
   describe('loading state', () => {
     it('renders loading skeleton while data is being fetched', async () => {
-      server.use(
-        http.get('/api/v1/surveys', () => new Promise<never>(() => {})),
-      )
+      server.use(http.get('/api/v1/surveys', () => new Promise<never>(() => {})))
 
       renderSurveys()
 
@@ -167,9 +178,9 @@ describe('SurveysPage', () => {
         http.get('/api/v1/surveys', () =>
           HttpResponse.json(
             { items: [], total: 0, page: 1, per_page: 10, total_pages: 1 },
-            { status: 200 },
-          ),
-        ),
+            { status: 200 }
+          )
+        )
       )
 
       renderSurveys()
@@ -190,14 +201,20 @@ describe('SurveysPage', () => {
           if (status === 'archived') {
             return HttpResponse.json(
               { items: [], total: 0, page: 1, per_page: 10, total_pages: 1 },
-              { status: 200 },
+              { status: 200 }
             )
           }
           return HttpResponse.json(
-            { items: mockSurveys, total: mockSurveys.length, page: 1, per_page: 10, total_pages: 1 },
-            { status: 200 },
+            {
+              items: mockSurveys,
+              total: mockSurveys.length,
+              page: 1,
+              per_page: 10,
+              total_pages: 1,
+            },
+            { status: 200 }
           )
-        }),
+        })
       )
 
       renderSurveys('/surveys?status=archived')
@@ -274,9 +291,9 @@ describe('SurveysPage', () => {
             : mockSurveys
           return HttpResponse.json(
             { items: filtered, total: filtered.length, page: 1, per_page: 10, total_pages: 1 },
-            { status: 200 },
+            { status: 200 }
           )
-        }),
+        })
       )
 
       const user = userEvent.setup()
@@ -298,12 +315,14 @@ describe('SurveysPage', () => {
 
       // After debounce settles, only one additional fetch should have fired
       await waitFor(() => {
-        const searchFetches = fetchedUrls.filter((u) =>
-          new URL(u).searchParams.get('search') !== null,
+        const searchFetches = fetchedUrls.filter(
+          (u) => new URL(u).searchParams.get('search') !== null
         )
         expect(searchFetches.length).toBeGreaterThanOrEqual(1)
         // The search param should be 'NPS'
-        expect(new URL(searchFetches[searchFetches.length - 1]).searchParams.get('search')).toBe('NPS')
+        expect(new URL(searchFetches[searchFetches.length - 1]).searchParams.get('search')).toBe(
+          'NPS'
+        )
       })
 
       // Total fetches should be very few: initial + 1 (debounced)
@@ -360,9 +379,9 @@ describe('SurveysPage', () => {
           const items = manySurveys.slice(start, start + perPage)
           return HttpResponse.json(
             { items, total: manySurveys.length, page, per_page: perPage, total_pages: 2 },
-            { status: 200 },
+            { status: 200 }
           )
-        }),
+        })
       )
 
       renderSurveys()
@@ -403,9 +422,9 @@ describe('SurveysPage', () => {
           const items = manySurveys.slice(start, start + perPage)
           return HttpResponse.json(
             { items, total: 15, page, per_page: perPage, total_pages: 2 },
-            { status: 200 },
+            { status: 200 }
           )
-        }),
+        })
       )
 
       renderSurveys()
@@ -459,7 +478,7 @@ describe('SurveysPage', () => {
         http.delete('/api/v1/surveys/:id', ({ params }) => {
           deleteCalledFor = params.id as string
           return new HttpResponse(null, { status: 204 })
-        }),
+        })
       )
 
       renderSurveys()
@@ -486,7 +505,7 @@ describe('SurveysPage', () => {
         http.delete('/api/v1/surveys/:id', () => {
           deleteCalled = true
           return new HttpResponse(null, { status: 204 })
-        }),
+        })
       )
 
       renderSurveys()
@@ -573,9 +592,9 @@ describe('SurveysPage', () => {
         http.get('/api/v1/surveys', () =>
           HttpResponse.json(
             { detail: { code: 'INTERNAL_SERVER_ERROR', message: 'Internal server error' } },
-            { status: 500 },
-          ),
-        ),
+            { status: 500 }
+          )
+        )
       )
 
       renderSurveys()
@@ -586,9 +605,7 @@ describe('SurveysPage', () => {
     })
 
     it('renders error alert when network fails', async () => {
-      server.use(
-        http.get('/api/v1/surveys', () => HttpResponse.error()),
-      )
+      server.use(http.get('/api/v1/surveys', () => HttpResponse.error()))
 
       renderSurveys()
 

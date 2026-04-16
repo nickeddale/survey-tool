@@ -140,7 +140,10 @@ describe('RankingInput — rendering', () => {
       <RankingInput
         value={[]}
         onChange={vi.fn()}
-        question={makeQuestion({ answer_options: options, settings: makeSettings({ randomize_initial_order: false }) })}
+        question={makeQuestion({
+          answer_options: options,
+          settings: makeSettings({ randomize_initial_order: false }),
+        })}
       />
     )
     const items = screen.getAllByRole('listitem')
@@ -156,22 +159,14 @@ describe('RankingInput — rendering', () => {
 describe('RankingInput — required validation', () => {
   it('does not show errors before blur', () => {
     render(
-      <RankingInput
-        value={[]}
-        onChange={vi.fn()}
-        question={makeQuestion({ is_required: true })}
-      />
+      <RankingInput value={[]} onChange={vi.fn()} question={makeQuestion({ is_required: true })} />
     )
     expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
   })
 
   it('shows required error on blur when value is empty', () => {
     render(
-      <RankingInput
-        value={[]}
-        onChange={vi.fn()}
-        question={makeQuestion({ is_required: true })}
-      />
+      <RankingInput value={[]} onChange={vi.fn()} question={makeQuestion({ is_required: true })} />
     )
     fireEvent.blur(screen.getByTestId('ranking-input-q-rank-1'))
     expect(screen.getByTestId('validation-errors')).toHaveTextContent('This field is required.')
@@ -211,11 +206,7 @@ describe('RankingInput — required validation', () => {
 
   it('does not show error when no options exist and no value (empty case)', () => {
     render(
-      <RankingInput
-        value={[]}
-        onChange={vi.fn()}
-        question={makeQuestion({ is_required: false })}
-      />
+      <RankingInput value={[]} onChange={vi.fn()} question={makeQuestion({ is_required: false })} />
     )
     fireEvent.blur(screen.getByTestId('ranking-input-q-rank-1'))
     expect(screen.queryByTestId('validation-errors')).not.toBeInTheDocument()
@@ -252,12 +243,7 @@ describe('RankingInput — accessibility', () => {
 
   it('sets aria-invalid=true on list when errors present', () => {
     render(
-      <RankingInput
-        value={[]}
-        onChange={vi.fn()}
-        question={makeQuestion()}
-        errors={['Error!']}
-      />
+      <RankingInput value={[]} onChange={vi.fn()} question={makeQuestion()} errors={['Error!']} />
     )
     expect(screen.getByTestId('ranking-list')).toHaveAttribute('aria-invalid', 'true')
   })
@@ -278,12 +264,7 @@ describe('RankingInput — accessibility', () => {
 
   it('error list has role=alert and aria-live=assertive', () => {
     render(
-      <RankingInput
-        value={[]}
-        onChange={vi.fn()}
-        question={makeQuestion()}
-        errors={['Error!']}
-      />
+      <RankingInput value={[]} onChange={vi.fn()} question={makeQuestion()} errors={['Error!']} />
     )
     const errorList = screen.getByTestId('validation-errors')
     expect(errorList).toHaveAttribute('role', 'alert')
@@ -301,7 +282,7 @@ describe('RankingInput — accessibility', () => {
     )
     expect(screen.getByTestId('ranking-drag-handle-opt-1')).toHaveAttribute(
       'aria-label',
-      'Drag to reorder My Option',
+      'Drag to reorder My Option'
     )
   })
 })

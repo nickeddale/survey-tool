@@ -45,7 +45,6 @@ export function HtmlContent({ question }: HtmlContentProps) {
         '[&_td]:border [&_td]:border-input [&_td]:px-2 [&_td]:py-1',
       ].join(' ')}
       data-testid={`html-content-${question.id}`}
-      // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: sanitized }}
     />
   )

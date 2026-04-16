@@ -54,11 +54,7 @@ export function ExpressionDisplay({ value, question }: ExpressionDisplayProps) {
   const isEmpty = displayValue === ''
 
   return (
-    <div
-      id={inputId}
-      className="space-y-1"
-      data-testid={`expression-display-${question.id}`}
-    >
+    <div id={inputId} className="space-y-1" data-testid={`expression-display-${question.id}`}>
       <div
         role="status"
         aria-label={question.title}

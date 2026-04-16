@@ -22,10 +22,11 @@ from app.utils.errors import UnprocessableError
 # ---------------------------------------------------------------------------
 
 
-def make_question(is_required: bool = False, settings: dict | None = None):
+def make_question(is_required: bool = False, settings: dict | None = None, validation: dict | None = None):
     q = MagicMock()
     q.is_required = is_required
     q.settings = settings
+    q.validation = validation
     return q
 
 

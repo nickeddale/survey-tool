@@ -165,8 +165,9 @@ def validate_numeric_answer(answer: dict[str, Any], question: Any) -> None:
     ((value - min_value) % step == 0).
     """
     settings = question.settings or {}
-    min_value = settings.get("min_value")
-    max_value = settings.get("max_value")
+    validation = question.validation or {}
+    min_value = settings.get("min_value") if settings.get("min_value") is not None else validation.get("min")
+    max_value = settings.get("max_value") if settings.get("max_value") is not None else validation.get("max")
     step = settings.get("step")
 
     value = answer.get("value")
@@ -177,7 +178,7 @@ def validate_numeric_answer(answer: dict[str, Any], question: Any) -> None:
     if value is None:
         return
 
-    if not isinstance(value, (int, float)):
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise UnprocessableError("Answer value must be a number")
 
     if min_value is not None and value < min_value:

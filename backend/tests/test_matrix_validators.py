@@ -5,9 +5,11 @@ from unittest.mock import MagicMock
 
 from app.services.validators.matrix_validators import (
     validate_matrix_settings,
+    validate_matrix_multiple_settings,
     validate_matrix_dropdown_settings,
     validate_matrix_dynamic_settings,
     validate_matrix_answer,
+    validate_matrix_multiple_answer,
     validate_matrix_dropdown_answer,
     validate_matrix_dynamic_answer,
 )
@@ -155,10 +157,9 @@ def test_matrix_dynamic_settings_valid():
     validate_matrix_dynamic_settings(None, opts, sqs)
 
 
-def test_matrix_dynamic_settings_no_subquestions_raises():
+def test_matrix_dynamic_settings_no_subquestions_valid():
     opts = [make_option("A1")]
-    with pytest.raises(UnprocessableError, match="at least one subquestion"):
-        validate_matrix_dynamic_settings(None, opts, [])
+    validate_matrix_dynamic_settings(None, opts, [])  # no exception — subquestions not required
 
 
 def test_matrix_dynamic_settings_no_options_raises():
@@ -329,10 +330,11 @@ def test_matrix_answer_is_all_rows_required_satisfied():
 
 
 def test_matrix_dropdown_answer_valid():
+    # Updated to use nested response shape: {sq_code: {col_code: cell_value}}
     sqs = [make_subquestion("Q1_SQ001")]
     opts = [make_option("A1"), make_option("A2")]
     q = make_question(is_required=False, settings={})
-    validate_matrix_dropdown_answer({"value": {"Q1_SQ001": "A1"}}, q, opts, sqs)
+    validate_matrix_dropdown_answer({"value": {"Q1_SQ001": {"A1": "some_val"}}}, q, opts, sqs)
 
 
 def test_matrix_dropdown_answer_invalid_sq_code():
@@ -340,15 +342,15 @@ def test_matrix_dropdown_answer_invalid_sq_code():
     opts = [make_option("A1")]
     q = make_question(is_required=False, settings={})
     with pytest.raises(UnprocessableError, match="not a valid subquestion code"):
-        validate_matrix_dropdown_answer({"value": {"BAD_SQ": "A1"}}, q, opts, sqs)
+        validate_matrix_dropdown_answer({"value": {"BAD_SQ": {"A1": "val"}}}, q, opts, sqs)
 
 
 def test_matrix_dropdown_answer_invalid_option_code():
     sqs = [make_subquestion("Q1_SQ001")]
     opts = [make_option("A1")]
     q = make_question(is_required=False, settings={})
-    with pytest.raises(UnprocessableError, match="not a valid answer option code"):
-        validate_matrix_dropdown_answer({"value": {"Q1_SQ001": "BAD_OPT"}}, q, opts, sqs)
+    with pytest.raises(UnprocessableError, match="not a valid column code"):
+        validate_matrix_dropdown_answer({"value": {"Q1_SQ001": {"BAD_OPT": "val"}}}, q, opts, sqs)
 
 
 def test_matrix_dropdown_answer_all_rows_required():
@@ -356,7 +358,7 @@ def test_matrix_dropdown_answer_all_rows_required():
     opts = [make_option("A1")]
     q = make_question(is_required=False, settings={"is_all_rows_required": True})
     with pytest.raises(UnprocessableError, match="All rows are required"):
-        validate_matrix_dropdown_answer({"value": {"Q1_SQ001": "A1"}}, q, opts, sqs)
+        validate_matrix_dropdown_answer({"value": {"Q1_SQ001": {"A1": "val"}}}, q, opts, sqs)
 
 
 def test_matrix_dropdown_answer_not_dict_raises():
@@ -437,3 +439,347 @@ def test_matrix_dynamic_answer_within_range_valid():
     validate_matrix_dynamic_answer(
         {"value": [{"col1": "v1"}, {"col1": "v2"}]}, q, opts, sqs
     )
+
+
+# ---------------------------------------------------------------------------
+# validate_matrix_multiple_settings
+# ---------------------------------------------------------------------------
+
+
+def test_matrix_multiple_settings_valid():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("A1")]
+    validate_matrix_multiple_settings(None, opts, sqs)  # no exception
+
+
+def test_matrix_multiple_settings_no_subquestions_raises():
+    opts = [make_option("A1")]
+    with pytest.raises(UnprocessableError, match="at least one subquestion"):
+        validate_matrix_multiple_settings(None, opts, [])
+
+
+def test_matrix_multiple_settings_no_options_raises():
+    sqs = [make_subquestion("Q1_SQ001")]
+    with pytest.raises(UnprocessableError, match="at least one answer option"):
+        validate_matrix_multiple_settings(None, [], sqs)
+
+
+def test_matrix_multiple_settings_valid_all_fields():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("A1"), make_option("A2")]
+    settings = {
+        "alternate_rows": True,
+        "is_all_rows_required": False,
+        "randomize_rows": True,
+        "transpose": False,
+    }
+    validate_matrix_multiple_settings(settings, opts, sqs)
+
+
+def test_matrix_multiple_settings_invalid_transpose():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("A1")]
+    with pytest.raises(UnprocessableError, match="transpose must be a boolean"):
+        validate_matrix_multiple_settings({"transpose": "yes"}, opts, sqs)
+
+
+# ---------------------------------------------------------------------------
+# validate_matrix_multiple_answer
+# ---------------------------------------------------------------------------
+
+
+def test_matrix_multiple_answer_valid():
+    sqs = [make_subquestion("Q1_SQ001"), make_subquestion("Q1_SQ002")]
+    opts = [make_option("A1"), make_option("A2")]
+    q = make_question(is_required=False, settings={})
+    validate_matrix_multiple_answer(
+        {"value": {"Q1_SQ001": ["A1", "A2"], "Q1_SQ002": ["A1"]}}, q, opts, sqs
+    )
+
+
+def test_matrix_multiple_answer_empty_not_required():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("A1")]
+    q = make_question(is_required=False, settings={})
+    validate_matrix_multiple_answer({"value": {}}, q, opts, sqs)
+
+
+def test_matrix_multiple_answer_empty_required_raises():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("A1")]
+    q = make_question(is_required=True, settings={})
+    with pytest.raises(UnprocessableError, match="required"):
+        validate_matrix_multiple_answer({"value": {}}, q, opts, sqs)
+
+
+def test_matrix_multiple_answer_not_dict_raises():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("A1")]
+    q = make_question(is_required=False, settings={})
+    with pytest.raises(UnprocessableError, match="must be a dict"):
+        validate_matrix_multiple_answer({"value": "A1"}, q, opts, sqs)
+
+
+def test_matrix_multiple_answer_value_not_list_raises():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("A1")]
+    q = make_question(is_required=False, settings={})
+    with pytest.raises(UnprocessableError, match="must be a list of option codes"):
+        validate_matrix_multiple_answer({"value": {"Q1_SQ001": "A1"}}, q, opts, sqs)
+
+
+def test_matrix_multiple_answer_invalid_subquestion_code():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("A1")]
+    q = make_question(is_required=False, settings={})
+    with pytest.raises(UnprocessableError, match="not a valid subquestion code"):
+        validate_matrix_multiple_answer({"value": {"INVALID_SQ": ["A1"]}}, q, opts, sqs)
+
+
+def test_matrix_multiple_answer_invalid_option_code():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("A1")]
+    q = make_question(is_required=False, settings={})
+    with pytest.raises(UnprocessableError, match="not a valid answer option code"):
+        validate_matrix_multiple_answer({"value": {"Q1_SQ001": ["INVALID"]}}, q, opts, sqs)
+
+
+def test_matrix_multiple_answer_all_rows_required_enforced():
+    sqs = [make_subquestion("Q1_SQ001"), make_subquestion("Q1_SQ002")]
+    opts = [make_option("A1")]
+    q = make_question(is_required=False, settings={"is_all_rows_required": True})
+    with pytest.raises(UnprocessableError, match="All rows are required"):
+        # Only one of two subquestions answered
+        validate_matrix_multiple_answer({"value": {"Q1_SQ001": ["A1"]}}, q, opts, sqs)
+
+
+def test_matrix_multiple_answer_all_rows_required_satisfied():
+    sqs = [make_subquestion("Q1_SQ001"), make_subquestion("Q1_SQ002")]
+    opts = [make_option("A1")]
+    q = make_question(is_required=False, settings={"is_all_rows_required": True})
+    validate_matrix_multiple_answer(
+        {"value": {"Q1_SQ001": ["A1"], "Q1_SQ002": ["A1"]}}, q, opts, sqs
+    )
+
+
+def test_matrix_multiple_answer_empty_list_fails_all_rows_required():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("A1")]
+    q = make_question(is_required=False, settings={"is_all_rows_required": True})
+    with pytest.raises(UnprocessableError, match="All rows are required"):
+        validate_matrix_multiple_answer({"value": {"Q1_SQ001": []}}, q, opts, sqs)
+
+
+# ---------------------------------------------------------------------------
+# validate_matrix_dropdown_answer — updated nested shape
+# ---------------------------------------------------------------------------
+
+
+def test_matrix_dropdown_answer_nested_valid():
+    sqs = [make_subquestion("Q1_SQ001"), make_subquestion("Q1_SQ002")]
+    opts = [make_option("col1"), make_option("col2")]
+    q = make_question(is_required=False, settings={})
+    validate_matrix_dropdown_answer(
+        {"value": {"Q1_SQ001": {"col1": "text_val", "col2": "other_val"}}}, q, opts, sqs
+    )
+
+
+def test_matrix_dropdown_answer_not_dict_raises():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={})
+    with pytest.raises(UnprocessableError, match="must be a dict"):
+        validate_matrix_dropdown_answer({"value": "not_a_dict"}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_row_value_not_dict_raises():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={})
+    with pytest.raises(UnprocessableError, match="must be a dict mapping column codes"):
+        validate_matrix_dropdown_answer({"value": {"Q1_SQ001": "flat_val"}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_invalid_subquestion_code_nested():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={})
+    with pytest.raises(UnprocessableError, match="not a valid subquestion code"):
+        validate_matrix_dropdown_answer({"value": {"BAD_SQ": {"col1": "val"}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_invalid_column_code():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={})
+    with pytest.raises(UnprocessableError, match="not a valid column code"):
+        validate_matrix_dropdown_answer({"value": {"Q1_SQ001": {"bad_col": "val"}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_cell_type_validation_text():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "text"}})
+    with pytest.raises(UnprocessableError, match="must be a string"):
+        validate_matrix_dropdown_answer({"value": {"Q1_SQ001": {"col1": 42}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_cell_type_validation_number_valid():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "number"}})
+    validate_matrix_dropdown_answer({"value": {"Q1_SQ001": {"col1": 3.14}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_cell_type_validation_number_invalid():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "number"}})
+    with pytest.raises(UnprocessableError, match="must be a number"):
+        validate_matrix_dropdown_answer({"value": {"Q1_SQ001": {"col1": "not_a_number"}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_cell_type_boolean_invalid():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "boolean"}})
+    with pytest.raises(UnprocessableError, match="must be a boolean"):
+        validate_matrix_dropdown_answer({"value": {"Q1_SQ001": {"col1": "yes"}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_cell_type_checkbox_invalid():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "checkbox"}})
+    with pytest.raises(UnprocessableError, match="must be a list of strings"):
+        validate_matrix_dropdown_answer({"value": {"Q1_SQ001": {"col1": "single_val"}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_cell_type_checkbox_valid():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "checkbox"}})
+    validate_matrix_dropdown_answer({"value": {"Q1_SQ001": {"col1": ["A", "B"]}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_all_rows_required_nested():
+    sqs = [make_subquestion("Q1_SQ001"), make_subquestion("Q1_SQ002")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"is_all_rows_required": True})
+    with pytest.raises(UnprocessableError, match="All rows are required"):
+        validate_matrix_dropdown_answer(
+            {"value": {"Q1_SQ001": {"col1": "val"}}}, q, opts, sqs
+        )
+
+
+def test_matrix_dropdown_answer_empty_not_required():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={})
+    validate_matrix_dropdown_answer({"value": {}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_empty_required_raises():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=True, settings={})
+    with pytest.raises(UnprocessableError, match="required"):
+        validate_matrix_dropdown_answer({"value": {}}, q, opts, sqs)
+
+
+# ---------------------------------------------------------------------------
+# validate_matrix_dropdown_settings — column_types valid type check
+# ---------------------------------------------------------------------------
+
+
+def test_matrix_dropdown_settings_column_types_invalid_cell_type():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("A1")]
+    with pytest.raises(UnprocessableError, match="not a valid cell type"):
+        validate_matrix_dropdown_settings({"column_types": {"A1": "invalid_type"}}, opts, sqs)
+
+
+def test_matrix_dropdown_settings_column_types_valid_all_types():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("A1")]
+    for cell_type in ("text", "number", "boolean", "dropdown", "checkbox", "rating", "radio"):
+        validate_matrix_dropdown_settings({"column_types": {"A1": cell_type}}, opts, sqs)
+
+
+# ---------------------------------------------------------------------------
+# validate_matrix_dropdown_answer — rating cell type (ISS-263)
+# ---------------------------------------------------------------------------
+
+
+def test_matrix_dropdown_answer_cell_type_rating_numeric_int_valid():
+    sqs = [make_subquestion("SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "rating"}})
+    validate_matrix_dropdown_answer({"value": {"SQ001": {"col1": 5}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_cell_type_rating_numeric_float_valid():
+    sqs = [make_subquestion("SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "rating"}})
+    validate_matrix_dropdown_answer({"value": {"SQ001": {"col1": 3.5}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_cell_type_rating_string_int_valid():
+    """Frontend sends rating values as strings (e.g. '5') — must be accepted."""
+    sqs = [make_subquestion("SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "rating"}})
+    validate_matrix_dropdown_answer({"value": {"SQ001": {"col1": "5"}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_cell_type_rating_string_all_values_valid():
+    """All valid rating string values 1-5 must pass."""
+    sqs = [make_subquestion("SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "rating"}})
+    for val in ("1", "2", "3", "4", "5"):
+        validate_matrix_dropdown_answer({"value": {"SQ001": {"col1": val}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_cell_type_rating_string_float_valid():
+    sqs = [make_subquestion("SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "rating"}})
+    validate_matrix_dropdown_answer({"value": {"SQ001": {"col1": "3.5"}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_cell_type_rating_non_numeric_string_raises():
+    """Non-numeric strings must still fail validation."""
+    sqs = [make_subquestion("SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "rating"}})
+    with pytest.raises(UnprocessableError, match="must be a number.*cell_type=rating"):
+        validate_matrix_dropdown_answer({"value": {"SQ001": {"col1": "abc"}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_cell_type_rating_bool_raises():
+    """Boolean must still fail validation for rating."""
+    sqs = [make_subquestion("SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "rating"}})
+    with pytest.raises(UnprocessableError, match="must be a number.*cell_type=rating"):
+        validate_matrix_dropdown_answer({"value": {"SQ001": {"col1": True}}}, q, opts, sqs)
+
+
+# ---------------------------------------------------------------------------
+# validate_matrix_settings — transpose support
+# ---------------------------------------------------------------------------
+
+
+def test_matrix_settings_valid_with_transpose():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("A1")]
+    validate_matrix_settings({"transpose": True}, opts, sqs)
+
+
+def test_matrix_settings_invalid_transpose():
+    sqs = [make_subquestion("Q1_SQ001")]
+    opts = [make_option("A1")]
+    with pytest.raises(UnprocessableError, match="transpose must be a boolean"):
+        validate_matrix_settings({"transpose": "yes"}, opts, sqs)

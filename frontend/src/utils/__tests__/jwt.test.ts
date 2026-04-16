@@ -50,8 +50,7 @@ describe('getTokenExpiry', () => {
 
   it('returns null for token without exp', () => {
     // Payload: {sub: "x"}
-    const noExp =
-      'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ4In0.sig'
+    const noExp = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ4In0.sig'
     expect(getTokenExpiry(noExp)).toBeNull()
   })
 

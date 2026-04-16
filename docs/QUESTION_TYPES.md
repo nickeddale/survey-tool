@@ -1,6 +1,6 @@
 # Question Types Reference
 
-This document describes all 18 question types supported by the survey tool. Each entry covers the type identifier, purpose, required fields, configurable settings, validation rules, response format, and an API example.
+This document describes all question types supported by the survey tool. Each entry covers the type identifier, purpose, required fields, configurable settings, validation rules, response format, and an API example.
 
 ---
 
@@ -10,21 +10,31 @@ This document describes all 18 question types supported by the survey tool. Each
   - [short_text](#short_text)
   - [long_text](#long_text)
   - [huge_text](#huge_text)
+  - [email](#email)
+  - [phone](#phone)
+  - [url](#url)
 - [Choice Types](#choice-types)
-  - [radio](#radio)
+  - [single_choice](#single_choice)
   - [dropdown](#dropdown)
-  - [checkbox](#checkbox)
+  - [multiple_choice](#multiple_choice)
   - [ranking](#ranking)
   - [image_picker](#image_picker)
 - [Matrix Types](#matrix-types)
   - [matrix](#matrix)
+  - [matrix_single](#matrix_single)
+  - [matrix_multiple](#matrix_multiple)
   - [matrix_dropdown](#matrix_dropdown)
   - [matrix_dynamic](#matrix_dynamic)
 - [Scalar Types](#scalar-types)
   - [numeric](#numeric)
+  - [number](#number)
   - [rating](#rating)
+  - [scale](#scale)
   - [boolean](#boolean)
+  - [yes_no](#yes_no)
   - [date](#date)
+  - [time](#time)
+  - [datetime](#datetime)
 - [Special Types](#special-types)
   - [file_upload](#file_upload)
   - [expression](#expression)
@@ -222,11 +232,146 @@ This document describes all 18 question types supported by the survey tool. Each
 
 ---
 
+### email
+
+**Type identifier:** `email`
+
+**Description:** A text input that validates the value as an email address. Must contain `@` with non-empty local and domain parts, and the domain must contain a dot.
+
+**Required fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | string | The question text displayed to the respondent |
+| `question_type` | string | Must be `email` |
+
+**Settings (JSONB):**
+
+No type-specific settings. Uses the standard `validation` JSONB for optional `min_length`, `max_length`, and `regex` rules.
+
+**Validation rules:**
+
+- Value must be a string.
+- Value must be a valid email address (contains `@`, non-empty local and domain parts, domain contains `.`).
+- Optional `min_length`, `max_length`, and `regex` from `validation` JSONB are applied if set.
+- If the question is marked `is_required`, the value must be non-empty.
+
+**Response format:**
+
+```json
+{
+  "question_id": "uuid",
+  "value": "user@example.com"
+}
+```
+
+**API example:**
+
+```json
+{
+  "title": "What is your email address?",
+  "question_type": "email",
+  "is_required": true
+}
+```
+
+---
+
+### phone
+
+**Type identifier:** `phone`
+
+**Description:** A text input that validates the value as a phone number. Accepts digits, spaces, hyphens, dots, parentheses, and an optional leading `+`.
+
+**Required fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | string | The question text displayed to the respondent |
+| `question_type` | string | Must be `phone` |
+
+**Settings (JSONB):**
+
+No type-specific settings. Uses the standard `validation` JSONB for optional `min_length`, `max_length`, and `regex` rules.
+
+**Validation rules:**
+
+- Value must be a string.
+- Value must match the phone number pattern: optional leading `+`, followed by at least 3 characters consisting of digits, spaces, hyphens, dots, and parentheses.
+- Optional `min_length`, `max_length`, and `regex` from `validation` JSONB are applied if set.
+- If the question is marked `is_required`, the value must be non-empty.
+
+**Response format:**
+
+```json
+{
+  "question_id": "uuid",
+  "value": "+1 (555) 123-4567"
+}
+```
+
+**API example:**
+
+```json
+{
+  "title": "What is your phone number?",
+  "question_type": "phone",
+  "is_required": false
+}
+```
+
+---
+
+### url
+
+**Type identifier:** `url`
+
+**Description:** A text input that validates the value as a URL. Requires `http://` or `https://` prefix.
+
+**Required fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | string | The question text displayed to the respondent |
+| `question_type` | string | Must be `url` |
+
+**Settings (JSONB):**
+
+No type-specific settings. Uses the standard `validation` JSONB for optional `min_length`, `max_length`, and `regex` rules.
+
+**Validation rules:**
+
+- Value must be a string.
+- Value must start with `http://` or `https://` followed by additional characters.
+- Optional `min_length`, `max_length`, and `regex` from `validation` JSONB are applied if set.
+- If the question is marked `is_required`, the value must be non-empty.
+
+**Response format:**
+
+```json
+{
+  "question_id": "uuid",
+  "value": "https://example.com"
+}
+```
+
+**API example:**
+
+```json
+{
+  "title": "What is your website?",
+  "question_type": "url",
+  "is_required": false
+}
+```
+
+---
+
 ## Choice Types
 
-### radio
+### single_choice
 
-**Type identifier:** `radio`
+**Type identifier:** `single_choice`
 
 **Description:** A single-select question rendered as radio buttons. The respondent picks exactly one option from the list.
 
@@ -235,7 +380,7 @@ This document describes all 18 question types supported by the survey tool. Each
 | Field | Type | Description |
 |-------|------|-------------|
 | `title` | string | The question text displayed to the respondent |
-| `question_type` | string | Must be `radio` |
+| `question_type` | string | Must be `single_choice` |
 | `answer_options` | array | List of options to choose from |
 
 **Settings (JSONB):**
@@ -258,7 +403,7 @@ This document describes all 18 question types supported by the survey tool. Each
 
 **Validation rules:**
 
-- Value must be a valid `answer_option_id` from the question's answer options, or the string `"other"` if `has_other` is enabled.
+- Value must be a valid option code from the question's answer options, or the string `"other"` if `has_other` is enabled.
 - If `has_other` is enabled and the respondent selects "other", the `other_value` field must be a non-empty string.
 - If the question is marked `is_required`, a selection must be made.
 
@@ -267,7 +412,7 @@ This document describes all 18 question types supported by the survey tool. Each
 ```json
 {
   "question_id": "uuid",
-  "value": "answer_option_id"
+  "value": "opt_search_engine"
 }
 ```
 
@@ -286,7 +431,7 @@ With "other" selected:
 ```json
 {
   "title": "How did you hear about us?",
-  "question_type": "radio",
+  "question_type": "single_choice",
   "is_required": true,
   "answer_options": [
     { "text": "Search engine", "position": 1 },
@@ -339,7 +484,7 @@ With "other" selected:
 
 **Validation rules:**
 
-- Value must be a valid `answer_option_id` from the question's answer options, or `"other"` if `has_other` is enabled.
+- Value must be a valid option code from the question's answer options, or `"other"` if `has_other` is enabled.
 - If `has_other` is enabled and the respondent selects "other", the `other_value` field must be a non-empty string.
 - If the question is marked `is_required`, a selection must be made.
 
@@ -348,7 +493,7 @@ With "other" selected:
 ```json
 {
   "question_id": "uuid",
-  "value": "answer_option_id"
+  "value": "opt_united_states"
 }
 ```
 
@@ -374,9 +519,9 @@ With "other" selected:
 
 ---
 
-### checkbox
+### multiple_choice
 
-**Type identifier:** `checkbox`
+**Type identifier:** `multiple_choice`
 
 **Description:** A multi-select question rendered as checkboxes. The respondent can pick one or more options.
 
@@ -385,7 +530,7 @@ With "other" selected:
 | Field | Type | Description |
 |-------|------|-------------|
 | `title` | string | The question text displayed to the respondent |
-| `question_type` | string | Must be `checkbox` |
+| `question_type` | string | Must be `multiple_choice` |
 | `answer_options` | array | List of options to choose from |
 
 **Settings (JSONB):**
@@ -416,7 +561,7 @@ With "other" selected:
 
 **Validation rules:**
 
-- `values` must be an array of valid `answer_option_id` entries.
+- `values` must be an array of valid option codes.
 - If `min_choices` is set, the number of selections must be >= `min_choices`.
 - If `max_choices` is set, the number of selections must be <= `max_choices`.
 - If `has_other` is enabled and `"other"` is included in `values`, the `other_value` field must be a non-empty string.
@@ -427,7 +572,7 @@ With "other" selected:
 ```json
 {
   "question_id": "uuid",
-  "values": ["answer_option_id_1", "answer_option_id_3"]
+  "values": ["opt_dashboard", "opt_api_access"]
 }
 ```
 
@@ -436,7 +581,7 @@ With "other" selected:
 ```json
 {
   "question_id": "uuid",
-  "values": ["answer_option_id_1", "other"],
+  "values": ["opt_dashboard", "other"],
   "other_value": "My custom answer"
 }
 ```
@@ -446,7 +591,7 @@ With "other" selected:
 ```json
 {
   "title": "Which features do you use? (Select all that apply)",
-  "question_type": "checkbox",
+  "question_type": "multiple_choice",
   "is_required": true,
   "answer_options": [
     { "text": "Dashboard", "position": 1 },
@@ -494,7 +639,7 @@ With "other" selected:
 
 **Validation rules:**
 
-- `values` must be an array containing every `answer_option_id` exactly once (complete ranking required).
+- `values` must be an array containing every option code exactly once (complete ranking required).
 - No duplicate entries are allowed.
 - The length of `values` must equal the number of answer options.
 - If the question is marked `is_required`, the respondent must submit a ranking.
@@ -506,7 +651,7 @@ The `values` array is ordered from highest priority (index 0) to lowest priority
 ```json
 {
   "question_id": "uuid",
-  "values": ["answer_option_id_2", "answer_option_id_1", "answer_option_id_3"]
+  "values": ["opt_price", "opt_performance", "opt_ease_of_use"]
 }
 ```
 
@@ -569,8 +714,8 @@ The `values` array is ordered from highest priority (index 0) to lowest priority
 
 **Validation rules:**
 
-- When `multi_select` is false, `value` must be a single valid `answer_option_id`.
-- When `multi_select` is true, `values` must be an array of valid `answer_option_id` entries, subject to `min_choices` and `max_choices` constraints.
+- When `multi_select` is false, `value` must be a single valid option code.
+- When `multi_select` is true, `values` must be an array of valid option codes, subject to `min_choices` and `max_choices` constraints.
 - If the question is marked `is_required`, at least one selection must be made.
 
 **Response format:**
@@ -580,7 +725,7 @@ Single select:
 ```json
 {
   "question_id": "uuid",
-  "value": "answer_option_id"
+  "value": "opt_design_a"
 }
 ```
 
@@ -589,7 +734,7 @@ Multi select:
 ```json
 {
   "question_id": "uuid",
-  "values": ["answer_option_id_1", "answer_option_id_3"]
+  "values": ["opt_design_a", "opt_design_c"]
 }
 ```
 
@@ -651,7 +796,7 @@ Multi select:
 
 **Validation rules:**
 
-- Each row answer must be a valid `answer_option_id` from the column definitions.
+- Each row answer must be a valid option code from the column definitions.
 - If `is_all_rows_required` is true, every row must have a selection.
 - If the question is marked `is_required`, at least one row must be answered.
 
@@ -661,9 +806,9 @@ Multi select:
 {
   "question_id": "uuid",
   "value": {
-    "subquestion_id_1": "answer_option_id_3",
-    "subquestion_id_2": "answer_option_id_2",
-    "subquestion_id_3": "answer_option_id_4"
+    "SQ001": "A3",
+    "SQ002": "A2",
+    "SQ003": "A4"
   }
 }
 ```
@@ -689,6 +834,156 @@ Multi select:
   ],
   "settings": {
     "alternate_rows": true,
+    "is_all_rows_required": true
+  }
+}
+```
+
+---
+
+### matrix_single
+
+**Type identifier:** `matrix_single`
+
+**Description:** A matrix question where each row allows a single selection from the column options. Functionally equivalent to `matrix` but explicitly named for clarity. Recognized as a matrix type for subquestion support.
+
+**Required fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | string | The question text displayed to the respondent |
+| `question_type` | string | Must be `matrix_single` |
+| `answer_options` | array | Column headers |
+| `subquestions` | array | Row labels, created as child questions with `parent_id` set |
+
+**Settings (JSONB):**
+
+Same as `matrix`:
+
+```json
+{
+  "alternate_rows": true,
+  "is_all_rows_required": false,
+  "randomize_rows": false
+}
+```
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `alternate_rows` | boolean | `true` | Whether to alternate row background colors for readability |
+| `is_all_rows_required` | boolean | `false` | Whether every row must be answered |
+| `randomize_rows` | boolean | `false` | Whether to randomize the row order |
+
+**Validation rules:**
+
+- Each row answer must be a valid option code from the column definitions.
+- If `is_all_rows_required` is true, every row must have a selection.
+- If the question is marked `is_required`, at least one row must be answered.
+
+**Response format:**
+
+```json
+{
+  "question_id": "uuid",
+  "value": {
+    "SQ001": "A1",
+    "SQ002": "A3"
+  }
+}
+```
+
+**API example:**
+
+```json
+{
+  "title": "Evaluate each area",
+  "question_type": "matrix_single",
+  "is_required": true,
+  "answer_options": [
+    { "text": "Poor", "position": 1 },
+    { "text": "Fair", "position": 2 },
+    { "text": "Good", "position": 3 }
+  ],
+  "subquestions": [
+    { "title": "Quality", "position": 1 },
+    { "title": "Speed", "position": 2 }
+  ],
+  "settings": {
+    "is_all_rows_required": true
+  }
+}
+```
+
+---
+
+### matrix_multiple
+
+**Type identifier:** `matrix_multiple`
+
+**Description:** A matrix question where each row allows multiple selections from the column options. Recognized as a matrix type for subquestion support.
+
+**Required fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | string | The question text displayed to the respondent |
+| `question_type` | string | Must be `matrix_multiple` |
+| `answer_options` | array | Column headers |
+| `subquestions` | array | Row labels, created as child questions with `parent_id` set |
+
+**Settings (JSONB):**
+
+Same as `matrix`:
+
+```json
+{
+  "alternate_rows": true,
+  "is_all_rows_required": false,
+  "randomize_rows": false
+}
+```
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `alternate_rows` | boolean | `true` | Whether to alternate row background colors for readability |
+| `is_all_rows_required` | boolean | `false` | Whether every row must be answered |
+| `randomize_rows` | boolean | `false` | Whether to randomize the row order |
+
+**Validation rules:**
+
+- Each row answer must consist of valid option codes from the column definitions.
+- If `is_all_rows_required` is true, every row must have at least one selection.
+- If the question is marked `is_required`, at least one row must be answered.
+
+**Response format:**
+
+```json
+{
+  "question_id": "uuid",
+  "value": {
+    "SQ001": ["A1", "A3"],
+    "SQ002": ["A2"]
+  }
+}
+```
+
+**API example:**
+
+```json
+{
+  "title": "Select all that apply for each category",
+  "question_type": "matrix_multiple",
+  "is_required": true,
+  "answer_options": [
+    { "text": "Option A", "position": 1 },
+    { "text": "Option B", "position": 2 },
+    { "text": "Option C", "position": 3 }
+  ],
+  "subquestions": [
+    { "title": "Category 1", "position": 1 },
+    { "title": "Category 2", "position": 2 }
+  ],
+  "settings": {
     "is_all_rows_required": true
   }
 }
@@ -732,7 +1027,7 @@ Multi select:
 **Validation rules:**
 
 - Each cell value must match the constraints of its column's `cell_type`.
-- Dropdown cells must reference valid `answer_option_id` values from that column's options.
+- Dropdown cells must reference valid option codes from that column's options.
 - If `is_all_rows_required` is true, every cell in every row must be filled.
 - If the question is marked `is_required`, at least one row must have data.
 
@@ -742,13 +1037,13 @@ Multi select:
 {
   "question_id": "uuid",
   "value": {
-    "subquestion_id_1": {
-      "column_1": "answer_option_id",
-      "column_2": "Free text value"
+    "SQ001": {
+      "quality": "A2",
+      "comments": "Good overall"
     },
-    "subquestion_id_2": {
-      "column_1": "answer_option_id",
-      "column_2": "Another value"
+    "SQ002": {
+      "quality": "A1",
+      "comments": "Needs improvement"
     }
   }
 }
@@ -840,11 +1135,11 @@ Multi select:
   "value": [
     {
       "name": "Alice",
-      "role": "answer_option_id"
+      "role": "A1"
     },
     {
       "name": "Bob",
-      "role": "answer_option_id"
+      "role": "A2"
     }
   ]
 }
@@ -891,7 +1186,7 @@ Multi select:
 
 **Type identifier:** `numeric`
 
-**Description:** A number input field for collecting integer or decimal values.
+**Description:** A number input field for collecting integer or decimal values. Supports step validation.
 
 **Required fields:**
 
@@ -904,9 +1199,9 @@ Multi select:
 
 ```json
 {
-  "min": null,
-  "max": null,
-  "decimal_places": 0,
+  "min_value": null,
+  "max_value": null,
+  "step": null,
   "placeholder": null,
   "prefix": null,
   "suffix": null
@@ -915,9 +1210,9 @@ Multi select:
 
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
-| `min` | number or null | `null` | Minimum allowed value (null = no minimum) |
-| `max` | number or null | `null` | Maximum allowed value (null = no maximum) |
-| `decimal_places` | integer | `0` | Number of decimal places (0 = integers only) |
+| `min_value` | number or null | `null` | Minimum allowed value (null = no minimum) |
+| `max_value` | number or null | `null` | Maximum allowed value (null = no maximum) |
+| `step` | number or null | `null` | Step increment (must be > 0). Value must satisfy `(value - min_value) % step == 0` |
 | `placeholder` | string or null | `null` | Placeholder text for the input |
 | `prefix` | string or null | `null` | Text displayed before the input (e.g., "$") |
 | `suffix` | string or null | `null` | Text displayed after the input (e.g., "kg") |
@@ -925,9 +1220,9 @@ Multi select:
 **Validation rules:**
 
 - Value must be a valid number.
-- If `min` is set, the value must be >= `min`.
-- If `max` is set, the value must be <= `max`.
-- The value must not have more decimal places than `decimal_places`.
+- If `min_value` is set, the value must be >= `min_value`.
+- If `max_value` is set, the value must be <= `max_value`.
+- If `step` is set, the value must be divisible by `step` relative to `min_value` (or 0 if no min).
 - If the question is marked `is_required`, a value must be provided.
 
 **Response format:**
@@ -947,11 +1242,60 @@ Multi select:
   "question_type": "numeric",
   "is_required": true,
   "settings": {
-    "min": 0,
-    "max": 10000000,
-    "decimal_places": 2,
+    "min_value": 0,
+    "max_value": 10000000,
+    "step": 0.01,
     "prefix": "$",
     "placeholder": "Enter amount"
+  }
+}
+```
+
+---
+
+### number
+
+**Type identifier:** `number`
+
+**Description:** A simple numeric input for collecting integer or decimal values. Similar to `numeric` but uses the `validation` JSONB for min/max constraints, falling back to `settings.min_value`/`settings.max_value`.
+
+**Required fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | string | The question text displayed to the respondent |
+| `question_type` | string | Must be `number` |
+
+**Settings (JSONB):**
+
+Optional settings `min_value` and `max_value` serve as fallback defaults when `validation.min` and `validation.max` are not set.
+
+**Validation rules:**
+
+- Value must be a number (integer or float; booleans are rejected).
+- If `validation.min` (or fallback `settings.min_value`) is set, the value must be >= that minimum.
+- If `validation.max` (or fallback `settings.max_value`) is set, the value must be <= that maximum.
+- If the question is marked `is_required`, a value must be provided.
+
+**Response format:**
+
+```json
+{
+  "question_id": "uuid",
+  "value": 7.5
+}
+```
+
+**API example:**
+
+```json
+{
+  "title": "How many hours do you work per week?",
+  "question_type": "number",
+  "is_required": true,
+  "validation": {
+    "min": 0,
+    "max": 168
   }
 }
 ```
@@ -975,8 +1319,8 @@ Multi select:
 
 ```json
 {
-  "min": 1,
-  "max": 5,
+  "min_rating": 1,
+  "max_rating": 5,
   "step": 1,
   "icon": "star"
 }
@@ -984,15 +1328,14 @@ Multi select:
 
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
-| `min` | integer | `1` | Minimum rating value |
-| `max` | integer | `5` | Maximum rating value |
-| `step` | integer | `1` | Increment between values |
-| `icon` | string | `"star"` | Icon type to display. Options: `star`, `heart`, `thumb`, `smiley` |
+| `min_rating` | integer | `1` | Minimum rating value |
+| `max_rating` | integer | `5` | Maximum rating value |
+| `step` | integer | `1` | Increment between values (must be > 0) |
+| `icon` | string | `"star"` | Icon type to display. Options: `star`, `heart`, `thumb` |
 
 **Validation rules:**
 
-- Value must be a number between `min` and `max` (inclusive).
-- Value must be aligned to `step` increments starting from `min` (i.e., `(value - min) % step === 0`).
+- Value must be an integer between `min_rating` and `max_rating` (inclusive).
 - If the question is marked `is_required`, a rating must be provided.
 
 **Response format:**
@@ -1012,10 +1355,59 @@ Multi select:
   "question_type": "rating",
   "is_required": true,
   "settings": {
-    "min": 1,
-    "max": 5,
+    "min_rating": 1,
+    "max_rating": 5,
     "step": 1,
     "icon": "star"
+  }
+}
+```
+
+---
+
+### scale
+
+**Type identifier:** `scale`
+
+**Description:** A numeric scale input, similar to rating but accepts both integers and decimals. Uses `validation` JSONB for min/max constraints, falling back to `settings.min_value`/`settings.max_value`.
+
+**Required fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | string | The question text displayed to the respondent |
+| `question_type` | string | Must be `scale` |
+
+**Settings (JSONB):**
+
+Optional settings `min_value` and `max_value` serve as fallback defaults when `validation.min` and `validation.max` are not set.
+
+**Validation rules:**
+
+- Value must be a number (integer or float; booleans are rejected).
+- If `validation.min` (or fallback `settings.min_value`) is set, the value must be >= that minimum.
+- If `validation.max` (or fallback `settings.max_value`) is set, the value must be <= that maximum.
+- If the question is marked `is_required`, a value must be provided.
+
+**Response format:**
+
+```json
+{
+  "question_id": "uuid",
+  "value": 7
+}
+```
+
+**API example:**
+
+```json
+{
+  "title": "On a scale of 1 to 10, how likely are you to recommend us?",
+  "question_type": "scale",
+  "is_required": true,
+  "settings": {
+    "min_value": 1,
+    "max_value": 10
   }
 }
 ```
@@ -1026,7 +1418,7 @@ Multi select:
 
 **Type identifier:** `boolean`
 
-**Description:** A yes/no or true/false toggle question. Rendered as a switch, toggle, or pair of buttons.
+**Description:** A yes/no or true/false toggle question. Rendered as a switch, toggle, or pair of radio buttons.
 
 **Required fields:**
 
@@ -1039,31 +1431,29 @@ Multi select:
 
 ```json
 {
-  "true_label": "Yes",
-  "false_label": "No",
-  "default_value": null,
-  "render_as": "toggle"
+  "label_true": "Yes",
+  "label_false": "No",
+  "display": "toggle"
 }
 ```
 
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
-| `true_label` | string | `"Yes"` | Display label for the true/affirmative option |
-| `false_label` | string | `"No"` | Display label for the false/negative option |
-| `default_value` | boolean or null | `null` | Pre-selected value (null = no default) |
-| `render_as` | string | `"toggle"` | Render style. Options: `toggle`, `radio`, `checkbox` |
+| `label_true` | string | `"Yes"` | Display label for the true/affirmative option |
+| `label_false` | string | `"No"` | Display label for the false/negative option |
+| `display` | string | `"toggle"` | Render style. Options: `toggle`, `radio` |
 
 **Validation rules:**
 
-- Value must be a boolean (`true` or `false`).
-- If the question is marked `is_required`, the respondent must make an explicit selection (the default value does not count unless confirmed).
+- Value must be the string `"true"` or `"false"`.
+- If the question is marked `is_required`, the respondent must make an explicit selection.
 
 **Response format:**
 
 ```json
 {
   "question_id": "uuid",
-  "value": true
+  "value": "true"
 }
 ```
 
@@ -1075,10 +1465,53 @@ Multi select:
   "question_type": "boolean",
   "is_required": true,
   "settings": {
-    "true_label": "I agree",
-    "false_label": "I do not agree",
-    "render_as": "radio"
+    "label_true": "I agree",
+    "label_false": "I do not agree",
+    "display": "radio"
   }
+}
+```
+
+---
+
+### yes_no
+
+**Type identifier:** `yes_no`
+
+**Description:** A simple yes/no question. The respondent selects either "yes" or "no".
+
+**Required fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | string | The question text displayed to the respondent |
+| `question_type` | string | Must be `yes_no` |
+
+**Settings (JSONB):**
+
+No type-specific settings.
+
+**Validation rules:**
+
+- Value must be the string `"yes"` or `"no"`.
+- If the question is marked `is_required`, a selection must be made.
+
+**Response format:**
+
+```json
+{
+  "question_id": "uuid",
+  "value": "yes"
+}
+```
+
+**API example:**
+
+```json
+{
+  "title": "Have you used our product before?",
+  "question_type": "yes_no",
+  "is_required": true
 }
 ```
 
@@ -1154,6 +1587,109 @@ With time:
     "max_date": "2026-12-31",
     "include_time": false,
     "date_format": "YYYY-MM-DD"
+  }
+}
+```
+
+---
+
+### time
+
+**Type identifier:** `time`
+
+**Description:** A time input for collecting a time of day. Accepts `HH:MM` or `HH:MM:SS` format.
+
+**Required fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | string | The question text displayed to the respondent |
+| `question_type` | string | Must be `time` |
+
+**Settings (JSONB):**
+
+No type-specific settings.
+
+**Validation rules:**
+
+- Value must be a string.
+- Value must be a valid time in `HH:MM` or `HH:MM:SS` format.
+- If the question is marked `is_required`, a value must be provided.
+
+**Response format:**
+
+```json
+{
+  "question_id": "uuid",
+  "value": "14:30"
+}
+```
+
+Or with seconds:
+
+```json
+{
+  "question_id": "uuid",
+  "value": "14:30:00"
+}
+```
+
+**API example:**
+
+```json
+{
+  "title": "What time do you usually start work?",
+  "question_type": "time",
+  "is_required": false
+}
+```
+
+---
+
+### datetime
+
+**Type identifier:** `datetime`
+
+**Description:** A combined date and time input. Accepts ISO-8601-like datetime strings in multiple formats.
+
+**Required fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | string | The question text displayed to the respondent |
+| `question_type` | string | Must be `datetime` |
+
+**Settings (JSONB):**
+
+No type-specific settings. Uses the `validation` JSONB for optional `min` and `max` datetime constraints.
+
+**Validation rules:**
+
+- Value must be a string.
+- Value must be a parseable ISO-8601-like datetime. Accepted formats: `YYYY-MM-DDTHH:MM:SS`, `YYYY-MM-DDTHH:MM`, `YYYY-MM-DD HH:MM:SS`, `YYYY-MM-DD HH:MM`, `YYYY-MM-DD`.
+- If `validation.min` is set, the datetime must be on or after that minimum.
+- If `validation.max` is set, the datetime must be on or before that maximum.
+- If the question is marked `is_required`, a value must be provided.
+
+**Response format:**
+
+```json
+{
+  "question_id": "uuid",
+  "value": "2026-04-12T09:30:00"
+}
+```
+
+**API example:**
+
+```json
+{
+  "title": "When is the event?",
+  "question_type": "datetime",
+  "is_required": true,
+  "validation": {
+    "min": "2026-01-01T00:00:00",
+    "max": "2026-12-31T23:59:59"
   }
 }
 ```
@@ -1359,7 +1895,7 @@ HTML questions do not produce entries in `response_answers`. They are display-on
 
 ## Subquestions
 
-Subquestions are used by matrix types (`matrix`, `matrix_dropdown`, `matrix_dynamic`) to define the rows of the grid. They are stored as regular question records with a `parent_id` that references the parent matrix question.
+Subquestions are used by matrix types (`matrix`, `matrix_single`, `matrix_multiple`, `matrix_dropdown`, `matrix_dynamic`) to define the rows of the grid. They are stored as regular question records with a `parent_id` that references the parent matrix question.
 
 ### Parent-child relationship
 
@@ -1379,7 +1915,7 @@ matrix_question (id: "abc-123")
 - **`question_type`**: Subquestions inherit the parent's type context. They do not have an independent `question_type`.
 - **No standalone rendering**: Subquestions are never rendered outside the context of their parent matrix. They do not appear as independent questions in the survey.
 - **Cascade delete**: Deleting a parent matrix question also deletes all its subquestions.
-- **Response keys**: In the response `value` object, subquestion IDs serve as keys mapping to the respondent's answer for each row.
+- **Response keys**: In the response `value` object, subquestion codes serve as keys mapping to the respondent's answer for each row.
 
 ### Creating subquestions
 

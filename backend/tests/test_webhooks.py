@@ -84,15 +84,13 @@ async def test_create_webhook_returns_201(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_create_webhook_returns_secret(client: AsyncClient):
-    """The create response must include a non-null signing secret (shown once)."""
+async def test_create_webhook_does_not_return_secret(client: AsyncClient):
+    """The create response must NOT expose the signing secret — it is never returned by the API."""
     headers = await auth_headers(client, "secret_wh@example.com")
     resp = await client.post(WEBHOOKS_URL, json=webhook_payload(), headers=headers)
     assert resp.status_code == 201
     data = resp.json()
-    assert "secret" in data
-    assert data["secret"] is not None
-    assert len(data["secret"]) > 0
+    assert "secret" not in data, "Webhook secret must never be exposed in the API response"
 
 
 @pytest.mark.asyncio

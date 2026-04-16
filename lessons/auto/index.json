@@ -1087,7 +1087,7 @@
     {
       "file": "2026-04-02-iss-058-42-backend-choice-question-types-radio-dropdown-ch.md",
       "ticketId": "ISS-058",
-      "title": "4.2: Backend — Choice Question Types (radio, dropdown, checkbox)",
+      "title": "4.2: Backend \u2014 Choice Question Types (radio, dropdown, checkbox)",
       "date": "2026-04-02",
       "categories": [
         "testing",
@@ -1108,7 +1108,7 @@
     {
       "file": "2026-04-02-iss-059-43-backend-matrix-question-types-matrix-matrixdrop.md",
       "ticketId": "ISS-059",
-      "title": "4.3: Backend — Matrix Question Types (matrix, matrix_dropdown, matrix_dynamic)",
+      "title": "4.3: Backend \u2014 Matrix Question Types (matrix, matrix_dropdown, matrix_dynamic)",
       "date": "2026-04-02",
       "categories": [
         "testing",
@@ -1129,7 +1129,7 @@
     {
       "file": "2026-04-02-iss-060-44-backend-scalar-question-types-numeric-rating-bo.md",
       "ticketId": "ISS-060",
-      "title": "4.4: Backend — Scalar Question Types (numeric, rating, boolean, date)",
+      "title": "4.4: Backend \u2014 Scalar Question Types (numeric, rating, boolean, date)",
       "date": "2026-04-02",
       "categories": [
         "testing",
@@ -1150,7 +1150,7 @@
     {
       "file": "2026-04-02-iss-062-46-backend-question-validation-engine.md",
       "ticketId": "ISS-062",
-      "title": "4.6: Backend — Question Validation Engine",
+      "title": "4.6: Backend \u2014 Question Validation Engine",
       "date": "2026-04-02",
       "categories": [
         "testing",
@@ -1171,7 +1171,7 @@
     {
       "file": "2026-04-02-iss-061-45-backend-special-question-types-ranking-imagepic.md",
       "ticketId": "ISS-061",
-      "title": "4.5: Backend — Special Question Types (ranking, image_picker, file_upload, expression, html)",
+      "title": "4.5: Backend \u2014 Special Question Types (ranking, image_picker, file_upload, expression, html)",
       "date": "2026-04-02",
       "categories": [
         "testing",
@@ -1192,7 +1192,7 @@
     {
       "file": "2026-04-03-iss-063-47-frontend-text-input-components.md",
       "ticketId": "ISS-063",
-      "title": "4.7: Frontend — Text Input Components",
+      "title": "4.7: Frontend \u2014 Text Input Components",
       "date": "2026-04-03",
       "categories": [
         "testing",
@@ -1213,7 +1213,7 @@
     {
       "file": "2026-04-03-iss-064-48-frontend-choice-input-components.md",
       "ticketId": "ISS-064",
-      "title": "4.8: Frontend — Choice Input Components",
+      "title": "4.8: Frontend \u2014 Choice Input Components",
       "date": "2026-04-03",
       "categories": [
         "testing",
@@ -1231,7 +1231,7 @@
     {
       "file": "2026-04-03-iss-065-49-frontend-matrix-input-components.md",
       "ticketId": "ISS-065",
-      "title": "4.9: Frontend — Matrix Input Components",
+      "title": "4.9: Frontend \u2014 Matrix Input Components",
       "date": "2026-04-03",
       "categories": [
         "testing",
@@ -1250,7 +1250,7 @@
     {
       "file": "2026-04-03-iss-066-410-frontend-scalar-input-components.md",
       "ticketId": "ISS-066",
-      "title": "4.10: Frontend — Scalar Input Components",
+      "title": "4.10: Frontend \u2014 Scalar Input Components",
       "date": "2026-04-03",
       "categories": [
         "testing",
@@ -1272,7 +1272,7 @@
     {
       "file": "2026-04-03-iss-067-411-frontend-special-input-components.md",
       "ticketId": "ISS-067",
-      "title": "4.11: Frontend — Special Input Components",
+      "title": "4.11: Frontend \u2014 Special Input Components",
       "date": "2026-04-03",
       "categories": [
         "testing",
@@ -1291,7 +1291,7 @@
     {
       "file": "2026-04-03-iss-068-412-frontend-client-side-validation-framework.md",
       "ticketId": "ISS-068",
-      "title": "4.12: Frontend — Client-Side Validation Framework",
+      "title": "4.12: Frontend \u2014 Client-Side Validation Framework",
       "date": "2026-04-03",
       "categories": [
         "testing",
@@ -1353,7 +1353,7 @@
     {
       "file": "2026-04-03-iss-057-41-backend-text-question-types-shorttext-longtext.md",
       "ticketId": "ISS-057",
-      "title": "4.1: Backend — Text Question Types (short_text, long_text, huge_text)",
+      "title": "4.1: Backend \u2014 Text Question Types (short_text, long_text, huge_text)",
       "date": "2026-04-03",
       "categories": [
         "testing",
@@ -1527,7 +1527,7 @@
     {
       "file": "2026-04-03-iss-080-510-frontend-relevance-expression-builder-ui.md",
       "ticketId": "ISS-080",
-      "title": "5.10: Frontend — Relevance Expression Builder UI",
+      "title": "5.10: Frontend \u2014 Relevance Expression Builder UI",
       "date": "2026-04-03",
       "categories": [
         "frontend",
@@ -1543,7 +1543,7 @@
     {
       "file": "2026-04-03-iss-081-511-frontend-expression-validation-and-preview.md",
       "ticketId": "ISS-081",
-      "title": "5.11: Frontend — Expression Validation and Preview",
+      "title": "5.11: Frontend \u2014 Expression Validation and Preview",
       "date": "2026-04-03",
       "categories": [
         "testing",
@@ -1791,7 +1791,7 @@
     {
       "file": "2026-04-03-iss-092-610-frontend-public-survey-response-form.md",
       "ticketId": "ISS-092",
-      "title": "6.10: Frontend — Public Survey Response Form",
+      "title": "6.10: Frontend \u2014 Public Survey Response Form",
       "date": "2026-04-03",
       "categories": [
         "testing",
@@ -1810,7 +1810,7 @@
     {
       "file": "2026-04-03-iss-093-611-frontend-conditional-display-and-piping-in-res.md",
       "ticketId": "ISS-093",
-      "title": "6.11: Frontend — Conditional Display and Piping in Response Form",
+      "title": "6.11: Frontend \u2014 Conditional Display and Piping in Response Form",
       "date": "2026-04-03",
       "categories": [
         "react-hooks",
@@ -1826,7 +1826,7 @@
     {
       "file": "2026-04-03-iss-094-612-frontend-response-list-and-detail-pages-admin.md",
       "ticketId": "ISS-094",
-      "title": "6.12: Frontend — Response List and Detail Pages (Admin)",
+      "title": "6.12: Frontend \u2014 Response List and Detail Pages (Admin)",
       "date": "2026-04-03",
       "categories": [
         "testing",
@@ -1846,7 +1846,7 @@
     {
       "file": "2026-04-03-iss-095-613-frontend-response-export-ui-and-statistics-das.md",
       "ticketId": "ISS-095",
-      "title": "6.13: Frontend — Response Export UI and Statistics Dashboard",
+      "title": "6.13: Frontend \u2014 Response Export UI and Statistics Dashboard",
       "date": "2026-04-03",
       "categories": [
         "frontend",
@@ -2034,7 +2034,7 @@
     {
       "file": "2026-04-03-iss-105-710-frontend-quota-management-ui.md",
       "ticketId": "ISS-105",
-      "title": "7.10: Frontend — Quota Management UI",
+      "title": "7.10: Frontend \u2014 Quota Management UI",
       "date": "2026-04-03",
       "categories": [
         "frontend",
@@ -2050,7 +2050,7 @@
     {
       "file": "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md",
       "ticketId": "ISS-106",
-      "title": "7.11: Frontend — Assessment Configuration UI",
+      "title": "7.11: Frontend \u2014 Assessment Configuration UI",
       "date": "2026-04-03",
       "categories": [
         "frontend",
@@ -2066,7 +2066,7 @@
     {
       "file": "2026-04-03-iss-107-712-frontend-webhook-management-ui.md",
       "ticketId": "ISS-107",
-      "title": "7.12: Frontend — Webhook Management UI",
+      "title": "7.12: Frontend \u2014 Webhook Management UI",
       "date": "2026-04-03",
       "categories": [
         "testing",
@@ -2126,7 +2126,7 @@
     {
       "file": "2026-04-04-iss-104-79-frontend-participant-management-ui.md",
       "ticketId": "ISS-104",
-      "title": "7.9: Frontend — Participant Management UI",
+      "title": "7.9: Frontend \u2014 Participant Management UI",
       "date": "2026-04-04",
       "categories": [
         "frontend",
@@ -3055,7 +3055,7 @@
     {
       "file": "2026-04-07-iss-157-dev-seed-emails-rejected-by-email-validator-dev-lo.md",
       "ticketId": "ISS-157",
-      "title": "Dev seed emails rejected by email-validator — dev login shortcuts broken",
+      "title": "Dev seed emails rejected by email-validator \u2014 dev login shortcuts broken",
       "date": "2026-04-07",
       "categories": [
         "testing",
@@ -3075,7 +3075,7 @@
     {
       "file": "2026-04-07-iss-158-no-error-message-shown-on-failed-login-401-interce.md",
       "ticketId": "ISS-158",
-      "title": "No error message shown on failed login — 401 interceptor swallows error",
+      "title": "No error message shown on failed login \u2014 401 interceptor swallows error",
       "date": "2026-04-07",
       "categories": [
         "testing",
@@ -3094,7 +3094,7 @@
     {
       "file": "2026-04-07-iss-163-public-survey-page-requires-authentication-cannot.md",
       "ticketId": "ISS-163",
-      "title": "Public survey page requires authentication — cannot load without login",
+      "title": "Public survey page requires authentication \u2014 cannot load without login",
       "date": "2026-04-07",
       "categories": [
         "testing",
@@ -3134,7 +3134,7 @@
     {
       "file": "2026-04-07-iss-164-resolve-flow-endpoint-requires-auth-breaks-public.md",
       "ticketId": "ISS-164",
-      "title": "resolve-flow endpoint requires auth — breaks public survey navigation",
+      "title": "resolve-flow endpoint requires auth \u2014 breaks public survey navigation",
       "date": "2026-04-07",
       "categories": [
         "testing",
@@ -3567,7 +3567,7 @@
     {
       "file": "2026-04-08-iss-185-alembic-migration-0012-fails-due-to-enumschema-con.md",
       "ticketId": "ISS-185",
-      "title": "Alembic migration 0012+ fails due to enum/schema conflicts — requires manual workaround",
+      "title": "Alembic migration 0012+ fails due to enum/schema conflicts \u2014 requires manual workaround",
       "date": "2026-04-08",
       "categories": [
         "testing",
@@ -3627,7 +3627,7 @@
     {
       "file": "2026-04-08-iss-188-webhooks-table-missing-userid-column-manual-migrat.md",
       "ticketId": "ISS-188",
-      "title": "Webhooks table missing user_id column — manual migration workaround incomplete",
+      "title": "Webhooks table missing user_id column \u2014 manual migration workaround incomplete",
       "date": "2026-04-08",
       "categories": [
         "testing",
@@ -3689,7 +3689,7 @@
     {
       "file": "2026-04-09-iss-191-iss-191-resolve-flow-still-crashes-optionlabel-sho.md",
       "ticketId": "ISS-191",
-      "title": "ISS-191: resolve-flow still crashes — option.label should be option.title",
+      "title": "ISS-191: resolve-flow still crashes \u2014 option.label should be option.title",
       "date": "2026-04-09",
       "categories": [
         "testing",
@@ -3707,7 +3707,7 @@
     {
       "file": "2026-04-09-iss-192-iss-192-migration-0013-still-fails-assessmentscope.md",
       "ticketId": "ISS-192",
-      "title": "ISS-192: Migration 0013 still fails — assessment_scope enum conflict",
+      "title": "ISS-192: Migration 0013 still fails \u2014 assessment_scope enum conflict",
       "date": "2026-04-09",
       "categories": [
         "testing",
@@ -3727,7 +3727,7 @@
     {
       "file": "2026-04-09-iss-193-iss-193-responsesstatus-column-type-mismatch-enum.md",
       "ticketId": "ISS-193",
-      "title": "ISS-193: responses.status column type mismatch — ENUM in DB vs String in model",
+      "title": "ISS-193: responses.status column type mismatch \u2014 ENUM in DB vs String in model",
       "date": "2026-04-09",
       "categories": [
         "testing",
@@ -3800,7 +3800,7 @@
     {
       "file": "2026-04-09-iss-197-number-question-type-fails-with-409-type-mismatch.md",
       "ticketId": "ISS-197",
-      "title": "Number question type fails with 409 — type mismatch",
+      "title": "Number question type fails with 409 \u2014 type mismatch",
       "date": "2026-04-09",
       "categories": [
         "testing",
@@ -4033,7 +4033,7 @@
     {
       "file": "2026-04-10-iss-211-backend-cpu-saturation-under-load-single-process-b.md",
       "ticketId": "ISS-211",
-      "title": "Backend CPU saturation under load — single-process bottleneck",
+      "title": "Backend CPU saturation under load \u2014 single-process bottleneck",
       "date": "2026-04-10",
       "categories": [
         "testing",
@@ -4055,7 +4055,7 @@
     {
       "file": "2026-04-10-iss-212-csv-export-endpoint-timeout-p9560s-at-5-vus.md",
       "ticketId": "ISS-212",
-      "title": "CSV export endpoint timeout — p95=60s at 5 VUs",
+      "title": "CSV export endpoint timeout \u2014 p95=60s at 5 VUs",
       "date": "2026-04-10",
       "categories": [
         "testing",
@@ -4078,7 +4078,7 @@
     {
       "file": "2026-04-10-iss-213-statistics-endpoint-slow-p95145s-for-500-response.md",
       "ticketId": "ISS-213",
-      "title": "Statistics endpoint slow — p95=14.5s for 500-response survey",
+      "title": "Statistics endpoint slow \u2014 p95=14.5s for 500-response survey",
       "date": "2026-04-10",
       "categories": [
         "testing",
@@ -4123,7 +4123,7 @@
     {
       "file": "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md",
       "ticketId": "ISS-215",
-      "title": "Idle-in-transaction connection leak — 18 connections stuck",
+      "title": "Idle-in-transaction connection leak \u2014 18 connections stuck",
       "date": "2026-04-10",
       "categories": [
         "testing",
@@ -4145,7 +4145,7 @@
     {
       "file": "2026-04-11-iss-216-webhook-ssrf-protection-add-ip-blocklist-and-dns-r.md",
       "ticketId": "ISS-216",
-      "title": "Webhook SSRF Protection — Add IP blocklist and DNS resolution check",
+      "title": "Webhook SSRF Protection \u2014 Add IP blocklist and DNS resolution check",
       "date": "2026-04-11",
       "categories": [
         "testing",
@@ -4165,7 +4165,7 @@
     {
       "file": "2026-04-11-iss-217-api-key-scope-enforcement-apply-requirescope-to-wr.md",
       "ticketId": "ISS-217",
-      "title": "API Key Scope Enforcement — Apply require_scope to write endpoints",
+      "title": "API Key Scope Enforcement \u2014 Apply require_scope to write endpoints",
       "date": "2026-04-11",
       "categories": [
         "testing",
@@ -4270,7 +4270,7 @@
     {
       "file": "2026-04-11-iss-222-no-request-body-size-limit-large-payload-dos.md",
       "ticketId": "ISS-222",
-      "title": "No request body size limit — large payload DoS",
+      "title": "No request body size limit \u2014 large payload DoS",
       "date": "2026-04-11",
       "categories": [
         "security",
@@ -4286,7 +4286,7 @@
     {
       "file": "2026-04-11-iss-226-api-post-apiv1surveys-title-255-chars-causes-500-d.md",
       "ticketId": "ISS-226",
-      "title": "[API] POST /api/v1/surveys — Title >255 chars causes 500 (DB column mismatch)",
+      "title": "[API] POST /api/v1/surveys \u2014 Title >255 chars causes 500 (DB column mismatch)",
       "date": "2026-04-11",
       "categories": [
         "database",
@@ -4311,7 +4311,7 @@
     {
       "file": "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md",
       "ticketId": "ISS-223",
-      "title": "Backend container runs as root — add non-root user",
+      "title": "Backend container runs as root \u2014 add non-root user",
       "date": "2026-04-11",
       "categories": [
         "docker",
@@ -4329,7 +4329,7 @@
     {
       "file": "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "ticketId": "ISS-227",
-      "title": "[API] GET /api/v1/surveys/{id}/public — Exposes draft surveys to unauthenticated users",
+      "title": "[API] GET /api/v1/surveys/{id}/public \u2014 Exposes draft surveys to unauthenticated users",
       "date": "2026-04-11",
       "categories": [
         "testing",
@@ -4351,7 +4351,7 @@
     {
       "file": "2026-04-11-iss-228-api-post-surveysidquestionsidsubquestions-matrixsi.md",
       "ticketId": "ISS-228",
-      "title": "[API] POST /surveys/{id}/questions/{id}/subquestions — matrix_single and matrix_multiple not recognized as matrix types",
+      "title": "[API] POST /surveys/{id}/questions/{id}/subquestions \u2014 matrix_single and matrix_multiple not recognized as matrix types",
       "date": "2026-04-11",
       "categories": [
         "testing",
@@ -4366,7 +4366,7 @@
     {
       "file": "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
       "ticketId": "ISS-225",
-      "title": "[API] POST /api/v1/surveys — Invalid status value causes 500 Internal Server Error",
+      "title": "[API] POST /api/v1/surveys \u2014 Invalid status value causes 500 Internal Server Error",
       "date": "2026-04-11",
       "categories": [
         "testing",
@@ -4385,7 +4385,7 @@
     {
       "file": "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
       "ticketId": "ISS-229",
-      "title": "[API] Group endpoints return 500 — missing nested eager loading",
+      "title": "[API] Group endpoints return 500 \u2014 missing nested eager loading",
       "date": "2026-04-11",
       "categories": [
         "testing",
@@ -4396,6 +4396,587 @@
         "feature",
         "documentation",
         "config"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
+      "ticketId": "ISS-230",
+      "title": "Email Infrastructure: SMTP config and base email service",
+      "date": "2026-04-13",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "ticketId": "ISS-231",
+      "title": "Email Invitation model, schema, and database migration",
+      "date": "2026-04-13",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
+      "ticketId": "ISS-232",
+      "title": "Email Invitation CRUD API endpoints",
+      "date": "2026-04-13",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "ticketId": "ISS-233",
+      "title": "HTML email templates for invitations and reminders",
+      "date": "2026-04-13",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "ticketId": "ISS-234",
+      "title": "Email delivery tracking with open and click tracking",
+      "date": "2026-04-13",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
+      "ticketId": "ISS-235",
+      "title": "Frontend TypeScript types and API service for email invitations",
+      "date": "2026-04-13",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-13-iss-236-frontend-email-invitations-management-page.md",
+      "ticketId": "ISS-236",
+      "title": "Frontend Email Invitations management page",
+      "date": "2026-04-13",
+      "categories": [
+        "frontend",
+        "react",
+        "ui-patterns",
+        "testing",
+        "forms"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
+      "ticketId": "ISS-237",
+      "title": "Automated reminder emails for incomplete surveys",
+      "date": "2026-04-13",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
+      "ticketId": "ISS-238",
+      "title": "Backend test suite for email invitation system",
+      "date": "2026-04-13",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-13-iss-239-frontend-test-suite-for-email-invitation-component.md",
+      "ticketId": "ISS-239",
+      "title": "Frontend test suite for email invitation components",
+      "date": "2026-04-13",
+      "categories": [
+        "testing",
+        "react",
+        "msw",
+        "vitest",
+        "frontend"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md",
+      "ticketId": "ISS-240",
+      "title": "Email invitations: Frontend API URL path mismatch causes all calls to 404",
+      "date": "2026-04-14",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
+      "ticketId": "ISS-241",
+      "title": "Email invitations: Stats field name mismatch between backend and frontend",
+      "date": "2026-04-14",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-14-iss-242-email-invitations-pagination-field-name-mismatch-p.md",
+      "ticketId": "ISS-242",
+      "title": "Email invitations: Pagination field name mismatch - pages vs total_pages",
+      "date": "2026-04-14",
+      "categories": [
+        "frontend",
+        "api-contract",
+        "pagination",
+        "bug-fix"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "low"
+    },
+    {
+      "file": "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
+      "ticketId": "ISS-243",
+      "title": "Email invitations: SSRF protection blocks SMTP to Mailpit in Docker dev environment",
+      "date": "2026-04-14",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
+      "ticketId": "ISS-244",
+      "title": "Email invitations: Email search input not passed to API",
+      "date": "2026-04-14",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
+      "ticketId": "ISS-245",
+      "title": "Email invitations: Email search uses exact match instead of partial/substring match",
+      "date": "2026-04-14",
+      "categories": [
+        "testing",
+        "database",
+        "bug-fix",
+        "feature",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "ticketId": "ISS-246",
+      "title": "Email invitations: Duplicate Alembic migration revision IDs (0014, 0023)",
+      "date": "2026-04-14",
+      "categories": [
+        "testing",
+        "database",
+        "ui",
+        "refactoring",
+        "bug-fix",
+        "feature",
+        "performance",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md",
+      "ticketId": "ISS-247",
+      "title": "Survey detail page: Builder link hidden when survey has question groups",
+      "date": "2026-04-15",
+      "categories": [
+        "testing",
+        "ui",
+        "bug-fix",
+        "feature",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-15-iss-248-complete-tablematrix-question-type-implementation.md",
+      "ticketId": "ISS-248",
+      "title": "Complete table/matrix question type implementation",
+      "date": "2026-04-15",
+      "categories": [
+        "validation",
+        "frontend-components",
+        "testing",
+        "data-modeling"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "high"
+    },
+    {
+      "file": "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md",
+      "ticketId": "ISS-249",
+      "title": "Add matrix question types to survey builder question palette",
+      "date": "2026-04-15",
+      "categories": [
+        "testing",
+        "ui",
+        "bug-fix",
+        "feature",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
+      "ticketId": "ISS-251",
+      "title": "CI failure: test_matrix_dropdown_answer_valid fails after ISS-248 merge",
+      "date": "2026-04-15",
+      "categories": [
+        "testing",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-16-iss-252-backend-typeerror-unhashable-dict-in-relevance-cac.md",
+      "ticketId": "ISS-252",
+      "title": "Backend: TypeError unhashable dict in relevance cache key blocks all matrix submissions",
+      "date": "2026-04-16",
+      "categories": [
+        "bug-fix",
+        "caching",
+        "matrix-questions",
+        "expressions"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "low"
+    },
+    {
+      "file": "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
+      "ticketId": "ISS-253",
+      "title": "Builder: matrix_single/matrix_multiple types not recognized in properties panel",
+      "date": "2026-04-16",
+      "categories": [
+        "testing",
+        "ui",
+        "bug-fix",
+        "feature",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-16-iss-254-matrix-dynamic-minmax-row-count-constraints-not-en.md",
+      "ticketId": "ISS-254",
+      "title": "Matrix Dynamic: min/max row count constraints not enforced",
+      "date": "2026-04-16",
+      "categories": [
+        "frontend",
+        "ui-constraints",
+        "accessibility",
+        "form-validation"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "low"
+    },
+    {
+      "file": "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md",
+      "ticketId": "ISS-255",
+      "title": "Matrix: transpose setting has no effect on response form layout",
+      "date": "2026-04-16",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "feature",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md",
+      "ticketId": "ISS-257",
+      "title": "Matrix Dropdown: rating column_type renders as dropdown instead of rating widget",
+      "date": "2026-04-16",
+      "categories": [
+        "frontend",
+        "react",
+        "component-composition",
+        "matrix-questions",
+        "rating"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "low"
+    },
+    {
+      "file": "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
+      "ticketId": "ISS-258",
+      "title": "Matrix Dynamic: frontend/backend settings key name mismatch prevents settings from saving",
+      "date": "2026-04-16",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "refactoring",
+        "bug-fix",
+        "feature",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
+      "ticketId": "ISS-259",
+      "title": "Matrix response submission fails 422: validator runs against subquestions instead of parent",
+      "date": "2026-04-16",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
+      "ticketId": "ISS-260",
+      "title": "Matrix Dynamic validator incorrectly requires subquestions, blocking settings save",
+      "date": "2026-04-16",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "refactoring",
+        "bug-fix",
+        "feature",
+        "documentation",
+        "config"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md",
+      "ticketId": "ISS-261",
+      "title": "Backend: TypeError unhashable list in relevance cache key for matrix_multiple answers",
+      "date": "2026-04-16",
+      "categories": [
+        "testing",
+        "ui",
+        "bug-fix",
+        "feature",
+        "performance",
+        "documentation"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
+    },
+    {
+      "file": "2026-04-16-iss-262-response-detail-page-shows-object-object-for-matri.md",
+      "ticketId": "ISS-262",
+      "title": "Response detail page shows [object Object] for matrix answer values",
+      "date": "2026-04-16",
+      "categories": [
+        "frontend",
+        "rendering",
+        "matrix-questions",
+        "type-safety"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "low"
+    },
+    {
+      "file": "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md",
+      "ticketId": "ISS-263",
+      "title": "Matrix dropdown: rating cell value sent as string instead of number, fails validation",
+      "date": "2026-04-16",
+      "categories": [
+        "testing",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "documentation",
+        "ci-cd"
       ],
       "filesModified": [],
       "outcome": "success",
@@ -4633,7 +5214,33 @@
       "2026-04-11-iss-228-api-post-surveysidquestionsidsubquestions-matrixsi.md",
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
       "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
-      "2026-04-16-iss-264-matrix-dynamic-frontend-sends-value-key-but-valida.md"
+      "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
+      "2026-04-13-iss-236-frontend-email-invitations-management-page.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
+      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
+      "2026-04-13-iss-239-frontend-test-suite-for-email-invitation-component.md",
+      "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md",
+      "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
+      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
+      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md",
+      "2026-04-15-iss-248-complete-tablematrix-question-type-implementation.md",
+      "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md",
+      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
+      "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
+      "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md",
+      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
+      "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
+      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md",
+      "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4827,7 +5434,22 @@
       "2026-04-11-iss-228-api-post-surveysidquestionsidsubquestions-matrixsi.md",
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
       "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
-      "2026-04-16-iss-264-matrix-dynamic-frontend-sends-value-key-but-valida.md"
+      "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
+      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
+      "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md",
+      "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
+      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
+      "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md",
+      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
+      "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4975,7 +5597,23 @@
       "2026-04-11-iss-226-api-post-apiv1surveys-title-255-chars-causes-500-d.md",
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
-      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md"
+      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
+      "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
+      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
+      "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
+      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
+      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
+      "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5183,7 +5821,29 @@
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
       "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
-      "2026-04-16-iss-264-matrix-dynamic-frontend-sends-value-key-but-valida.md"
+      "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
+      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
+      "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md",
+      "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
+      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md",
+      "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md",
+      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
+      "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
+      "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md",
+      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
+      "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
+      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md",
+      "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5244,7 +5904,10 @@
       "2026-04-10-iss-212-csv-export-endpoint-timeout-p9560s-at-5-vus.md",
       "2026-04-10-iss-213-statistics-endpoint-slow-p95145s-for-500-response.md",
       "2026-04-10-iss-215-idle-in-transaction-connection-leak-18-connections.md",
-      "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md"
+      "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
+      "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md"
     ],
     "bug-fix": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5446,7 +6109,31 @@
       "2026-04-11-iss-228-api-post-surveysidquestionsidsubquestions-matrixsi.md",
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
       "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
-      "2026-04-16-iss-264-matrix-dynamic-frontend-sends-value-key-but-valida.md"
+      "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
+      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
+      "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md",
+      "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
+      "2026-04-14-iss-242-email-invitations-pagination-field-name-mismatch-p.md",
+      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
+      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md",
+      "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md",
+      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
+      "2026-04-16-iss-252-backend-typeerror-unhashable-dict-in-relevance-cac.md",
+      "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
+      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
+      "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
+      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md",
+      "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5655,7 +6342,30 @@
       "2026-04-11-iss-228-api-post-surveysidquestionsidsubquestions-matrixsi.md",
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
       "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
-      "2026-04-16-iss-264-matrix-dynamic-frontend-sends-value-key-but-valida.md"
+      "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
+      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
+      "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md",
+      "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
+      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
+      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md",
+      "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md",
+      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
+      "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
+      "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md",
+      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
+      "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
+      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md",
+      "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5757,7 +6467,12 @@
       "2026-04-11-iss-218-open-redirect-xss-via-returnto-parameter-on-login.md",
       "2026-04-11-iss-219-redos-via-user-supplied-regex-in-question-validati.md",
       "2026-04-11-iss-220-closed-surveys-still-accept-new-responses-and-comp.md",
-      "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md"
+      "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md",
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md"
     ],
     "documentation": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5842,7 +6557,21 @@
       "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md",
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
-      "2026-04-16-iss-264-matrix-dynamic-frontend-sends-value-key-but-valida.md"
+      "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
+      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
+      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
+      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
+      "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
+      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md",
+      "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5997,7 +6726,22 @@
       "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md",
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
-      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md"
+      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
+      "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
+      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
+      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
+      "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
+      "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md",
+      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
+      "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6195,7 +6939,27 @@
       "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md",
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
-      "2026-04-16-iss-264-matrix-dynamic-frontend-sends-value-key-but-valida.md"
+      "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-235-frontend-typescript-types-and-api-service-for-emai.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
+      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
+      "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
+      "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
+      "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md",
+      "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md",
+      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
+      "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
+      "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md",
+      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
+      "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -6328,7 +7092,16 @@
       "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md",
       "2026-04-11-iss-222-no-request-body-size-limit-large-payload-dos.md",
       "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md",
-      "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md"
+      "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
+      "2026-04-13-iss-230-email-infrastructure-smtp-config-and-base-email-se.md",
+      "2026-04-13-iss-231-email-invitation-model-schema-and-database-migrati.md",
+      "2026-04-13-iss-232-email-invitation-crud-api-endpoints.md",
+      "2026-04-13-iss-233-html-email-templates-for-invitations-and-reminders.md",
+      "2026-04-13-iss-234-email-delivery-tracking-with-open-and-click-tracki.md",
+      "2026-04-13-iss-237-automated-reminder-emails-for-incomplete-surveys.md",
+      "2026-04-13-iss-238-backend-test-suite-for-email-invitation-system.md",
+      "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
+      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
@@ -6340,15 +7113,23 @@
       "2026-04-09-iss-195-add-builder-button-to-survey-detail-page.md",
       "2026-04-09-iss-204-questions-with-relevance-flash-visible-before-init.md",
       "2026-04-09-iss-200-test-expression-evaluator-always-returns-true-rega.md",
-      "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md"
+      "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md",
+      "2026-04-13-iss-236-frontend-email-invitations-management-page.md",
+      "2026-04-13-iss-239-frontend-test-suite-for-email-invitation-component.md",
+      "2026-04-14-iss-242-email-invitations-pagination-field-name-mismatch-p.md",
+      "2026-04-16-iss-254-matrix-dynamic-minmax-row-count-constraints-not-en.md",
+      "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md",
+      "2026-04-16-iss-262-response-detail-page-shows-object-object-for-matri.md"
     ],
     "vitest": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
-      "2026-04-04-iss-104-79-frontend-participant-management-ui.md"
+      "2026-04-04-iss-104-79-frontend-participant-management-ui.md",
+      "2026-04-13-iss-239-frontend-test-suite-for-email-invitation-component.md"
     ],
     "msw": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
-      "2026-04-04-iss-104-79-frontend-participant-management-ui.md"
+      "2026-04-04-iss-104-79-frontend-participant-management-ui.md",
+      "2026-04-13-iss-239-frontend-test-suite-for-email-invitation-component.md"
     ],
     "react-testing-library": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md"
@@ -6358,7 +7139,8 @@
       "2026-04-09-iss-200-test-expression-evaluator-always-returns-true-rega.md"
     ],
     "data-modeling": [
-      "2026-04-03-iss-075-55-variable-resolution-system.md"
+      "2026-04-03-iss-075-55-variable-resolution-system.md",
+      "2026-04-15-iss-248-complete-tablematrix-question-type-implementation.md"
     ],
     "type-coercion": [
       "2026-04-03-iss-075-55-variable-resolution-system.md"
@@ -6372,7 +7154,8 @@
       "2026-04-09-iss-204-questions-with-relevance-flash-visible-before-init.md"
     ],
     "expressions": [
-      "2026-04-03-iss-077-57-skip-logic-implementation.md"
+      "2026-04-03-iss-077-57-skip-logic-implementation.md",
+      "2026-04-16-iss-252-backend-typeerror-unhashable-dict-in-relevance-cac.md"
     ],
     "skip-logic": [
       "2026-04-03-iss-077-57-skip-logic-implementation.md"
@@ -6382,7 +7165,10 @@
       "2026-04-03-iss-095-613-frontend-response-export-ui-and-statistics-das.md",
       "2026-04-03-iss-105-710-frontend-quota-management-ui.md",
       "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md",
-      "2026-04-04-iss-104-79-frontend-participant-management-ui.md"
+      "2026-04-04-iss-104-79-frontend-participant-management-ui.md",
+      "2026-04-13-iss-236-frontend-email-invitations-management-page.md",
+      "2026-04-13-iss-239-frontend-test-suite-for-email-invitation-component.md",
+      "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md"
     ],
     "expression-builder": [
       "2026-04-03-iss-080-510-frontend-relevance-expression-builder-ui.md"
@@ -6438,7 +7224,8 @@
       "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md"
     ],
     "forms": [
-      "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md"
+      "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md",
+      "2026-04-13-iss-236-frontend-email-invitations-management-page.md"
     ],
     "module-splitting": [
       "2026-04-06-iss-123-cq-01-split-responseservicepy-into-focused-modules.md"
@@ -6475,6 +7262,50 @@
     ],
     "asgi": [
       "2026-04-11-iss-222-no-request-body-size-limit-large-payload-dos.md"
+    ],
+    "ui-patterns": [
+      "2026-04-13-iss-236-frontend-email-invitations-management-page.md"
+    ],
+    "api-contract": [
+      "2026-04-14-iss-242-email-invitations-pagination-field-name-mismatch-p.md"
+    ],
+    "pagination": [
+      "2026-04-14-iss-242-email-invitations-pagination-field-name-mismatch-p.md"
+    ],
+    "validation": [
+      "2026-04-15-iss-248-complete-tablematrix-question-type-implementation.md"
+    ],
+    "frontend-components": [
+      "2026-04-15-iss-248-complete-tablematrix-question-type-implementation.md"
+    ],
+    "caching": [
+      "2026-04-16-iss-252-backend-typeerror-unhashable-dict-in-relevance-cac.md"
+    ],
+    "matrix-questions": [
+      "2026-04-16-iss-252-backend-typeerror-unhashable-dict-in-relevance-cac.md",
+      "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md",
+      "2026-04-16-iss-262-response-detail-page-shows-object-object-for-matri.md"
+    ],
+    "ui-constraints": [
+      "2026-04-16-iss-254-matrix-dynamic-minmax-row-count-constraints-not-en.md"
+    ],
+    "accessibility": [
+      "2026-04-16-iss-254-matrix-dynamic-minmax-row-count-constraints-not-en.md"
+    ],
+    "form-validation": [
+      "2026-04-16-iss-254-matrix-dynamic-minmax-row-count-constraints-not-en.md"
+    ],
+    "component-composition": [
+      "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md"
+    ],
+    "rating": [
+      "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md"
+    ],
+    "rendering": [
+      "2026-04-16-iss-262-response-detail-page-shows-object-object-for-matri.md"
+    ],
+    "type-safety": [
+      "2026-04-16-iss-262-response-detail-page-shows-object-object-for-matri.md"
     ]
   },
   "fileIndex": {

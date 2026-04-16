@@ -44,9 +44,10 @@ export function ConditionGroupEditor({
           <button
             type="button"
             className={`text-xs font-semibold px-2 py-0.5 rounded border transition-colors
-              ${group.logic === 'and'
-                ? 'bg-blue-100 text-blue-700 border-blue-300 hover:bg-blue-200'
-                : 'bg-amber-100 text-amber-700 border-amber-300 hover:bg-amber-200'
+              ${
+                group.logic === 'and'
+                  ? 'bg-blue-100 text-blue-700 border-blue-300 hover:bg-blue-200'
+                  : 'bg-amber-100 text-amber-700 border-amber-300 hover:bg-amber-200'
               } disabled:opacity-50`}
             onClick={toggleLogic}
             disabled={disabled}

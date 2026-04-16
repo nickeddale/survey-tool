@@ -610,18 +610,18 @@ def test_file_upload_not_required_ok():
 
 
 def test_number_valid():
-    q = make_question("number")
+    q = make_question("numeric")
     validate_number_answer({"value": 42.5}, q)
 
 
 def test_number_required_missing_raises():
-    q = make_question("number", is_required=True)
+    q = make_question("numeric", is_required=True)
     with pytest.raises(UnprocessableError, match="required"):
         validate_number_answer({"value": None}, q)
 
 
 def test_number_min_validation():
-    q = make_question("number", validation={"min": 10})
+    q = make_question("numeric", validation={"min": 10})
     with pytest.raises(UnprocessableError, match="minimum"):
         validate_number_answer({"value": 5}, q)
 
@@ -680,7 +680,7 @@ async def _create_group(client: AsyncClient, headers: dict, survey_id: str) -> s
 
 @pytest.mark.asyncio
 async def test_create_question_invalid_validation_jsonb_returns_422(client: AsyncClient):
-    """POST with invalid validation JSONB (min > max) should return 422."""
+    """POST with invalid validation JSONB (min > max) should return 400."""
     headers = await _register_and_login(client)
     survey_id = await _create_survey(client, headers)
     group_id = await _create_group(client, headers, survey_id)

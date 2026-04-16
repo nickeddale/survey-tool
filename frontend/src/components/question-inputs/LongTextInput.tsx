@@ -42,7 +42,12 @@ function validate(value: string, s: Partial<LongTextSettings>, isRequired: boole
 // Component
 // ---------------------------------------------------------------------------
 
-export function LongTextInput({ value, onChange, question, errors: externalErrors }: LongTextInputProps) {
+export function LongTextInput({
+  value,
+  onChange,
+  question,
+  errors: externalErrors,
+}: LongTextInputProps) {
   const s = (question.settings ?? {}) as Partial<LongTextSettings>
   const rows = s.rows ?? 4
   const maxLength = s.max_length ?? null

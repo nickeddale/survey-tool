@@ -1,8 +1,8 @@
 /**
  * Tests for MatrixDynamicInput component.
  *
- * Covers: initial rows from row_count, column headers from answer_options,
- * Add Row button (respects max_row_count), Remove Row button (respects min_row_count),
+ * Covers: initial rows from default_row_count, column headers from answer_options,
+ * Add Row button (respects max_rows), Remove Row button (respects min_rows),
  * cell value changes update values array, external errors, accessibility.
  */
 
@@ -55,9 +55,9 @@ function makeQuestion(overrides: Partial<BuilderQuestion> = {}): BuilderQuestion
 
 function makeSettings(overrides: Partial<MatrixDynamicSettings> = {}): MatrixDynamicSettings {
   return {
-    row_count: 1,
-    min_row_count: 0,
-    max_row_count: null,
+    default_row_count: 1,
+    min_rows: 0,
+    max_rows: null,
     add_row_text: 'Add row',
     remove_row_text: 'Remove',
     cell_type: 'text',
@@ -71,7 +71,9 @@ function makeSettings(overrides: Partial<MatrixDynamicSettings> = {}): MatrixDyn
 
 describe('MatrixDynamicInput — rendering', () => {
   it('renders container with question id in testid', () => {
-    render(<MatrixDynamicInput value={[]} onChange={vi.fn()} question={makeQuestion({ id: 'q-abc' })} />)
+    render(
+      <MatrixDynamicInput value={[]} onChange={vi.fn()} question={makeQuestion({ id: 'q-abc' })} />
+    )
     expect(screen.getByTestId('matrix-dynamic-input-q-abc')).toBeInTheDocument()
   })
 
@@ -94,9 +96,9 @@ describe('MatrixDynamicInput — rendering', () => {
     expect(screen.getByTestId('matrix-dynamic-col-col2')).toHaveTextContent('Last Name')
   })
 
-  it('renders initial rows based on row_count when value is empty', () => {
+  it('renders initial rows based on default_row_count when value is empty', () => {
     const question = makeQuestion({
-      settings: makeSettings({ row_count: 3 }),
+      settings: makeSettings({ default_row_count: 3 }),
     })
     render(<MatrixDynamicInput value={[]} onChange={vi.fn()} question={question} />)
     expect(screen.getByTestId('matrix-dynamic-row-0')).toBeInTheDocument()
@@ -123,7 +125,9 @@ describe('MatrixDynamicInput — rendering', () => {
   it('populates cell input with existing value', () => {
     const options = [makeOption({ code: 'col1' })]
     const question = makeQuestion({ answer_options: options })
-    render(<MatrixDynamicInput value={[{ col1: 'Hello' }]} onChange={vi.fn()} question={question} />)
+    render(
+      <MatrixDynamicInput value={[{ col1: 'Hello' }]} onChange={vi.fn()} question={question} />
+    )
     const input = screen.getByTestId('matrix-dynamic-input-0-col1') as HTMLInputElement
     expect(input.value).toBe('Hello')
   })
@@ -145,7 +149,7 @@ describe('MatrixDynamicInput — rendering', () => {
 
   it('uses custom remove_row_text for the Remove button', () => {
     const question = makeQuestion({
-      settings: makeSettings({ remove_row_text: 'Delete', min_row_count: 0 }),
+      settings: makeSettings({ remove_row_text: 'Delete', min_rows: 0 }),
     })
     render(<MatrixDynamicInput value={[{}]} onChange={vi.fn()} question={question} />)
     expect(screen.getByTestId('matrix-dynamic-remove-0')).toHaveTextContent('Delete')
@@ -153,7 +157,9 @@ describe('MatrixDynamicInput — rendering', () => {
 
   it('has an overflow-x-auto scroll container', () => {
     const question = makeQuestion()
-    const { container } = render(<MatrixDynamicInput value={[]} onChange={vi.fn()} question={question} />)
+    const { container } = render(
+      <MatrixDynamicInput value={[]} onChange={vi.fn()} question={question} />
+    )
     expect(container.querySelector('.overflow-x-auto')).toBeInTheDocument()
   })
 })
@@ -176,28 +182,41 @@ describe('MatrixDynamicInput — Add Row', () => {
     expect(onChange).toHaveBeenCalledWith([{}, {}])
   })
 
-  it('hides Add Row button when max_row_count is reached', () => {
+  it('disables Add Row button when max_rows is reached', () => {
     const question = makeQuestion({
-      settings: makeSettings({ max_row_count: 2 }),
+      settings: makeSettings({ max_rows: 2 }),
     })
     render(<MatrixDynamicInput value={[{}, {}]} onChange={vi.fn()} question={question} />)
-    expect(screen.queryByTestId('matrix-dynamic-add-row')).not.toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dynamic-add-row')).toBeDisabled()
   })
 
-  it('shows Add Row button when below max_row_count', () => {
+  it('does not call onChange when Add Row is clicked while disabled', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
     const question = makeQuestion({
-      settings: makeSettings({ max_row_count: 3 }),
+      settings: makeSettings({ max_rows: 2 }),
     })
-    render(<MatrixDynamicInput value={[{}, {}]} onChange={vi.fn()} question={question} />)
-    expect(screen.getByTestId('matrix-dynamic-add-row')).toBeInTheDocument()
+    render(<MatrixDynamicInput value={[{}, {}]} onChange={onChange} question={question} />)
+    await act(async () => {
+      await user.click(screen.getByTestId('matrix-dynamic-add-row'))
+    })
+    expect(onChange).not.toHaveBeenCalled()
   })
 
-  it('shows Add Row button when max_row_count is null (unlimited)', () => {
+  it('enables Add Row button when below max_rows', () => {
     const question = makeQuestion({
-      settings: makeSettings({ max_row_count: null }),
+      settings: makeSettings({ max_rows: 3 }),
     })
     render(<MatrixDynamicInput value={[{}, {}]} onChange={vi.fn()} question={question} />)
-    expect(screen.getByTestId('matrix-dynamic-add-row')).toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dynamic-add-row')).not.toBeDisabled()
+  })
+
+  it('enables Add Row button when max_rows is null (unlimited)', () => {
+    const question = makeQuestion({
+      settings: makeSettings({ max_rows: null }),
+    })
+    render(<MatrixDynamicInput value={[{}, {}]} onChange={vi.fn()} question={question} />)
+    expect(screen.getByTestId('matrix-dynamic-add-row')).not.toBeDisabled()
   })
 })
 
@@ -211,7 +230,13 @@ describe('MatrixDynamicInput — Remove Row', () => {
     const onChange = vi.fn()
     const options = [makeOption({ code: 'col1' })]
     const question = makeQuestion({ answer_options: options })
-    render(<MatrixDynamicInput value={[{ col1: 'Alice' }, { col1: 'Bob' }]} onChange={onChange} question={question} />)
+    render(
+      <MatrixDynamicInput
+        value={[{ col1: 'Alice' }, { col1: 'Bob' }]}
+        onChange={onChange}
+        question={question}
+      />
+    )
 
     await act(async () => {
       await user.click(screen.getByTestId('matrix-dynamic-remove-0'))
@@ -220,33 +245,46 @@ describe('MatrixDynamicInput — Remove Row', () => {
     expect(onChange).toHaveBeenCalledWith([{ col1: 'Bob' }])
   })
 
-  it('hides Remove button when at min_row_count', () => {
+  it('disables Remove button when at min_rows', () => {
     const question = makeQuestion({
-      settings: makeSettings({ min_row_count: 1 }),
+      settings: makeSettings({ min_rows: 1 }),
     })
     render(<MatrixDynamicInput value={[{}]} onChange={vi.fn()} question={question} />)
-    expect(screen.queryByTestId('matrix-dynamic-remove-0')).not.toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dynamic-remove-0')).toBeDisabled()
   })
 
-  it('shows Remove button when above min_row_count', () => {
+  it('does not call onChange when Remove is clicked while disabled', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
     const question = makeQuestion({
-      settings: makeSettings({ min_row_count: 1 }),
+      settings: makeSettings({ min_rows: 1 }),
+    })
+    render(<MatrixDynamicInput value={[{}]} onChange={onChange} question={question} />)
+    await act(async () => {
+      await user.click(screen.getByTestId('matrix-dynamic-remove-0'))
+    })
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
+  it('enables Remove button when above min_rows', () => {
+    const question = makeQuestion({
+      settings: makeSettings({ min_rows: 1 }),
     })
     render(<MatrixDynamicInput value={[{}, {}]} onChange={vi.fn()} question={question} />)
-    expect(screen.getByTestId('matrix-dynamic-remove-0')).toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dynamic-remove-0')).not.toBeDisabled()
   })
 
-  it('shows Remove button when min_row_count is 0 and rows > 0', () => {
+  it('enables Remove button when min_rows is 0 and rows > 0', () => {
     const question = makeQuestion({
-      settings: makeSettings({ min_row_count: 0 }),
+      settings: makeSettings({ min_rows: 0 }),
     })
     render(<MatrixDynamicInput value={[{}]} onChange={vi.fn()} question={question} />)
-    expect(screen.getByTestId('matrix-dynamic-remove-0')).toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dynamic-remove-0')).not.toBeDisabled()
   })
 
-  it('hides Remove button when row_count=0 and value is empty (no rows rendered)', () => {
+  it('hides Remove button when default_row_count=0 and value is empty (no rows rendered)', () => {
     const question = makeQuestion({
-      settings: makeSettings({ row_count: 0, min_row_count: 0 }),
+      settings: makeSettings({ default_row_count: 0, min_rows: 0 }),
     })
     render(<MatrixDynamicInput value={[]} onChange={vi.fn()} question={question} />)
     // No rows, so no Remove button
@@ -280,7 +318,13 @@ describe('MatrixDynamicInput — cell value changes', () => {
     const onChange = vi.fn()
     const options = [makeOption({ code: 'col1' })]
     const question = makeQuestion({ answer_options: options })
-    render(<MatrixDynamicInput value={[{ col1: 'Alice' }, { col1: 'Bob' }]} onChange={onChange} question={question} />)
+    render(
+      <MatrixDynamicInput
+        value={[{ col1: 'Alice' }, { col1: 'Bob' }]}
+        onChange={onChange}
+        question={question}
+      />
+    )
 
     await act(async () => {
       await user.clear(screen.getByTestId('matrix-dynamic-input-1-col1'))
@@ -301,7 +345,12 @@ describe('MatrixDynamicInput — external errors prop', () => {
   it('displays external errors immediately', () => {
     const question = makeQuestion()
     render(
-      <MatrixDynamicInput value={[]} onChange={vi.fn()} question={question} errors={['At least one row required']} />
+      <MatrixDynamicInput
+        value={[]}
+        onChange={vi.fn()}
+        question={question}
+        errors={['At least one row required']}
+      />
     )
     expect(screen.getByTestId('validation-errors')).toHaveTextContent('At least one row required')
   })
@@ -326,13 +375,17 @@ describe('MatrixDynamicInput — accessibility', () => {
 
   it('sets aria-invalid=true when errors present', () => {
     const question = makeQuestion()
-    render(<MatrixDynamicInput value={[]} onChange={vi.fn()} question={question} errors={['Error']} />)
+    render(
+      <MatrixDynamicInput value={[]} onChange={vi.fn()} question={question} errors={['Error']} />
+    )
     expect(screen.getByRole('table')).toHaveAttribute('aria-invalid', 'true')
   })
 
   it('sets aria-describedby pointing to error container when errors present', () => {
     const question = makeQuestion({ id: 'q-test' })
-    render(<MatrixDynamicInput value={[]} onChange={vi.fn()} question={question} errors={['Error']} />)
+    render(
+      <MatrixDynamicInput value={[]} onChange={vi.fn()} question={question} errors={['Error']} />
+    )
     const table = screen.getByRole('table')
     expect(table).toHaveAttribute('aria-describedby', 'question-q-test-error')
     expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')
@@ -340,7 +393,9 @@ describe('MatrixDynamicInput — accessibility', () => {
 
   it('error list has role=alert and aria-live=assertive', () => {
     const question = makeQuestion()
-    render(<MatrixDynamicInput value={[]} onChange={vi.fn()} question={question} errors={['Error']} />)
+    render(
+      <MatrixDynamicInput value={[]} onChange={vi.fn()} question={question} errors={['Error']} />
+    )
     const errorList = screen.getByTestId('validation-errors')
     expect(errorList).toHaveAttribute('role', 'alert')
     expect(errorList).toHaveAttribute('aria-live', 'assertive')

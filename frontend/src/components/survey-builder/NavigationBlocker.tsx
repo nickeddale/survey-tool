@@ -29,9 +29,7 @@ export function NavigationBlocker({ shouldBlock }: NavigationBlockerProps) {
 
   useEffect(() => {
     if (blocker.state === 'blocked') {
-      const confirmed = window.confirm(
-        'You have unsaved changes. Are you sure you want to leave?',
-      )
+      const confirmed = window.confirm('You have unsaved changes. Are you sure you want to leave?')
       if (confirmed) {
         blocker.proceed()
       } else {

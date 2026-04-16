@@ -25,7 +25,12 @@ export interface DropdownInputProps {
 // Validation helpers
 // ---------------------------------------------------------------------------
 
-function validate(value: string, otherText: string, isOther: boolean, isRequired: boolean): string[] {
+function validate(
+  value: string,
+  otherText: string,
+  isOther: boolean,
+  isRequired: boolean
+): string[] {
   const errs: string[] = []
   if (isRequired && value === '') {
     errs.push('This field is required.')
@@ -40,7 +45,12 @@ function validate(value: string, otherText: string, isOther: boolean, isRequired
 // Component
 // ---------------------------------------------------------------------------
 
-export function DropdownInput({ value, onChange, question, errors: externalErrors }: DropdownInputProps) {
+export function DropdownInput({
+  value,
+  onChange,
+  question,
+  errors: externalErrors,
+}: DropdownInputProps) {
   const s = (question.settings ?? {}) as Partial<DropdownSettings>
   const placeholder = s.placeholder ?? 'Select an option'
   const searchable = s.searchable ?? false
@@ -71,7 +81,9 @@ export function DropdownInput({ value, onChange, question, errors: externalError
     const newValue = e.target.value
     onChange(newValue)
     if (touched) {
-      setInternalErrors(validate(newValue, otherText, newValue === OTHER_VALUE, question.is_required))
+      setInternalErrors(
+        validate(newValue, otherText, newValue === OTHER_VALUE, question.is_required)
+      )
     }
   }
 

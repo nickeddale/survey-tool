@@ -19,7 +19,12 @@ function wrapper({ children }: { children: ReactNode }) {
 // ---------------------------------------------------------------------------
 
 function resetAuthStore() {
-  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: true, isLoading: false })
+  useAuthStore.setState({
+    user: null,
+    isAuthenticated: false,
+    isInitializing: true,
+    isLoading: false,
+  })
 }
 
 // ---------------------------------------------------------------------------
@@ -38,7 +43,7 @@ describe('AuthContext', () => {
       // Suppress console.error from React for the expected throw
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
       expect(() => renderHook(() => useAuth())).toThrow(
-        'useAuth must be used within an AuthProvider',
+        'useAuth must be used within an AuthProvider'
       )
       consoleSpy.mockRestore()
     })
@@ -115,7 +120,12 @@ describe('AuthContext', () => {
     it('exposes logout action that clears auth state', async () => {
       // Set access token so initialize() succeeds (refresh returns 200 when token is set)
       setTokens(mockTokens.access_token)
-      useAuthStore.setState({ user: mockUser, isAuthenticated: true, isInitializing: false, isLoading: false })
+      useAuthStore.setState({
+        user: mockUser,
+        isAuthenticated: true,
+        isInitializing: false,
+        isLoading: false,
+      })
 
       const { result } = renderHook(() => useAuth(), { wrapper })
 
@@ -156,7 +166,7 @@ describe('AuthContext', () => {
       await expect(
         act(async () => {
           await result.current.register({ email: 'existing@example.com', password: 'password123' })
-        }),
+        })
       ).rejects.toMatchObject({ status: 409, code: 'CONFLICT' })
     })
   })

@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 if TYPE_CHECKING:
     from app.schemas.question import QuestionResponse
@@ -39,6 +39,18 @@ class QuestionGroupResponse(BaseModel):
     translations: dict[str, Any] = {}
     created_at: datetime
     questions: list["QuestionResponse"] = []
+
+    @field_validator("questions", mode="before")
+    @classmethod
+    def filter_top_level_questions(cls, v: Any) -> Any:
+        """Exclude subquestions (parent_id is not None) from the group's question list.
+
+        SQLAlchemy loads all questions (including subquestions) via the relationship;
+        subquestions are exposed only through their parent's ``subquestions`` field.
+        """
+        if not v:
+            return v
+        return [q for q in v if getattr(q, "parent_id", None) is None]
 
 
 class QuestionGroupListResponse(BaseModel):

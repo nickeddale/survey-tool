@@ -2,7 +2,12 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AssessmentForm from '../AssessmentForm'
-import type { AssessmentResponse, QuestionGroupResponse, QuestionResponse, AssessmentCreate } from '../../../types/survey'
+import type {
+  AssessmentResponse,
+  QuestionGroupResponse,
+  QuestionResponse,
+  AssessmentCreate,
+} from '../../../types/survey'
 
 // ---------------------------------------------------------------------------
 // Mock data
@@ -128,7 +133,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       expect(screen.getByRole('heading', { name: 'Create Assessment' })).toBeInTheDocument()
@@ -143,7 +148,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       expect((screen.getByTestId('assessment-name-input') as HTMLInputElement).value).toBe('')
@@ -160,7 +165,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       const scopeSelect = screen.getByTestId('assessment-scope-select') as HTMLSelectElement
@@ -175,7 +180,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       expect(screen.queryByTestId('assessment-group-select')).not.toBeInTheDocument()
@@ -191,7 +196,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -211,7 +216,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -235,7 +240,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -257,7 +262,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={vi.fn()}
           onCancel={onCancel}
-        />,
+        />
       )
 
       await act(async () => {
@@ -278,7 +283,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={onSubmit}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -299,7 +304,7 @@ describe('AssessmentForm', () => {
           min_score: 5,
           max_score: 10,
           message: 'Great job!',
-        }),
+        })
       )
     })
 
@@ -314,7 +319,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={onSubmit}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -337,7 +342,7 @@ describe('AssessmentForm', () => {
         expect.objectContaining<Partial<AssessmentCreate>>({
           scope: 'group',
           group_id: 'g1',
-        }),
+        })
       )
     })
   })
@@ -358,7 +363,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={onSubmit}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -384,7 +389,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={onSubmit}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -396,7 +401,9 @@ describe('AssessmentForm', () => {
       })
 
       expect(screen.getByTestId('assessment-form-error')).toBeInTheDocument()
-      expect(screen.getByTestId('assessment-form-error').textContent).toMatch(/min score.*max score/i)
+      expect(screen.getByTestId('assessment-form-error').textContent).toMatch(
+        /min score.*max score/i
+      )
       expect(onSubmit).not.toHaveBeenCalled()
     })
 
@@ -411,7 +418,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={onSubmit}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -439,7 +446,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={onSubmit}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -450,7 +457,9 @@ describe('AssessmentForm', () => {
       })
 
       expect(screen.getByTestId('assessment-form-error')).toBeInTheDocument()
-      expect(screen.getByTestId('assessment-form-error').textContent).toMatch(/message is required/i)
+      expect(screen.getByTestId('assessment-form-error').textContent).toMatch(
+        /message is required/i
+      )
       expect(onSubmit).not.toHaveBeenCalled()
     })
 
@@ -463,11 +472,13 @@ describe('AssessmentForm', () => {
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
           error="Server error occurred"
-        />,
+        />
       )
 
       expect(screen.getByTestId('assessment-form-error')).toBeInTheDocument()
-      expect(screen.getByTestId('assessment-form-error').textContent).toContain('Server error occurred')
+      expect(screen.getByTestId('assessment-form-error').textContent).toContain(
+        'Server error occurred'
+      )
     })
 
     it('shows loading state on submit button when isLoading is true', () => {
@@ -479,7 +490,7 @@ describe('AssessmentForm', () => {
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
           isLoading={true}
-        />,
+        />
       )
 
       expect(screen.getByTestId('assessment-form-submit')).toHaveTextContent('Saving...')
@@ -500,7 +511,7 @@ describe('AssessmentForm', () => {
           assessment={mockExistingAssessment}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       expect(screen.getByText('Edit Assessment')).toBeInTheDocument()
@@ -515,7 +526,7 @@ describe('AssessmentForm', () => {
           assessment={mockExistingAssessment}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       const nameInput = screen.getByTestId('assessment-name-input') as HTMLInputElement
@@ -530,7 +541,7 @@ describe('AssessmentForm', () => {
           assessment={mockExistingAssessment}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       const scopeSelect = screen.getByTestId('assessment-scope-select') as HTMLSelectElement
@@ -545,7 +556,7 @@ describe('AssessmentForm', () => {
           assessment={mockExistingAssessment}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       const minInput = screen.getByTestId('assessment-min-score-input') as HTMLInputElement
@@ -562,7 +573,7 @@ describe('AssessmentForm', () => {
           assessment={mockExistingAssessment}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       const messageInput = screen.getByTestId('assessment-message-input') as HTMLTextAreaElement
@@ -577,7 +588,7 @@ describe('AssessmentForm', () => {
           assessment={mockGroupAssessment}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       const groupSelect = screen.getByTestId('assessment-group-select') as HTMLSelectElement
@@ -599,7 +610,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       expect(screen.queryByTestId('assessment-question-select')).not.toBeInTheDocument()
@@ -616,7 +627,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -637,7 +648,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -658,7 +669,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -683,7 +694,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -706,7 +717,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={onSubmit}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -719,7 +730,9 @@ describe('AssessmentForm', () => {
       })
 
       expect(screen.getByTestId('assessment-form-error')).toBeInTheDocument()
-      expect(screen.getByTestId('assessment-form-error').textContent).toMatch(/question is required/i)
+      expect(screen.getByTestId('assessment-form-error').textContent).toMatch(
+        /question is required/i
+      )
       expect(onSubmit).not.toHaveBeenCalled()
     })
 
@@ -735,7 +748,7 @@ describe('AssessmentForm', () => {
           assessment={null}
           onSubmit={onSubmit}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       await act(async () => {
@@ -758,7 +771,7 @@ describe('AssessmentForm', () => {
         expect.objectContaining<Partial<AssessmentCreate>>({
           scope: 'question',
           question_id: 'q1',
-        }),
+        })
       )
     })
 
@@ -771,7 +784,7 @@ describe('AssessmentForm', () => {
           assessment={mockQuestionAssessment}
           onSubmit={vi.fn()}
           onCancel={vi.fn()}
-        />,
+        />
       )
 
       const questionSelect = screen.getByTestId('assessment-question-select') as HTMLSelectElement

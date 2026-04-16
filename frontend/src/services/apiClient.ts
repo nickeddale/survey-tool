@@ -111,7 +111,7 @@ async function performRefresh(): Promise<string> {
   const response = await axios.post<{ access_token: string }>(
     `${BASE_URL}/auth/refresh`,
     {},
-    { headers: { 'Content-Type': 'application/json' }, withCredentials: true },
+    { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
   )
 
   const { access_token } = response.data
@@ -180,9 +180,7 @@ const NO_REDIRECT_ROUTE_PATTERNS = ['/s/', '/login', '/register']
 
 function isPublicRoute(): boolean {
   if (typeof window === 'undefined') return false
-  return NO_REDIRECT_ROUTE_PATTERNS.some((pattern) =>
-    window.location.pathname.startsWith(pattern),
-  )
+  return NO_REDIRECT_ROUTE_PATTERNS.some((pattern) => window.location.pathname.startsWith(pattern))
 }
 
 // ---------------------------------------------------------------------------
@@ -234,9 +232,7 @@ apiClient.interceptors.response.use(
       }
 
       originalRequest._refreshRateLimitRetried = true
-      const retryAfterMs = parseRetryAfterMs(
-        error.response.headers['retry-after'] as string | null,
-      )
+      const retryAfterMs = parseRetryAfterMs(error.response.headers['retry-after'] as string | null)
       await new Promise<void>((resolve) => setTimeout(resolve, retryAfterMs))
 
       // Retry the refresh call directly (not via apiClient to avoid interceptor loops)
@@ -312,7 +308,7 @@ apiClient.interceptors.response.use(
     }
 
     return Promise.reject(error)
-  },
+  }
 )
 
 export default apiClient

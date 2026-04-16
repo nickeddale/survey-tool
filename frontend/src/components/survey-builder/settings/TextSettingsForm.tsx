@@ -3,7 +3,11 @@
  * Covers: short_text, long_text, huge_text
  */
 
-import type { ShortTextSettings, LongTextSettings, HugeTextSettings } from '../../../types/questionSettings'
+import type {
+  ShortTextSettings,
+  LongTextSettings,
+  HugeTextSettings,
+} from '../../../types/questionSettings'
 
 // ---------------------------------------------------------------------------
 // Shared field components
@@ -42,7 +46,12 @@ interface TextSettingsFormProps {
 // Component
 // ---------------------------------------------------------------------------
 
-export function TextSettingsForm({ type, settings, onChange, readOnly = false }: TextSettingsFormProps) {
+export function TextSettingsForm({
+  type,
+  settings,
+  onChange,
+  readOnly = false,
+}: TextSettingsFormProps) {
   const s = settings as ShortTextSettings & LongTextSettings & HugeTextSettings
 
   return (
@@ -106,7 +115,9 @@ export function TextSettingsForm({ type, settings, onChange, readOnly = false }:
             disabled={readOnly}
             data-testid="text-setting-rich-text"
           />
-          <label htmlFor="setting-rich-text" className="text-sm">Enable rich text editor</label>
+          <label htmlFor="setting-rich-text" className="text-sm">
+            Enable rich text editor
+          </label>
         </div>
       )}
 
@@ -116,7 +127,9 @@ export function TextSettingsForm({ type, settings, onChange, readOnly = false }:
           <select
             className={inputClass}
             value={(s as ShortTextSettings).input_type ?? 'text'}
-            onChange={(e) => onChange({ input_type: e.target.value as ShortTextSettings['input_type'] })}
+            onChange={(e) =>
+              onChange({ input_type: e.target.value as ShortTextSettings['input_type'] })
+            }
             disabled={readOnly}
             data-testid="text-setting-input-type"
           >

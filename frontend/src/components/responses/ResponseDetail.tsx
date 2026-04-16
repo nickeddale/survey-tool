@@ -44,7 +44,30 @@ function formatDate(iso: string | null): string {
 // Answer value rendering
 // ---------------------------------------------------------------------------
 
-function MatrixAnswerGrid({ answers, questionCode }: { answers: ResponseAnswerDetail[]; questionCode: string }) {
+/**
+ * Formats an answer value into a human-readable string.
+ * Handles objects (key: value pairs), arrays (comma-joined), and primitives.
+ */
+export function formatAnswerValue(value: unknown): string {
+  if (value === null || value === undefined || value === '') return '—'
+  if (Array.isArray(value)) {
+    return value.map((v) => formatAnswerValue(v)).join(', ')
+  }
+  if (typeof value === 'object') {
+    return Object.entries(value as Record<string, unknown>)
+      .map(([k, v]) => `${k}: ${formatAnswerValue(v)}`)
+      .join(', ')
+  }
+  return String(value)
+}
+
+function MatrixAnswerGrid({
+  answers,
+  questionCode,
+}: {
+  answers: ResponseAnswerDetail[]
+  questionCode: string
+}) {
   // Collect unique subquestion labels (rows) for this matrix question
   const rows = Array.from(
     new Map(
@@ -70,7 +93,7 @@ function MatrixAnswerGrid({ answers, questionCode }: { answers: ResponseAnswerDe
             <tr key={answer.question_id} className="bg-card">
               <td className="px-3 py-2 text-muted-foreground">{answer.subquestion_label}</td>
               <td className="px-3 py-2 text-foreground">
-                {answer.selected_option_title ?? String(answer.value ?? '—')}
+                {answer.selected_option_title ?? formatAnswerValue(answer.value)}
               </td>
             </tr>
           ))}
@@ -102,6 +125,11 @@ function AnswerValue({ answer }: { answer: ResponseAnswerDetail }) {
     return <span className="text-sm text-muted-foreground italic">No answer</span>
   }
 
+  // Object or array values (e.g. matrix answers stored as plain objects)
+  if (typeof answer.value === 'object') {
+    return <span className="text-sm text-foreground">{formatAnswerValue(answer.value)}</span>
+  }
+
   return <span className="text-sm text-foreground">{String(answer.value)}</span>
 }
 
@@ -128,7 +156,9 @@ function groupAnswers(answers: ResponseAnswerDetail[]): AnswerGroup[] {
     if (!groups.has(groupKey)) {
       groups.set(groupKey, {
         questionCode: groupKey,
-        questionTitle: matrixMatch ? answer.question_title.split(' — ')[0] ?? answer.question_title : answer.question_title,
+        questionTitle: matrixMatch
+          ? (answer.question_title.split(' — ')[0] ?? answer.question_title)
+          : answer.question_title,
         questionType: answer.question_type,
         isMatrixParent: !!matrixMatch,
         answers: [],
@@ -164,27 +194,39 @@ function ResponseDetail({ response }: ResponseDetailProps) {
         <CardContent>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Response ID</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                Response ID
+              </p>
               <p className="text-sm font-mono text-foreground break-all">{response.id}</p>
             </div>
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Started</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                Started
+              </p>
               <p className="text-sm text-foreground">{formatDate(response.started_at)}</p>
             </div>
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Completed</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                Completed
+              </p>
               <p className="text-sm text-foreground">{formatDate(response.completed_at)}</p>
             </div>
             {response.ip_address && (
               <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">IP Address</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                  IP Address
+                </p>
                 <p className="text-sm text-foreground">{response.ip_address}</p>
               </div>
             )}
             {response.participant_id && (
               <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Participant ID</p>
-                <p className="text-sm font-mono text-foreground break-all">{response.participant_id}</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                  Participant ID
+                </p>
+                <p className="text-sm font-mono text-foreground break-all">
+                  {response.participant_id}
+                </p>
               </div>
             )}
           </div>
@@ -203,7 +245,9 @@ function ResponseDetail({ response }: ResponseDetailProps) {
         {answerGroups.length === 0 ? (
           <Card data-testid="no-answers-state">
             <CardContent className="text-center py-10">
-              <p className="text-muted-foreground text-sm">No answers recorded for this response.</p>
+              <p className="text-muted-foreground text-sm">
+                No answers recorded for this response.
+              </p>
             </CardContent>
           </Card>
         ) : (
@@ -222,10 +266,7 @@ function ResponseDetail({ response }: ResponseDetailProps) {
                   </div>
 
                   {group.isMatrixParent ? (
-                    <MatrixAnswerGrid
-                      answers={group.answers}
-                      questionCode={group.questionCode}
-                    />
+                    <MatrixAnswerGrid answers={group.answers} questionCode={group.questionCode} />
                   ) : (
                     <div className="pl-2">
                       {group.answers.map((answer) => (

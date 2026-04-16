@@ -112,7 +112,9 @@ describe('RadioInput — rendering', () => {
   })
 
   it('uses custom other_text label', () => {
-    const question = makeQuestion({ settings: makeSettings({ has_other: true, other_text: 'Specify' }) })
+    const question = makeQuestion({
+      settings: makeSettings({ has_other: true, other_text: 'Specify' }),
+    })
     render(<RadioInput value="" onChange={vi.fn()} question={question} />)
     expect(screen.getByText('Specify')).toBeInTheDocument()
   })
@@ -275,7 +277,12 @@ describe('RadioInput — external errors prop', () => {
   it('displays external errors immediately without blur', () => {
     const question = makeQuestion()
     render(
-      <RadioInput value="" onChange={vi.fn()} question={question} errors={['Server error occurred']} />
+      <RadioInput
+        value=""
+        onChange={vi.fn()}
+        question={question}
+        errors={['Server error occurred']}
+      />
     )
     expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error occurred')
   })

@@ -36,7 +36,14 @@ interface ToggleRowProps {
   'data-testid'?: string
 }
 
-function ToggleRow({ id, label, checked, onChange, disabled, 'data-testid': testId }: ToggleRowProps) {
+function ToggleRow({
+  id,
+  label,
+  checked,
+  onChange,
+  disabled,
+  'data-testid': testId,
+}: ToggleRowProps) {
   return (
     <div className="flex items-center gap-2">
       <input
@@ -47,7 +54,9 @@ function ToggleRow({ id, label, checked, onChange, disabled, 'data-testid': test
         disabled={disabled}
         data-testid={testId}
       />
-      <label htmlFor={id} className="text-sm">{label}</label>
+      <label htmlFor={id} className="text-sm">
+        {label}
+      </label>
     </div>
   )
 }
@@ -61,9 +70,11 @@ const inputClass =
 // ---------------------------------------------------------------------------
 
 interface MatrixSettingsFormProps {
-  type: 'matrix' | 'matrix_dropdown' | 'matrix_dynamic'
+  type: 'matrix' | 'matrix_single' | 'matrix_multiple' | 'matrix_dropdown' | 'matrix_dynamic'
   settings: MatrixSettings | MatrixDropdownSettings | MatrixDynamicSettings
-  onChange: (updates: Partial<MatrixSettings & MatrixDropdownSettings & MatrixDynamicSettings>) => void
+  onChange: (
+    updates: Partial<MatrixSettings & MatrixDropdownSettings & MatrixDynamicSettings>
+  ) => void
   readOnly?: boolean
 }
 
@@ -71,13 +82,18 @@ interface MatrixSettingsFormProps {
 // Component
 // ---------------------------------------------------------------------------
 
-export function MatrixSettingsForm({ type, settings, onChange, readOnly = false }: MatrixSettingsFormProps) {
+export function MatrixSettingsForm({
+  type,
+  settings,
+  onChange,
+  readOnly = false,
+}: MatrixSettingsFormProps) {
   const s = settings as MatrixSettings & MatrixDropdownSettings & MatrixDynamicSettings
 
   return (
     <div className="space-y-3" data-testid="matrix-settings-form">
-      {/* alternate_rows — matrix and matrix_dropdown */}
-      {(type === 'matrix' || type === 'matrix_dropdown') && (
+      {/* alternate_rows — all except matrix_dynamic */}
+      {type !== 'matrix_dynamic' && (
         <ToggleRow
           id="setting-alternate-rows"
           label="Alternate row colors"
@@ -88,8 +104,8 @@ export function MatrixSettingsForm({ type, settings, onChange, readOnly = false 
         />
       )}
 
-      {/* is_all_rows_required — matrix and matrix_dropdown */}
-      {(type === 'matrix' || type === 'matrix_dropdown') && (
+      {/* is_all_rows_required — all except matrix_dynamic */}
+      {type !== 'matrix_dynamic' && (
         <ToggleRow
           id="setting-all-rows-required"
           label="All rows required"
@@ -100,8 +116,8 @@ export function MatrixSettingsForm({ type, settings, onChange, readOnly = false 
         />
       )}
 
-      {/* randomize_rows — matrix and matrix_dropdown */}
-      {(type === 'matrix' || type === 'matrix_dropdown') && (
+      {/* randomize_rows — all except matrix_dynamic */}
+      {type !== 'matrix_dynamic' && (
         <ToggleRow
           id="setting-randomize-rows"
           label="Randomize row order"
@@ -112,13 +128,29 @@ export function MatrixSettingsForm({ type, settings, onChange, readOnly = false 
         />
       )}
 
-      {/* cell_type — matrix_dropdown and matrix_dynamic */}
+      {/* transpose — all except matrix_dynamic */}
+      {type !== 'matrix_dynamic' && (
+        <ToggleRow
+          id="setting-transpose"
+          label="Transpose (swap rows and columns)"
+          checked={s.transpose ?? false}
+          onChange={(checked) => onChange({ transpose: checked })}
+          disabled={readOnly}
+          data-testid="matrix-setting-transpose"
+        />
+      )}
+
+      {/* cell_type — matrix_dropdown and matrix_dynamic only */}
       {(type === 'matrix_dropdown' || type === 'matrix_dynamic') && (
         <FieldRow label="Default Cell Type">
           <select
             className={inputClass}
             value={s.cell_type ?? 'dropdown'}
-            onChange={(e) => onChange({ cell_type: e.target.value as MatrixDropdownSettings['cell_type'] })}
+            onChange={(e) =>
+              onChange({
+                cell_type: e.target.value as 'dropdown' | 'text' | 'checkbox' | 'radio',
+              })
+            }
             disabled={readOnly}
             data-testid="matrix-setting-cell-type"
           >
@@ -137,11 +169,11 @@ export function MatrixSettingsForm({ type, settings, onChange, readOnly = false 
             <input
               type="number"
               className={inputClass}
-              value={s.row_count ?? 1}
+              value={s.default_row_count ?? 1}
               min={0}
               onChange={(e) => {
                 const val = parseInt(e.target.value, 10)
-                if (!isNaN(val) && val >= 0) onChange({ row_count: val })
+                if (!isNaN(val) && val >= 0) onChange({ default_row_count: val })
               }}
               disabled={readOnly}
               data-testid="matrix-setting-row-count"
@@ -151,11 +183,11 @@ export function MatrixSettingsForm({ type, settings, onChange, readOnly = false 
             <input
               type="number"
               className={inputClass}
-              value={s.min_row_count ?? 0}
+              value={s.min_rows ?? 0}
               min={0}
               onChange={(e) => {
                 const val = parseInt(e.target.value, 10)
-                if (!isNaN(val) && val >= 0) onChange({ min_row_count: val })
+                if (!isNaN(val) && val >= 0) onChange({ min_rows: val })
               }}
               disabled={readOnly}
               data-testid="matrix-setting-min-row-count"
@@ -165,12 +197,12 @@ export function MatrixSettingsForm({ type, settings, onChange, readOnly = false 
             <input
               type="number"
               className={inputClass}
-              value={s.max_row_count ?? ''}
+              value={s.max_rows ?? ''}
               min={0}
               placeholder="None"
               onChange={(e) => {
                 const val = e.target.value === '' ? null : parseInt(e.target.value, 10)
-                onChange({ max_row_count: isNaN(val as number) ? null : val })
+                onChange({ max_rows: isNaN(val as number) ? null : val })
               }}
               disabled={readOnly}
               data-testid="matrix-setting-max-row-count"

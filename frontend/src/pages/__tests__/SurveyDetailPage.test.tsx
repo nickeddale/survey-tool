@@ -23,7 +23,10 @@ const SURVEY_ID = mockSurveyFull.id // '10000000-0000-0000-0000-000000000002'
 
 function renderDetail(id = SURVEY_ID) {
   return render(
-    <MemoryRouter initialEntries={[`/surveys/${id}`]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <MemoryRouter
+      initialEntries={[`/surveys/${id}`]}
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
       <AuthProvider>
         <Routes>
           <Route path="/surveys/:id" element={<SurveyDetailPage />} />
@@ -35,12 +38,17 @@ function renderDetail(id = SURVEY_ID) {
           />
         </Routes>
       </AuthProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
 function resetAuthStore() {
-  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
+  useAuthStore.setState({
+    user: null,
+    isAuthenticated: false,
+    isInitializing: false,
+    isLoading: false,
+  })
 }
 
 // ---------------------------------------------------------------------------
@@ -59,7 +67,12 @@ describe('SurveyDetailPage', () => {
     setTokens(mockTokens.access_token)
     localStorage.removeItem('devtracker_refresh_token')
     // Pre-populate the auth store so components that check isAuthenticated work correctly
-    useAuthStore.setState({ user: mockUser, isAuthenticated: true, isInitializing: false, isLoading: false })
+    useAuthStore.setState({
+      user: mockUser,
+      isAuthenticated: true,
+      isInitializing: false,
+      isLoading: false,
+    })
   })
 
   afterEach(() => {
@@ -75,9 +88,7 @@ describe('SurveyDetailPage', () => {
   describe('loading state', () => {
     it('renders loading skeleton while survey is being fetched', async () => {
       // Use a hanging promise so isLoading stays true indefinitely
-      server.use(
-        http.get(`/api/v1/surveys/${SURVEY_ID}`, () => new Promise<never>(() => {})),
-      )
+      server.use(http.get(`/api/v1/surveys/${SURVEY_ID}`, () => new Promise<never>(() => {})))
 
       renderDetail()
 
@@ -181,9 +192,9 @@ describe('SurveyDetailPage', () => {
         http.get(`/api/v1/surveys/${SURVEY_ID}`, () =>
           HttpResponse.json(
             { ...mockSurveyFull, groups: [], questions: [], options: [] },
-            { status: 200 },
-          ),
-        ),
+            { status: 200 }
+          )
+        )
       )
 
       renderDetail()
@@ -215,9 +226,9 @@ describe('SurveyDetailPage', () => {
         http.get(`/api/v1/surveys/${SURVEY_ID}`, () =>
           HttpResponse.json(
             { ...mockSurveyFull, status: 'active', groups: [], questions: [], options: [] },
-            { status: 200 },
-          ),
-        ),
+            { status: 200 }
+          )
+        )
       )
 
       renderDetail()
@@ -235,9 +246,9 @@ describe('SurveyDetailPage', () => {
         http.get(`/api/v1/surveys/${SURVEY_ID}`, () =>
           HttpResponse.json(
             { ...mockSurveyFull, status: 'closed', groups: [], questions: [], options: [] },
-            { status: 200 },
-          ),
-        ),
+            { status: 200 }
+          )
+        )
       )
 
       renderDetail()
@@ -255,9 +266,9 @@ describe('SurveyDetailPage', () => {
         http.get(`/api/v1/surveys/${SURVEY_ID}`, () =>
           HttpResponse.json(
             { ...mockSurveyFull, status: 'archived', groups: [], questions: [], options: [] },
-            { status: 200 },
-          ),
-        ),
+            { status: 200 }
+          )
+        )
       )
 
       renderDetail()
@@ -300,7 +311,7 @@ describe('SurveyDetailPage', () => {
         http.post(`/api/v1/surveys/${SURVEY_ID}/activate`, () => {
           activateCalled = true
           return HttpResponse.json({}, { status: 200 })
-        }),
+        })
       )
 
       renderDetail()
@@ -352,10 +363,15 @@ describe('SurveyDetailPage', () => {
       server.use(
         http.post(`/api/v1/surveys/${SURVEY_ID}/activate`, () =>
           HttpResponse.json(
-            { detail: { code: 'VALIDATION_ERROR', message: 'Survey must have at least one question to activate' } },
-            { status: 422 },
-          ),
-        ),
+            {
+              detail: {
+                code: 'VALIDATION_ERROR',
+                message: 'Survey must have at least one question to activate',
+              },
+            },
+            { status: 422 }
+          )
+        )
       )
 
       renderDetail()
@@ -390,9 +406,9 @@ describe('SurveyDetailPage', () => {
         http.get(`/api/v1/surveys/${SURVEY_ID}`, () =>
           HttpResponse.json(
             { ...mockSurveyFull, status: 'active', groups: [], questions: [], options: [] },
-            { status: 200 },
-          ),
-        ),
+            { status: 200 }
+          )
+        )
       )
     })
 
@@ -447,9 +463,9 @@ describe('SurveyDetailPage', () => {
         http.get(`/api/v1/surveys/${SURVEY_ID}`, () =>
           HttpResponse.json(
             { ...mockSurveyFull, status: 'closed', groups: [], questions: [], options: [] },
-            { status: 200 },
-          ),
-        ),
+            { status: 200 }
+          )
+        )
       )
     })
 
@@ -512,9 +528,9 @@ describe('SurveyDetailPage', () => {
         http.get(`/api/v1/surveys/${SURVEY_ID}`, () =>
           HttpResponse.json(
             { ...mockSurveyFull, status: 'active', groups: [], questions: [], options: [] },
-            { status: 200 },
-          ),
-        ),
+            { status: 200 }
+          )
+        )
       )
 
       renderDetail()
@@ -590,7 +606,7 @@ describe('SurveyDetailPage', () => {
 
       await waitFor(() => {
         expect(screen.getByTestId('location').textContent).toBe(
-          '/surveys/30000000-0000-0000-0000-000000000001',
+          '/surveys/30000000-0000-0000-0000-000000000001'
         )
       })
     })
@@ -622,13 +638,15 @@ describe('SurveyDetailPage', () => {
       // Spy on anchor click
       const mockClick = vi.fn()
       const originalCreateElement = document.createElement.bind(document)
-      vi.spyOn(document, 'createElement').mockImplementation((tag: string, options?: ElementCreationOptions) => {
-        const el = originalCreateElement(tag, options)
-        if (tag === 'a') {
-          el.click = mockClick
+      vi.spyOn(document, 'createElement').mockImplementation(
+        (tag: string, options?: ElementCreationOptions) => {
+          const el = originalCreateElement(tag, options)
+          if (tag === 'a') {
+            el.click = mockClick
+          }
+          return el
         }
-        return el
-      })
+      )
 
       renderDetail()
 
@@ -702,7 +720,7 @@ describe('SurveyDetailPage', () => {
         http.delete(`/api/v1/surveys/${SURVEY_ID}`, () => {
           deleteCalled = true
           return new HttpResponse(null, { status: 204 })
-        }),
+        })
       )
 
       renderDetail()
@@ -756,9 +774,9 @@ describe('SurveyDetailPage', () => {
         http.get(`/api/v1/surveys/${SURVEY_ID}`, () =>
           HttpResponse.json(
             { detail: { code: 'INTERNAL_SERVER_ERROR', message: 'Internal server error' } },
-            { status: 500 },
-          ),
-        ),
+            { status: 500 }
+          )
+        )
       )
 
       renderDetail()

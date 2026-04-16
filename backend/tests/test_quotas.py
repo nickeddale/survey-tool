@@ -200,7 +200,7 @@ async def test_create_quota_with_empty_conditions_returns_422(client: AsyncClien
         },
         headers=headers,
     )
-    assert resp.status_code == 422
+    assert resp.status_code == 400
     data = resp.json()
     # FastAPI Pydantic v2 validation errors surface under 'detail' as a list
     assert "detail" in data

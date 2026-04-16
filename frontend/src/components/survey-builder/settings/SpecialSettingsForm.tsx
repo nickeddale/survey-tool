@@ -38,7 +38,14 @@ interface ToggleRowProps {
   'data-testid'?: string
 }
 
-function ToggleRow({ id, label, checked, onChange, disabled, 'data-testid': testId }: ToggleRowProps) {
+function ToggleRow({
+  id,
+  label,
+  checked,
+  onChange,
+  disabled,
+  'data-testid': testId,
+}: ToggleRowProps) {
   return (
     <div className="flex items-center gap-2">
       <input
@@ -49,7 +56,9 @@ function ToggleRow({ id, label, checked, onChange, disabled, 'data-testid': test
         disabled={disabled}
         data-testid={testId}
       />
-      <label htmlFor={id} className="text-sm">{label}</label>
+      <label htmlFor={id} className="text-sm">
+        {label}
+      </label>
     </div>
   )
 }
@@ -66,8 +75,17 @@ type SpecialType = 'ranking' | 'image_picker' | 'file_upload' | 'expression' | '
 
 interface SpecialSettingsFormProps {
   type: SpecialType
-  settings: RankingSettings | ImagePickerSettings | FileUploadSettings | ExpressionSettings | HtmlSettings
-  onChange: (updates: Partial<RankingSettings & ImagePickerSettings & FileUploadSettings & ExpressionSettings & HtmlSettings>) => void
+  settings:
+    | RankingSettings
+    | ImagePickerSettings
+    | FileUploadSettings
+    | ExpressionSettings
+    | HtmlSettings
+  onChange: (
+    updates: Partial<
+      RankingSettings & ImagePickerSettings & FileUploadSettings & ExpressionSettings & HtmlSettings
+    >
+  ) => void
   readOnly?: boolean
 }
 
@@ -75,7 +93,12 @@ interface SpecialSettingsFormProps {
 // Component
 // ---------------------------------------------------------------------------
 
-export function SpecialSettingsForm({ type, settings, onChange, readOnly = false }: SpecialSettingsFormProps) {
+export function SpecialSettingsForm({
+  type,
+  settings,
+  onChange,
+  readOnly = false,
+}: SpecialSettingsFormProps) {
   // ---- Ranking ----
   if (type === 'ranking') {
     const s = settings as RankingSettings
@@ -214,13 +237,18 @@ export function SpecialSettingsForm({ type, settings, onChange, readOnly = false
           />
         </FieldRow>
         <FieldRow label="Allowed File Types">
-          <p className="text-xs text-muted-foreground mb-1">One MIME type per line (e.g. image/*, application/pdf)</p>
+          <p className="text-xs text-muted-foreground mb-1">
+            One MIME type per line (e.g. image/*, application/pdf)
+          </p>
           <textarea
             className={`${inputClass} resize-none font-mono text-xs`}
             rows={4}
             value={(s.allowed_types ?? []).join('\n')}
             onChange={(e) => {
-              const types = e.target.value.split('\n').map((t) => t.trim()).filter(Boolean)
+              const types = e.target.value
+                .split('\n')
+                .map((t) => t.trim())
+                .filter(Boolean)
               onChange({ allowed_types: types })
             }}
             disabled={readOnly}
@@ -254,7 +282,9 @@ export function SpecialSettingsForm({ type, settings, onChange, readOnly = false
           <select
             className={inputClass}
             value={s.display_format ?? 'text'}
-            onChange={(e) => onChange({ display_format: e.target.value as ExpressionSettings['display_format'] })}
+            onChange={(e) =>
+              onChange({ display_format: e.target.value as ExpressionSettings['display_format'] })
+            }
             disabled={readOnly}
             data-testid="special-setting-display-format"
           >
@@ -278,7 +308,9 @@ export function SpecialSettingsForm({ type, settings, onChange, readOnly = false
             />
           </FieldRow>
         )}
-        {(s.display_format === 'number' || s.display_format === 'currency' || s.display_format === 'percent') && (
+        {(s.display_format === 'number' ||
+          s.display_format === 'currency' ||
+          s.display_format === 'percent') && (
           <FieldRow label="Decimal Places">
             <input
               type="number"

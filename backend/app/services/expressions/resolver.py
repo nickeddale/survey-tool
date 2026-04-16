@@ -58,7 +58,6 @@ _NUMERIC_QUESTION_TYPES = frozenset(
     {
         "rating",
         "scale",
-        "number",
         "numeric",
     }
 )
