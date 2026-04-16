@@ -154,9 +154,9 @@ describe('getDefaultSettings', () => {
     expect(d.is_all_rows_required).toBe(false)
   })
 
-  it('matrix_dynamic defaults include row_count=1', () => {
+  it('matrix_dynamic defaults include default_row_count=1', () => {
     const d = getDefaultSettings('matrix_dynamic') as MatrixDynamicSettings
-    expect(d.row_count).toBe(1)
+    expect(d.default_row_count).toBe(1)
     expect(d.add_row_text).toBe('Add row')
   })
 })
