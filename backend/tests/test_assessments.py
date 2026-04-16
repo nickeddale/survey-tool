@@ -1014,3 +1014,438 @@ async def test_create_assessment_non_subquestion_scope_with_subquestion_id_retur
         headers=headers,
     )
     assert resp.status_code == 422
+
+
+# ---------------------------------------------------------------------------
+# Matrix Scoring Tests
+# ---------------------------------------------------------------------------
+
+
+async def create_matrix_question(
+    client: AsyncClient, headers: dict, survey_id: str, group_id: str,
+    question_type: str = "matrix_single", code: str = "MAT1"
+) -> str:
+    """Create a matrix question and return its ID."""
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": "Matrix Question", "question_type": question_type, "code": code},
+        headers=headers,
+    )
+    assert resp.status_code == 201
+    return resp.json()["id"]
+
+
+async def create_subquestion(
+    client: AsyncClient, headers: dict, survey_id: str, group_id: str,
+    parent_id: str, code: str, sort_order: int = 1
+) -> str:
+    """Create a subquestion row via the group questions endpoint with parent_id."""
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={
+            "title": f"Row {code}",
+            "question_type": "matrix_single",
+            "code": code,
+            "parent_id": parent_id,
+            "sort_order": sort_order,
+        },
+        headers=headers,
+    )
+    assert resp.status_code == 201, resp.json()
+    return resp.json()["id"]
+
+
+async def create_matrix_answer_option(
+    client: AsyncClient, headers: dict, survey_id: str, question_id: str,
+    code: str, assessment_value: int
+) -> str:
+    """Create an answer option on a matrix parent question."""
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/questions/{question_id}/options",
+        json={"code": code, "title": code, "sort_order": 1, "assessment_value": assessment_value},
+        headers=headers,
+    )
+    assert resp.status_code == 201, resp.json()
+    return resp.json()["id"]
+
+
+async def submit_matrix_response(
+    client: AsyncClient, survey_id: str, question_id: str, matrix_value: dict
+) -> str:
+    """Submit a response with a matrix answer dict."""
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={"answers": [{"question_id": question_id, "value": matrix_value}]},
+    )
+    assert resp.status_code == 201, resp.json()
+    return resp.json()["id"]
+
+
+@pytest.mark.asyncio
+async def test_score_matrix_single_total_scope_sums_all_rows(client: AsyncClient):
+    """matrix_single answers contribute to total scope: SQ001→A1(val=3), SQ002→A2(val=5), total=8."""
+    headers = await auth_headers(client, "score_mat_single_total@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+
+    mat_id = await create_matrix_question(client, headers, survey_id, group_id, "matrix_single", "MAT1")
+    sq1_id = await create_subquestion(client, headers, survey_id, group_id, mat_id, "SQ001", 1)
+    sq2_id = await create_subquestion(client, headers, survey_id, group_id, mat_id, "SQ002", 2)
+
+    # Answer options on parent question
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "A1", 3)
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "A2", 5)
+
+    await activate_survey(client, headers, survey_id)
+    response_id = await submit_matrix_response(
+        client, survey_id, mat_id, {"SQ001": "A1", "SQ002": "A2"}
+    )
+
+    # Assessment matching total=8
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="TotalMatch", min_score=8, max_score=8),
+        headers=headers,
+    )
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="TotalNoMatch", min_score=9, max_score=20),
+        headers=headers,
+    )
+
+    score_resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/assessment",
+        headers=headers,
+    )
+    assert score_resp.status_code == 200
+    data = score_resp.json()
+    assert float(data["score"]) == 8.0
+    matching_names = [a["name"] for a in data["matching_assessments"]]
+    assert "TotalMatch" in matching_names
+    assert "TotalNoMatch" not in matching_names
+
+
+@pytest.mark.asyncio
+async def test_score_matrix_single_question_scope_sums_question(client: AsyncClient):
+    """matrix_single question scope: sum of all selected options across rows."""
+    headers = await auth_headers(client, "score_mat_single_qscope@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+
+    mat_id = await create_matrix_question(client, headers, survey_id, group_id, "matrix_single", "MAT1")
+    await create_subquestion(client, headers, survey_id, group_id, mat_id, "SQ001", 1)
+    await create_subquestion(client, headers, survey_id, group_id, mat_id, "SQ002", 2)
+
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "A1", 3)
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "A2", 5)
+
+    await activate_survey(client, headers, survey_id)
+    response_id = await submit_matrix_response(
+        client, survey_id, mat_id, {"SQ001": "A1", "SQ002": "A2"}
+    )
+
+    # Question-scoped rule for mat_id: score = 3+5 = 8
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="QMatch", scope="question", question_id=mat_id, min_score=8, max_score=8),
+        headers=headers,
+    )
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="QNoMatch", scope="question", question_id=mat_id, min_score=9, max_score=20),
+        headers=headers,
+    )
+
+    score_resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/assessment",
+        headers=headers,
+    )
+    assert score_resp.status_code == 200
+    data = score_resp.json()
+    assert float(data["score"]) == 8.0
+    matching_names = [a["name"] for a in data["matching_assessments"]]
+    assert "QMatch" in matching_names
+    assert "QNoMatch" not in matching_names
+
+
+@pytest.mark.asyncio
+async def test_score_matrix_single_subquestion_scope_returns_row_score(client: AsyncClient):
+    """matrix_single subquestion scope: SQ001→A1(val=3), SQ002→A2(val=5); SQ001 score=3."""
+    headers = await auth_headers(client, "score_mat_single_sqscope@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+
+    mat_id = await create_matrix_question(client, headers, survey_id, group_id, "matrix_single", "MAT1")
+    sq1_id = await create_subquestion(client, headers, survey_id, group_id, mat_id, "SQ001", 1)
+    sq2_id = await create_subquestion(client, headers, survey_id, group_id, mat_id, "SQ002", 2)
+
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "A1", 3)
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "A2", 5)
+
+    await activate_survey(client, headers, survey_id)
+    response_id = await submit_matrix_response(
+        client, survey_id, mat_id, {"SQ001": "A1", "SQ002": "A2"}
+    )
+
+    # Subquestion-scoped rule for SQ001: score = 3
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(
+            name="SQ1Match", scope="subquestion", question_id=mat_id,
+            subquestion_id=sq1_id, min_score=3, max_score=3
+        ),
+        headers=headers,
+    )
+    # SQ001 scoped rule that does NOT match (score=3 not in 5-10)
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(
+            name="SQ1NoMatch", scope="subquestion", question_id=mat_id,
+            subquestion_id=sq1_id, min_score=5, max_score=10
+        ),
+        headers=headers,
+    )
+    # SQ002 scoped rule: score = 5
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(
+            name="SQ2Match", scope="subquestion", question_id=mat_id,
+            subquestion_id=sq2_id, min_score=5, max_score=5
+        ),
+        headers=headers,
+    )
+
+    score_resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/assessment",
+        headers=headers,
+    )
+    assert score_resp.status_code == 200
+    data = score_resp.json()
+    # Total score is 3 + 5 = 8
+    assert float(data["score"]) == 8.0
+    matching_names = [a["name"] for a in data["matching_assessments"]]
+    assert "SQ1Match" in matching_names
+    assert "SQ1NoMatch" not in matching_names
+    assert "SQ2Match" in matching_names
+
+
+@pytest.mark.asyncio
+async def test_score_matrix_multiple_total_scope_sums_multi_select_rows(client: AsyncClient):
+    """matrix_multiple total scope: SQ001→[A1,A2](3+5=8), total=8."""
+    headers = await auth_headers(client, "score_mat_multi_total@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+
+    mat_id = await create_matrix_question(
+        client, headers, survey_id, group_id, "matrix_multiple", "MAT1"
+    )
+    # For matrix_multiple subquestions, use same question_type as parent
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={
+            "title": "Row SQ001",
+            "question_type": "matrix_multiple",
+            "code": "SQ001",
+            "parent_id": mat_id,
+            "sort_order": 1,
+        },
+        headers=headers,
+    )
+    assert resp.status_code == 201, resp.json()
+    sq1_id = resp.json()["id"]
+
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "A1", 3)
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "A2", 5)
+
+    await activate_survey(client, headers, survey_id)
+    # SQ001 selects both A1 and A2
+    response_id = await submit_matrix_response(
+        client, survey_id, mat_id, {"SQ001": ["A1", "A2"]}
+    )
+
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="TotalMatch", min_score=8, max_score=8),
+        headers=headers,
+    )
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="TotalNoMatch", min_score=9, max_score=20),
+        headers=headers,
+    )
+
+    score_resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/assessment",
+        headers=headers,
+    )
+    assert score_resp.status_code == 200
+    data = score_resp.json()
+    assert float(data["score"]) == 8.0
+    matching_names = [a["name"] for a in data["matching_assessments"]]
+    assert "TotalMatch" in matching_names
+    assert "TotalNoMatch" not in matching_names
+
+
+@pytest.mark.asyncio
+async def test_score_matrix_multiple_subquestion_scope_sums_row_selections(client: AsyncClient):
+    """matrix_multiple subquestion scope: SQ001→[A1,A2](3+5=8), SQ001 score=8."""
+    headers = await auth_headers(client, "score_mat_multi_sqscope@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+
+    mat_id = await create_matrix_question(
+        client, headers, survey_id, group_id, "matrix_multiple", "MAT1"
+    )
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={
+            "title": "Row SQ001",
+            "question_type": "matrix_multiple",
+            "code": "SQ001",
+            "parent_id": mat_id,
+            "sort_order": 1,
+        },
+        headers=headers,
+    )
+    assert resp.status_code == 201, resp.json()
+    sq1_id = resp.json()["id"]
+
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "A1", 3)
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "A2", 5)
+
+    await activate_survey(client, headers, survey_id)
+    response_id = await submit_matrix_response(
+        client, survey_id, mat_id, {"SQ001": ["A1", "A2"]}
+    )
+
+    # Subquestion-scoped rule for SQ001: score = 3+5 = 8
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(
+            name="SQ1Match", scope="subquestion", question_id=mat_id,
+            subquestion_id=sq1_id, min_score=8, max_score=8
+        ),
+        headers=headers,
+    )
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(
+            name="SQ1NoMatch", scope="subquestion", question_id=mat_id,
+            subquestion_id=sq1_id, min_score=9, max_score=20
+        ),
+        headers=headers,
+    )
+
+    score_resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/assessment",
+        headers=headers,
+    )
+    assert score_resp.status_code == 200
+    data = score_resp.json()
+    assert float(data["score"]) == 8.0
+    matching_names = [a["name"] for a in data["matching_assessments"]]
+    assert "SQ1Match" in matching_names
+    assert "SQ1NoMatch" not in matching_names
+
+
+@pytest.mark.asyncio
+async def test_score_mixed_matrix_and_single_choice_total_scope(client: AsyncClient):
+    """Mixed survey: matrix_single + single_choice both contribute to total score."""
+    headers = await auth_headers(client, "score_mixed_total@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+
+    # Single choice question: select A1 (val=4)
+    sc_id = await create_question(client, headers, survey_id, group_id, code="SC1")
+    await create_answer_option(client, headers, survey_id, sc_id, "A1", 4)
+
+    # Matrix single question: SQ001→B1(val=6)
+    mat_id = await create_matrix_question(client, headers, survey_id, group_id, "matrix_single", "MAT1")
+    await create_subquestion(client, headers, survey_id, group_id, mat_id, "SQ001", 1)
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "B1", 6)
+
+    await activate_survey(client, headers, survey_id)
+    # Submit with both single_choice and matrix answers
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={
+            "answers": [
+                {"question_id": sc_id, "value": "A1"},
+                {"question_id": mat_id, "value": {"SQ001": "B1"}},
+            ]
+        },
+    )
+    assert resp.status_code == 201
+    response_id = resp.json()["id"]
+
+    # Total should be 4 + 6 = 10
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="TotalMatch", min_score=10, max_score=10),
+        headers=headers,
+    )
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="TotalNoMatch", min_score=11, max_score=20),
+        headers=headers,
+    )
+
+    score_resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/assessment",
+        headers=headers,
+    )
+    assert score_resp.status_code == 200
+    data = score_resp.json()
+    assert float(data["score"]) == 10.0
+    matching_names = [a["name"] for a in data["matching_assessments"]]
+    assert "TotalMatch" in matching_names
+    assert "TotalNoMatch" not in matching_names
+
+
+@pytest.mark.asyncio
+async def test_score_backward_compat_string_and_list_answers_unchanged(client: AsyncClient):
+    """Backward compatibility: string and list answers still produce identical scores."""
+    headers = await auth_headers(client, "score_backcompat@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+
+    # Single choice (string value)
+    q1_id = await create_question(client, headers, survey_id, group_id, code="Q1")
+    await create_answer_option(client, headers, survey_id, q1_id, "A", 3)
+
+    # Multiple choice (list value)
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": "Q2", "question_type": "multiple_choice", "code": "Q2"},
+        headers=headers,
+    )
+    assert resp.status_code == 201
+    q2_id = resp.json()["id"]
+    await create_answer_option(client, headers, survey_id, q2_id, "B", 4)
+    await create_answer_option(client, headers, survey_id, q2_id, "C", 5)
+
+    await activate_survey(client, headers, survey_id)
+    response_id = await submit_response(
+        client, survey_id,
+        answers=[
+            {"question_id": q1_id, "value": "A"},
+            {"question_id": q2_id, "value": ["B", "C"]},
+        ],
+    )
+
+    # Total score = 3 + 4 + 5 = 12
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="BackCompatMatch", min_score=12, max_score=12),
+        headers=headers,
+    )
+
+    score_resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/assessment",
+        headers=headers,
+    )
+    assert score_resp.status_code == 200
+    data = score_resp.json()
+    assert float(data["score"]) == 12.0
+    matching_names = [a["name"] for a in data["matching_assessments"]]
+    assert "BackCompatMatch" in matching_names
