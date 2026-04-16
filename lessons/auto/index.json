@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-16T08:24:10.822Z",
+  "lastUpdated": "2026-04-16T08:28:21.131Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4823,6 +4823,21 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-16-iss-254-matrix-dynamic-minmax-row-count-constraints-not-en.md",
+      "ticketId": "ISS-254",
+      "title": "Matrix Dynamic: min/max row count constraints not enforced",
+      "date": "2026-04-16",
+      "categories": [
+        "frontend",
+        "ui-constraints",
+        "accessibility",
+        "form-validation"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "low"
     }
   ],
   "categoryIndex": {
@@ -6894,7 +6909,8 @@
       "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md",
       "2026-04-13-iss-236-frontend-email-invitations-management-page.md",
       "2026-04-13-iss-239-frontend-test-suite-for-email-invitation-component.md",
-      "2026-04-14-iss-242-email-invitations-pagination-field-name-mismatch-p.md"
+      "2026-04-14-iss-242-email-invitations-pagination-field-name-mismatch-p.md",
+      "2026-04-16-iss-254-matrix-dynamic-minmax-row-count-constraints-not-en.md"
     ],
     "vitest": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
@@ -7057,6 +7073,15 @@
     ],
     "matrix-questions": [
       "2026-04-16-iss-252-backend-typeerror-unhashable-dict-in-relevance-cac.md"
+    ],
+    "ui-constraints": [
+      "2026-04-16-iss-254-matrix-dynamic-minmax-row-count-constraints-not-en.md"
+    ],
+    "accessibility": [
+      "2026-04-16-iss-254-matrix-dynamic-minmax-row-count-constraints-not-en.md"
+    ],
+    "form-validation": [
+      "2026-04-16-iss-254-matrix-dynamic-minmax-row-count-constraints-not-en.md"
     ]
   },
   "fileIndex": {

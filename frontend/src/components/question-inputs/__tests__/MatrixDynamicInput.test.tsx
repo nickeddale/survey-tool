@@ -182,28 +182,41 @@ describe('MatrixDynamicInput — Add Row', () => {
     expect(onChange).toHaveBeenCalledWith([{}, {}])
   })
 
-  it('hides Add Row button when max_row_count is reached', () => {
+  it('disables Add Row button when max_row_count is reached', () => {
     const question = makeQuestion({
       settings: makeSettings({ max_row_count: 2 }),
     })
     render(<MatrixDynamicInput value={[{}, {}]} onChange={vi.fn()} question={question} />)
-    expect(screen.queryByTestId('matrix-dynamic-add-row')).not.toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dynamic-add-row')).toBeDisabled()
   })
 
-  it('shows Add Row button when below max_row_count', () => {
+  it('does not call onChange when Add Row is clicked while disabled', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    const question = makeQuestion({
+      settings: makeSettings({ max_row_count: 2 }),
+    })
+    render(<MatrixDynamicInput value={[{}, {}]} onChange={onChange} question={question} />)
+    await act(async () => {
+      await user.click(screen.getByTestId('matrix-dynamic-add-row'))
+    })
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
+  it('enables Add Row button when below max_row_count', () => {
     const question = makeQuestion({
       settings: makeSettings({ max_row_count: 3 }),
     })
     render(<MatrixDynamicInput value={[{}, {}]} onChange={vi.fn()} question={question} />)
-    expect(screen.getByTestId('matrix-dynamic-add-row')).toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dynamic-add-row')).not.toBeDisabled()
   })
 
-  it('shows Add Row button when max_row_count is null (unlimited)', () => {
+  it('enables Add Row button when max_row_count is null (unlimited)', () => {
     const question = makeQuestion({
       settings: makeSettings({ max_row_count: null }),
     })
     render(<MatrixDynamicInput value={[{}, {}]} onChange={vi.fn()} question={question} />)
-    expect(screen.getByTestId('matrix-dynamic-add-row')).toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dynamic-add-row')).not.toBeDisabled()
   })
 })
 
@@ -232,28 +245,41 @@ describe('MatrixDynamicInput — Remove Row', () => {
     expect(onChange).toHaveBeenCalledWith([{ col1: 'Bob' }])
   })
 
-  it('hides Remove button when at min_row_count', () => {
+  it('disables Remove button when at min_row_count', () => {
     const question = makeQuestion({
       settings: makeSettings({ min_row_count: 1 }),
     })
     render(<MatrixDynamicInput value={[{}]} onChange={vi.fn()} question={question} />)
-    expect(screen.queryByTestId('matrix-dynamic-remove-0')).not.toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dynamic-remove-0')).toBeDisabled()
   })
 
-  it('shows Remove button when above min_row_count', () => {
+  it('does not call onChange when Remove is clicked while disabled', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    const question = makeQuestion({
+      settings: makeSettings({ min_row_count: 1 }),
+    })
+    render(<MatrixDynamicInput value={[{}]} onChange={onChange} question={question} />)
+    await act(async () => {
+      await user.click(screen.getByTestId('matrix-dynamic-remove-0'))
+    })
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
+  it('enables Remove button when above min_row_count', () => {
     const question = makeQuestion({
       settings: makeSettings({ min_row_count: 1 }),
     })
     render(<MatrixDynamicInput value={[{}, {}]} onChange={vi.fn()} question={question} />)
-    expect(screen.getByTestId('matrix-dynamic-remove-0')).toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dynamic-remove-0')).not.toBeDisabled()
   })
 
-  it('shows Remove button when min_row_count is 0 and rows > 0', () => {
+  it('enables Remove button when min_row_count is 0 and rows > 0', () => {
     const question = makeQuestion({
       settings: makeSettings({ min_row_count: 0 }),
     })
     render(<MatrixDynamicInput value={[{}]} onChange={vi.fn()} question={question} />)
-    expect(screen.getByTestId('matrix-dynamic-remove-0')).toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dynamic-remove-0')).not.toBeDisabled()
   })
 
   it('hides Remove button when row_count=0 and value is empty (no rows rendered)', () => {
