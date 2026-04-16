@@ -11,8 +11,9 @@
  */
 
 import { useState, useMemo } from 'react'
+import { Star, Heart, ThumbsUp, Smile } from 'lucide-react'
 import type { BuilderQuestion } from '../../store/builderStore'
-import type { MatrixDropdownSettings } from '../../types/questionSettings'
+import type { MatrixDropdownSettings, RatingSettings } from '../../types/questionSettings'
 import { ValidationErrors } from '../common/ValidationErrors'
 
 // ---------------------------------------------------------------------------
@@ -57,13 +58,93 @@ function getSessionSeed(questionId: string): number {
 }
 
 // ---------------------------------------------------------------------------
+// Rating cell helpers
+// ---------------------------------------------------------------------------
+
+type IconName = RatingSettings['icon']
+
+function RatingIcon({ icon, filled }: { icon: IconName; filled: boolean }) {
+  const className = filled ? 'fill-current text-yellow-500' : 'text-muted-foreground'
+  const props = { size: 18, className }
+  switch (icon) {
+    case 'heart':
+      return <Heart {...props} />
+    case 'thumb':
+      return <ThumbsUp {...props} />
+    case 'smiley':
+      return <Smile {...props} />
+    case 'star':
+    default:
+      return <Star {...props} />
+  }
+}
+
+interface RatingCellProps {
+  sqCode: string
+  value: string
+  onChange: (sqCode: string, rating: string) => void
+  ratingMin: number
+  ratingMax: number
+  ratingStep: number
+  icon: IconName
+}
+
+function RatingCell({
+  sqCode,
+  value,
+  onChange,
+  ratingMin,
+  ratingMax,
+  ratingStep,
+  icon,
+}: RatingCellProps) {
+  const [hoverValue, setHoverValue] = useState<number | null>(null)
+  const numericValue = value !== '' ? parseFloat(value) : null
+
+  const ratingValues: number[] = []
+  for (let v = ratingMin; v <= ratingMax; v += ratingStep) {
+    ratingValues.push(v)
+  }
+
+  return (
+    <div
+      className="flex items-center gap-0.5"
+      role="radiogroup"
+      data-testid={`matrix-dropdown-rating-${sqCode}`}
+    >
+      {ratingValues.map((rating) => {
+        const activeValue = hoverValue ?? numericValue
+        const isFilled = activeValue !== null && rating <= activeValue
+        return (
+          <button
+            key={rating}
+            type="button"
+            role="radio"
+            aria-checked={numericValue === rating}
+            aria-label={`Rate ${rating}`}
+            onClick={() => onChange(sqCode, String(rating))}
+            onMouseEnter={() => setHoverValue(rating)}
+            onMouseLeave={() => setHoverValue(null)}
+            className="cursor-pointer p-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+            data-testid={`matrix-dropdown-rating-${sqCode}-${rating}`}
+            data-filled={isFilled}
+          >
+            <RatingIcon icon={icon} filled={isFilled} />
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Validation helpers
 // ---------------------------------------------------------------------------
 
 function validate(
   value: Record<string, string>,
   subquestionCodes: string[],
-  isAllRowsRequired: boolean,
+  isAllRowsRequired: boolean
 ): string[] {
   const errs: string[] = []
   if (isAllRowsRequired) {
@@ -79,11 +160,22 @@ function validate(
 // Component
 // ---------------------------------------------------------------------------
 
-export function MatrixDropdownInput({ value, onChange, question, errors: externalErrors }: MatrixDropdownInputProps) {
+export function MatrixDropdownInput({
+  value,
+  onChange,
+  question,
+  errors: externalErrors,
+}: MatrixDropdownInputProps) {
   const s = (question.settings ?? {}) as Partial<MatrixDropdownSettings>
   const alternateRows = s.alternate_rows ?? true
   const isAllRowsRequired = s.is_all_rows_required ?? false
   const randomizeRows = s.randomize_rows ?? false
+  const columnTypes = s.column_types ?? {}
+
+  function getCellType(columnCode: string): 'dropdown' | 'rating' {
+    const colType = columnTypes[columnCode]
+    return colType === 'rating' ? 'rating' : 'dropdown'
+  }
 
   const [touched, setTouched] = useState(false)
   const [internalErrors, setInternalErrors] = useState<string[]>([])
@@ -143,19 +235,31 @@ export function MatrixDropdownInput({ value, onChange, question, errors: externa
                 >
                   <td className="px-3 py-2 font-medium">{sq.title}</td>
                   <td className="px-3 py-2" data-testid={`matrix-dropdown-cell-${sq.code}`}>
-                    <select
-                      value={value[sq.code] ?? ''}
-                      onChange={(e) => handleCellChange(sq.code, e.target.value)}
-                      className="rounded-md border border-input bg-background px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                      data-testid={`matrix-dropdown-select-${sq.code}`}
-                    >
-                      <option value="">— Select —</option>
-                      {question.answer_options.map((option) => (
-                        <option key={option.id} value={option.code}>
-                          {option.title}
-                        </option>
-                      ))}
-                    </select>
+                    {getCellType(sq.code) === 'rating' ? (
+                      <RatingCell
+                        sqCode={sq.code}
+                        value={value[sq.code] ?? ''}
+                        onChange={handleCellChange}
+                        ratingMin={1}
+                        ratingMax={5}
+                        ratingStep={1}
+                        icon="star"
+                      />
+                    ) : (
+                      <select
+                        value={value[sq.code] ?? ''}
+                        onChange={(e) => handleCellChange(sq.code, e.target.value)}
+                        className="rounded-md border border-input bg-background px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                        data-testid={`matrix-dropdown-select-${sq.code}`}
+                      >
+                        <option value="">— Select —</option>
+                        {question.answer_options.map((option) => (
+                          <option key={option.id} value={option.code}>
+                            {option.title}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                   </td>
                 </tr>
               )

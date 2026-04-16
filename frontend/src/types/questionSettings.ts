@@ -83,6 +83,7 @@ export interface MatrixDropdownSettings {
   is_all_rows_required: boolean
   randomize_rows: boolean
   cell_type: 'dropdown' | 'text' | 'checkbox' | 'radio'
+  column_types?: Record<string, 'dropdown' | 'rating' | 'text' | 'number' | 'checkbox' | 'radio'>
 }
 
 export interface MatrixDynamicSettings {
@@ -185,11 +186,26 @@ export function getDefaultSettings(type: string): QuestionSettings {
     case 'long_text':
       return { placeholder: null, max_length: 5000, rows: 4 } satisfies LongTextSettings
     case 'huge_text':
-      return { placeholder: null, max_length: 50000, rows: 10, rich_text: false } satisfies HugeTextSettings
+      return {
+        placeholder: null,
+        max_length: 50000,
+        rows: 10,
+        rich_text: false,
+      } satisfies HugeTextSettings
     case 'single_choice':
-      return { has_other: false, other_text: 'Other', randomize: false, columns: 1 } satisfies RadioSettings
+      return {
+        has_other: false,
+        other_text: 'Other',
+        randomize: false,
+        columns: 1,
+      } satisfies RadioSettings
     case 'dropdown':
-      return { placeholder: 'Select an option', searchable: false, has_other: false, other_text: 'Other' } satisfies DropdownSettings
+      return {
+        placeholder: 'Select an option',
+        searchable: false,
+        has_other: false,
+        other_text: 'Other',
+      } satisfies DropdownSettings
     case 'multiple_choice':
       return {
         min_choices: null,
@@ -213,7 +229,11 @@ export function getDefaultSettings(type: string): QuestionSettings {
         show_labels: true,
       } satisfies ImagePickerSettings
     case 'matrix':
-      return { alternate_rows: true, is_all_rows_required: false, randomize_rows: false } satisfies MatrixSettings
+      return {
+        alternate_rows: true,
+        is_all_rows_required: false,
+        randomize_rows: false,
+      } satisfies MatrixSettings
     case 'matrix_dropdown':
       return {
         alternate_rows: true,
@@ -289,7 +309,7 @@ export function getDefaultSettings(type: string): QuestionSettings {
 export function getCompatibleSettings(
   oldType: string,
   newType: string,
-  oldSettings: Record<string, unknown> | null,
+  oldSettings: Record<string, unknown> | null
 ): Record<string, unknown> {
   const defaults = getDefaultSettings(newType) as unknown as Record<string, unknown>
   if (!oldSettings) return defaults
@@ -321,7 +341,8 @@ export function getCompatibleSettings(
   const matrixTypes = new Set(['matrix', 'matrix_dropdown', 'matrix_dynamic'])
   if (matrixTypes.has(oldType) && matrixTypes.has(newType)) {
     if ('alternate_rows' in oldSettings) merged['alternate_rows'] = oldSettings['alternate_rows']
-    if ('is_all_rows_required' in oldSettings) merged['is_all_rows_required'] = oldSettings['is_all_rows_required']
+    if ('is_all_rows_required' in oldSettings)
+      merged['is_all_rows_required'] = oldSettings['is_all_rows_required']
     if ('randomize_rows' in oldSettings) merged['randomize_rows'] = oldSettings['randomize_rows']
     if ('cell_type' in oldSettings) merged['cell_type'] = oldSettings['cell_type']
   }

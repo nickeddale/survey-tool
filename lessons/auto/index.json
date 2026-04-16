@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-11T12:24:12.789Z",
+  "lastUpdated": "2026-04-16T08:54:32.409Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4400,6 +4400,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md",
+      "ticketId": "ISS-257",
+      "title": "Matrix Dropdown: rating column_type renders as dropdown instead of rating widget",
+      "date": "2026-04-16",
+      "categories": [
+        "frontend",
+        "react",
+        "component-composition",
+        "matrix-questions",
+        "rating"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "low"
     }
   ],
   "categoryIndex": {
@@ -6315,7 +6331,8 @@
       "2026-04-09-iss-195-add-builder-button-to-survey-detail-page.md",
       "2026-04-09-iss-204-questions-with-relevance-flash-visible-before-init.md",
       "2026-04-09-iss-200-test-expression-evaluator-always-returns-true-rega.md",
-      "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md"
+      "2026-04-10-iss-207-piping-answer-substitution-not-working-in-public-s.md",
+      "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md"
     ],
     "vitest": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
@@ -6357,7 +6374,8 @@
       "2026-04-03-iss-095-613-frontend-response-export-ui-and-statistics-das.md",
       "2026-04-03-iss-105-710-frontend-quota-management-ui.md",
       "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md",
-      "2026-04-04-iss-104-79-frontend-participant-management-ui.md"
+      "2026-04-04-iss-104-79-frontend-participant-management-ui.md",
+      "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md"
     ],
     "expression-builder": [
       "2026-04-03-iss-080-510-frontend-relevance-expression-builder-ui.md"
@@ -6450,6 +6468,15 @@
     ],
     "asgi": [
       "2026-04-11-iss-222-no-request-body-size-limit-large-payload-dos.md"
+    ],
+    "component-composition": [
+      "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md"
+    ],
+    "matrix-questions": [
+      "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md"
+    ],
+    "rating": [
+      "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md"
     ]
   },
   "fileIndex": {

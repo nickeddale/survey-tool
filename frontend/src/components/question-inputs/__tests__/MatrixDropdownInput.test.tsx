@@ -84,13 +84,21 @@ function makeSettings(overrides: Partial<MatrixDropdownSettings> = {}): MatrixDr
   }
 }
 
+function makeRatingSettings(
+  columnTypes: Record<string, 'dropdown' | 'rating'>
+): MatrixDropdownSettings {
+  return makeSettings({ column_types: columnTypes })
+}
+
 // ---------------------------------------------------------------------------
 // Rendering
 // ---------------------------------------------------------------------------
 
 describe('MatrixDropdownInput — rendering', () => {
   it('renders container with question id in testid', () => {
-    render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={makeQuestion({ id: 'q-abc' })} />)
+    render(
+      <MatrixDropdownInput value={{}} onChange={vi.fn()} question={makeQuestion({ id: 'q-abc' })} />
+    )
     expect(screen.getByTestId('matrix-dropdown-input-q-abc')).toBeInTheDocument()
   })
 
@@ -153,7 +161,9 @@ describe('MatrixDropdownInput — rendering', () => {
 
   it('has an overflow-x-auto scroll container', () => {
     const question = makeQuestion()
-    const { container } = render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} />)
+    const { container } = render(
+      <MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} />
+    )
     expect(container.querySelector('.overflow-x-auto')).toBeInTheDocument()
   })
 })
@@ -304,7 +314,13 @@ describe('MatrixDropdownInput — is_all_rows_required validation', () => {
       settings: makeSettings({ is_all_rows_required: true }),
       subquestions,
     })
-    render(<MatrixDropdownInput value={{ SQ001: 'A1', SQ002: 'A2' }} onChange={vi.fn()} question={question} />)
+    render(
+      <MatrixDropdownInput
+        value={{ SQ001: 'A1', SQ002: 'A2' }}
+        onChange={vi.fn()}
+        question={question}
+      />
+    )
 
     fireEvent.blur(screen.getByTestId('matrix-dropdown-input-q-mdd-1'))
 
@@ -320,9 +336,125 @@ describe('MatrixDropdownInput — external errors prop', () => {
   it('displays external errors immediately without blur', () => {
     const question = makeQuestion()
     render(
-      <MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} errors={['Server error']} />
+      <MatrixDropdownInput
+        value={{}}
+        onChange={vi.fn()}
+        question={question}
+        errors={['Server error']}
+      />
     )
     expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Rating column_type
+// ---------------------------------------------------------------------------
+
+describe('MatrixDropdownInput — rating column_type', () => {
+  it('renders rating widget instead of select when column_types sets rating for that column', () => {
+    const subquestions = [makeSubquestion({ id: 'sq-1', code: 'SQ001', title: 'Row 1' })]
+    const question = makeQuestion({
+      settings: makeRatingSettings({ SQ001: 'rating' }),
+      subquestions,
+    })
+    render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} />)
+
+    expect(screen.queryByTestId('matrix-dropdown-select-SQ001')).not.toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dropdown-rating-SQ001')).toBeInTheDocument()
+  })
+
+  it('renders 5 rating buttons by default for a rating column', () => {
+    const subquestions = [makeSubquestion({ code: 'SQ001' })]
+    const question = makeQuestion({
+      settings: makeRatingSettings({ SQ001: 'rating' }),
+      subquestions,
+    })
+    render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} />)
+
+    for (let i = 1; i <= 5; i++) {
+      expect(screen.getByTestId(`matrix-dropdown-rating-SQ001-${i}`)).toBeInTheDocument()
+    }
+  })
+
+  it('calls onChange with numeric rating string when rating button is clicked', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    const subquestions = [makeSubquestion({ code: 'SQ001' })]
+    const question = makeQuestion({
+      settings: makeRatingSettings({ SQ001: 'rating' }),
+      subquestions,
+    })
+    render(<MatrixDropdownInput value={{}} onChange={onChange} question={question} />)
+
+    await act(async () => {
+      await user.click(screen.getByTestId('matrix-dropdown-rating-SQ001-3'))
+    })
+
+    expect(onChange).toHaveBeenCalledWith({ SQ001: '3' })
+  })
+
+  it('reflects selected rating value via data-filled attribute', () => {
+    const subquestions = [makeSubquestion({ code: 'SQ001' })]
+    const question = makeQuestion({
+      settings: makeRatingSettings({ SQ001: 'rating' }),
+      subquestions,
+    })
+    render(<MatrixDropdownInput value={{ SQ001: '3' }} onChange={vi.fn()} question={question} />)
+
+    expect(screen.getByTestId('matrix-dropdown-rating-SQ001-1')).toHaveAttribute(
+      'data-filled',
+      'true'
+    )
+    expect(screen.getByTestId('matrix-dropdown-rating-SQ001-3')).toHaveAttribute(
+      'data-filled',
+      'true'
+    )
+    expect(screen.getByTestId('matrix-dropdown-rating-SQ001-4')).toHaveAttribute(
+      'data-filled',
+      'false'
+    )
+  })
+
+  it('renders dropdown for non-rating columns and rating for rating columns in the same question', () => {
+    const subquestions = [
+      makeSubquestion({ id: 'sq-1', code: 'SQ001', title: 'Row 1' }),
+      makeSubquestion({ id: 'sq-2', code: 'SQ002', title: 'Row 2' }),
+    ]
+    const options = [makeOption({ id: 'opt-1', code: 'A1', title: 'Option 1' })]
+    const question = makeQuestion({
+      settings: makeRatingSettings({ SQ001: 'rating', SQ002: 'dropdown' }),
+      subquestions,
+      answer_options: options,
+    })
+    render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} />)
+
+    expect(screen.getByTestId('matrix-dropdown-rating-SQ001')).toBeInTheDocument()
+    expect(screen.queryByTestId('matrix-dropdown-select-SQ001')).not.toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dropdown-select-SQ002')).toBeInTheDocument()
+    expect(screen.queryByTestId('matrix-dropdown-rating-SQ002')).not.toBeInTheDocument()
+  })
+
+  it('preserves existing dropdown selections when a rating column is answered', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    const subquestions = [
+      makeSubquestion({ id: 'sq-1', code: 'SQ001' }),
+      makeSubquestion({ id: 'sq-2', code: 'SQ002' }),
+    ]
+    const options = [makeOption({ code: 'A1', title: 'Yes' })]
+    const question = makeQuestion({
+      settings: makeRatingSettings({ SQ001: 'rating' }),
+      subquestions,
+      answer_options: options,
+    })
+    render(<MatrixDropdownInput value={{ SQ002: 'A1' }} onChange={onChange} question={question} />)
+
+    await act(async () => {
+      await user.click(screen.getByTestId('matrix-dropdown-rating-SQ001-4'))
+    })
+
+    expect(onChange).toHaveBeenCalledWith({ SQ001: '4', SQ002: 'A1' })
   })
 })
 
@@ -339,13 +471,27 @@ describe('MatrixDropdownInput — accessibility', () => {
 
   it('sets aria-invalid=true when errors present', () => {
     const question = makeQuestion()
-    render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} errors={['Required']} />)
+    render(
+      <MatrixDropdownInput
+        value={{}}
+        onChange={vi.fn()}
+        question={question}
+        errors={['Required']}
+      />
+    )
     expect(screen.getByRole('table')).toHaveAttribute('aria-invalid', 'true')
   })
 
   it('sets aria-describedby pointing to error container when errors present', () => {
     const question = makeQuestion({ id: 'q-test' })
-    render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} errors={['Required']} />)
+    render(
+      <MatrixDropdownInput
+        value={{}}
+        onChange={vi.fn()}
+        question={question}
+        errors={['Required']}
+      />
+    )
     const table = screen.getByRole('table')
     expect(table).toHaveAttribute('aria-describedby', 'question-q-test-error')
     expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')
@@ -353,7 +499,9 @@ describe('MatrixDropdownInput — accessibility', () => {
 
   it('error list has role=alert and aria-live=assertive', () => {
     const question = makeQuestion()
-    render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} errors={['Error']} />)
+    render(
+      <MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} errors={['Error']} />
+    )
     const errorList = screen.getByTestId('validation-errors')
     expect(errorList).toHaveAttribute('role', 'alert')
     expect(errorList).toHaveAttribute('aria-live', 'assertive')
