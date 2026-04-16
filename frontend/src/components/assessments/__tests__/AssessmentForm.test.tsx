@@ -43,6 +43,7 @@ const mockExistingAssessment: AssessmentResponse = {
   scope: 'total',
   group_id: null,
   question_id: null,
+  subquestion_id: null,
   min_score: 8,
   max_score: 10,
   message: 'You are very satisfied!',
@@ -57,6 +58,7 @@ const mockGroupAssessment: AssessmentResponse = {
   scope: 'group',
   group_id: 'g1',
   question_id: null,
+  subquestion_id: null,
   min_score: 0,
   max_score: 3,
   message: 'Needs improvement.',
@@ -108,9 +110,101 @@ const mockQuestionAssessment: AssessmentResponse = {
   scope: 'question',
   group_id: null,
   question_id: 'q1',
+  subquestion_id: null,
   min_score: 0,
   max_score: 2,
   message: 'Low satisfaction on Q1.',
+  created_at: '2024-01-01T00:00:00Z',
+  updated_at: '2024-01-01T00:00:00Z',
+}
+
+// Matrix questions with subquestions for subquestion scope tests
+const mockMatrixSubquestions: QuestionResponse[] = [
+  {
+    id: 'sq1',
+    group_id: 'g1',
+    parent_id: 'mq1',
+    question_type: 'text',
+    code: 'SQ1',
+    title: 'Row 1',
+    description: null,
+    is_required: false,
+    sort_order: 1,
+    relevance: null,
+    validation: null,
+    settings: null,
+    created_at: '2024-01-01T00:00:00Z',
+    subquestions: [],
+    answer_options: [],
+  },
+  {
+    id: 'sq2',
+    group_id: 'g1',
+    parent_id: 'mq1',
+    question_type: 'text',
+    code: 'SQ2',
+    title: 'Row 2',
+    description: null,
+    is_required: false,
+    sort_order: 2,
+    relevance: null,
+    validation: null,
+    settings: null,
+    created_at: '2024-01-01T00:00:00Z',
+    subquestions: [],
+    answer_options: [],
+  },
+]
+
+const mockQuestionsWithMatrix: QuestionResponse[] = [
+  ...mockQuestions,
+  {
+    id: 'mq1',
+    group_id: 'g1',
+    parent_id: null,
+    question_type: 'matrix_single',
+    code: 'MQ1',
+    title: 'Rate our services',
+    description: null,
+    is_required: false,
+    sort_order: 3,
+    relevance: null,
+    validation: null,
+    settings: null,
+    created_at: '2024-01-01T00:00:00Z',
+    subquestions: mockMatrixSubquestions,
+    answer_options: [],
+  },
+  {
+    id: 'mq2',
+    group_id: 'g1',
+    parent_id: null,
+    question_type: 'matrix_dynamic',
+    code: 'MQ2',
+    title: 'Dynamic matrix question',
+    description: null,
+    is_required: false,
+    sort_order: 4,
+    relevance: null,
+    validation: null,
+    settings: null,
+    created_at: '2024-01-01T00:00:00Z',
+    subquestions: [],
+    answer_options: [],
+  },
+]
+
+const mockSubquestionAssessment: AssessmentResponse = {
+  id: 'assessment-4',
+  survey_id: 'survey-1',
+  name: 'Row 1 Score',
+  scope: 'subquestion',
+  group_id: null,
+  question_id: 'mq1',
+  subquestion_id: 'sq1',
+  min_score: 0,
+  max_score: 5,
+  message: 'Low score on row 1.',
   created_at: '2024-01-01T00:00:00Z',
   updated_at: '2024-01-01T00:00:00Z',
 }
@@ -789,6 +883,204 @@ describe('AssessmentForm', () => {
 
       const questionSelect = screen.getByTestId('assessment-question-select') as HTMLSelectElement
       expect(questionSelect.value).toBe('q1')
+    })
+  })
+
+  // -------------------------------------------------------------------------
+  // Subquestion scope
+  // -------------------------------------------------------------------------
+
+  describe('subquestion scope', () => {
+    it('shows matrix question selector filtered to matrix types when scope is subquestion', async () => {
+      const user = userEvent.setup()
+
+      render(
+        <AssessmentForm
+          surveyId="survey-1"
+          groups={mockGroups}
+          questions={mockQuestionsWithMatrix}
+          assessment={null}
+          onSubmit={vi.fn()}
+          onCancel={vi.fn()}
+        />
+      )
+
+      await act(async () => {
+        await user.selectOptions(screen.getByTestId('assessment-scope-select'), 'subquestion')
+      })
+
+      const matrixSelect = screen.getByTestId('assessment-matrix-question-select')
+      expect(matrixSelect).toBeInTheDocument()
+      // matrix_single question should appear
+      expect(screen.getByText('MQ1: Rate our services')).toBeInTheDocument()
+      // non-matrix questions should not appear in the matrix selector
+      expect(screen.queryByText('Q1: How satisfied are you?')).not.toBeInTheDocument()
+      // matrix_dynamic should not appear (excluded)
+      expect(screen.queryByText('MQ2: Dynamic matrix question')).not.toBeInTheDocument()
+    })
+
+    it('shows subquestion selector when a matrix question is selected', async () => {
+      const user = userEvent.setup()
+
+      render(
+        <AssessmentForm
+          surveyId="survey-1"
+          groups={mockGroups}
+          questions={mockQuestionsWithMatrix}
+          assessment={null}
+          onSubmit={vi.fn()}
+          onCancel={vi.fn()}
+        />
+      )
+
+      await act(async () => {
+        await user.selectOptions(screen.getByTestId('assessment-scope-select'), 'subquestion')
+      })
+
+      await act(async () => {
+        await user.selectOptions(screen.getByTestId('assessment-matrix-question-select'), 'mq1')
+      })
+
+      const subquestionSelect = screen.getByTestId('assessment-subquestion-select')
+      expect(subquestionSelect).toBeInTheDocument()
+      expect(screen.getByText('SQ1: Row 1')).toBeInTheDocument()
+      expect(screen.getByText('SQ2: Row 2')).toBeInTheDocument()
+    })
+
+    it('submits correct subquestion_id payload when scope is subquestion', async () => {
+      const user = userEvent.setup()
+      const onSubmit = vi.fn().mockResolvedValue(undefined)
+
+      render(
+        <AssessmentForm
+          surveyId="survey-1"
+          groups={mockGroups}
+          questions={mockQuestionsWithMatrix}
+          assessment={null}
+          onSubmit={onSubmit}
+          onCancel={vi.fn()}
+        />
+      )
+
+      await act(async () => {
+        await user.type(screen.getByTestId('assessment-name-input'), 'Subquestion Assessment')
+        await user.selectOptions(screen.getByTestId('assessment-scope-select'), 'subquestion')
+      })
+
+      await act(async () => {
+        await user.selectOptions(screen.getByTestId('assessment-matrix-question-select'), 'mq1')
+      })
+
+      await act(async () => {
+        await user.selectOptions(screen.getByTestId('assessment-subquestion-select'), 'sq1')
+        await user.type(screen.getByTestId('assessment-min-score-input'), '0')
+        await user.type(screen.getByTestId('assessment-max-score-input'), '5')
+        await user.type(screen.getByTestId('assessment-message-input'), 'Low row score')
+      })
+
+      await act(async () => {
+        await user.click(screen.getByTestId('assessment-form-submit'))
+      })
+
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining<Partial<AssessmentCreate>>({
+          scope: 'subquestion',
+          question_id: 'mq1',
+          subquestion_id: 'sq1',
+        })
+      )
+    })
+
+    it('shows error when scope is subquestion but no subquestion is selected', async () => {
+      const user = userEvent.setup()
+      const onSubmit = vi.fn()
+
+      render(
+        <AssessmentForm
+          surveyId="survey-1"
+          groups={mockGroups}
+          questions={mockQuestionsWithMatrix}
+          assessment={null}
+          onSubmit={onSubmit}
+          onCancel={vi.fn()}
+        />
+      )
+
+      await act(async () => {
+        await user.type(screen.getByTestId('assessment-name-input'), 'Test')
+        await user.selectOptions(screen.getByTestId('assessment-scope-select'), 'subquestion')
+      })
+
+      await act(async () => {
+        await user.selectOptions(screen.getByTestId('assessment-matrix-question-select'), 'mq1')
+        await user.type(screen.getByTestId('assessment-min-score-input'), '0')
+        await user.type(screen.getByTestId('assessment-max-score-input'), '5')
+        await user.type(screen.getByTestId('assessment-message-input'), 'Test message')
+        await user.click(screen.getByTestId('assessment-form-submit'))
+      })
+
+      expect(screen.getByTestId('assessment-form-error')).toBeInTheDocument()
+      expect(screen.getByTestId('assessment-form-error').textContent).toMatch(
+        /subquestion is required/i
+      )
+      expect(onSubmit).not.toHaveBeenCalled()
+    })
+
+    it('pre-fills matrix question and subquestion when editing a subquestion-scoped assessment', () => {
+      render(
+        <AssessmentForm
+          surveyId="survey-1"
+          groups={mockGroups}
+          questions={mockQuestionsWithMatrix}
+          assessment={mockSubquestionAssessment}
+          onSubmit={vi.fn()}
+          onCancel={vi.fn()}
+        />
+      )
+
+      const matrixSelect = screen.getByTestId(
+        'assessment-matrix-question-select'
+      ) as HTMLSelectElement
+      expect(matrixSelect.value).toBe('mq1')
+
+      const subquestionSelect = screen.getByTestId(
+        'assessment-subquestion-select'
+      ) as HTMLSelectElement
+      expect(subquestionSelect.value).toBe('sq1')
+    })
+
+    it('clears subquestionId when scope changes away from subquestion', async () => {
+      const user = userEvent.setup()
+
+      render(
+        <AssessmentForm
+          surveyId="survey-1"
+          groups={mockGroups}
+          questions={mockQuestionsWithMatrix}
+          assessment={null}
+          onSubmit={vi.fn()}
+          onCancel={vi.fn()}
+        />
+      )
+
+      await act(async () => {
+        await user.selectOptions(screen.getByTestId('assessment-scope-select'), 'subquestion')
+      })
+      await act(async () => {
+        await user.selectOptions(screen.getByTestId('assessment-matrix-question-select'), 'mq1')
+      })
+      await act(async () => {
+        await user.selectOptions(screen.getByTestId('assessment-subquestion-select'), 'sq1')
+      })
+
+      // Switch away from subquestion scope
+      await act(async () => {
+        await user.selectOptions(screen.getByTestId('assessment-scope-select'), 'total')
+      })
+
+      // Subquestion selector should no longer be present
+      expect(screen.queryByTestId('assessment-matrix-question-select')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('assessment-subquestion-select')).not.toBeInTheDocument()
     })
   })
 })
