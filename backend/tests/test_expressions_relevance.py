@@ -709,3 +709,76 @@ def test_yes_no_string_true_does_not_match_bool_literal_false():
 
     assert q_target.id in result.hidden_question_ids
     assert q_target.id not in result.visible_question_ids
+
+
+# ---------------------------------------------------------------------------
+# ISS-252: matrix answer dict values must not cause TypeError in cache key
+# ---------------------------------------------------------------------------
+
+
+def test_matrix_answer_dict_does_not_raise_type_error():
+    """Matrix answers are dicts (e.g. {'SQ001': 'A1', 'SQ002': 'A2'}).
+    The cache key must handle dict values without raising TypeError."""
+    clear_relevance_cache()
+
+    q = _make_question("Q1", relevance=None)
+    g = _make_group([q], relevance=None)
+    survey = _make_survey([g])
+
+    matrix_answers = {"Q1": {"SQ001": "A1", "SQ002": "A2"}}
+
+    # Must not raise TypeError: unhashable type: 'dict'
+    result = evaluate_relevance(survey, answers=matrix_answers)
+
+    assert q.id in result.visible_question_ids
+
+
+def test_matrix_answer_dict_cache_hit():
+    """Identical matrix answer dicts produce a cache hit (same result object)."""
+    clear_relevance_cache()
+
+    q = _make_question("Q1", relevance=None)
+    g = _make_group([q], relevance=None)
+    sid = uuid.uuid4()
+    survey = _make_survey([g], sid=sid)
+
+    matrix_answers = {"Q1": {"SQ001": "A1", "SQ002": "A2"}}
+
+    result1 = evaluate_relevance(survey, answers=matrix_answers)
+    result2 = evaluate_relevance(survey, answers=matrix_answers)
+
+    assert result1 is result2
+
+
+def test_matrix_answer_dict_different_values_different_results():
+    """Different matrix answer dicts produce different cache entries."""
+    clear_relevance_cache()
+
+    q = _make_question("Q1", relevance=None)
+    g = _make_group([q], relevance=None)
+    sid = uuid.uuid4()
+    survey = _make_survey([g], sid=sid)
+
+    result1 = evaluate_relevance(survey, answers={"Q1": {"SQ001": "A1"}})
+    result2 = evaluate_relevance(survey, answers={"Q1": {"SQ001": "A2"}})
+
+    assert result1 is not result2
+
+
+def test_mixed_answer_types_no_error():
+    """A mix of scalar, list, and dict answer values all hash without error."""
+    clear_relevance_cache()
+
+    q = _make_question("Q1", relevance=None)
+    g = _make_group([q], relevance=None)
+    survey = _make_survey([g])
+
+    mixed_answers = {
+        "Q1": "scalar",
+        "Q2": ["choice1", "choice2"],
+        "Q3": {"SQ001": "A1", "SQ002": "A2"},
+    }
+
+    # Must not raise
+    result = evaluate_relevance(survey, answers=mixed_answers)
+    assert q.id in result.visible_question_ids
