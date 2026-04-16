@@ -371,9 +371,9 @@ describe('MatrixPreview', () => {
     const question = makeQuestion({
       question_type: 'matrix_dynamic',
       settings: {
-        row_count: 2,
-        min_row_count: 0,
-        max_row_count: null,
+        default_row_count: 2,
+        min_rows: 0,
+        max_rows: null,
         add_row_text: 'Add row',
         remove_row_text: 'Remove',
         cell_type: 'text',

@@ -4,9 +4,9 @@
  * Renders an HTML table with answer_options as column headers and
  * user-added rows (not from subquestions). Each cell is a text input.
  * Supports:
- * - row_count: initial number of rows
- * - min_row_count: disable Remove button when at minimum
- * - max_row_count: disable Add button when at maximum (null = unlimited)
+ * - default_row_count: initial number of rows
+ * - min_rows: disable Remove button when at minimum
+ * - max_rows: disable Add button when at maximum (null = unlimited)
  * - add_row_text: label for the Add Row button
  * - remove_row_text: label for the Remove Row button
  *
@@ -40,9 +40,9 @@ export function MatrixDynamicInput({
   errors: externalErrors,
 }: MatrixDynamicInputProps) {
   const s = (question.settings ?? {}) as Partial<MatrixDynamicSettings>
-  const rowCount = s.row_count ?? 1
-  const minRowCount = s.min_row_count ?? 0
-  const maxRowCount = s.max_row_count ?? null
+  const rowCount = s.default_row_count ?? 1
+  const minRowCount = s.min_rows ?? 0
+  const maxRowCount = s.max_rows ?? null
   const addRowText = s.add_row_text ?? 'Add row'
   const removeRowText = s.remove_row_text ?? 'Remove'
 

@@ -1,8 +1,8 @@
 /**
  * Tests for MatrixDynamicInput component.
  *
- * Covers: initial rows from row_count, column headers from answer_options,
- * Add Row button (respects max_row_count), Remove Row button (respects min_row_count),
+ * Covers: initial rows from default_row_count, column headers from answer_options,
+ * Add Row button (respects max_rows), Remove Row button (respects min_rows),
  * cell value changes update values array, external errors, accessibility.
  */
 
@@ -55,9 +55,9 @@ function makeQuestion(overrides: Partial<BuilderQuestion> = {}): BuilderQuestion
 
 function makeSettings(overrides: Partial<MatrixDynamicSettings> = {}): MatrixDynamicSettings {
   return {
-    row_count: 1,
-    min_row_count: 0,
-    max_row_count: null,
+    default_row_count: 1,
+    min_rows: 0,
+    max_rows: null,
     add_row_text: 'Add row',
     remove_row_text: 'Remove',
     cell_type: 'text',
@@ -96,9 +96,9 @@ describe('MatrixDynamicInput — rendering', () => {
     expect(screen.getByTestId('matrix-dynamic-col-col2')).toHaveTextContent('Last Name')
   })
 
-  it('renders initial rows based on row_count when value is empty', () => {
+  it('renders initial rows based on default_row_count when value is empty', () => {
     const question = makeQuestion({
-      settings: makeSettings({ row_count: 3 }),
+      settings: makeSettings({ default_row_count: 3 }),
     })
     render(<MatrixDynamicInput value={[]} onChange={vi.fn()} question={question} />)
     expect(screen.getByTestId('matrix-dynamic-row-0')).toBeInTheDocument()
@@ -149,7 +149,7 @@ describe('MatrixDynamicInput — rendering', () => {
 
   it('uses custom remove_row_text for the Remove button', () => {
     const question = makeQuestion({
-      settings: makeSettings({ remove_row_text: 'Delete', min_row_count: 0 }),
+      settings: makeSettings({ remove_row_text: 'Delete', min_rows: 0 }),
     })
     render(<MatrixDynamicInput value={[{}]} onChange={vi.fn()} question={question} />)
     expect(screen.getByTestId('matrix-dynamic-remove-0')).toHaveTextContent('Delete')
@@ -182,9 +182,9 @@ describe('MatrixDynamicInput — Add Row', () => {
     expect(onChange).toHaveBeenCalledWith([{}, {}])
   })
 
-  it('disables Add Row button when max_row_count is reached', () => {
+  it('disables Add Row button when max_rows is reached', () => {
     const question = makeQuestion({
-      settings: makeSettings({ max_row_count: 2 }),
+      settings: makeSettings({ max_rows: 2 }),
     })
     render(<MatrixDynamicInput value={[{}, {}]} onChange={vi.fn()} question={question} />)
     expect(screen.getByTestId('matrix-dynamic-add-row')).toBeDisabled()
@@ -194,7 +194,7 @@ describe('MatrixDynamicInput — Add Row', () => {
     const user = userEvent.setup()
     const onChange = vi.fn()
     const question = makeQuestion({
-      settings: makeSettings({ max_row_count: 2 }),
+      settings: makeSettings({ max_rows: 2 }),
     })
     render(<MatrixDynamicInput value={[{}, {}]} onChange={onChange} question={question} />)
     await act(async () => {
@@ -203,17 +203,17 @@ describe('MatrixDynamicInput — Add Row', () => {
     expect(onChange).not.toHaveBeenCalled()
   })
 
-  it('enables Add Row button when below max_row_count', () => {
+  it('enables Add Row button when below max_rows', () => {
     const question = makeQuestion({
-      settings: makeSettings({ max_row_count: 3 }),
+      settings: makeSettings({ max_rows: 3 }),
     })
     render(<MatrixDynamicInput value={[{}, {}]} onChange={vi.fn()} question={question} />)
     expect(screen.getByTestId('matrix-dynamic-add-row')).not.toBeDisabled()
   })
 
-  it('enables Add Row button when max_row_count is null (unlimited)', () => {
+  it('enables Add Row button when max_rows is null (unlimited)', () => {
     const question = makeQuestion({
-      settings: makeSettings({ max_row_count: null }),
+      settings: makeSettings({ max_rows: null }),
     })
     render(<MatrixDynamicInput value={[{}, {}]} onChange={vi.fn()} question={question} />)
     expect(screen.getByTestId('matrix-dynamic-add-row')).not.toBeDisabled()
@@ -245,9 +245,9 @@ describe('MatrixDynamicInput — Remove Row', () => {
     expect(onChange).toHaveBeenCalledWith([{ col1: 'Bob' }])
   })
 
-  it('disables Remove button when at min_row_count', () => {
+  it('disables Remove button when at min_rows', () => {
     const question = makeQuestion({
-      settings: makeSettings({ min_row_count: 1 }),
+      settings: makeSettings({ min_rows: 1 }),
     })
     render(<MatrixDynamicInput value={[{}]} onChange={vi.fn()} question={question} />)
     expect(screen.getByTestId('matrix-dynamic-remove-0')).toBeDisabled()
@@ -257,7 +257,7 @@ describe('MatrixDynamicInput — Remove Row', () => {
     const user = userEvent.setup()
     const onChange = vi.fn()
     const question = makeQuestion({
-      settings: makeSettings({ min_row_count: 1 }),
+      settings: makeSettings({ min_rows: 1 }),
     })
     render(<MatrixDynamicInput value={[{}]} onChange={onChange} question={question} />)
     await act(async () => {
@@ -266,25 +266,25 @@ describe('MatrixDynamicInput — Remove Row', () => {
     expect(onChange).not.toHaveBeenCalled()
   })
 
-  it('enables Remove button when above min_row_count', () => {
+  it('enables Remove button when above min_rows', () => {
     const question = makeQuestion({
-      settings: makeSettings({ min_row_count: 1 }),
+      settings: makeSettings({ min_rows: 1 }),
     })
     render(<MatrixDynamicInput value={[{}, {}]} onChange={vi.fn()} question={question} />)
     expect(screen.getByTestId('matrix-dynamic-remove-0')).not.toBeDisabled()
   })
 
-  it('enables Remove button when min_row_count is 0 and rows > 0', () => {
+  it('enables Remove button when min_rows is 0 and rows > 0', () => {
     const question = makeQuestion({
-      settings: makeSettings({ min_row_count: 0 }),
+      settings: makeSettings({ min_rows: 0 }),
     })
     render(<MatrixDynamicInput value={[{}]} onChange={vi.fn()} question={question} />)
     expect(screen.getByTestId('matrix-dynamic-remove-0')).not.toBeDisabled()
   })
 
-  it('hides Remove button when row_count=0 and value is empty (no rows rendered)', () => {
+  it('hides Remove button when default_row_count=0 and value is empty (no rows rendered)', () => {
     const question = makeQuestion({
-      settings: makeSettings({ row_count: 0, min_row_count: 0 }),
+      settings: makeSettings({ default_row_count: 0, min_rows: 0 }),
     })
     render(<MatrixDynamicInput value={[]} onChange={vi.fn()} question={question} />)
     // No rows, so no Remove button

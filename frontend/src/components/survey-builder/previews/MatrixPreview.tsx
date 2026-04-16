@@ -419,7 +419,7 @@ export function MatrixPreview({ question }: QuestionPreviewProps) {
   if (question_type === 'matrix_dynamic') {
     const s = (settings ?? {}) as Partial<MatrixDynamicSettings>
     const cellType = s.cell_type ?? 'text'
-    const rowCount = s.row_count ?? 1
+    const rowCount = s.default_row_count ?? 1
     const displayRows = Math.max(1, rowCount)
 
     return (

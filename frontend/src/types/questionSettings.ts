@@ -89,9 +89,9 @@ export interface MatrixDropdownSettings {
 }
 
 export interface MatrixDynamicSettings {
-  row_count: number
-  min_row_count: number
-  max_row_count: number | null
+  default_row_count: number
+  min_rows: number
+  max_rows: number | null
   add_row_text: string
   remove_row_text: string
   cell_type: 'dropdown' | 'text' | 'checkbox' | 'radio'
@@ -250,9 +250,9 @@ export function getDefaultSettings(type: string): QuestionSettings {
       } satisfies MatrixDropdownSettings
     case 'matrix_dynamic':
       return {
-        row_count: 1,
-        min_row_count: 0,
-        max_row_count: null,
+        default_row_count: 1,
+        min_rows: 0,
+        max_rows: null,
         add_row_text: 'Add row',
         remove_row_text: 'Remove',
         cell_type: 'text',

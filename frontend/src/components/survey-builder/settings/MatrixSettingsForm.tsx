@@ -169,11 +169,11 @@ export function MatrixSettingsForm({
             <input
               type="number"
               className={inputClass}
-              value={s.row_count ?? 1}
+              value={s.default_row_count ?? 1}
               min={0}
               onChange={(e) => {
                 const val = parseInt(e.target.value, 10)
-                if (!isNaN(val) && val >= 0) onChange({ row_count: val })
+                if (!isNaN(val) && val >= 0) onChange({ default_row_count: val })
               }}
               disabled={readOnly}
               data-testid="matrix-setting-row-count"
@@ -183,11 +183,11 @@ export function MatrixSettingsForm({
             <input
               type="number"
               className={inputClass}
-              value={s.min_row_count ?? 0}
+              value={s.min_rows ?? 0}
               min={0}
               onChange={(e) => {
                 const val = parseInt(e.target.value, 10)
-                if (!isNaN(val) && val >= 0) onChange({ min_row_count: val })
+                if (!isNaN(val) && val >= 0) onChange({ min_rows: val })
               }}
               disabled={readOnly}
               data-testid="matrix-setting-min-row-count"
@@ -197,12 +197,12 @@ export function MatrixSettingsForm({
             <input
               type="number"
               className={inputClass}
-              value={s.max_row_count ?? ''}
+              value={s.max_rows ?? ''}
               min={0}
               placeholder="None"
               onChange={(e) => {
                 const val = e.target.value === '' ? null : parseInt(e.target.value, 10)
-                onChange({ max_row_count: isNaN(val as number) ? null : val })
+                onChange({ max_rows: isNaN(val as number) ? null : val })
               }}
               disabled={readOnly}
               data-testid="matrix-setting-max-row-count"
