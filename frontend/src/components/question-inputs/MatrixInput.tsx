@@ -6,6 +6,7 @@
  * - alternate_rows: alternating row background colors
  * - randomize_rows: Fisher-Yates shuffle of subquestion display order
  * - is_all_rows_required: validates that every row has been answered
+ * - transpose: swap rows and columns in display
  *
  * Response format: { value: { [sqCode]: optionCode } }
  */
@@ -89,6 +90,7 @@ export function MatrixInput({
   const alternateRows = s.alternate_rows ?? true
   const isAllRowsRequired = s.is_all_rows_required ?? false
   const randomizeRows = s.randomize_rows ?? false
+  const transpose = s.transpose ?? false
 
   const [touched, setTouched] = useState(false)
   const [internalErrors, setInternalErrors] = useState<string[]>([])
@@ -117,6 +119,69 @@ export function MatrixInput({
   function handleBlur() {
     setTouched(true)
     setInternalErrors(validate(value, subquestionCodes, isAllRowsRequired))
+  }
+
+  if (transpose) {
+    // Transposed: answer options as rows, subquestions as columns
+    return (
+      <div className="space-y-2" data-testid={`matrix-input-${question.id}`} onBlur={handleBlur}>
+        <div className="overflow-x-auto">
+          <table
+            className="w-full border-collapse text-sm"
+            aria-invalid={hasErrors}
+            aria-describedby={hasErrors ? errorId : undefined}
+          >
+            <thead>
+              <tr>
+                <th className="text-left px-3 py-2 font-medium border-b border-border" />
+                {orderedSubquestions.map((sq) => (
+                  <th
+                    key={sq.id}
+                    className="text-center px-3 py-2 font-medium border-b border-border"
+                    data-testid={`matrix-col-${sq.code}`}
+                  >
+                    {sq.title}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {question.answer_options.map((option, rowIdx) => {
+                const isAltRow = alternateRows && rowIdx % 2 === 1
+                return (
+                  <tr
+                    key={option.id}
+                    className={isAltRow ? 'bg-muted/40' : ''}
+                    data-testid={`matrix-row-${option.code}`}
+                  >
+                    <td className="px-3 py-2 font-medium">{option.title}</td>
+                    {orderedSubquestions.map((sq) => (
+                      <td
+                        key={sq.id}
+                        className="text-center px-3 py-2"
+                        data-testid={`matrix-cell-${sq.code}-${option.code}`}
+                      >
+                        <input
+                          type="radio"
+                          name={`${inputId}-${sq.code}`}
+                          value={option.code}
+                          checked={value[sq.code] === option.code}
+                          onChange={() => handleCellChange(sq.code, option.code)}
+                          className="accent-primary"
+                          data-testid={`matrix-radio-${sq.code}-${option.code}`}
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        <ValidationErrors errors={displayErrors} id={errorId} />
+      </div>
+    )
   }
 
   return (

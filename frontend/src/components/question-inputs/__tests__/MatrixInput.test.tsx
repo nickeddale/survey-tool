@@ -357,6 +357,93 @@ describe('MatrixInput — external errors prop', () => {
 })
 
 // ---------------------------------------------------------------------------
+// Transpose
+// ---------------------------------------------------------------------------
+
+describe('MatrixInput — transpose', () => {
+  it('renders subquestion titles as column headers when transpose=true', () => {
+    const subquestions = [
+      makeSubquestion({ id: 'sq-1', code: 'SQ001', title: 'Price' }),
+      makeSubquestion({ id: 'sq-2', code: 'SQ002', title: 'Quality' }),
+    ]
+    const options = [
+      makeOption({ id: 'opt-1', code: 'A1', title: 'Poor' }),
+      makeOption({ id: 'opt-2', code: 'A2', title: 'Good' }),
+    ]
+    const question = makeQuestion({
+      settings: makeSettings({ transpose: true }),
+      subquestions,
+      answer_options: options,
+    })
+    render(<MatrixInput value={{}} onChange={vi.fn()} question={question} />)
+
+    expect(screen.getByTestId('matrix-col-SQ001')).toHaveTextContent('Price')
+    expect(screen.getByTestId('matrix-col-SQ002')).toHaveTextContent('Quality')
+  })
+
+  it('renders answer option titles as row labels when transpose=true', () => {
+    const subquestions = [makeSubquestion({ id: 'sq-1', code: 'SQ001', title: 'Price' })]
+    const options = [
+      makeOption({ id: 'opt-1', code: 'A1', title: 'Poor' }),
+      makeOption({ id: 'opt-2', code: 'A2', title: 'Good' }),
+    ]
+    const question = makeQuestion({
+      settings: makeSettings({ transpose: true }),
+      subquestions,
+      answer_options: options,
+    })
+    render(<MatrixInput value={{}} onChange={vi.fn()} question={question} />)
+
+    expect(screen.getByTestId('matrix-row-A1')).toBeInTheDocument()
+    expect(screen.getByTestId('matrix-row-A2')).toBeInTheDocument()
+    expect(screen.getByText('Poor')).toBeInTheDocument()
+    expect(screen.getByText('Good')).toBeInTheDocument()
+  })
+
+  it('radio buttons fire onChange with correct sqCode/optionCode in transposed layout', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    const subquestions = [makeSubquestion({ id: 'sq-1', code: 'SQ001', title: 'Price' })]
+    const options = [makeOption({ id: 'opt-1', code: 'A1', title: 'Poor' })]
+    const question = makeQuestion({
+      settings: makeSettings({ transpose: true }),
+      subquestions,
+      answer_options: options,
+    })
+    render(<MatrixInput value={{}} onChange={onChange} question={question} />)
+
+    await act(async () => {
+      await user.click(screen.getByTestId('matrix-radio-SQ001-A1'))
+    })
+
+    expect(onChange).toHaveBeenCalledWith({ SQ001: 'A1' })
+  })
+
+  it('applies alternate_rows to option rows in transposed layout', () => {
+    const subquestions = [makeSubquestion({ id: 'sq-1', code: 'SQ001', title: 'Price' })]
+    const options = [
+      makeOption({ id: 'opt-1', code: 'A1', title: 'Poor' }),
+      makeOption({ id: 'opt-2', code: 'A2', title: 'Average' }),
+      makeOption({ id: 'opt-3', code: 'A3', title: 'Good' }),
+    ]
+    const question = makeQuestion({
+      settings: makeSettings({ transpose: true, alternate_rows: true }),
+      subquestions,
+      answer_options: options,
+    })
+    render(<MatrixInput value={{}} onChange={vi.fn()} question={question} />)
+
+    const row1 = screen.getByTestId('matrix-row-A1')
+    const row2 = screen.getByTestId('matrix-row-A2')
+    const row3 = screen.getByTestId('matrix-row-A3')
+
+    expect(row1.className).not.toContain('bg-muted')
+    expect(row2.className).toContain('bg-muted')
+    expect(row3.className).not.toContain('bg-muted')
+  })
+})
+
+// ---------------------------------------------------------------------------
 // Accessibility
 // ---------------------------------------------------------------------------
 
