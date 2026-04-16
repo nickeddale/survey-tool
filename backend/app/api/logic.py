@@ -13,7 +13,7 @@ Provides:
 import uuid
 from typing import Any, Dict, List, Literal, Optional
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, Query, Request, status
 from pydantic import BaseModel
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -43,6 +43,7 @@ from app.services.expressions.flow import (
     build_ordered_pairs,
 )
 from app.services.expressions.piping import pipe_all, PipingError
+from app.services.translation_service import translate_questions_for_piping
 from app.services.expressions.resolver import _STRING_QUESTION_TYPES
 from app.services.expressions.relevance import (
     CircularRelevanceError,
@@ -440,6 +441,7 @@ async def resolve_flow_endpoint(
     request: Request,
     survey_id: str,
     payload: ResolveFlowRequest,
+    lang: Optional[str] = Query(default=None, description="Language code for translated question texts (e.g. 'fr')"),
     session: AsyncSession = Depends(get_db),
 ) -> ResolveFlowResponse:
     """Resolve the survey navigation flow for a given answer state.
@@ -587,18 +589,26 @@ async def resolve_flow_endpoint(
 
     # ------------------------------------------------------------------
     # Apply piping to all top-level questions and their answer options.
+    # When a lang is requested, apply translations to question/option text
+    # fields before piping so piped_texts reflects the requested language.
     # ------------------------------------------------------------------
     all_questions: List[Any] = []
     for group in survey.groups:
         all_questions.extend(group.questions)
 
+    questions_for_piping = (
+        translate_questions_for_piping(all_questions, lang, survey.default_language)
+        if lang is not None
+        else all_questions
+    )
+
     try:
-        piped_texts = pipe_all(all_questions, answers)
+        piped_texts = pipe_all(questions_for_piping, answers)
     except (PipingError, Exception):
         # If piping fails for any reason, fall back to unmodified question texts
         # so the survey remains usable rather than returning a 500.
         piped_texts = {}
-        for question in all_questions:
+        for question in questions_for_piping:
             if getattr(question, "parent_id", None) is not None:
                 continue
             piped_texts[f"{question.code}_title"] = question.title or ""

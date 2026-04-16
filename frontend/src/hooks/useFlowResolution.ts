@@ -61,7 +61,8 @@ export function computeInitialHiddenQuestions(questions: QuestionResponse[]): Se
 export function useFlowResolution(
   surveyId: string | undefined,
   answers: AnswerMap,
-  questions?: QuestionResponse[]
+  questions?: QuestionResponse[],
+  lang?: string,
 ): FlowResolutionState {
   const initialHidden = questions ? computeInitialHiddenQuestions(questions) : new Set<string>()
 
@@ -83,6 +84,9 @@ export function useFlowResolution(
   const surveyIdRef = useRef<string | undefined>(surveyId)
   surveyIdRef.current = surveyId
 
+  const langRef = useRef<string | undefined>(lang)
+  langRef.current = lang
+
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const isMountedRef = useRef(true)
 
@@ -98,7 +102,7 @@ export function useFlowResolution(
     }
   }, [])
 
-  // Trigger effect only when the serialized answers content or surveyId actually changes.
+  // Trigger effect only when the serialized answers content, surveyId, or lang actually changes.
   // We compute the key as a stable primitive that can safely be used as a dep.
   const answersKey = surveyId
     ? JSON.stringify(Object.entries(answers).sort(([a], [b]) => a.localeCompare(b)))
@@ -129,9 +133,11 @@ export function useFlowResolution(
           value,
         }))
 
-        const result: ResolveFlowResponse = await responseService.resolveFlow(surveyIdRef.current, {
-          answers: answerInputs,
-        })
+        const result: ResolveFlowResponse = await responseService.resolveFlow(
+          surveyIdRef.current,
+          { answers: answerInputs },
+          langRef.current,
+        )
 
         if (!isMountedRef.current) return
 
@@ -151,7 +157,8 @@ export function useFlowResolution(
         }
       }
     }, 300)
-  }, [surveyId, answersKey])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [surveyId, answersKey, lang])
   // Note: `answersKey` is derived from `answers` contents (not the reference),
   // so this effect only re-fires when the actual answer values change.
   // `setState` is stable and does NOT need to be listed as a dependency.

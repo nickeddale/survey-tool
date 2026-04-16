@@ -8,7 +8,9 @@ Provides functions to:
 - update_group_translations: fetch group, merge translations, persist, return updated model
 - update_question_translations: fetch question, merge translations, persist, return updated model
 - update_answer_option_translations: fetch option, merge translations, persist, return updated model
+- translate_questions_for_piping: return translated proxy objects suitable for pipe_all()
 """
+import types
 import uuid
 from typing import Any
 
@@ -203,6 +205,69 @@ def apply_survey_translations(
 
     result = dict(result)
     result["groups"] = translated_groups
+    return result
+
+
+def translate_questions_for_piping(
+    questions: list[Any],
+    lang: str,
+    fallback_lang: str,
+) -> list[Any]:
+    """Return translated proxy objects for a list of ORM Question instances.
+
+    Creates lightweight SimpleNamespace objects that mirror the interface
+    expected by pipe_all() (attributes: code, title, description, parent_id,
+    answer_options with code and title). The translatable text fields (title,
+    description for questions; title for answer options) are overlaid with
+    translated values for *lang* before piping.
+
+    ORM instances are never mutated.
+
+    Args:
+        questions: Flat list of Question ORM objects (may include subquestions).
+        lang: Target language code (e.g. "fr").
+        fallback_lang: Survey's default_language used as fallback (e.g. "en").
+
+    Returns:
+        A new list of SimpleNamespace objects with translated text fields,
+        suitable for passing to pipe_all().
+    """
+    result = []
+    for q in questions:
+        q_translations: dict[str, Any] = getattr(q, "translations", None) or {}
+        lang_trans = q_translations.get(lang, {})
+        fallback_trans = q_translations.get(fallback_lang, {}) if lang != fallback_lang else {}
+
+        def _get_field(field: str, default: Any) -> Any:
+            if lang_trans.get(field) is not None:
+                return lang_trans[field]
+            if fallback_trans.get(field) is not None:
+                return fallback_trans[field]
+            return default
+
+        translated_options = []
+        for opt in getattr(q, "answer_options", None) or []:
+            opt_translations: dict[str, Any] = getattr(opt, "translations", None) or {}
+            opt_lang_trans = opt_translations.get(lang, {})
+            opt_fallback_trans = opt_translations.get(fallback_lang, {}) if lang != fallback_lang else {}
+            opt_title = (
+                opt_lang_trans.get("title")
+                or opt_fallback_trans.get("title")
+                or getattr(opt, "title", "")
+            )
+            translated_options.append(types.SimpleNamespace(
+                code=opt.code,
+                title=opt_title,
+            ))
+
+        result.append(types.SimpleNamespace(
+            code=q.code,
+            title=_get_field("title", getattr(q, "title", "")),
+            description=_get_field("description", getattr(q, "description", None)),
+            parent_id=getattr(q, "parent_id", None),
+            answer_options=translated_options,
+        ))
+
     return result
 
 

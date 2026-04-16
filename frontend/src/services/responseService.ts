@@ -104,9 +104,16 @@ class ResponseService {
    * Resolve survey flow logic: determines which questions/groups are visible
    * and computes piped text substitutions for the given answer state.
    */
-  async resolveFlow(surveyId: string, data: ResolveFlowRequest): Promise<ResolveFlowResponse> {
+  async resolveFlow(
+    surveyId: string,
+    data: ResolveFlowRequest,
+    lang?: string,
+  ): Promise<ResolveFlowResponse> {
+    const url = lang
+      ? `${BASE_URL}/surveys/${surveyId}/logic/resolve-flow?lang=${encodeURIComponent(lang)}`
+      : `${BASE_URL}/surveys/${surveyId}/logic/resolve-flow`
     const response = await axios.post<ResolveFlowResponse>(
-      `${BASE_URL}/surveys/${surveyId}/logic/resolve-flow`,
+      url,
       data,
       { headers: { 'Content-Type': 'application/json' } }
     )
