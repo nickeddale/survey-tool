@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-11T12:24:12.789Z",
+  "lastUpdated": "2026-04-16T20:14:52.692Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4400,6 +4400,26 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-16-iss-271-public-survey-form-question-and-option-texts-not-t.md",
+      "ticketId": "ISS-271",
+      "title": "Public survey form: question and option texts not translated when language switched",
+      "date": "2026-04-16",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -4614,7 +4634,8 @@
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "2026-04-11-iss-228-api-post-surveysidquestionsidsubquestions-matrixsi.md",
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
-      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md"
+      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
+      "2026-04-16-iss-271-public-survey-form-question-and-option-texts-not-t.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4807,7 +4828,8 @@
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "2026-04-11-iss-228-api-post-surveysidquestionsidsubquestions-matrixsi.md",
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
-      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md"
+      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
+      "2026-04-16-iss-271-public-survey-form-question-and-option-texts-not-t.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4955,7 +4977,8 @@
       "2026-04-11-iss-226-api-post-apiv1surveys-title-255-chars-causes-500-d.md",
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
-      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md"
+      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
+      "2026-04-16-iss-271-public-survey-form-question-and-option-texts-not-t.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5162,7 +5185,8 @@
       "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md",
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
-      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md"
+      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
+      "2026-04-16-iss-271-public-survey-form-question-and-option-texts-not-t.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5424,7 +5448,8 @@
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "2026-04-11-iss-228-api-post-surveysidquestionsidsubquestions-matrixsi.md",
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
-      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md"
+      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
+      "2026-04-16-iss-271-public-survey-form-question-and-option-texts-not-t.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5632,7 +5657,8 @@
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "2026-04-11-iss-228-api-post-surveysidquestionsidsubquestions-matrixsi.md",
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
-      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md"
+      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
+      "2026-04-16-iss-271-public-survey-form-question-and-option-texts-not-t.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5818,7 +5844,8 @@
       "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md",
       "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md",
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
-      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md"
+      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
+      "2026-04-16-iss-271-public-survey-form-question-and-option-texts-not-t.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5973,7 +6000,8 @@
       "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md",
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
       "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
-      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md"
+      "2026-04-11-iss-229-api-group-endpoints-return-500-missing-nested-eage.md",
+      "2026-04-16-iss-271-public-survey-form-question-and-option-texts-not-t.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6170,7 +6198,8 @@
       "2026-04-11-iss-221-missing-http-security-headers-on-frontend-and-back.md",
       "2026-04-11-iss-223-backend-container-runs-as-root-add-non-root-user.md",
       "2026-04-11-iss-227-api-get-apiv1surveysidpublic-exposes-draft-surveys.md",
-      "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md"
+      "2026-04-11-iss-225-api-post-apiv1surveys-invalid-status-value-causes.md",
+      "2026-04-16-iss-271-public-survey-form-question-and-option-texts-not-t.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",

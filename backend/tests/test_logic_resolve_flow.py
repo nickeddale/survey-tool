@@ -787,3 +787,71 @@ async def test_numeric_field_with_valid_value_still_works(client: AsyncClient):
     # Q3 is visible because 150 > 100
     assert q2["id"] in body["visible_questions"]
     assert q2["id"] not in body["hidden_questions"]
+
+
+# --------------------------------------------------------------------------- #
+# Translation support: ?lang= query parameter
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.asyncio
+async def test_resolve_flow_without_lang_returns_default_texts(client: AsyncClient):
+    """Without ?lang=, piped_texts contains the default-language question title."""
+    headers = await auth_headers(client)
+    survey_id = await create_survey(client, headers, title="Survey EN")
+    group_id = await create_group(client, headers, survey_id)
+    q1 = await create_question(
+        client, headers, survey_id, group_id, code="Q1", sort_order=1, title="Default Title"
+    )
+
+    # Add French translation for the question
+    await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions/{q1['id']}/translations",
+        json={"lang": "fr", "translations": {"title": "Titre Français"}},
+        headers=headers,
+    )
+
+    response = await client.post(resolve_url(survey_id), json={"answers": []})
+    assert response.status_code == 200
+    body = response.json()
+    assert body["piped_texts"]["Q1_title"] == "Default Title"
+
+
+@pytest.mark.asyncio
+async def test_resolve_flow_with_lang_returns_translated_question_title(client: AsyncClient):
+    """?lang=fr makes piped_texts contain the French question title."""
+    headers = await auth_headers(client)
+    survey_id = await create_survey(client, headers, title="Survey EN")
+    group_id = await create_group(client, headers, survey_id)
+    q1 = await create_question(
+        client, headers, survey_id, group_id, code="Q1", sort_order=1, title="Default Title"
+    )
+
+    # Add French translation for the question
+    await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions/{q1['id']}/translations",
+        json={"lang": "fr", "translations": {"title": "Titre Français"}},
+        headers=headers,
+    )
+
+    response = await client.post(resolve_url(survey_id) + "?lang=fr", json={"answers": []})
+    assert response.status_code == 200
+    body = response.json()
+    assert body["piped_texts"]["Q1_title"] == "Titre Français"
+
+
+@pytest.mark.asyncio
+async def test_resolve_flow_with_lang_falls_back_when_no_translation(client: AsyncClient):
+    """?lang=de falls back to default title when no German translation exists."""
+    headers = await auth_headers(client)
+    survey_id = await create_survey(client, headers, title="Survey EN")
+    group_id = await create_group(client, headers, survey_id)
+    await create_question(
+        client, headers, survey_id, group_id, code="Q1", sort_order=1, title="Default Title"
+    )
+
+    # No German translations — should fall back to default
+    response = await client.post(resolve_url(survey_id) + "?lang=de", json={"answers": []})
+    assert response.status_code == 200
+    body = response.json()
+    assert body["piped_texts"]["Q1_title"] == "Default Title"

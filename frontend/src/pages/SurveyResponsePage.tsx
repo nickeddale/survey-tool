@@ -60,7 +60,7 @@ function SurveyResponsePage() {
   }, [survey])
 
   const { hiddenQuestions, hiddenGroups, pipedTexts, nextQuestionId } =
-    useFlowResolution(screen === 'form' ? survey_id : undefined, answers, surveyQuestions)
+    useFlowResolution(screen === 'form' ? survey_id : undefined, answers, surveyQuestions, activeLang)
 
   const availableLanguages = useMemo(() => {
     if (!survey) return []
