@@ -1402,6 +1402,328 @@ async def test_score_mixed_matrix_and_single_choice_total_scope(client: AsyncCli
     assert "TotalNoMatch" not in matching_names
 
 
+async def create_matrix_question_with_settings(
+    client: AsyncClient, headers: dict, survey_id: str, group_id: str,
+    question_type: str, code: str, settings: dict
+) -> str:
+    """Create a matrix question without settings (to pass creation-time validation),
+    returning its ID. Settings are applied separately via PATCH after subquestions/options
+    are added, using patch_question_settings().
+    """
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={
+            "title": "Matrix Question",
+            "question_type": question_type,
+            "code": code,
+        },
+        headers=headers,
+    )
+    assert resp.status_code == 201, resp.json()
+    return resp.json()["id"]
+
+
+async def patch_question_settings(
+    client: AsyncClient, headers: dict, survey_id: str, group_id: str,
+    question_id: str, settings: dict
+) -> None:
+    """Apply settings to a question via PATCH after it has been fully populated."""
+    resp = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions/{question_id}",
+        json={"settings": settings},
+        headers=headers,
+    )
+    assert resp.status_code == 200, resp.json()
+
+
+@pytest.mark.asyncio
+async def test_score_matrix_dropdown_total_scope_only_scorable_columns_contribute(client: AsyncClient):
+    """matrix_dropdown: only scorable column types (dropdown/radio/rating/checkbox) contribute to score.
+
+    Setup:
+      - Columns (answer options): "COL_DD" (dropdown type, assessment_value=0),
+        "COL_TEXT" (text type, assessment_value=0),
+        "OPT_A" (assessment_value=3, a valid dropdown choice),
+        "OPT_B" (assessment_value=5, a valid dropdown choice)
+      - column_types = {"COL_DD": "dropdown", "COL_TEXT": "text"}
+      - Answer: SQ001→{COL_DD: "OPT_A", COL_TEXT: "hello"}, SQ002→{COL_DD: "OPT_B", COL_TEXT: "world"}
+    Expected: only COL_DD column values score → OPT_A(3) + OPT_B(5) = 8
+    """
+    headers = await auth_headers(client, "score_mat_dd_scorable@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+
+    mat_id = await create_matrix_question_with_settings(
+        client, headers, survey_id, group_id,
+        question_type="matrix_dropdown",
+        code="MAT1",
+        settings={},
+    )
+    sq1_id = await create_subquestion(client, headers, survey_id, group_id, mat_id, "SQ001", 1)
+    sq2_id = await create_subquestion(client, headers, survey_id, group_id, mat_id, "SQ002", 2)
+
+    # Column definitions (answer options) — COL_DD and COL_TEXT are column names
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "COL_DD", 0)
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "COL_TEXT", 0)
+    # Scorable choices for the COL_DD dropdown column (assessment_value assigned)
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "OPT_A", 3)
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "OPT_B", 5)
+
+    # Apply settings after subquestions and options are in place
+    await patch_question_settings(
+        client, headers, survey_id, group_id, mat_id,
+        {"column_types": {"COL_DD": "dropdown", "COL_TEXT": "text"}},
+    )
+
+    await activate_survey(client, headers, survey_id)
+    response_id = await submit_matrix_response(
+        client, survey_id, mat_id,
+        {
+            "SQ001": {"COL_DD": "OPT_A", "COL_TEXT": "hello"},
+            "SQ002": {"COL_DD": "OPT_B", "COL_TEXT": "world"},
+        },
+    )
+
+    # Assessment matching total=8 (only scorable COL_DD column contributes)
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="TotalMatch", min_score=8, max_score=8),
+        headers=headers,
+    )
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="TotalNoMatch", min_score=9, max_score=20),
+        headers=headers,
+    )
+
+    score_resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/assessment",
+        headers=headers,
+    )
+    assert score_resp.status_code == 200
+    data = score_resp.json()
+    assert float(data["score"]) == 8.0
+    matching_names = [a["name"] for a in data["matching_assessments"]]
+    assert "TotalMatch" in matching_names
+    assert "TotalNoMatch" not in matching_names
+
+
+@pytest.mark.asyncio
+async def test_score_matrix_dropdown_text_number_columns_produce_zero_score(client: AsyncClient):
+    """matrix_dropdown: text-only columns are not scorable, so total score = 0.
+
+    Setup:
+      - Columns (answer options): "COL_TEXT" (text type, assessment_value=0)
+      - column_types = {"COL_TEXT": "text"}
+      - Even though an answer option "OPT_HI" with assessment_value=10 exists,
+        cell values from text columns are not extracted for scoring.
+    """
+    headers = await auth_headers(client, "score_mat_dd_zero@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+
+    mat_id = await create_matrix_question_with_settings(
+        client, headers, survey_id, group_id,
+        question_type="matrix_dropdown",
+        code="MAT1",
+        settings={},
+    )
+    sq1_id = await create_subquestion(client, headers, survey_id, group_id, mat_id, "SQ001", 1)
+
+    # Column definition (answer option) — COL_TEXT is the column name
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "COL_TEXT", 0)
+    # High-value option that should NOT be scored (column is text type)
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "OPT_HI", 10)
+
+    # Apply settings after subquestions and options are in place
+    await patch_question_settings(
+        client, headers, survey_id, group_id, mat_id,
+        {"column_types": {"COL_TEXT": "text"}},
+    )
+
+    await activate_survey(client, headers, survey_id)
+    # Submit: cell value "OPT_HI" is in a text column, so it won't be scored
+    response_id = await submit_matrix_response(
+        client, survey_id, mat_id,
+        {"SQ001": {"COL_TEXT": "OPT_HI"}},
+    )
+
+    # Assessment matching total=0 (text column not scored)
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="ZeroMatch", min_score=0, max_score=0),
+        headers=headers,
+    )
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="ZeroNoMatch", min_score=1, max_score=20),
+        headers=headers,
+    )
+
+    score_resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/assessment",
+        headers=headers,
+    )
+    assert score_resp.status_code == 200
+    data = score_resp.json()
+    assert float(data["score"]) == 0.0
+    matching_names = [a["name"] for a in data["matching_assessments"]]
+    assert "ZeroMatch" in matching_names
+    assert "ZeroNoMatch" not in matching_names
+
+
+@pytest.mark.asyncio
+async def test_score_matrix_dynamic_total_scope_sums_scorable_columns(client: AsyncClient):
+    """matrix_dynamic: list-of-row-dicts scoring; only scorable columns contribute.
+
+    Setup: question with column_types {col_rating: "rating", col_text: "text"}.
+    Answer: [{"col_rating": "R3", "col_text": "foo"}, {"col_rating": "R5", "col_text": "bar"}]
+    Expected: R3(val=3) + R5(val=5) = 8
+    """
+    headers = await auth_headers(client, "score_mat_dyn_total@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+
+    mat_id = await create_matrix_question_with_settings(
+        client, headers, survey_id, group_id,
+        question_type="matrix_dynamic",
+        code="MAT1",
+        settings={"column_types": {"col_rating": "rating", "col_text": "text"}},
+    )
+
+    # Answer options on the question (represent column definitions)
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "R3", 3)
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "R5", 5)
+
+    # Apply settings after options are in place
+    await patch_question_settings(
+        client, headers, survey_id, group_id, mat_id,
+        {"column_types": {"col_rating": "rating", "col_text": "text"}},
+    )
+
+    await activate_survey(client, headers, survey_id)
+
+    # Submit a list-of-rows answer (matrix_dynamic format)
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={
+            "answers": [
+                {
+                    "question_id": mat_id,
+                    "value": [
+                        {"col_rating": "R3", "col_text": "foo"},
+                        {"col_rating": "R5", "col_text": "bar"},
+                    ],
+                }
+            ]
+        },
+    )
+    assert resp.status_code == 201, resp.json()
+    response_id = resp.json()["id"]
+
+    # Assessment matching total=8
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="TotalMatch", min_score=8, max_score=8),
+        headers=headers,
+    )
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="TotalNoMatch", min_score=9, max_score=20),
+        headers=headers,
+    )
+
+    score_resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/assessment",
+        headers=headers,
+    )
+    assert score_resp.status_code == 200
+    data = score_resp.json()
+    assert float(data["score"]) == 8.0
+    matching_names = [a["name"] for a in data["matching_assessments"]]
+    assert "TotalMatch" in matching_names
+    assert "TotalNoMatch" not in matching_names
+
+
+@pytest.mark.asyncio
+async def test_score_matrix_dynamic_question_scope_and_no_subquestion_scores(client: AsyncClient):
+    """matrix_dynamic: rows are scored without subquestion IDs.
+
+    Verifies that question-scope assessment works correctly for matrix_dynamic,
+    and that the total score reflects only scorable columns across all rows.
+    (matrix_dynamic never populates subquestion_score_map since rows are user-defined.)
+
+    Setup:
+      - column_types: {"col_rating": "rating"}
+      - Answer: [{"col_rating": "R3"}, {"col_rating": "R5"}] — two rows
+    Expected total score: R3(3) + R5(5) = 8
+    Question-scoped assessment matching 8 should match; one matching 0 should not.
+    """
+    headers = await auth_headers(client, "score_mat_dyn_qscope@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+
+    mat_id = await create_matrix_question_with_settings(
+        client, headers, survey_id, group_id,
+        question_type="matrix_dynamic",
+        code="MAT1",
+        settings={},
+    )
+
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "R3", 3)
+    await create_matrix_answer_option(client, headers, survey_id, mat_id, "R5", 5)
+
+    # Apply settings after options are in place
+    await patch_question_settings(
+        client, headers, survey_id, group_id, mat_id,
+        {"column_types": {"col_rating": "rating"}},
+    )
+
+    await activate_survey(client, headers, survey_id)
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={
+            "answers": [
+                {
+                    "question_id": mat_id,
+                    "value": [{"col_rating": "R3"}, {"col_rating": "R5"}],
+                }
+            ]
+        },
+    )
+    assert resp.status_code == 201, resp.json()
+    response_id = resp.json()["id"]
+
+    # Question-scoped assessment: should see score=8 for this question
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(
+            name="QMatch", scope="question", question_id=mat_id, min_score=8, max_score=8
+        ),
+        headers=headers,
+    )
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(
+            name="QNoMatch", scope="question", question_id=mat_id, min_score=0, max_score=0
+        ),
+        headers=headers,
+    )
+
+    score_resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/assessment",
+        headers=headers,
+    )
+    assert score_resp.status_code == 200
+    data = score_resp.json()
+    # Total score is R3(3) + R5(5) = 8
+    assert float(data["score"]) == 8.0
+    matching_names = [a["name"] for a in data["matching_assessments"]]
+    assert "QMatch" in matching_names
+    assert "QNoMatch" not in matching_names
+
+
 @pytest.mark.asyncio
 async def test_score_backward_compat_string_and_list_answers_unchanged(client: AsyncClient):
     """Backward compatibility: string and list answers still produce identical scores."""
