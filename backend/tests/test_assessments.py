@@ -107,6 +107,7 @@ def assessment_payload(
     message: str = "Test message",
     group_id: str | None = None,
     question_id: str | None = None,
+    subquestion_id: str | None = None,
 ) -> dict:
     payload = {
         "name": name,
@@ -119,6 +120,8 @@ def assessment_payload(
         payload["group_id"] = group_id
     if question_id is not None:
         payload["question_id"] = question_id
+    if subquestion_id is not None:
+        payload["subquestion_id"] = subquestion_id
     return payload
 
 
@@ -933,3 +936,81 @@ async def test_delete_assessment_api_key_missing_scope_returns_403(client: Async
         headers={"X-API-Key": api_key},
     )
     assert resp.status_code == 403
+
+
+# ---------------------------------------------------------------------------
+# Subquestion Scope Tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_create_assessment_subquestion_scope_returns_201(client: AsyncClient):
+    """Creating an assessment with scope='subquestion', question_id and subquestion_id returns 201."""
+    headers = await auth_headers(client, "create_subq_asmt@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+    question_id = await create_question(client, headers, survey_id, group_id, code="Q1")
+    subquestion_id = await create_question(client, headers, survey_id, group_id, code="SQ1")
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(
+            scope="subquestion",
+            question_id=question_id,
+            subquestion_id=subquestion_id,
+        ),
+        headers=headers,
+    )
+    assert resp.status_code == 201
+    data = resp.json()
+    assert data["scope"] == "subquestion"
+    assert data["question_id"] == question_id
+    assert data["subquestion_id"] == subquestion_id
+
+
+@pytest.mark.asyncio
+async def test_create_assessment_subquestion_scope_missing_question_id_returns_422(client: AsyncClient):
+    """scope='subquestion' without question_id returns 422."""
+    headers = await auth_headers(client, "subq_no_qid@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+    subquestion_id = await create_question(client, headers, survey_id, group_id, code="SQ1")
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(scope="subquestion", subquestion_id=subquestion_id),
+        headers=headers,
+    )
+    assert resp.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_create_assessment_subquestion_scope_missing_subquestion_id_returns_422(client: AsyncClient):
+    """scope='subquestion' without subquestion_id returns 422."""
+    headers = await auth_headers(client, "subq_no_sqid@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+    question_id = await create_question(client, headers, survey_id, group_id, code="Q1")
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(scope="subquestion", question_id=question_id),
+        headers=headers,
+    )
+    assert resp.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_create_assessment_non_subquestion_scope_with_subquestion_id_returns_422(client: AsyncClient):
+    """scope='total' with subquestion_id returns 422."""
+    headers = await auth_headers(client, "total_with_sqid@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+    subquestion_id = await create_question(client, headers, survey_id, group_id, code="SQ1")
+
+    resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(scope="total", subquestion_id=subquestion_id),
+        headers=headers,
+    )
+    assert resp.status_code == 422
