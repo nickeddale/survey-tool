@@ -215,7 +215,18 @@ def _validate_cell_value(sq_code: str, col_code: str, cell_type: str, cell_value
                 f"Cell value for {location} must be a list of strings (cell_type=checkbox)"
             )
     elif cell_type == "rating":
-        if not isinstance(cell_value, (int, float)) or isinstance(cell_value, bool):
+        if isinstance(cell_value, bool):
+            raise UnprocessableError(
+                f"Cell value for {location} must be a number (cell_type=rating)"
+            )
+        if isinstance(cell_value, str):
+            try:
+                float(cell_value)
+            except ValueError:
+                raise UnprocessableError(
+                    f"Cell value for {location} must be a number (cell_type=rating)"
+                )
+        elif not isinstance(cell_value, (int, float)):
             raise UnprocessableError(
                 f"Cell value for {location} must be a number (cell_type=rating)"
             )
