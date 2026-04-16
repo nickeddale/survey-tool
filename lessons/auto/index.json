@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-16T08:28:21.131Z",
+  "lastUpdated": "2026-04-16T08:34:09.838Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4838,6 +4838,23 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "low"
+    },
+    {
+      "file": "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md",
+      "ticketId": "ISS-255",
+      "title": "Matrix: transpose setting has no effect on response form layout",
+      "date": "2026-04-16",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "feature",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -5073,7 +5090,8 @@
       "2026-04-15-iss-248-complete-tablematrix-question-type-implementation.md",
       "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md",
       "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
-      "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md"
+      "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
+      "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5278,7 +5296,8 @@
       "2026-04-14-iss-240-email-invitations-frontend-api-url-path-mismatch-c.md",
       "2026-04-14-iss-241-email-invitations-stats-field-name-mismatch-betwee.md",
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
-      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md"
+      "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
+      "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5664,7 +5683,8 @@
       "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md",
       "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md",
       "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
-      "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md"
+      "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
+      "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6173,7 +6193,8 @@
       "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md",
       "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md",
       "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
-      "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md"
+      "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
+      "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6539,7 +6560,8 @@
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
       "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
       "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
-      "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md"
+      "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
+      "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6753,7 +6775,8 @@
       "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md",
       "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md",
       "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
-      "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md"
+      "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
+      "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
