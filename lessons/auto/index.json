@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-16T08:34:09.838Z",
+  "lastUpdated": "2026-04-16T08:54:32.409Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4855,6 +4855,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md",
+      "ticketId": "ISS-257",
+      "title": "Matrix Dropdown: rating column_type renders as dropdown instead of rating widget",
+      "date": "2026-04-16",
+      "categories": [
+        "frontend",
+        "react",
+        "component-composition",
+        "matrix-questions",
+        "rating"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "low"
     }
   ],
   "categoryIndex": {
@@ -6933,7 +6949,8 @@
       "2026-04-13-iss-236-frontend-email-invitations-management-page.md",
       "2026-04-13-iss-239-frontend-test-suite-for-email-invitation-component.md",
       "2026-04-14-iss-242-email-invitations-pagination-field-name-mismatch-p.md",
-      "2026-04-16-iss-254-matrix-dynamic-minmax-row-count-constraints-not-en.md"
+      "2026-04-16-iss-254-matrix-dynamic-minmax-row-count-constraints-not-en.md",
+      "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md"
     ],
     "vitest": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
@@ -6981,7 +6998,8 @@
       "2026-04-03-iss-106-711-frontend-assessment-configuration-ui.md",
       "2026-04-04-iss-104-79-frontend-participant-management-ui.md",
       "2026-04-13-iss-236-frontend-email-invitations-management-page.md",
-      "2026-04-13-iss-239-frontend-test-suite-for-email-invitation-component.md"
+      "2026-04-13-iss-239-frontend-test-suite-for-email-invitation-component.md",
+      "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md"
     ],
     "expression-builder": [
       "2026-04-03-iss-080-510-frontend-relevance-expression-builder-ui.md"
@@ -7095,7 +7113,8 @@
       "2026-04-16-iss-252-backend-typeerror-unhashable-dict-in-relevance-cac.md"
     ],
     "matrix-questions": [
-      "2026-04-16-iss-252-backend-typeerror-unhashable-dict-in-relevance-cac.md"
+      "2026-04-16-iss-252-backend-typeerror-unhashable-dict-in-relevance-cac.md",
+      "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md"
     ],
     "ui-constraints": [
       "2026-04-16-iss-254-matrix-dynamic-minmax-row-count-constraints-not-en.md"
@@ -7105,6 +7124,12 @@
     ],
     "form-validation": [
       "2026-04-16-iss-254-matrix-dynamic-minmax-row-count-constraints-not-en.md"
+    ],
+    "component-composition": [
+      "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md"
+    ],
+    "rating": [
+      "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md"
     ]
   },
   "fileIndex": {

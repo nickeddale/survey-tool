@@ -87,6 +87,12 @@ function makeSettings(overrides: Partial<MatrixDropdownSettings> = {}): MatrixDr
   }
 }
 
+function makeRatingSettings(
+  columnTypes: Record<string, 'dropdown' | 'rating'>
+): MatrixDropdownSettings {
+  return makeSettings({ column_types: columnTypes })
+}
+
 // ---------------------------------------------------------------------------
 // Rendering
 // ---------------------------------------------------------------------------
@@ -430,6 +436,147 @@ describe('MatrixDropdownInput — external errors prop', () => {
       />
     )
     expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Rating column_type
+// ---------------------------------------------------------------------------
+
+describe('MatrixDropdownInput — rating column_type', () => {
+  // In the multi-column model, column_types is keyed by answer_option (column) code.
+  // A rating column renders a rating widget for every row in that column.
+
+  it('renders rating widget instead of select when column_types sets rating for a column', () => {
+    const subquestions = [makeSubquestion({ id: 'sq-1', code: 'SQ001', title: 'Row 1' })]
+    const options = [makeOption({ id: 'opt-1', code: 'col1', title: 'Column 1' })]
+    const question = makeQuestion({
+      settings: makeRatingSettings({ col1: 'rating' }),
+      subquestions,
+      answer_options: options,
+    })
+    render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} />)
+
+    expect(screen.queryByTestId('matrix-dropdown-select-SQ001-col1')).not.toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dropdown-rating-SQ001-col1')).toBeInTheDocument()
+  })
+
+  it('renders 5 rating buttons by default for a rating column', () => {
+    const subquestions = [makeSubquestion({ code: 'SQ001' })]
+    const options = [makeOption({ id: 'opt-1', code: 'col1', title: 'Column 1' })]
+    const question = makeQuestion({
+      settings: makeRatingSettings({ col1: 'rating' }),
+      subquestions,
+      answer_options: options,
+    })
+    render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} />)
+
+    for (let i = 1; i <= 5; i++) {
+      expect(screen.getByTestId(`matrix-dropdown-rating-SQ001-col1-${i}`)).toBeInTheDocument()
+    }
+  })
+
+  it('calls onChange with nested value map containing rating string when rating button clicked', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    const subquestions = [makeSubquestion({ code: 'SQ001' })]
+    const options = [makeOption({ id: 'opt-1', code: 'col1', title: 'Column 1' })]
+    const question = makeQuestion({
+      settings: makeRatingSettings({ col1: 'rating' }),
+      subquestions,
+      answer_options: options,
+    })
+    render(<MatrixDropdownInput value={{}} onChange={onChange} question={question} />)
+
+    await act(async () => {
+      await user.click(screen.getByTestId('matrix-dropdown-rating-SQ001-col1-3'))
+    })
+
+    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1][0] as MatrixDropdownValue
+    expect(lastCall.SQ001).toBeDefined()
+    expect(lastCall.SQ001['col1']).toBe('3')
+  })
+
+  it('reflects selected rating value via data-filled attribute', () => {
+    const subquestions = [makeSubquestion({ code: 'SQ001' })]
+    const options = [makeOption({ id: 'opt-1', code: 'col1', title: 'Column 1' })]
+    const question = makeQuestion({
+      settings: makeRatingSettings({ col1: 'rating' }),
+      subquestions,
+      answer_options: options,
+    })
+    render(
+      <MatrixDropdownInput
+        value={{ SQ001: { col1: '3' } }}
+        onChange={vi.fn()}
+        question={question}
+      />
+    )
+
+    expect(screen.getByTestId('matrix-dropdown-rating-SQ001-col1-1')).toHaveAttribute(
+      'data-filled',
+      'true'
+    )
+    expect(screen.getByTestId('matrix-dropdown-rating-SQ001-col1-3')).toHaveAttribute(
+      'data-filled',
+      'true'
+    )
+    expect(screen.getByTestId('matrix-dropdown-rating-SQ001-col1-4')).toHaveAttribute(
+      'data-filled',
+      'false'
+    )
+  })
+
+  it('renders dropdown for non-rating columns and rating for rating column in the same question', () => {
+    const subquestions = [makeSubquestion({ id: 'sq-1', code: 'SQ001', title: 'Row 1' })]
+    const options = [
+      makeOption({ id: 'opt-1', code: 'col1', title: 'Rate it' }),
+      makeOption({ id: 'opt-2', code: 'col2', title: 'Pick one' }),
+    ]
+    const question = makeQuestion({
+      settings: makeRatingSettings({ col1: 'rating', col2: 'dropdown' }),
+      subquestions,
+      answer_options: options,
+    })
+    render(<MatrixDropdownInput value={{}} onChange={vi.fn()} question={question} />)
+
+    expect(screen.getByTestId('matrix-dropdown-rating-SQ001-col1')).toBeInTheDocument()
+    expect(screen.queryByTestId('matrix-dropdown-select-SQ001-col1')).not.toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dropdown-select-SQ001-col2')).toBeInTheDocument()
+    expect(screen.queryByTestId('matrix-dropdown-rating-SQ001-col2')).not.toBeInTheDocument()
+  })
+
+  it('preserves existing dropdown selections when a rating cell is answered', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    const subquestions = [
+      makeSubquestion({ id: 'sq-1', code: 'SQ001' }),
+      makeSubquestion({ id: 'sq-2', code: 'SQ002' }),
+    ]
+    const options = [
+      makeOption({ id: 'opt-1', code: 'col1', title: 'Rate it' }),
+      makeOption({ id: 'opt-2', code: 'col2', title: 'Pick one' }),
+    ]
+    const question = makeQuestion({
+      settings: makeRatingSettings({ col1: 'rating' }),
+      subquestions,
+      answer_options: options,
+    })
+    render(
+      <MatrixDropdownInput
+        value={{ SQ002: { col2: 'col2' } }}
+        onChange={onChange}
+        question={question}
+      />
+    )
+
+    await act(async () => {
+      await user.click(screen.getByTestId('matrix-dropdown-rating-SQ001-col1-4'))
+    })
+
+    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1][0] as MatrixDropdownValue
+    expect(lastCall.SQ001?.['col1']).toBe('4')
+    expect(lastCall.SQ002?.['col2']).toBe('col2')
   })
 })
 

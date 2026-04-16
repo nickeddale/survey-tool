@@ -85,7 +85,7 @@ export interface MatrixDropdownSettings {
   randomize_rows: boolean
   transpose: boolean
   cell_type: 'dropdown' | 'text' | 'checkbox' | 'radio' | 'number' | 'boolean' | 'rating'
-  column_types: Record<string, string> | null
+  column_types: Record<string, 'dropdown' | 'rating' | 'text' | 'number' | 'checkbox' | 'radio' | 'boolean'> | null
 }
 
 export interface MatrixDynamicSettings {

@@ -17,8 +17,9 @@
  */
 
 import { useState, useMemo } from 'react'
+import { Star, Heart, ThumbsUp, Smile } from 'lucide-react'
 import type { BuilderQuestion } from '../../store/builderStore'
-import type { MatrixDropdownSettings } from '../../types/questionSettings'
+import type { MatrixDropdownSettings, RatingSettings } from '../../types/questionSettings'
 import { ValidationErrors } from '../common/ValidationErrors'
 
 // ---------------------------------------------------------------------------
@@ -62,6 +63,72 @@ function getSessionSeed(questionId: string): number {
     sessionSeeds[questionId] = Math.floor(Math.random() * 2147483646) + 1
   }
   return sessionSeeds[questionId]
+}
+
+// ---------------------------------------------------------------------------
+// Rating cell helpers
+// ---------------------------------------------------------------------------
+
+type IconName = RatingSettings['icon']
+
+function RatingIcon({ icon, filled }: { icon: IconName; filled: boolean }) {
+  const className = filled ? 'fill-current text-yellow-500' : 'text-muted-foreground'
+  const props = { size: 18, className }
+  switch (icon) {
+    case 'heart':
+      return <Heart {...props} />
+    case 'thumb':
+      return <ThumbsUp {...props} />
+    case 'smiley':
+      return <Smile {...props} />
+    case 'star':
+    default:
+      return <Star {...props} />
+  }
+}
+
+// RatingCellWidget — fits CellInput's onChange(val: unknown) API
+interface RatingCellWidgetProps {
+  sqCode: string
+  colCode: string
+  value: string
+  onChange: (val: unknown) => void
+}
+
+function RatingCellWidget({ sqCode, colCode, value, onChange }: RatingCellWidgetProps) {
+  const [hoverValue, setHoverValue] = useState<number | null>(null)
+  const numericValue = value !== '' ? parseFloat(value) : null
+  const ratingValues = [1, 2, 3, 4, 5]
+
+  return (
+    <div
+      className="flex items-center gap-0.5"
+      role="radiogroup"
+      data-testid={`matrix-dropdown-rating-${sqCode}-${colCode}`}
+    >
+      {ratingValues.map((rating) => {
+        const activeValue = hoverValue ?? numericValue
+        const isFilled = activeValue !== null && rating <= activeValue
+        return (
+          <button
+            key={rating}
+            type="button"
+            role="radio"
+            aria-checked={numericValue === rating}
+            aria-label={`Rate ${rating}`}
+            onClick={() => onChange(String(rating))}
+            onMouseEnter={() => setHoverValue(rating)}
+            onMouseLeave={() => setHoverValue(null)}
+            className="cursor-pointer p-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+            data-testid={`matrix-dropdown-rating-${sqCode}-${colCode}-${rating}`}
+            data-filled={isFilled}
+          >
+            <RatingIcon icon="star" filled={isFilled} />
+          </button>
+        )
+      })}
+    </div>
+  )
 }
 
 // ---------------------------------------------------------------------------
@@ -185,6 +252,15 @@ function CellInput({
         </div>
       )
     }
+    case 'rating':
+      return (
+        <RatingCellWidget
+          sqCode={sqCode}
+          colCode={colCode}
+          value={value !== '' && value != null ? String(value) : ''}
+          onChange={onChange}
+        />
+      )
     default:
       // dropdown (default)
       return (
