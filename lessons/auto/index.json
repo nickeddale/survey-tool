@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-16T14:02:14.259Z",
+  "lastUpdated": "2026-04-16T14:15:13.032Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4948,6 +4948,21 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-16-iss-262-response-detail-page-shows-object-object-for-matri.md",
+      "ticketId": "ISS-262",
+      "title": "Response detail page shows [object Object] for matrix answer values",
+      "date": "2026-04-16",
+      "categories": [
+        "frontend",
+        "rendering",
+        "matrix-questions",
+        "type-safety"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "low"
     }
   ],
   "categoryIndex": {
@@ -7060,7 +7075,8 @@
       "2026-04-13-iss-239-frontend-test-suite-for-email-invitation-component.md",
       "2026-04-14-iss-242-email-invitations-pagination-field-name-mismatch-p.md",
       "2026-04-16-iss-254-matrix-dynamic-minmax-row-count-constraints-not-en.md",
-      "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md"
+      "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md",
+      "2026-04-16-iss-262-response-detail-page-shows-object-object-for-matri.md"
     ],
     "vitest": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
@@ -7224,7 +7240,8 @@
     ],
     "matrix-questions": [
       "2026-04-16-iss-252-backend-typeerror-unhashable-dict-in-relevance-cac.md",
-      "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md"
+      "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md",
+      "2026-04-16-iss-262-response-detail-page-shows-object-object-for-matri.md"
     ],
     "ui-constraints": [
       "2026-04-16-iss-254-matrix-dynamic-minmax-row-count-constraints-not-en.md"
@@ -7240,6 +7257,12 @@
     ],
     "rating": [
       "2026-04-16-iss-257-matrix-dropdown-rating-columntype-renders-as-dropd.md"
+    ],
+    "rendering": [
+      "2026-04-16-iss-262-response-detail-page-shows-object-object-for-matri.md"
+    ],
+    "type-safety": [
+      "2026-04-16-iss-262-response-detail-page-shows-object-object-for-matri.md"
     ]
   },
   "fileIndex": {

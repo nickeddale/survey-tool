@@ -44,6 +44,23 @@ function formatDate(iso: string | null): string {
 // Answer value rendering
 // ---------------------------------------------------------------------------
 
+/**
+ * Formats an answer value into a human-readable string.
+ * Handles objects (key: value pairs), arrays (comma-joined), and primitives.
+ */
+export function formatAnswerValue(value: unknown): string {
+  if (value === null || value === undefined || value === '') return '—'
+  if (Array.isArray(value)) {
+    return value.map((v) => formatAnswerValue(v)).join(', ')
+  }
+  if (typeof value === 'object') {
+    return Object.entries(value as Record<string, unknown>)
+      .map(([k, v]) => `${k}: ${formatAnswerValue(v)}`)
+      .join(', ')
+  }
+  return String(value)
+}
+
 function MatrixAnswerGrid({
   answers,
   questionCode,
@@ -76,7 +93,7 @@ function MatrixAnswerGrid({
             <tr key={answer.question_id} className="bg-card">
               <td className="px-3 py-2 text-muted-foreground">{answer.subquestion_label}</td>
               <td className="px-3 py-2 text-foreground">
-                {answer.selected_option_title ?? String(answer.value ?? '—')}
+                {answer.selected_option_title ?? formatAnswerValue(answer.value)}
               </td>
             </tr>
           ))}
@@ -106,6 +123,11 @@ function AnswerValue({ answer }: { answer: ResponseAnswerDetail }) {
   // Null/empty
   if (answer.value === null || answer.value === undefined || answer.value === '') {
     return <span className="text-sm text-muted-foreground italic">No answer</span>
+  }
+
+  // Object or array values (e.g. matrix answers stored as plain objects)
+  if (typeof answer.value === 'object') {
+    return <span className="text-sm text-foreground">{formatAnswerValue(answer.value)}</span>
   }
 
   return <span className="text-sm text-foreground">{String(answer.value)}</span>
