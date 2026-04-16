@@ -35,6 +35,8 @@ type QuestionType =
   | 'ranking'
   | 'image_picker'
   | 'matrix'
+  | 'matrix_single'
+  | 'matrix_multiple'
   | 'matrix_dropdown'
   | 'matrix_dynamic'
   | 'numeric'
@@ -63,6 +65,8 @@ const questionPreviewMap: Record<QuestionType, FC<QuestionPreviewProps>> = {
   image_picker: SpecialPreview,
   // Matrix types
   matrix: MatrixPreview,
+  matrix_single: MatrixPreview,
+  matrix_multiple: MatrixPreview,
   matrix_dropdown: MatrixPreview,
   matrix_dynamic: MatrixPreview,
   // Scalar types

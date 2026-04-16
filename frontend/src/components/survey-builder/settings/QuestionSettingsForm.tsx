@@ -56,7 +56,13 @@ export function QuestionSettingsForm({
   }
 
   // Matrix types
-  if (type === 'matrix' || type === 'matrix_dropdown' || type === 'matrix_dynamic') {
+  if (
+    type === 'matrix' ||
+    type === 'matrix_single' ||
+    type === 'matrix_multiple' ||
+    type === 'matrix_dropdown' ||
+    type === 'matrix_dynamic'
+  ) {
     return (
       <MatrixSettingsForm
         type={type}
