@@ -133,16 +133,12 @@ def validate_matrix_dynamic_settings(
 ) -> None:
     """Validate settings for matrix_dynamic questions.
 
-    Requires at least one subquestion (row template) and one answer_option (column).
+    Requires at least one answer_option (column). Subquestions are not used —
+    rows are added dynamically by respondents at response time.
     Optional fields: min_rows (int >= 1), max_rows (int >= min_rows),
     add_row_text (str), remove_row_text (str),
     default_row_count (int within [min_rows, max_rows]).
     """
-    if not subquestions:
-        raise UnprocessableError(
-            "matrix_dynamic question requires at least one subquestion (row)"
-        )
-
     if not answer_options:
         raise UnprocessableError(
             "matrix_dynamic question requires at least one answer option (column)"

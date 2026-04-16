@@ -157,10 +157,9 @@ def test_matrix_dynamic_settings_valid():
     validate_matrix_dynamic_settings(None, opts, sqs)
 
 
-def test_matrix_dynamic_settings_no_subquestions_raises():
+def test_matrix_dynamic_settings_no_subquestions_valid():
     opts = [make_option("A1")]
-    with pytest.raises(UnprocessableError, match="at least one subquestion"):
-        validate_matrix_dynamic_settings(None, opts, [])
+    validate_matrix_dynamic_settings(None, opts, [])  # no exception — subquestions not required
 
 
 def test_matrix_dynamic_settings_no_options_raises():
