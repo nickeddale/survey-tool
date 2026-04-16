@@ -233,21 +233,21 @@ def validate_matrix_dynamic_answer(
 ) -> None:
     """Validate a submitted answer for a matrix_dynamic question.
 
-    answer: {"values": [{"col1": "val1", "col2": "val2"}, ...]}
+    answer: {"value": [{"col1": "val1", "col2": "val2"}, ...]}
     Each element is a row; each key is a column code (answer_option code), each value is a cell value.
-    settings.min_rows <= len(values) <= settings.max_rows.
+    settings.min_rows <= len(value) <= settings.max_rows.
     """
     settings = question.settings or {}
     min_rows = settings.get("min_rows", 0)
     max_rows = settings.get("max_rows")
 
-    values = answer.get("values")
+    values = answer.get("value")
     if not isinstance(values, list):
-        raise UnprocessableError("matrix_dynamic answer 'values' must be a list of row objects")
+        raise UnprocessableError("matrix_dynamic answer 'value' must be a list of row objects")
 
     for i, row in enumerate(values):
         if not isinstance(row, dict):
-            raise UnprocessableError(f"matrix_dynamic answer 'values[{i}]' must be a dict")
+            raise UnprocessableError(f"matrix_dynamic answer 'value[{i}]' must be a dict")
 
     if question.is_required and not values:
         raise UnprocessableError("An answer is required for this question")

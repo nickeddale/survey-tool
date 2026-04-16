@@ -377,7 +377,7 @@ def test_matrix_dynamic_answer_valid():
     opts = [make_option("col1"), make_option("col2")]
     q = make_question(is_required=False, settings={})
     validate_matrix_dynamic_answer(
-        {"values": [{"col1": "val1", "col2": "val2"}]}, q, opts, sqs
+        {"value": [{"col1": "val1", "col2": "val2"}]}, q, opts, sqs
     )
 
 
@@ -385,7 +385,7 @@ def test_matrix_dynamic_answer_empty_not_required():
     sqs = [make_subquestion("Q1_SQ001")]
     opts = [make_option("col1")]
     q = make_question(is_required=False, settings={})
-    validate_matrix_dynamic_answer({"values": []}, q, opts, sqs)
+    validate_matrix_dynamic_answer({"value": []}, q, opts, sqs)
 
 
 def test_matrix_dynamic_answer_empty_required_raises():
@@ -393,7 +393,7 @@ def test_matrix_dynamic_answer_empty_required_raises():
     opts = [make_option("col1")]
     q = make_question(is_required=True, settings={})
     with pytest.raises(UnprocessableError, match="required"):
-        validate_matrix_dynamic_answer({"values": []}, q, opts, sqs)
+        validate_matrix_dynamic_answer({"value": []}, q, opts, sqs)
 
 
 def test_matrix_dynamic_answer_not_list_raises():
@@ -401,7 +401,7 @@ def test_matrix_dynamic_answer_not_list_raises():
     opts = [make_option("col1")]
     q = make_question(is_required=False, settings={})
     with pytest.raises(UnprocessableError, match="must be a list"):
-        validate_matrix_dynamic_answer({"values": {"col1": "val1"}}, q, opts, sqs)
+        validate_matrix_dynamic_answer({"value": {"col1": "val1"}}, q, opts, sqs)
 
 
 def test_matrix_dynamic_answer_row_not_dict_raises():
@@ -409,7 +409,7 @@ def test_matrix_dynamic_answer_row_not_dict_raises():
     opts = [make_option("col1")]
     q = make_question(is_required=False, settings={})
     with pytest.raises(UnprocessableError, match="must be a dict"):
-        validate_matrix_dynamic_answer({"values": ["not_a_dict"]}, q, opts, sqs)
+        validate_matrix_dynamic_answer({"value": ["not_a_dict"]}, q, opts, sqs)
 
 
 def test_matrix_dynamic_answer_below_min_rows_raises():
@@ -417,7 +417,7 @@ def test_matrix_dynamic_answer_below_min_rows_raises():
     opts = [make_option("col1")]
     q = make_question(is_required=False, settings={"min_rows": 3})
     with pytest.raises(UnprocessableError, match="At least 3 row"):
-        validate_matrix_dynamic_answer({"values": [{"col1": "v"}]}, q, opts, sqs)
+        validate_matrix_dynamic_answer({"value": [{"col1": "v"}]}, q, opts, sqs)
 
 
 def test_matrix_dynamic_answer_above_max_rows_raises():
@@ -426,7 +426,7 @@ def test_matrix_dynamic_answer_above_max_rows_raises():
     q = make_question(is_required=False, settings={"max_rows": 2})
     with pytest.raises(UnprocessableError, match="No more than 2 row"):
         validate_matrix_dynamic_answer(
-            {"values": [{"col1": "v"}, {"col1": "v"}, {"col1": "v"}]}, q, opts, sqs
+            {"value": [{"col1": "v"}, {"col1": "v"}, {"col1": "v"}]}, q, opts, sqs
         )
 
 
@@ -435,5 +435,5 @@ def test_matrix_dynamic_answer_within_range_valid():
     opts = [make_option("col1")]
     q = make_question(is_required=False, settings={"min_rows": 1, "max_rows": 5})
     validate_matrix_dynamic_answer(
-        {"values": [{"col1": "v1"}, {"col1": "v2"}]}, q, opts, sqs
+        {"value": [{"col1": "v1"}, {"col1": "v2"}]}, q, opts, sqs
     )
