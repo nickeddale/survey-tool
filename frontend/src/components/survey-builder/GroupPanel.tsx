@@ -55,6 +55,8 @@ const QUESTION_TYPES = [
   { type: 'multiple_choice', label: 'Multiple Choice' },
   { type: 'dropdown', label: 'Dropdown' },
   { type: 'number', label: 'Number' },
+  { type: 'matrix_dropdown', label: 'Matrix Dropdown' },
+  { type: 'matrix_dynamic', label: 'Matrix Dynamic' },
 ]
 
 // ---------------------------------------------------------------------------
