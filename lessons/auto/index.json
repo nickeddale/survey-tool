@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-16T19:26:59.978Z",
+  "lastUpdated": "2026-04-16T19:34:38.379Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5099,6 +5099,23 @@
       ],
       "outcome": "success",
       "complexity": "low"
+    },
+    {
+      "file": "2026-04-16-iss-270-builder-translationeditor-not-rendered-when-transl.md",
+      "ticketId": "ISS-270",
+      "title": "Builder: TranslationEditor not rendered when translation mode toggled",
+      "date": "2026-04-16",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -5344,7 +5361,8 @@
       "2026-04-16-iss-265-add-subquestion-scope-to-assessment-model-and-migr.md",
       "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md",
       "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md",
-      "2026-04-16-iss-268-add-subquestion-scope-ui-to-assessment-form.md"
+      "2026-04-16-iss-268-add-subquestion-scope-ui-to-assessment-form.md",
+      "2026-04-16-iss-270-builder-translationeditor-not-rendered-when-transl.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5556,7 +5574,8 @@
       "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
       "2026-04-16-iss-265-add-subquestion-scope-to-assessment-model-and-migr.md",
       "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md",
-      "2026-04-16-iss-268-add-subquestion-scope-ui-to-assessment-form.md"
+      "2026-04-16-iss-268-add-subquestion-scope-ui-to-assessment-form.md",
+      "2026-04-16-iss-270-builder-translationeditor-not-rendered-when-transl.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5958,7 +5977,8 @@
       "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md",
       "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md",
       "2026-04-16-iss-268-add-subquestion-scope-ui-to-assessment-form.md",
-      "2026-04-16-iss-269-add-matrix-question-types-to-builder-question-type.md"
+      "2026-04-16-iss-269-add-matrix-question-types-to-builder-question-type.md",
+      "2026-04-16-iss-270-builder-translationeditor-not-rendered-when-transl.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6254,7 +6274,8 @@
       "2026-04-16-iss-265-add-subquestion-scope-to-assessment-model-and-migr.md",
       "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md",
       "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md",
-      "2026-04-16-iss-268-add-subquestion-scope-ui-to-assessment-form.md"
+      "2026-04-16-iss-268-add-subquestion-scope-ui-to-assessment-form.md",
+      "2026-04-16-iss-270-builder-translationeditor-not-rendered-when-transl.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6490,7 +6511,8 @@
       "2026-04-16-iss-265-add-subquestion-scope-to-assessment-model-and-migr.md",
       "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md",
       "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md",
-      "2026-04-16-iss-268-add-subquestion-scope-ui-to-assessment-form.md"
+      "2026-04-16-iss-268-add-subquestion-scope-ui-to-assessment-form.md",
+      "2026-04-16-iss-270-builder-translationeditor-not-rendered-when-transl.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -7097,7 +7119,8 @@
       "2026-04-16-iss-265-add-subquestion-scope-to-assessment-model-and-migr.md",
       "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md",
       "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md",
-      "2026-04-16-iss-268-add-subquestion-scope-ui-to-assessment-form.md"
+      "2026-04-16-iss-268-add-subquestion-scope-ui-to-assessment-form.md",
+      "2026-04-16-iss-270-builder-translationeditor-not-rendered-when-transl.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
