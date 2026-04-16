@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-15T20:43:45.229Z",
+  "lastUpdated": "2026-04-16T08:16:20.868Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4791,6 +4791,21 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-16-iss-252-backend-typeerror-unhashable-dict-in-relevance-cac.md",
+      "ticketId": "ISS-252",
+      "title": "Backend: TypeError unhashable dict in relevance cache key blocks all matrix submissions",
+      "date": "2026-04-16",
+      "categories": [
+        "bug-fix",
+        "caching",
+        "matrix-questions",
+        "expressions"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "low"
     }
   ],
   "categoryIndex": {
@@ -5896,7 +5911,8 @@
       "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
       "2026-04-15-iss-247-survey-detail-page-builder-link-hidden-when-survey.md",
       "2026-04-15-iss-249-add-matrix-question-types-to-survey-builder-questi.md",
-      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md"
+      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
+      "2026-04-16-iss-252-backend-typeerror-unhashable-dict-in-relevance-cac.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6890,7 +6906,8 @@
       "2026-04-09-iss-204-questions-with-relevance-flash-visible-before-init.md"
     ],
     "expressions": [
-      "2026-04-03-iss-077-57-skip-logic-implementation.md"
+      "2026-04-03-iss-077-57-skip-logic-implementation.md",
+      "2026-04-16-iss-252-backend-typeerror-unhashable-dict-in-relevance-cac.md"
     ],
     "skip-logic": [
       "2026-04-03-iss-077-57-skip-logic-implementation.md"
@@ -7011,6 +7028,12 @@
     ],
     "frontend-components": [
       "2026-04-15-iss-248-complete-tablematrix-question-type-implementation.md"
+    ],
+    "caching": [
+      "2026-04-16-iss-252-backend-typeerror-unhashable-dict-in-relevance-cac.md"
+    ],
+    "matrix-questions": [
+      "2026-04-16-iss-252-backend-typeerror-unhashable-dict-in-relevance-cac.md"
     ]
   },
   "fileIndex": {
