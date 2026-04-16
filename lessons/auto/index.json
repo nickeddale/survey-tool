@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-16T14:15:13.032Z",
+  "lastUpdated": "2026-04-16T14:30:34.412Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4963,6 +4963,24 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "low"
+    },
+    {
+      "file": "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md",
+      "ticketId": "ISS-263",
+      "title": "Matrix dropdown: rating cell value sent as string instead of number, fails validation",
+      "date": "2026-04-16",
+      "categories": [
+        "testing",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "documentation",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -5203,7 +5221,8 @@
       "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
       "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
       "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
-      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md"
+      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md",
+      "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5575,7 +5594,8 @@
       "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
       "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
       "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
-      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md"
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
+      "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5804,7 +5824,8 @@
       "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
       "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
       "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
-      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md"
+      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md",
+      "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6093,7 +6114,8 @@
       "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
       "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
       "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
-      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md"
+      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md",
+      "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6324,7 +6346,8 @@
       "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
       "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
       "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
-      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md"
+      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md",
+      "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6529,7 +6552,8 @@
       "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
       "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
       "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
-      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md"
+      "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md",
+      "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6916,7 +6940,8 @@
       "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
       "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md",
       "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
-      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md"
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
+      "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",

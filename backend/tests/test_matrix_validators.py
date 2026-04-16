@@ -707,6 +707,67 @@ def test_matrix_dropdown_settings_column_types_valid_all_types():
 
 
 # ---------------------------------------------------------------------------
+# validate_matrix_dropdown_answer — rating cell type (ISS-263)
+# ---------------------------------------------------------------------------
+
+
+def test_matrix_dropdown_answer_cell_type_rating_numeric_int_valid():
+    sqs = [make_subquestion("SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "rating"}})
+    validate_matrix_dropdown_answer({"value": {"SQ001": {"col1": 5}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_cell_type_rating_numeric_float_valid():
+    sqs = [make_subquestion("SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "rating"}})
+    validate_matrix_dropdown_answer({"value": {"SQ001": {"col1": 3.5}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_cell_type_rating_string_int_valid():
+    """Frontend sends rating values as strings (e.g. '5') — must be accepted."""
+    sqs = [make_subquestion("SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "rating"}})
+    validate_matrix_dropdown_answer({"value": {"SQ001": {"col1": "5"}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_cell_type_rating_string_all_values_valid():
+    """All valid rating string values 1-5 must pass."""
+    sqs = [make_subquestion("SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "rating"}})
+    for val in ("1", "2", "3", "4", "5"):
+        validate_matrix_dropdown_answer({"value": {"SQ001": {"col1": val}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_cell_type_rating_string_float_valid():
+    sqs = [make_subquestion("SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "rating"}})
+    validate_matrix_dropdown_answer({"value": {"SQ001": {"col1": "3.5"}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_cell_type_rating_non_numeric_string_raises():
+    """Non-numeric strings must still fail validation."""
+    sqs = [make_subquestion("SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "rating"}})
+    with pytest.raises(UnprocessableError, match="must be a number.*cell_type=rating"):
+        validate_matrix_dropdown_answer({"value": {"SQ001": {"col1": "abc"}}}, q, opts, sqs)
+
+
+def test_matrix_dropdown_answer_cell_type_rating_bool_raises():
+    """Boolean must still fail validation for rating."""
+    sqs = [make_subquestion("SQ001")]
+    opts = [make_option("col1")]
+    q = make_question(is_required=False, settings={"column_types": {"col1": "rating"}})
+    with pytest.raises(UnprocessableError, match="must be a number.*cell_type=rating"):
+        validate_matrix_dropdown_answer({"value": {"SQ001": {"col1": True}}}, q, opts, sqs)
+
+
+# ---------------------------------------------------------------------------
 # validate_matrix_settings — transpose support
 # ---------------------------------------------------------------------------
 
