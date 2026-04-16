@@ -14,14 +14,40 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import { useParams, useNavigate, UNSAFE_DataRouterContext } from 'react-router-dom'
 import surveyService from '../services/surveyService'
 import { useBuilderStore } from '../store/builderStore'
+import type { BuilderGroup, SelectedItem } from '../store/builderStore'
 import { ApiError } from '../types/api'
+import type { SurveyFullResponse } from '../types/survey'
 import { Button } from '../components/ui/button'
 import { BuilderToolbar } from '../components/survey-builder/BuilderToolbar'
 import { BuilderSkeleton } from '../components/survey-builder/BuilderSkeleton'
 import { QuestionPalette } from '../components/survey-builder/QuestionPalette'
 import { SurveyCanvas } from '../components/survey-builder/SurveyCanvas'
 import { PropertyEditor } from '../components/survey-builder/PropertyEditor'
+import { TranslationEditor } from '../components/survey-builder/TranslationEditor'
+import type { TranslationTarget } from '../components/survey-builder/TranslationEditor'
 import { NavigationBlocker } from '../components/survey-builder/NavigationBlocker'
+
+function buildTranslationTarget(
+  survey: SurveyFullResponse,
+  groups: BuilderGroup[],
+  selectedItem: SelectedItem
+): TranslationTarget {
+  if (selectedItem?.type === 'question') {
+    for (const g of groups) {
+      const q = g.questions.find((q) => q.id === selectedItem.id)
+      if (q) {
+        return { type: 'question', survey, group: g, question: q }
+      }
+    }
+  }
+  if (selectedItem?.type === 'group') {
+    const g = groups.find((g) => g.id === selectedItem.id)
+    if (g) {
+      return { type: 'group', survey, group: g }
+    }
+  }
+  return { type: 'survey', survey }
+}
 
 function SurveyBuilderPage() {
   const { id } = useParams<{ id: string }>()
@@ -46,11 +72,13 @@ function SurveyBuilderPage() {
     isTranslationMode,
     setTranslationMode,
     groups,
+    defaultLanguage,
     addQuestion,
   } = useBuilderStore()
 
   const readOnly = status !== '' && status !== 'draft'
   const [isPreviewMode, setIsPreviewMode] = useState(false)
+  const [surveyData, setSurveyData] = useState<SurveyFullResponse | null>(null)
   const undoRedoPendingRef = useRef(false)
   const hasUnsavedChanges = saveStatus === 'saving' || saveStatus === 'error'
 
@@ -154,7 +182,10 @@ function SurveyBuilderPage() {
       setError(null)
       try {
         const data = await surveyService.getSurvey(id!)
-        if (!cancelled) loadSurvey(data)
+        if (!cancelled) {
+          loadSurvey(data)
+          setSurveyData(data)
+        }
       } catch (err) {
         if (!cancelled) {
           setError(
@@ -213,7 +244,16 @@ function SurveyBuilderPage() {
           onSelectItem={setSelectedItem}
           isPreviewMode={isPreviewMode}
         />
-        <PropertyEditor surveyId={surveyId ?? ''} readOnly={readOnly} selectedItem={selectedItem} />
+        {isTranslationMode && surveyData ? (
+          <TranslationEditor
+            surveyId={surveyId ?? ''}
+            target={buildTranslationTarget(surveyData, groups, selectedItem)}
+            defaultLanguage={defaultLanguage}
+            availableLanguages={[]}
+          />
+        ) : (
+          <PropertyEditor surveyId={surveyId ?? ''} readOnly={readOnly} selectedItem={selectedItem} />
+        )}
       </div>
       {dataRouterContext && !readOnly && <NavigationBlocker shouldBlock={hasUnsavedChanges} />}
     </div>
