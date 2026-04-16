@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-16T12:31:00.993Z",
+  "lastUpdated": "2026-04-16T12:40:04.897Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -4892,6 +4892,26 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
+      "ticketId": "ISS-259",
+      "title": "Matrix response submission fails 422: validator runs against subquestions instead of parent",
+      "date": "2026-04-16",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -5129,7 +5149,8 @@
       "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
       "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
       "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md",
-      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md"
+      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5336,7 +5357,8 @@
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
       "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
       "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md",
-      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md"
+      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5498,7 +5520,8 @@
       "2026-04-14-iss-244-email-invitations-email-search-input-not-passed-to.md",
       "2026-04-14-iss-245-email-invitations-email-search-uses-exact-match-in.md",
       "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
-      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md"
+      "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5724,7 +5747,8 @@
       "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
       "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
       "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md",
-      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md"
+      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6009,7 +6033,8 @@
       "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
       "2026-04-16-iss-252-backend-typeerror-unhashable-dict-in-relevance-cac.md",
       "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
-      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md"
+      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6237,7 +6262,8 @@
       "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
       "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
       "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md",
-      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md"
+      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6438,7 +6464,8 @@
       "2026-04-14-iss-243-email-invitations-ssrf-protection-blocks-smtp-to-m.md",
       "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
       "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
-      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md"
+      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6606,7 +6633,8 @@
       "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
       "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
       "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md",
-      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md"
+      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6822,7 +6850,8 @@
       "2026-04-15-iss-251-ci-failure-testmatrixdropdownanswervalid-fails-aft.md",
       "2026-04-16-iss-253-builder-matrixsinglematrixmultiple-types-not-recog.md",
       "2026-04-16-iss-255-matrix-transpose-setting-has-no-effect-on-response.md",
-      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md"
+      "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
+      "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",

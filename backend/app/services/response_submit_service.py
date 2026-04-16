@@ -118,6 +118,9 @@ async def _complete_response_core(
     # Build a list of "virtual" answers for required visible questions with no answer.
     for group in survey.groups:
         for question in group.questions:
+            # Skip subquestions — their answers are stored on the parent question
+            if question.parent_id is not None:
+                continue
             if question.id in visible_question_ids and question.id not in answered_question_ids:
                 # Add a virtual "no answer" entry so _validate_answers can check required
                 answer_dicts.append({"question_id": question.id, "value": None})
