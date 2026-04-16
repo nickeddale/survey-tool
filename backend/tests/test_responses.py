@@ -2951,3 +2951,143 @@ async def test_update_response_status_api_key_empty_scopes_returns_403(client: A
     assert resp.status_code == 403
     body = resp.json()
     assert body["detail"]["code"] == "FORBIDDEN"
+
+
+# --------------------------------------------------------------------------- #
+# ISS-259: Matrix response completion — subquestion validator skip
+# --------------------------------------------------------------------------- #
+
+
+async def _create_matrix_survey_with_options(
+    client: AsyncClient,
+) -> tuple[str, str, dict]:
+    """Create an active survey with a matrix_single question (3 subquestions, 3 options).
+
+    Returns (survey_id, parent_question_id, auth_headers).
+    """
+    headers = await auth_headers(client, email="matrix_complete_259@example.com")
+    survey_id = await create_survey(client, headers, title="Matrix Complete Survey ISS-259")
+
+    # Create a group
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": "Matrix Group"},
+        headers=headers,
+    )
+    assert group_resp.status_code == 201
+    group_id = group_resp.json()["id"]
+
+    # Create parent matrix question
+    parent_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={
+            "title": "Matrix Question",
+            "question_type": "matrix_single",
+            "code": "MAT1",
+            "is_required": True,
+        },
+        headers=headers,
+    )
+    assert parent_resp.status_code == 201
+    parent_id = parent_resp.json()["id"]
+
+    # Add 3 subquestions
+    for i, sq_code in enumerate(["SQ001", "SQ002", "SQ003"], start=1):
+        sq_resp = await client.post(
+            f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+            json={
+                "title": f"Row {sq_code}",
+                "question_type": "matrix_single",
+                "code": sq_code,
+                "parent_id": parent_id,
+                "sort_order": i,
+            },
+            headers=headers,
+        )
+        assert sq_resp.status_code == 201
+
+    # Add 3 answer options to the parent
+    for opt_code in ["A1", "A2", "A3"]:
+        opt_resp = await client.post(
+            f"{SURVEYS_URL}/{survey_id}/questions/{parent_id}/options",
+            json={"code": opt_code, "title": f"Option {opt_code}"},
+            headers=headers,
+        )
+        assert opt_resp.status_code == 201
+
+    await activate_survey(client, headers, survey_id)
+    return survey_id, parent_id, headers
+
+
+@pytest.mark.asyncio
+async def test_matrix_complete_with_all_subquestions_answered_returns_200(
+    client: AsyncClient,
+):
+    """Completing a matrix response with all subquestions answered returns 200.
+
+    Regression test for ISS-259: validator previously ran against subquestions (SQ001,
+    SQ002, SQ003) instead of the parent question, causing a 422 because each subquestion
+    lacks its own standalone answer dict.
+    """
+    survey_id, parent_id, _ = await _create_matrix_survey_with_options(client)
+
+    # Start a response
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # Partial save: answer stored on the parent question (dict mapping subq code -> option code)
+    patch_partial = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={
+            "answers": [
+                {
+                    "question_id": parent_id,
+                    "value": {"SQ001": "A1", "SQ002": "A2", "SQ003": "A3"},
+                }
+            ]
+        },
+    )
+    assert patch_partial.status_code == 200
+
+    # Complete — must return 200, not 422
+    patch_complete = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"status": "complete"},
+    )
+    assert patch_complete.status_code == 200, patch_complete.text
+    body = patch_complete.json()
+    assert body["status"] == "complete"
+    assert body["completed_at"] is not None
+
+
+@pytest.mark.asyncio
+async def test_matrix_complete_missing_answer_on_required_parent_returns_422(
+    client: AsyncClient,
+):
+    """Completing a matrix response without answering the required parent returns 422.
+
+    Regression guard: the fix must not allow unanswered required matrix questions through.
+    """
+    survey_id, _parent_id, _ = await _create_matrix_survey_with_options(client)
+
+    # Start a response without saving any answers
+    post_resp = await client.post(f"{SURVEYS_URL}/{survey_id}/responses", json={})
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # Complete without any answers — required matrix parent must be flagged
+    patch_complete = await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}",
+        json={"status": "complete"},
+    )
+    assert patch_complete.status_code == 422
+    body = patch_complete.json()
+    assert body["detail"]["code"] == "VALIDATION_ERROR"
+    errors = body["detail"]["errors"]
+    # Only the parent question (MAT1) should appear in errors, NOT the subquestions
+    error_codes = {e["question_code"] for e in errors}
+    assert "MAT1" in error_codes
+    assert "SQ001" not in error_codes
+    assert "SQ002" not in error_codes
+    assert "SQ003" not in error_codes

@@ -138,6 +138,10 @@ async def _validate_answers(
             })
             continue
 
+        # Skip subquestions — their answers are stored on the parent question
+        if question.parent_id is not None:
+            continue
+
         # Fetch answer_options for this question
         ao_result = await session.execute(
             select(AnswerOption).where(AnswerOption.question_id == question_id)
