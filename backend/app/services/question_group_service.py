@@ -82,13 +82,17 @@ async def create_group(
     session.add(group)
     await session.flush()
 
-    # Reload with questions eagerly loaded
+    # Reload with all questions and their nested relations eagerly loaded.
+    # Subquestion filtering (parent_id is None) is handled at the schema layer.
     result = await session.execute(
         select(QuestionGroup)
         .where(QuestionGroup.id == group.id)
         .options(
-            selectinload(QuestionGroup.questions).selectinload(Question.subquestions),
-            selectinload(QuestionGroup.questions).selectinload(Question.answer_options),
+            selectinload(QuestionGroup.questions)
+            .selectinload(Question.subquestions)
+            .selectinload(Question.answer_options),
+            selectinload(QuestionGroup.questions)
+            .selectinload(Question.answer_options),
         )
     )
     return result.scalar_one()
@@ -110,8 +114,11 @@ async def get_group_by_id(
             Survey.user_id == user_id,
         )
         .options(
-            selectinload(QuestionGroup.questions).selectinload(Question.subquestions),
-            selectinload(QuestionGroup.questions).selectinload(Question.answer_options),
+            selectinload(QuestionGroup.questions)
+            .selectinload(Question.subquestions)
+            .selectinload(Question.answer_options),
+            selectinload(QuestionGroup.questions)
+            .selectinload(Question.answer_options),
         )
     )
     return result.scalar_one_or_none()
@@ -131,8 +138,11 @@ async def list_groups(
         .where(QuestionGroup.survey_id == survey_id)
         .order_by(QuestionGroup.sort_order)
         .options(
-            selectinload(QuestionGroup.questions).selectinload(Question.subquestions),
-            selectinload(QuestionGroup.questions).selectinload(Question.answer_options),
+            selectinload(QuestionGroup.questions)
+            .selectinload(Question.subquestions)
+            .selectinload(Question.answer_options),
+            selectinload(QuestionGroup.questions)
+            .selectinload(Question.answer_options),
         )
     )
     return list(result.scalars().all())
@@ -157,13 +167,17 @@ async def update_group(
     session.add(group)
     await session.flush()
 
-    # Reload with questions eagerly loaded
+    # Reload with all questions and their nested relations eagerly loaded.
+    # Subquestion filtering (parent_id is None) is handled at the schema layer.
     result = await session.execute(
         select(QuestionGroup)
         .where(QuestionGroup.id == group.id)
         .options(
-            selectinload(QuestionGroup.questions).selectinload(Question.subquestions),
-            selectinload(QuestionGroup.questions).selectinload(Question.answer_options),
+            selectinload(QuestionGroup.questions)
+            .selectinload(Question.subquestions)
+            .selectinload(Question.answer_options),
+            selectinload(QuestionGroup.questions)
+            .selectinload(Question.answer_options),
         )
     )
     return result.scalar_one()
@@ -225,8 +239,11 @@ async def reorder_groups(
         .where(QuestionGroup.survey_id == survey_id)
         .order_by(QuestionGroup.sort_order)
         .options(
-            selectinload(QuestionGroup.questions).selectinload(Question.subquestions),
-            selectinload(QuestionGroup.questions).selectinload(Question.answer_options),
+            selectinload(QuestionGroup.questions)
+            .selectinload(Question.subquestions)
+            .selectinload(Question.answer_options),
+            selectinload(QuestionGroup.questions)
+            .selectinload(Question.answer_options),
         )
     )
     return list(result2.scalars().all())

@@ -19,8 +19,8 @@ import type { UserResponse, LoginRequest, UserCreate, UserUpdateRequest } from '
 interface AuthState {
   user: UserResponse | null
   isAuthenticated: boolean
-  isInitializing: boolean  // true only during cold-start token check; set false once, never again
-  isLoading: boolean       // true during any in-flight auth action (login, logout, register, update)
+  isInitializing: boolean // true only during cold-start token check; set false once, never again
+  isLoading: boolean // true during any in-flight auth action (login, logout, register, update)
 
   // Actions
   initialize: () => Promise<void>
@@ -33,7 +33,7 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
-  isInitializing: true,  // starts true — blocks route guards until initialize() completes
+  isInitializing: true, // starts true — blocks route guards until initialize() completes
   isLoading: false,
 
   /**

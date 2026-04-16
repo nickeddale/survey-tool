@@ -3,7 +3,11 @@
  */
 
 import type { BuilderQuestion } from '../../../store/builderStore'
-import type { RadioSettings, CheckboxSettings, DropdownSettings } from '../../../types/questionSettings'
+import type {
+  RadioSettings,
+  CheckboxSettings,
+  DropdownSettings,
+} from '../../../types/questionSettings'
 
 export interface QuestionPreviewProps {
   question: BuilderQuestion
@@ -128,14 +132,10 @@ export function ChoicePreview({ question }: QuestionPreviewProps) {
               {opt.title}
             </option>
           ))}
-          {s.has_other && (
-            <option value="__other__">{s.other_text ?? 'Other'}</option>
-          )}
+          {s.has_other && <option value="__other__">{s.other_text ?? 'Other'}</option>}
         </select>
         {s.searchable && (
-          <p className="text-xs text-muted-foreground italic mt-1">
-            (Searchable dropdown)
-          </p>
+          <p className="text-xs text-muted-foreground italic mt-1">(Searchable dropdown)</p>
         )}
       </div>
     )

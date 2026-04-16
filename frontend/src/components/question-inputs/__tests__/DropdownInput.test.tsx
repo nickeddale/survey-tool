@@ -111,7 +111,9 @@ describe('DropdownInput — rendering', () => {
   })
 
   it('uses custom other_text label', () => {
-    const question = makeQuestion({ settings: makeSettings({ has_other: true, other_text: 'N/A' }) })
+    const question = makeQuestion({
+      settings: makeSettings({ has_other: true, other_text: 'N/A' }),
+    })
     render(<DropdownInput value="" onChange={vi.fn()} question={question} />)
     expect(screen.getByText('N/A')).toBeInTheDocument()
   })
@@ -267,7 +269,12 @@ describe('DropdownInput — external errors prop', () => {
   it('displays external errors immediately without blur', () => {
     const question = makeQuestion()
     render(
-      <DropdownInput value="" onChange={vi.fn()} question={question} errors={['Server error occurred']} />
+      <DropdownInput
+        value=""
+        onChange={vi.fn()}
+        question={question}
+        errors={['Server error occurred']}
+      />
     )
     expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error occurred')
   })

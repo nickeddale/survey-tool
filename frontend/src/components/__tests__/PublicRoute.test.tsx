@@ -24,7 +24,10 @@ function LocationDisplay() {
 
 function renderPublicRoute(initialPath: string) {
   return render(
-    <MemoryRouter initialEntries={[initialPath]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <MemoryRouter
+      initialEntries={[initialPath]}
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
       <AuthProvider>
         <Routes>
           <Route element={<PublicRoute />}>
@@ -35,7 +38,7 @@ function renderPublicRoute(initialPath: string) {
           <Route path="*" element={<LocationDisplay />} />
         </Routes>
       </AuthProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
@@ -48,15 +51,18 @@ describe('PublicRoute', () => {
     clearTokens()
     localStorage.clear()
     // Reset store but keep isInitializing: true so AuthProvider.initialize() drives the state
-    useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: true, isLoading: false })
+    useAuthStore.setState({
+      user: null,
+      isAuthenticated: false,
+      isInitializing: true,
+      isLoading: false,
+    })
   })
 
   it('shows loading spinner while isInitializing is true', async () => {
     // Make refresh endpoint hang so initialize() keeps isInitializing=true
     setTokens(mockTokens.access_token)
-    server.use(
-      http.post('/api/v1/auth/refresh', () => new Promise<never>(() => {})),
-    )
+    server.use(http.post('/api/v1/auth/refresh', () => new Promise<never>(() => {})))
 
     renderPublicRoute('/login')
     // isInitializing should be true immediately while the hung refresh is pending
@@ -68,7 +74,12 @@ describe('PublicRoute', () => {
   it('renders children when isLoading is true (login in progress) but not isInitializing', async () => {
     // Simulate a login attempt in progress: isInitializing=false, isLoading=true
     // PublicRoute should NOT replace Outlet with a spinner in this case
-    useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: true })
+    useAuthStore.setState({
+      user: null,
+      isAuthenticated: false,
+      isInitializing: false,
+      isLoading: true,
+    })
     renderPublicRoute('/login')
     await waitFor(() => {
       expect(screen.getByText('Login Content')).toBeInTheDocument()

@@ -61,14 +61,12 @@ function SurveysPage() {
     return isNaN(p) || p < 1 ? 1 : p
   })
   const [statusFilter, setStatusFilter] = useState<string>(
-    () => searchParams.get('status') ?? 'all',
+    () => searchParams.get('status') ?? 'all'
   )
-  const [searchInput, setSearchInput] = useState<string>(
-    () => searchParams.get('search') ?? '',
-  )
+  const [searchInput, setSearchInput] = useState<string>(() => searchParams.get('search') ?? '')
   // The debounced search value that actually triggers the fetch
   const [debouncedSearch, setDebouncedSearch] = useState<string>(
-    () => searchParams.get('search') ?? '',
+    () => searchParams.get('search') ?? ''
   )
 
   const [surveys, setSurveys] = useState<SurveyResponse[]>([])
@@ -169,7 +167,7 @@ function SurveysPage() {
         setError('Failed to delete survey. Please try again.')
       }
     },
-    [page, statusFilter, debouncedSearch],
+    [page, statusFilter, debouncedSearch]
   )
 
   // ---------------------------------------------------------------------------
@@ -202,7 +200,10 @@ function SurveysPage() {
 
       {/* Error alert */}
       {error && (
-        <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+        <div
+          className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+          role="alert"
+        >
           {error}
         </div>
       )}
@@ -235,16 +236,17 @@ function SurveysPage() {
       {isLoading ? (
         <SurveyListSkeleton />
       ) : surveys.length === 0 ? (
-        <div className="text-center py-16 bg-card border border-border rounded-lg" data-testid="empty-state">
+        <div
+          className="text-center py-16 bg-card border border-border rounded-lg"
+          data-testid="empty-state"
+        >
           <p className="text-muted-foreground text-sm mb-4">
             {debouncedSearch || statusFilter !== 'all'
               ? 'No surveys match your filters.'
               : "You haven't created any surveys yet."}
           </p>
           {!debouncedSearch && statusFilter === 'all' && (
-            <Button onClick={() => navigate('/surveys/new')}>
-              Create your first survey
-            </Button>
+            <Button onClick={() => navigate('/surveys/new')}>Create your first survey</Button>
           )}
         </div>
       ) : (
@@ -256,9 +258,15 @@ function SurveysPage() {
                 <tr>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Title</th>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Status</th>
-                  <th className="hidden sm:table-cell text-left px-4 py-3 font-medium text-muted-foreground">Questions</th>
-                  <th className="hidden sm:table-cell text-left px-4 py-3 font-medium text-muted-foreground">Created</th>
-                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">Actions</th>
+                  <th className="hidden sm:table-cell text-left px-4 py-3 font-medium text-muted-foreground">
+                    Questions
+                  </th>
+                  <th className="hidden sm:table-cell text-left px-4 py-3 font-medium text-muted-foreground">
+                    Created
+                  </th>
+                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">

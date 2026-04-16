@@ -306,7 +306,12 @@ describe('BooleanInput — required validation (radio)', () => {
 describe('BooleanInput — external errors prop', () => {
   it('displays external errors immediately without blur', () => {
     render(
-      <BooleanInput value="" onChange={vi.fn()} question={makeQuestion()} errors={['Server error']} />
+      <BooleanInput
+        value=""
+        onChange={vi.fn()}
+        question={makeQuestion()}
+        errors={['Server error']}
+      />
     )
     expect(screen.getByTestId('validation-errors')).toHaveTextContent('Server error')
   })
@@ -331,9 +336,7 @@ describe('BooleanInput — accessibility (toggle)', () => {
 
   it('sets aria-describedby pointing to error container when errors present', () => {
     const question = makeQuestion({ id: 'q-test' })
-    render(
-      <BooleanInput value="" onChange={vi.fn()} question={question} errors={['Required']} />
-    )
+    render(<BooleanInput value="" onChange={vi.fn()} question={question} errors={['Required']} />)
     const toggle = screen.getByTestId('boolean-toggle')
     expect(toggle).toHaveAttribute('aria-describedby', 'question-q-test-error')
     expect(screen.getByTestId('validation-errors')).toHaveAttribute('id', 'question-q-test-error')

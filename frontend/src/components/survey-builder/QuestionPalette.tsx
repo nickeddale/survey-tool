@@ -7,7 +7,7 @@
  * is planned for a future iteration).
  */
 
-import { Type, List, AlignLeft, CheckSquare, ToggleLeft, Hash } from 'lucide-react'
+import { Type, List, AlignLeft, CheckSquare, ToggleLeft, Hash, Grid3x3 } from 'lucide-react'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -20,6 +20,10 @@ export const QUESTION_TYPES = [
   { type: 'multiple_choice', label: 'Multiple Choice', icon: CheckSquare },
   { type: 'dropdown', label: 'Dropdown', icon: List },
   { type: 'number', label: 'Number', icon: Hash },
+  { type: 'matrix_single', label: 'Matrix (Single)', icon: Grid3x3 },
+  { type: 'matrix_multiple', label: 'Matrix (Multi)', icon: Grid3x3 },
+  { type: 'matrix_dropdown', label: 'Matrix (Dropdown)', icon: Grid3x3 },
+  { type: 'matrix_dynamic', label: 'Matrix (Dynamic)', icon: Grid3x3 },
 ]
 
 // ---------------------------------------------------------------------------
@@ -43,7 +47,9 @@ export function QuestionPalette({ readOnly, onAddQuestion }: QuestionPaletteProp
       data-testid="question-palette"
     >
       <div className="px-3 py-3 border-b border-border">
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Question Types</p>
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+          Question Types
+        </p>
       </div>
       <div className="p-2 space-y-1">
         {QUESTION_TYPES.map(({ type, label, icon: Icon }) => (
@@ -51,9 +57,10 @@ export function QuestionPalette({ readOnly, onAddQuestion }: QuestionPaletteProp
             key={type}
             type="button"
             className={`w-full flex items-center gap-2 px-2 py-2 rounded-md text-sm text-left transition-colors
-              ${readOnly
-                ? 'text-muted-foreground cursor-not-allowed opacity-50'
-                : 'hover:bg-muted text-foreground cursor-pointer'
+              ${
+                readOnly
+                  ? 'text-muted-foreground cursor-not-allowed opacity-50'
+                  : 'hover:bg-muted text-foreground cursor-pointer'
               }`}
             disabled={readOnly}
             aria-label={`Add ${label} question`}

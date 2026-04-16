@@ -3,8 +3,8 @@
 Adds 'question' value to assessment_scope enum and adds nullable question_id
 FK column to the assessments table.
 
-Revision ID: 0014
-Revises: 0013
+Revision ID: 0014b
+Revises: 0014
 Create Date: 2026-04-09 00:00:00.000000
 """
 
@@ -13,8 +13,8 @@ from alembic import op
 from sqlalchemy.dialects.postgresql import UUID
 
 # revision identifiers, used by Alembic.
-revision = "0014"
-down_revision = "0013"
+revision = "0014b"
+down_revision = "0014"
 branch_labels = None
 depends_on = None
 

@@ -2,7 +2,13 @@ import { useState, useEffect } from 'react'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
-import type { AssessmentResponse, AssessmentCreate, AssessmentScope, QuestionGroupResponse, QuestionResponse } from '../../types/survey'
+import type {
+  AssessmentResponse,
+  AssessmentCreate,
+  AssessmentScope,
+  QuestionGroupResponse,
+  QuestionResponse,
+} from '../../types/survey'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -51,8 +57,12 @@ function AssessmentForm({
   const [scope, setScope] = useState<AssessmentScope>(assessment?.scope ?? 'total')
   const [groupId, setGroupId] = useState<string>(assessment?.group_id ?? '')
   const [questionId, setQuestionId] = useState<string>(assessment?.question_id ?? '')
-  const [minScore, setMinScore] = useState<string>(assessment != null ? String(assessment.min_score) : '')
-  const [maxScore, setMaxScore] = useState<string>(assessment != null ? String(assessment.max_score) : '')
+  const [minScore, setMinScore] = useState<string>(
+    assessment != null ? String(assessment.min_score) : ''
+  )
+  const [maxScore, setMaxScore] = useState<string>(
+    assessment != null ? String(assessment.max_score) : ''
+  )
   const [message, setMessage] = useState(assessment?.message ?? '')
   const [validationError, setValidationError] = useState<string | null>(null)
 
@@ -140,10 +150,7 @@ function AssessmentForm({
     >
       <div className="bg-background rounded-lg shadow-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="p-6">
-          <h2
-            id="assessment-form-title"
-            className="text-lg font-semibold text-foreground mb-4"
-          >
+          <h2 id="assessment-form-title" className="text-lg font-semibold text-foreground mb-4">
             {isEdit ? 'Edit Assessment' : 'Create Assessment'}
           </h2>
 
@@ -235,7 +242,8 @@ function AssessmentForm({
                     <option value="">Select a question...</option>
                     {questions.map((q) => (
                       <option key={q.id} value={q.id}>
-                        {q.code ? `${q.code}: ` : ''}{q.title}
+                        {q.code ? `${q.code}: ` : ''}
+                        {q.title}
                       </option>
                     ))}
                   </select>
@@ -289,19 +297,10 @@ function AssessmentForm({
 
             {/* Actions */}
             <div className="flex gap-3 justify-end mt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-                disabled={isLoading}
-              >
+              <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                disabled={isLoading}
-                data-testid="assessment-form-submit"
-              >
+              <Button type="submit" disabled={isLoading} data-testid="assessment-form-submit">
                 {isLoading ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Assessment'}
               </Button>
             </div>

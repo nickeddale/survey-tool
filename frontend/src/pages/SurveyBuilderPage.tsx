@@ -105,10 +105,16 @@ function SurveyBuilderPage() {
       const isMeta = e.metaKey || e.ctrlKey
       if (isMeta && e.shiftKey && e.key === 'z') {
         e.preventDefault()
-        if (redoStack.length > 0) { undoRedoPendingRef.current = true; redo() }
+        if (redoStack.length > 0) {
+          undoRedoPendingRef.current = true
+          redo()
+        }
       } else if (isMeta && !e.shiftKey && e.key === 'z') {
         e.preventDefault()
-        if (undoStack.length > 0) { undoRedoPendingRef.current = true; undo() }
+        if (undoStack.length > 0) {
+          undoRedoPendingRef.current = true
+          undo()
+        }
       }
     }
 
@@ -129,7 +135,10 @@ function SurveyBuilderPage() {
   // Block browser close / tab refresh when there are unsaved changes
   useEffect(() => {
     function handleBeforeUnload(e: BeforeUnloadEvent) {
-      if (hasUnsavedChanges) { e.preventDefault(); e.returnValue = '' }
+      if (hasUnsavedChanges) {
+        e.preventDefault()
+        e.returnValue = ''
+      }
     }
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
@@ -148,7 +157,9 @@ function SurveyBuilderPage() {
         if (!cancelled) loadSurvey(data)
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof ApiError ? err.message : 'Failed to load survey. Please try again.')
+          setError(
+            err instanceof ApiError ? err.message : 'Failed to load survey. Please try again.'
+          )
         }
       } finally {
         if (!cancelled) setLoading(false)
@@ -156,18 +167,28 @@ function SurveyBuilderPage() {
     }
 
     load()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (isLoading) return <BuilderSkeleton />
 
   if (error || !surveyId) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen gap-4" data-testid="builder-error">
-        <div className="p-4 text-sm text-destructive bg-destructive/10 rounded-md max-w-md text-center" role="alert">
+      <div
+        className="flex flex-col items-center justify-center h-screen gap-4"
+        data-testid="builder-error"
+      >
+        <div
+          className="p-4 text-sm text-destructive bg-destructive/10 rounded-md max-w-md text-center"
+          role="alert"
+        >
           {error ?? 'Failed to load survey.'}
         </div>
-        <Button variant="outline" onClick={() => navigate('/surveys')}>Back to Surveys</Button>
+        <Button variant="outline" onClick={() => navigate('/surveys')}>
+          Back to Surveys
+        </Button>
       </div>
     )
   }
@@ -194,9 +215,7 @@ function SurveyBuilderPage() {
         />
         <PropertyEditor surveyId={surveyId ?? ''} readOnly={readOnly} selectedItem={selectedItem} />
       </div>
-      {dataRouterContext && !readOnly && (
-        <NavigationBlocker shouldBlock={hasUnsavedChanges} />
-      )}
+      {dataRouterContext && !readOnly && <NavigationBlocker shouldBlock={hasUnsavedChanges} />}
     </div>
   )
 }

@@ -24,7 +24,10 @@ function LocationDisplay() {
 
 function renderAppLayout(initialPath = '/dashboard') {
   return render(
-    <MemoryRouter initialEntries={[initialPath]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <MemoryRouter
+      initialEntries={[initialPath]}
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
       <AuthProvider>
         <Routes>
           <Route element={<AppLayout />}>
@@ -35,7 +38,7 @@ function renderAppLayout(initialPath = '/dashboard') {
           <Route path="*" element={<LocationDisplay />} />
         </Routes>
       </AuthProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
@@ -47,7 +50,12 @@ describe('AppLayout', () => {
   beforeEach(() => {
     clearTokens()
     localStorage.clear()
-    useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
+    useAuthStore.setState({
+      user: null,
+      isAuthenticated: false,
+      isInitializing: false,
+      isLoading: false,
+    })
     vi.restoreAllMocks()
   })
 
@@ -223,9 +231,7 @@ describe('AppLayout', () => {
     it('does not render nav content while auth is initializing', async () => {
       // Make refresh hang so isLoading stays true
       setTokens(mockTokens.access_token)
-      server.use(
-        http.post('/api/v1/auth/refresh', () => new Promise<never>(() => {})),
-      )
+      server.use(http.post('/api/v1/auth/refresh', () => new Promise<never>(() => {})))
 
       renderAppLayout()
 

@@ -15,11 +15,7 @@ import surveyService from '../../services/surveyService'
 import type { ValidateExpressionResult } from '../../types/survey'
 import { ExpressionPreview } from './ExpressionPreview'
 import type { ConditionGroup } from './logic/types'
-import {
-  parseExpression,
-  serializeRootGroup,
-  makeEmptyGroup,
-} from './logic/expressionUtils'
+import { parseExpression, serializeRootGroup, makeEmptyGroup } from './logic/expressionUtils'
 import { ConditionGroupEditor } from './logic/ConditionGroupEditor'
 import { ValidationFeedback } from './logic/ValidationFeedback'
 
@@ -58,9 +54,7 @@ export function LogicEditor({
   disabled = false,
 }: LogicEditorProps) {
   // Filter to only questions that appear before this one
-  const eligibleQuestions = previousQuestions.filter(
-    (q) => q.sort_order < currentSortOrder,
-  )
+  const eligibleQuestions = previousQuestions.filter((q) => q.sort_order < currentSortOrder)
 
   // Mode: 'visual' or 'raw'
   const [mode, setMode] = useState<'visual' | 'raw'>('visual')
@@ -127,7 +121,7 @@ export function LogicEditor({
         }
       }, 500)
     },
-    [surveyId, currentQuestionCode],
+    [surveyId, currentQuestionCode]
   )
 
   useEffect(() => {
@@ -176,8 +170,7 @@ export function LogicEditor({
   }
 
   // Derived preview expression
-  const previewExpression =
-    mode === 'visual' ? serializeRootGroup(conditionGroup) : rawValue
+  const previewExpression = mode === 'visual' ? serializeRootGroup(conditionGroup) : rawValue
 
   return (
     <div className="space-y-2" data-testid="logic-editor">
@@ -192,7 +185,11 @@ export function LogicEditor({
           }`}
           onClick={() => handleModeToggle('visual')}
           disabled={disabled || (!canVisual && !!value)}
-          title={!canVisual && !!value ? 'Expression cannot be parsed visually — edit in Raw mode' : undefined}
+          title={
+            !canVisual && !!value
+              ? 'Expression cannot be parsed visually — edit in Raw mode'
+              : undefined
+          }
           data-testid="logic-editor-mode-visual"
         >
           Visual
@@ -265,7 +262,14 @@ export function LogicEditor({
             viewBox="0 0 24 24"
             aria-hidden="true"
           >
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
             <path
               className="opacity-75"
               fill="currentColor"
@@ -286,14 +290,17 @@ export function LogicEditor({
       )}
 
       {/* Test Expression panel */}
-      {showTestPanel && validationResult && validationResult.errors.length === 0 && previewExpression && (
-        <ExpressionPreview
-          surveyId={surveyId}
-          expression={previewExpression}
-          parsedVariables={validationResult.parsed_variables}
-          disabled={disabled}
-        />
-      )}
+      {showTestPanel &&
+        validationResult &&
+        validationResult.errors.length === 0 &&
+        previewExpression && (
+          <ExpressionPreview
+            surveyId={surveyId}
+            expression={previewExpression}
+            parsedVariables={validationResult.parsed_variables}
+            disabled={disabled}
+          />
+        )}
     </div>
   )
 }

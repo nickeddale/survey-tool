@@ -37,13 +37,11 @@ const Q2 = mockSurveyFull.groups[0].questions[1] // radio, 'How satisfied are yo
 
 function renderEditor(surveyId = SURVEY_ID, readOnly = false) {
   return render(
-    <MemoryRouter
-      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-    >
+    <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AuthProvider>
         <QuestionEditor surveyId={surveyId} readOnly={readOnly} />
       </AuthProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
@@ -54,13 +52,23 @@ function renderEditor(surveyId = SURVEY_ID, readOnly = false) {
 beforeEach(() => {
   clearTokens()
   localStorage.clear()
-  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
+  useAuthStore.setState({
+    user: null,
+    isAuthenticated: false,
+    isInitializing: false,
+    isLoading: false,
+  })
   useBuilderStore.getState().reset()
 
   // Pre-populate auth state without triggering AuthProvider.initialize()
   setTokens(mockTokens.access_token)
   localStorage.removeItem('devtracker_refresh_token')
-  useAuthStore.setState({ user: mockUser, isAuthenticated: true, isInitializing: false, isLoading: false })
+  useAuthStore.setState({
+    user: mockUser,
+    isAuthenticated: true,
+    isInitializing: false,
+    isLoading: false,
+  })
 
   // Load survey into builder store
   useBuilderStore.getState().loadSurvey(mockSurveyFull)
@@ -155,7 +163,7 @@ describe('question selection populates fields', () => {
           <AuthProvider>
             <QuestionEditor surveyId={SURVEY_ID} readOnly={false} />
           </AuthProvider>
-        </MemoryRouter>,
+        </MemoryRouter>
       )
     })
     expect(screen.getByTestId('property-question-title')).toHaveValue(Q2.title)
@@ -481,8 +489,8 @@ describe('debounced PATCH calls', () => {
           const q = mockSurveyFull.groups[0].questions[0]
           const body = (await request.json()) as Record<string, unknown>
           return HttpResponse.json({ ...q, ...body }, { status: 200 })
-        },
-      ),
+        }
+      )
     )
 
     useBuilderStore.getState().setSelectedItem({ type: 'question', id: Q1.id })
@@ -499,7 +507,7 @@ describe('debounced PATCH calls', () => {
       () => {
         expect(capturedRequests.length).toBe(1)
       },
-      { timeout: 2000 },
+      { timeout: 2000 }
     )
   })
 })

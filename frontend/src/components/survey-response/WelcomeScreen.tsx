@@ -21,7 +21,10 @@ export function WelcomeScreen({
         </div>
       )}
       {availableLanguages.length > 1 && (
-        <div className="flex justify-end max-w-2xl mx-auto px-8 pt-4" data-testid="language-switcher">
+        <div
+          className="flex justify-end max-w-2xl mx-auto px-8 pt-4"
+          data-testid="language-switcher"
+        >
           <div className="flex items-center gap-2">
             <label htmlFor="lang-select" className="text-sm text-muted-foreground">
               Language:
@@ -29,11 +32,11 @@ export function WelcomeScreen({
             <select
               id="lang-select"
               value={activeLang ?? survey.default_language}
-              onChange={e => onLangChange(e.target.value)}
+              onChange={(e) => onLangChange(e.target.value)}
               className="px-2 py-1 rounded border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               data-testid="response-lang-select"
             >
-              {availableLanguages.map(lang => (
+              {availableLanguages.map((lang) => (
                 <option key={lang} value={lang}>
                   {LANGUAGE_LABELS[lang] ?? lang}
                 </option>
@@ -59,12 +62,7 @@ export function WelcomeScreen({
             {survey.welcome_message}
           </div>
         )}
-        <Button
-          onClick={onStart}
-          disabled={isStarting}
-          size="lg"
-          data-testid="start-survey-button"
-        >
+        <Button onClick={onStart} disabled={isStarting} size="lg" data-testid="start-survey-button">
           {isStarting ? 'Starting…' : 'Start Survey'}
         </Button>
       </div>

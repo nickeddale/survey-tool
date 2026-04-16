@@ -337,7 +337,7 @@ async def test_resolve_flow_exceeds_limit_returns_429(client: AsyncClient):
     headers = await _get_auth_headers(client, "rl_resolve_flow@example.com")
     survey_id = "00000000-0000-0000-0000-000000000005"
     url = f"/api/v1/surveys/{survey_id}/logic/resolve-flow"
-    payload = {"answers": {}, "direction": "forward"}
+    payload = {"answers": [], "direction": "forward"}
 
     for _ in range(DEFAULT_MUTATING_LIMIT):
         await client.post(url, json=payload, headers=headers)

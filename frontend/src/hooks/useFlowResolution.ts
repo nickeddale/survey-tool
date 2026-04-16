@@ -61,7 +61,7 @@ export function computeInitialHiddenQuestions(questions: QuestionResponse[]): Se
 export function useFlowResolution(
   surveyId: string | undefined,
   answers: AnswerMap,
-  questions?: QuestionResponse[],
+  questions?: QuestionResponse[]
 ): FlowResolutionState {
   const initialHidden = questions ? computeInitialHiddenQuestions(questions) : new Set<string>()
 
@@ -100,10 +100,9 @@ export function useFlowResolution(
 
   // Trigger effect only when the serialized answers content or surveyId actually changes.
   // We compute the key as a stable primitive that can safely be used as a dep.
-  const answersKey =
-    surveyId
-      ? JSON.stringify(Object.entries(answers).sort(([a], [b]) => a.localeCompare(b)))
-      : null
+  const answersKey = surveyId
+    ? JSON.stringify(Object.entries(answers).sort(([a], [b]) => a.localeCompare(b)))
+    : null
 
   useEffect(() => {
     if (!surveyId || answersKey === null) {
@@ -130,10 +129,9 @@ export function useFlowResolution(
           value,
         }))
 
-        const result: ResolveFlowResponse = await responseService.resolveFlow(
-          surveyIdRef.current,
-          { answers: answerInputs },
-        )
+        const result: ResolveFlowResponse = await responseService.resolveFlow(surveyIdRef.current, {
+          answers: answerInputs,
+        })
 
         if (!isMountedRef.current) return
 
@@ -153,7 +151,6 @@ export function useFlowResolution(
         }
       }
     }, 300)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [surveyId, answersKey])
   // Note: `answersKey` is derived from `answers` contents (not the reference),
   // so this effect only re-fires when the actual answer values change.

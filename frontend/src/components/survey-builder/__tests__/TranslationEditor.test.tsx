@@ -68,7 +68,7 @@ function renderSurveyTarget(overrides: Partial<typeof mockSurvey> = {}) {
         defaultLanguage="en"
         availableLanguages={['fr', 'es']}
       />
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
@@ -160,10 +160,10 @@ describe('TranslationEditor', () => {
             expect.objectContaining({
               lang: 'fr',
               translations: expect.objectContaining({ title: 'Nouveau titre' }),
-            }),
+            })
           )
         },
-        { timeout: 2000 },
+        { timeout: 2000 }
       )
     }, 5000)
 
@@ -180,10 +180,10 @@ describe('TranslationEditor', () => {
             'survey-1',
             expect.objectContaining({
               translations: expect.objectContaining({ title: null }),
-            }),
+            })
           )
         },
-        { timeout: 2000 },
+        { timeout: 2000 }
       )
     }, 5000)
   })
@@ -209,7 +209,7 @@ describe('TranslationEditor', () => {
             defaultLanguage="en"
             availableLanguages={['fr']}
           />
-        </MemoryRouter>,
+        </MemoryRouter>
       )
       expect(screen.getByTestId('source-field-title')).toBeInTheDocument()
       expect(screen.getByTestId('source-field-description')).toBeInTheDocument()
@@ -264,7 +264,7 @@ describe('TranslationEditor', () => {
             defaultLanguage="en"
             availableLanguages={['fr']}
           />
-        </MemoryRouter>,
+        </MemoryRouter>
       )
       expect(screen.getByTestId('source-field-title')).toBeInTheDocument()
       expect(screen.queryByTestId('source-field-description')).not.toBeInTheDocument()

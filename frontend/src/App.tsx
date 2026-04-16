@@ -19,52 +19,54 @@ import QuotasPage from './pages/QuotasPage'
 import AssessmentsPage from './pages/AssessmentsPage'
 import WebhooksPage from './pages/WebhooksPage'
 import ParticipantsPage from './pages/ParticipantsPage'
+import EmailInvitationsPage from './pages/EmailInvitationsPage'
 import SettingsPage from './pages/SettingsPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 function App() {
   return (
     <ErrorBoundary>
-    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <AuthProvider>
-        <Routes>
-          {/* Public survey response form — no auth required */}
-          <Route path="/s/:survey_id" element={<SurveyResponsePage />} />
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <AuthProvider>
+          <Routes>
+            {/* Public survey response form — no auth required */}
+            <Route path="/s/:survey_id" element={<SurveyResponsePage />} />
 
-          {/* Redirect root to dashboard (ProtectedRoute will redirect to /login if needed) */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            {/* Redirect root to dashboard (ProtectedRoute will redirect to /login if needed) */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-          {/* Public routes — redirect to /dashboard if already authenticated */}
-          <Route element={<PublicRoute />}>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-          </Route>
-
-          {/* Protected routes — wrapped in AppLayout which renders Outlet */}
-          <Route element={<ProtectedRoute />}>
-            <Route element={<AppLayout />}>
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/surveys/new" element={<SurveyFormPage />} />
-              <Route path="/surveys/:id/edit" element={<SurveyFormPage />} />
-              <Route path="/surveys/:id/responses/:rid" element={<ResponseDetailPage />} />
-              <Route path="/surveys/:id/responses" element={<ResponsesPage />} />
-              <Route path="/surveys/:id/quotas" element={<QuotasPage />} />
-              <Route path="/surveys/:id/assessments" element={<AssessmentsPage />} />
-              <Route path="/surveys/:id/participants" element={<ParticipantsPage />} />
-              <Route path="/surveys/:id" element={<SurveyDetailPage />} />
-              <Route path="/webhooks" element={<WebhooksPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/surveys" element={<SurveysPage />} />
+            {/* Public routes — redirect to /dashboard if already authenticated */}
+            <Route element={<PublicRoute />}>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
             </Route>
-            {/* Full-screen pages outside AppLayout */}
-            <Route path="/surveys/:id/builder" element={<SurveyBuilderPage />} />
-            <Route path="/surveys/:id/preview" element={<SurveyPreviewPage />} />
-          </Route>
 
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+            {/* Protected routes — wrapped in AppLayout which renders Outlet */}
+            <Route element={<ProtectedRoute />}>
+              <Route element={<AppLayout />}>
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/surveys/new" element={<SurveyFormPage />} />
+                <Route path="/surveys/:id/edit" element={<SurveyFormPage />} />
+                <Route path="/surveys/:id/responses/:rid" element={<ResponseDetailPage />} />
+                <Route path="/surveys/:id/responses" element={<ResponsesPage />} />
+                <Route path="/surveys/:id/quotas" element={<QuotasPage />} />
+                <Route path="/surveys/:id/assessments" element={<AssessmentsPage />} />
+                <Route path="/surveys/:id/participants" element={<ParticipantsPage />} />
+                <Route path="/surveys/:id/email-invitations" element={<EmailInvitationsPage />} />
+                <Route path="/surveys/:id" element={<SurveyDetailPage />} />
+                <Route path="/webhooks" element={<WebhooksPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/surveys" element={<SurveysPage />} />
+              </Route>
+              {/* Full-screen pages outside AppLayout */}
+              <Route path="/surveys/:id/builder" element={<SurveyBuilderPage />} />
+              <Route path="/surveys/:id/preview" element={<SurveyPreviewPage />} />
+            </Route>
+
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
     </ErrorBoundary>
   )
 }

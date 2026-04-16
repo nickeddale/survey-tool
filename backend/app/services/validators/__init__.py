@@ -20,9 +20,11 @@ from app.services.validators.choice_validators import (
 )
 from app.services.validators.matrix_validators import (
     validate_matrix_settings,
+    validate_matrix_multiple_settings,
     validate_matrix_dropdown_settings,
     validate_matrix_dynamic_settings,
     validate_matrix_answer,
+    validate_matrix_multiple_answer,
     validate_matrix_dropdown_answer,
     validate_matrix_dynamic_answer,
 )
@@ -53,7 +55,6 @@ from app.services.validators.misc_validators import (
     validate_time_answer,
     validate_datetime_answer,
     validate_file_upload_answer,
-    validate_number_answer,
 )
 from app.services.validators.special_validators import (
     validate_ranking_settings,
@@ -86,10 +87,10 @@ __all__ = [
 # matrix needs both, scalar needs neither), so the dispatcher normalises the call.
 
 _CHOICE_TYPES = frozenset({"single_choice", "dropdown", "multiple_choice"})
-_MATRIX_TYPES = frozenset({"matrix", "matrix_dropdown", "matrix_dynamic"})
+_MATRIX_TYPES = frozenset({"matrix", "matrix_single", "matrix_multiple", "matrix_dropdown", "matrix_dynamic"})
 _SCALAR_TYPES = frozenset({"numeric", "rating", "boolean", "date"})
 _TEXT_TYPES = frozenset({"short_text", "long_text", "huge_text", "email", "phone", "url"})
-_MISC_TYPES = frozenset({"scale", "yes_no", "time", "datetime", "file_upload", "number"})
+_MISC_TYPES = frozenset({"scale", "yes_no", "time", "datetime", "file_upload"})
 # Special types that require answer_options in their config/answer validators
 _SPECIAL_CHOICE_TYPES = frozenset({"ranking", "image_picker"})
 
@@ -105,6 +106,8 @@ _CONFIG_VALIDATORS: dict[str, Callable[..., None]] = {
     "multiple_choice": validate_checkbox_settings,
     # matrix
     "matrix": validate_matrix_settings,
+    "matrix_single": validate_matrix_settings,
+    "matrix_multiple": validate_matrix_multiple_settings,
     "matrix_dropdown": validate_matrix_dropdown_settings,
     "matrix_dynamic": validate_matrix_dynamic_settings,
     # scalar
@@ -134,6 +137,8 @@ _ANSWER_VALIDATORS: dict[str, Callable[..., None]] = {
     "multiple_choice": validate_checkbox_answer,
     # matrix (signature: answer, question, answer_options, subquestions)
     "matrix": validate_matrix_answer,
+    "matrix_single": validate_matrix_answer,
+    "matrix_multiple": validate_matrix_multiple_answer,
     "matrix_dropdown": validate_matrix_dropdown_answer,
     "matrix_dynamic": validate_matrix_dynamic_answer,
     # scalar (signature: answer, question)
@@ -154,7 +159,6 @@ _ANSWER_VALIDATORS: dict[str, Callable[..., None]] = {
     "time": validate_time_answer,
     "datetime": validate_datetime_answer,
     "file_upload": validate_file_upload_answer,
-    "number": validate_number_answer,
     # special choice-like (signature: answer, question, answer_options)
     "ranking": validate_ranking_answer,
     "image_picker": validate_image_picker_answer,

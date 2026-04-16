@@ -76,14 +76,16 @@ export interface MatrixSettings {
   alternate_rows: boolean
   is_all_rows_required: boolean
   randomize_rows: boolean
+  transpose: boolean
 }
 
 export interface MatrixDropdownSettings {
   alternate_rows: boolean
   is_all_rows_required: boolean
   randomize_rows: boolean
-  cell_type: 'dropdown' | 'text' | 'checkbox' | 'radio'
-  column_types?: Record<string, 'dropdown' | 'rating' | 'text' | 'number' | 'checkbox' | 'radio'>
+  transpose: boolean
+  cell_type: 'dropdown' | 'text' | 'checkbox' | 'radio' | 'number' | 'boolean' | 'rating'
+  column_types: Record<string, 'dropdown' | 'rating' | 'text' | 'number' | 'checkbox' | 'radio' | 'boolean'> | null
 }
 
 export interface MatrixDynamicSettings {
@@ -229,17 +231,22 @@ export function getDefaultSettings(type: string): QuestionSettings {
         show_labels: true,
       } satisfies ImagePickerSettings
     case 'matrix':
+    case 'matrix_single':
+    case 'matrix_multiple':
       return {
         alternate_rows: true,
         is_all_rows_required: false,
         randomize_rows: false,
+        transpose: false,
       } satisfies MatrixSettings
     case 'matrix_dropdown':
       return {
         alternate_rows: true,
         is_all_rows_required: false,
         randomize_rows: false,
+        transpose: false,
         cell_type: 'dropdown',
+        column_types: null,
       } satisfies MatrixDropdownSettings
     case 'matrix_dynamic':
       return {
@@ -337,13 +344,20 @@ export function getCompatibleSettings(
     if ('columns' in oldSettings) merged['columns'] = oldSettings['columns']
   }
 
-  // alternate_rows / is_all_rows_required / randomize_rows shared across matrix types
-  const matrixTypes = new Set(['matrix', 'matrix_dropdown', 'matrix_dynamic'])
+  // alternate_rows / is_all_rows_required / randomize_rows / transpose shared across matrix types
+  const matrixTypes = new Set([
+    'matrix',
+    'matrix_single',
+    'matrix_multiple',
+    'matrix_dropdown',
+    'matrix_dynamic',
+  ])
   if (matrixTypes.has(oldType) && matrixTypes.has(newType)) {
     if ('alternate_rows' in oldSettings) merged['alternate_rows'] = oldSettings['alternate_rows']
     if ('is_all_rows_required' in oldSettings)
       merged['is_all_rows_required'] = oldSettings['is_all_rows_required']
     if ('randomize_rows' in oldSettings) merged['randomize_rows'] = oldSettings['randomize_rows']
+    if ('transpose' in oldSettings) merged['transpose'] = oldSettings['transpose']
     if ('cell_type' in oldSettings) merged['cell_type'] = oldSettings['cell_type']
   }
 

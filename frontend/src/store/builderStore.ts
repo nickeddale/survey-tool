@@ -22,10 +22,7 @@ import type {
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 
-export type SelectedItem =
-  | { type: 'group'; id: string }
-  | { type: 'question'; id: string }
-  | null
+export type SelectedItem = { type: 'group'; id: string } | { type: 'question'; id: string } | null
 
 export interface BuilderGroup extends Omit<QuestionGroupResponse, 'questions'> {
   questions: BuilderQuestion[]
@@ -88,7 +85,7 @@ interface BuilderActions {
   updateQuestion: (
     groupId: string,
     questionId: string,
-    updates: Partial<Omit<BuilderQuestion, 'id' | 'group_id' | 'answer_options' | 'subquestions'>>,
+    updates: Partial<Omit<BuilderQuestion, 'id' | 'group_id' | 'answer_options' | 'subquestions'>>
   ) => void
   moveQuestion: (fromGroupId: string, toGroupId: string, questionId: string) => void
   reorderQuestions: (groupId: string, orderedIds: string[]) => void
@@ -100,7 +97,7 @@ interface BuilderActions {
     groupId: string,
     questionId: string,
     optionId: string,
-    updates: Partial<Omit<AnswerOptionResponse, 'id' | 'question_id'>>,
+    updates: Partial<Omit<AnswerOptionResponse, 'id' | 'question_id'>>
   ) => void
   reorderOptions: (groupId: string, questionId: string, orderedIds: string[]) => void
 
@@ -240,12 +237,13 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
       set((state) => {
         pushUndo(state)
         const map = new Map(state.groups.map((g) => [g.id, g]))
-        state.groups = orderedIds
-          .filter((id) => map.has(id))
-          .map((id) => map.get(id)!)
+        state.groups = orderedIds.filter((id) => map.has(id)).map((id) => map.get(id)!)
         // Keep any groups not in orderedIds at the end
         const extra = state.groups.filter((g) => !orderedIds.includes(g.id))
-        state.groups = [...orderedIds.filter((id) => map.has(id)).map((id) => map.get(id)!), ...extra]
+        state.groups = [
+          ...orderedIds.filter((id) => map.has(id)).map((id) => map.get(id)!),
+          ...extra,
+        ]
       }),
 
     // -----------------------------------------------------------------------
@@ -453,7 +451,7 @@ export const useBuilderStore = create<BuilderState & BuilderActions>()(
       set((state) => {
         Object.assign(state, initialState)
       }),
-  })),
+  }))
 )
 
 export default useBuilderStore

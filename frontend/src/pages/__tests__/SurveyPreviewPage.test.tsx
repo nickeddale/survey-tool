@@ -40,7 +40,7 @@ function renderPreview(surveyId = SURVEY_ID) {
           <Route path="/surveys" element={<div data-testid="surveys-page" />} />
         </Routes>
       </AuthProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   )
 }
 
@@ -51,11 +51,21 @@ function renderPreview(surveyId = SURVEY_ID) {
 beforeEach(() => {
   clearTokens()
   localStorage.clear()
-  useAuthStore.setState({ user: null, isAuthenticated: false, isInitializing: false, isLoading: false })
+  useAuthStore.setState({
+    user: null,
+    isAuthenticated: false,
+    isInitializing: false,
+    isLoading: false,
+  })
 
   setTokens(mockTokens.access_token)
   localStorage.removeItem('devtracker_refresh_token')
-  useAuthStore.setState({ user: mockUser, isAuthenticated: true, isInitializing: false, isLoading: false })
+  useAuthStore.setState({
+    user: mockUser,
+    isAuthenticated: true,
+    isInitializing: false,
+    isLoading: false,
+  })
 })
 
 afterEach(() => {
@@ -69,9 +79,7 @@ afterEach(() => {
 
 describe('loading state', () => {
   it('renders loading skeleton while survey is being fetched', async () => {
-    server.use(
-      http.get(`/api/v1/surveys/${SURVEY_ID}`, () => new Promise<never>(() => {})),
-    )
+    server.use(http.get(`/api/v1/surveys/${SURVEY_ID}`, () => new Promise<never>(() => {})))
 
     renderPreview()
 
@@ -122,7 +130,7 @@ describe('welcome screen', () => {
 
     await waitFor(() => expect(screen.getByTestId('preview-welcome-message')).toBeInTheDocument())
     expect(screen.getByTestId('preview-welcome-message')).toHaveTextContent(
-      mockSurveyFull.welcome_message!,
+      mockSurveyFull.welcome_message!
     )
   })
 
@@ -170,7 +178,7 @@ describe('group navigation', () => {
     })
 
     expect(screen.getByTestId('preview-group-title')).toHaveTextContent(
-      mockSurveyFull.groups[0].title,
+      mockSurveyFull.groups[0].title
     )
   })
 
@@ -297,8 +305,8 @@ describe('multi-group navigation', () => {
   beforeEach(() => {
     server.use(
       http.get('/api/v1/surveys/multi-group-survey', () =>
-        HttpResponse.json(twoGroupSurvey, { status: 200 }),
-      ),
+        HttpResponse.json(twoGroupSurvey, { status: 200 })
+      )
     )
   })
 
@@ -308,11 +316,15 @@ describe('multi-group navigation', () => {
 
     await waitFor(() => expect(screen.getByTestId('preview-start-button')).toBeInTheDocument())
 
-    await act(async () => { await user.click(screen.getByTestId('preview-start-button')) })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-start-button'))
+    })
 
     expect(screen.getByTestId('preview-group-title')).toHaveTextContent('Section One')
 
-    await act(async () => { await user.click(screen.getByTestId('preview-next-button')) })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-next-button'))
+    })
 
     expect(screen.getByTestId('preview-group-title')).toHaveTextContent('Section Two')
   })
@@ -323,12 +335,18 @@ describe('multi-group navigation', () => {
 
     await waitFor(() => expect(screen.getByTestId('preview-start-button')).toBeInTheDocument())
 
-    await act(async () => { await user.click(screen.getByTestId('preview-start-button')) })
-    await act(async () => { await user.click(screen.getByTestId('preview-next-button')) })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-start-button'))
+    })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-next-button'))
+    })
 
     expect(screen.getByTestId('preview-group-title')).toHaveTextContent('Section Two')
 
-    await act(async () => { await user.click(screen.getByTestId('preview-previous-button')) })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-previous-button'))
+    })
 
     expect(screen.getByTestId('preview-group-title')).toHaveTextContent('Section One')
   })
@@ -339,7 +357,9 @@ describe('multi-group navigation', () => {
 
     await waitFor(() => expect(screen.getByTestId('preview-start-button')).toBeInTheDocument())
 
-    await act(async () => { await user.click(screen.getByTestId('preview-start-button')) })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-start-button'))
+    })
 
     expect(screen.getByTestId('preview-progress-pct')).toHaveTextContent('50%')
   })
@@ -350,9 +370,15 @@ describe('multi-group navigation', () => {
 
     await waitFor(() => expect(screen.getByTestId('preview-start-button')).toBeInTheDocument())
 
-    await act(async () => { await user.click(screen.getByTestId('preview-start-button')) })
-    await act(async () => { await user.click(screen.getByTestId('preview-next-button')) })
-    await act(async () => { await user.click(screen.getByTestId('preview-next-button')) })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-start-button'))
+    })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-next-button'))
+    })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-next-button'))
+    })
 
     expect(screen.getByTestId('preview-end-screen')).toBeInTheDocument()
     expect(screen.getByTestId('preview-progress-pct')).toHaveTextContent('100%')
@@ -386,8 +412,8 @@ describe('single-page mode (one_page_per_group = false)', () => {
   beforeEach(() => {
     server.use(
       http.get('/api/v1/surveys/single-page-survey', () =>
-        HttpResponse.json(singlePageSurvey, { status: 200 }),
-      ),
+        HttpResponse.json(singlePageSurvey, { status: 200 })
+      )
     )
   })
 
@@ -397,7 +423,9 @@ describe('single-page mode (one_page_per_group = false)', () => {
 
     await waitFor(() => expect(screen.getByTestId('preview-start-button')).toBeInTheDocument())
 
-    await act(async () => { await user.click(screen.getByTestId('preview-start-button')) })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-start-button'))
+    })
 
     expect(screen.getByTestId('preview-all-groups')).toBeInTheDocument()
     expect(screen.getByTestId('preview-group-sp-g1')).toBeInTheDocument()
@@ -410,8 +438,12 @@ describe('single-page mode (one_page_per_group = false)', () => {
 
     await waitFor(() => expect(screen.getByTestId('preview-start-button')).toBeInTheDocument())
 
-    await act(async () => { await user.click(screen.getByTestId('preview-start-button')) })
-    await act(async () => { await user.click(screen.getByTestId('preview-next-button')) })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-start-button'))
+    })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-next-button'))
+    })
 
     expect(screen.getByTestId('preview-end-screen')).toBeInTheDocument()
   })
@@ -428,27 +460,33 @@ describe('end screen', () => {
 
     await waitFor(() => expect(screen.getByTestId('preview-start-button')).toBeInTheDocument())
 
-    await act(async () => { await user.click(screen.getByTestId('preview-start-button')) })
-    await act(async () => { await user.click(screen.getByTestId('preview-next-button')) })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-start-button'))
+    })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-next-button'))
+    })
 
-    expect(screen.getByTestId('preview-end-message')).toHaveTextContent(
-      mockSurveyFull.end_message!,
-    )
+    expect(screen.getByTestId('preview-end-message')).toHaveTextContent(mockSurveyFull.end_message!)
   })
 
   it('displays default message when no end_message', async () => {
     server.use(
       http.get(`/api/v1/surveys/${SURVEY_ID}`, () =>
-        HttpResponse.json({ ...mockSurveyFull, end_message: null }, { status: 200 }),
-      ),
+        HttpResponse.json({ ...mockSurveyFull, end_message: null }, { status: 200 })
+      )
     )
     const user = userEvent.setup()
     renderPreview()
 
     await waitFor(() => expect(screen.getByTestId('preview-start-button')).toBeInTheDocument())
 
-    await act(async () => { await user.click(screen.getByTestId('preview-start-button')) })
-    await act(async () => { await user.click(screen.getByTestId('preview-next-button')) })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-start-button'))
+    })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-next-button'))
+    })
 
     expect(screen.getByTestId('preview-end-default-message')).toBeInTheDocument()
   })
@@ -459,8 +497,12 @@ describe('end screen', () => {
 
     await waitFor(() => expect(screen.getByTestId('preview-start-button')).toBeInTheDocument())
 
-    await act(async () => { await user.click(screen.getByTestId('preview-start-button')) })
-    await act(async () => { await user.click(screen.getByTestId('preview-next-button')) })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-start-button'))
+    })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-next-button'))
+    })
 
     expect(screen.queryByTestId('preview-navigation')).not.toBeInTheDocument()
   })
@@ -496,7 +538,9 @@ describe('interactive questions', () => {
 
     await waitFor(() => expect(screen.getByTestId('preview-start-button')).toBeInTheDocument())
 
-    await act(async () => { await user.click(screen.getByTestId('preview-start-button')) })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-start-button'))
+    })
 
     // q1 is short_text — find the input and confirm it's interactable
     const questionPreview = screen.getByTestId('question-preview-q1')
@@ -514,9 +558,9 @@ describe('error state', () => {
       http.get(`/api/v1/surveys/${SURVEY_ID}`, () =>
         HttpResponse.json(
           { detail: { code: 'INTERNAL_ERROR', message: 'Server error' } },
-          { status: 500 },
-        ),
-      ),
+          { status: 500 }
+        )
+      )
     )
 
     renderPreview()
@@ -534,8 +578,8 @@ describe('survey with no groups', () => {
   beforeEach(() => {
     server.use(
       http.get(`/api/v1/surveys/${SURVEY_ID}`, () =>
-        HttpResponse.json({ ...mockSurveyFull, groups: [] }, { status: 200 }),
-      ),
+        HttpResponse.json({ ...mockSurveyFull, groups: [] }, { status: 200 })
+      )
     )
   })
 
@@ -552,7 +596,9 @@ describe('survey with no groups', () => {
 
     await waitFor(() => expect(screen.getByTestId('preview-start-button')).toBeInTheDocument())
 
-    await act(async () => { await user.click(screen.getByTestId('preview-start-button')) })
+    await act(async () => {
+      await user.click(screen.getByTestId('preview-start-button'))
+    })
 
     expect(screen.getByTestId('preview-end-screen')).toBeInTheDocument()
   })
@@ -581,12 +627,10 @@ describe('SurveyBuilderPage Full Preview button', () => {
             <Route path="/surveys/:id/preview" element={<div data-testid="preview-page" />} />
           </Routes>
         </AuthProvider>
-      </MemoryRouter>,
+      </MemoryRouter>
     )
 
-    await waitFor(() =>
-      expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument(),
-    )
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
     expect(screen.getByTestId('full-preview-button')).toBeInTheDocument()
 
@@ -612,12 +656,10 @@ describe('SurveyBuilderPage Full Preview button', () => {
             <Route path="/surveys/:id/preview" element={<div data-testid="preview-page" />} />
           </Routes>
         </AuthProvider>
-      </MemoryRouter>,
+      </MemoryRouter>
     )
 
-    await waitFor(() =>
-      expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument(),
-    )
+    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
 
     await act(async () => {
       await user.click(screen.getByTestId('full-preview-button'))

@@ -100,7 +100,6 @@ survey_tool/
 │   │   │   └── webhook.py
 │   │   ├── api/
 │   │   │   ├── __init__.py
-│   │   │   ├── router.py
 │   │   │   ├── auth.py             # Login, register, refresh, API keys
 │   │   │   ├── users.py            # User profile management
 │   │   │   ├── surveys.py
@@ -224,39 +223,39 @@ survey_tool/
 
 #### Documentation
 
-- [ ] `docs/PROJECT_PLAN.md` -- Full project plan (this document)
-- [ ] `docs/API_REFERENCE.md` -- All endpoints with request/response examples
-- [ ] `docs/DATABASE_SCHEMA.md` -- ER diagram description and all table definitions
-- [ ] `docs/QUESTION_TYPES.md` -- Each question type with settings and validation rules
-- [ ] `docs/EXPRESSION_LANGUAGE.md` -- Expression syntax, operators, functions, and examples
-- [ ] `docs/GETTING_STARTED.md` -- Setup, running locally, and creating a first survey via API
+- [x] `docs/PROJECT_PLAN.md` -- Full project plan (this document)
+- [x] `docs/API_REFERENCE.md` -- All endpoints with request/response examples
+- [x] `docs/DATABASE_SCHEMA.md` -- ER diagram description and all table definitions
+- [x] `docs/QUESTION_TYPES.md` -- Each question type with settings and validation rules
+- [x] `docs/EXPRESSION_LANGUAGE.md` -- Expression syntax, operators, functions, and examples
+- [x] `docs/GETTING_STARTED.md` -- Setup, running locally, and creating a first survey via API
 
 See: [API Reference](API_REFERENCE.md), [Database Schema](DATABASE_SCHEMA.md), [Question Types](QUESTION_TYPES.md), [Expression Language](EXPRESSION_LANGUAGE.md), [Getting Started](GETTING_STARTED.md)
 
 #### Backend Setup
 
-- [ ] `pyproject.toml` -- FastAPI, SQLAlchemy[asyncio], asyncpg, Alembic, pydantic-settings, python-jose[cryptography], passlib[bcrypt], pytest, pytest-asyncio, httpx
-- [ ] `docker-compose.yml` -- PostgreSQL 16
-- [ ] `app/config.py` -- DATABASE_URL, JWT_SECRET, JWT_EXPIRY, etc.
-- [ ] `app/database.py` -- Async engine, async session factory, Base
-- [ ] `app/main.py` -- FastAPI app, CORS, error handlers, router includes
+- [x] `pyproject.toml` -- FastAPI, SQLAlchemy[asyncio], asyncpg, Alembic, pydantic-settings, python-jose[cryptography], passlib[bcrypt], pytest, pytest-asyncio, httpx
+- [x] `docker-compose.yml` -- PostgreSQL 16
+- [x] `app/config.py` -- DATABASE_URL, JWT_SECRET, JWT_EXPIRY, etc.
+- [x] `app/database.py` -- Async engine, async session factory, Base
+- [x] `app/main.py` -- FastAPI app, CORS, error handlers, router includes
 
 #### User Auth
 
-- [ ] Migration: `users`, `api_keys` tables
-- [ ] `models/user.py`, `models/api_key.py`
-- [ ] `services/auth_service.py` -- Register, login, hash password, create/verify JWT, create/verify API key
-- [ ] `api/auth.py` -- Register, login, refresh, me, API key CRUD
-- [ ] `dependencies.py` -- `get_current_user` (JWT or API key), `get_db`
+- [x] Migration: `users`, `api_keys` tables
+- [x] `models/user.py`, `models/api_key.py`
+- [x] `services/auth_service.py` -- Register, login, hash password, create/verify JWT, create/verify API key
+- [x] `api/auth.py` -- Register, login, refresh, me, API key CRUD
+- [x] `dependencies.py` -- `get_current_user` (JWT or API key), `get_db`
 
 #### Core Survey CRUD
 
-- [ ] Migration: `surveys`, `question_groups`, `questions`, `answer_options` tables
-- [ ] Models and Schemas for each entity
-- [ ] API routes: full CRUD for surveys, groups, questions, answer_options
-- [ ] Pagination utility (offset-based with total count)
-- [ ] Standardized error responses
-- [ ] Tests: auth flows and CRUD for all entities
+- [x] Migration: `surveys`, `question_groups`, `questions`, `answer_options` tables
+- [x] Models and Schemas for each entity
+- [x] API routes: full CRUD for surveys, groups, questions, answer_options
+- [x] Pagination utility (offset-based with total count)
+- [x] Standardized error responses
+- [x] Tests: auth flows and CRUD for all entities
 
 ---
 
@@ -264,17 +263,17 @@ See: [API Reference](API_REFERENCE.md), [Database Schema](DATABASE_SCHEMA.md), [
 
 **Goal**: React app with authentication, dashboard, and basic survey list.
 
-- [ ] Vite + React 18 + TypeScript project initialization
-- [ ] TailwindCSS + component library setup (shadcn/ui for primitives)
-- [ ] `api/client.ts` -- Axios instance with JWT interceptor and refresh logic
-- [ ] `store/authStore.ts` -- Zustand store for auth state
-- [ ] `pages/LoginPage.tsx`, `pages/RegisterPage.tsx`
-- [ ] `components/layout/AppShell.tsx` -- Sidebar navigation and top bar
-- [ ] `components/layout/ProtectedRoute.tsx` -- Redirect if not authenticated
-- [ ] `pages/DashboardPage.tsx` -- List surveys with status badges, create button
-- [ ] `pages/SettingsPage.tsx` -- API key management, profile editing
-- [ ] React Router setup with protected routes
-- [ ] Dockerfile for frontend (nginx serving built assets, proxying /api to backend)
+- [x] Vite + React 18 + TypeScript project initialization
+- [x] TailwindCSS + component library setup (shadcn/ui for primitives)
+- [x] `api/client.ts` -- Axios instance with JWT interceptor and refresh logic
+- [x] `store/authStore.ts` -- Zustand store for auth state
+- [x] `pages/LoginPage.tsx`, `pages/RegisterPage.tsx`
+- [x] `components/layout/AppShell.tsx` -- Sidebar navigation and top bar
+- [x] `components/layout/ProtectedRoute.tsx` -- Redirect if not authenticated
+- [x] `pages/DashboardPage.tsx` -- List surveys with status badges, create button
+- [x] `pages/SettingsPage.tsx` -- API key management, profile editing
+- [x] React Router setup with protected routes
+- [x] Dockerfile for frontend (nginx serving built assets, proxying /api to backend)
 
 ---
 
@@ -282,18 +281,18 @@ See: [API Reference](API_REFERENCE.md), [Database Schema](DATABASE_SCHEMA.md), [
 
 **Goal**: Full drag-and-drop survey builder in the web UI.
 
-- [ ] `pages/SurveyBuilderPage.tsx` -- Main builder layout (3-panel: type palette | canvas | properties)
-- [ ] `components/survey-builder/QuestionTypePicker.tsx` -- Sidebar palette with all 18 question types, draggable
-- [ ] `components/survey-builder/SurveyBuilder.tsx` -- Main canvas using @dnd-kit/core and @dnd-kit/sortable
-- [ ] `components/survey-builder/GroupPanel.tsx` -- Collapsible group with drop zone for questions
-- [ ] `components/survey-builder/QuestionCard.tsx` -- Draggable card showing question preview
-- [ ] `components/survey-builder/QuestionEditor.tsx` -- Right panel: edit title, type, required, help text
-- [ ] `components/survey-builder/AnswerOptionsEditor.tsx` -- Add/remove/reorder answer choices
-- [ ] `components/survey-builder/QuestionPreview.tsx` -- Inline preview of how question renders
-- [ ] Auto-save with debounce (PATCH on change)
-- [ ] Survey settings panel (title, description, welcome/end messages)
-- [ ] Activate/close survey actions
-- [ ] `pages/SurveyPreviewPage.tsx` -- Read-only preview of full survey
+- [x] `pages/SurveyBuilderPage.tsx` -- Main builder layout (3-panel: type palette | canvas | properties)
+- [x] `components/survey-builder/QuestionTypePicker.tsx` -- Sidebar palette with all 27 question types, draggable
+- [x] `components/survey-builder/SurveyBuilder.tsx` -- Main canvas using @dnd-kit/core and @dnd-kit/sortable
+- [x] `components/survey-builder/GroupPanel.tsx` -- Collapsible group with drop zone for questions
+- [x] `components/survey-builder/QuestionCard.tsx` -- Draggable card showing question preview
+- [x] `components/survey-builder/QuestionEditor.tsx` -- Right panel: edit title, type, required, help text
+- [x] `components/survey-builder/AnswerOptionsEditor.tsx` -- Add/remove/reorder answer choices
+- [x] `components/survey-builder/QuestionPreview.tsx` -- Inline preview of how question renders
+- [x] Auto-save with debounce (PATCH on change)
+- [x] Survey settings panel (title, description, welcome/end messages)
+- [x] Activate/close survey actions
+- [x] `pages/SurveyPreviewPage.tsx` -- Read-only preview of full survey
 
 ---
 
@@ -301,15 +300,15 @@ See: [API Reference](API_REFERENCE.md), [Database Schema](DATABASE_SCHEMA.md), [
 
 **Goal**: Type-specific validation, settings, and import/export.
 
-- [ ] `QuestionType` enum with all 18 types
-- [ ] Per-type validation in `question_service.py` (matrix requires subquestions, radio requires options, etc.)
-- [ ] Per-type `settings` JSONB schema validation
-- [ ] Subquestion support (parent_id relationship)
-- [ ] Question code auto-generation
-- [ ] Survey structure export (GET `/surveys/{id}/export` returns full nested JSON)
-- [ ] Survey import (POST `/surveys/import` accepts JSON definition)
-- [ ] Survey clone endpoint
-- [ ] Tests: each question type, validation edge cases
+- [x] `QuestionType` enum with all 27 types
+- [x] Per-type validation in `question_service.py` (matrix requires subquestions, radio requires options, etc.)
+- [x] Per-type `settings` JSONB schema validation
+- [x] Subquestion support (parent_id relationship)
+- [x] Question code auto-generation
+- [x] Survey structure export (GET `/surveys/{id}/export` returns full nested JSON)
+- [x] Survey import (POST `/surveys/import` accepts JSON definition)
+- [x] Survey clone endpoint
+- [x] Tests: each question type, validation edge cases
 
 See: [Question Types](QUESTION_TYPES.md) for the full list of supported types, their settings, and validation rules.
 
@@ -321,15 +320,15 @@ See: [Question Types](QUESTION_TYPES.md) for the full list of supported types, t
 
 #### Backend
 
-- [ ] `services/expression_engine.py` -- Safe expression evaluator
-- [ ] Relevance field evaluation on questions and groups
-- [ ] `POST /logic/validate-expression` -- Validates expression syntax
-- [ ] `POST /logic/resolve-flow` -- Given answers, returns visible question IDs
+- [x] `services/expression_engine.py` -- Safe expression evaluator
+- [x] Relevance field evaluation on questions and groups
+- [x] `POST /logic/validate-expression` -- Validates expression syntax
+- [x] `POST /logic/resolve-flow` -- Given answers, returns visible question IDs
 
 #### Frontend
 
-- [ ] `components/survey-builder/LogicEditor.tsx` -- Visual condition builder ("Show this question IF [Q1] [equals] [value]" with AND/OR grouping and expression preview)
-- [ ] Tests: expression parsing, evaluation, complex branching
+- [x] `components/survey-builder/LogicEditor.tsx` -- Visual condition builder ("Show this question IF [Q1] [equals] [value]" with AND/OR grouping and expression preview)
+- [x] Tests: expression parsing, evaluation, complex branching
 
 See: [Expression Language](EXPRESSION_LANGUAGE.md) for the full expression syntax, operators, and built-in functions.
 
@@ -341,21 +340,21 @@ See: [Expression Language](EXPRESSION_LANGUAGE.md) for the full expression synta
 
 #### Backend
 
-- [ ] Migration: `responses`, `response_answers` tables
-- [ ] `services/response_service.py` -- Start, submit answers, complete, validate
-- [ ] Answer validation per question type
-- [ ] Relevance-aware validation (only validate visible questions)
-- [ ] `services/export_service.py` -- JSON and CSV export
-- [ ] Survey statistics endpoint
+- [x] Migration: `responses`, `response_answers` tables
+- [x] `services/response_service.py` -- Start, submit answers, complete, validate
+- [x] Answer validation per question type
+- [x] Relevance-aware validation (only validate visible questions)
+- [x] `services/export_service.py` -- JSON and CSV export
+- [x] Survey statistics endpoint
 
 #### Frontend
 
-- [ ] `pages/ResponsesPage.tsx` -- Table of responses with filters
-- [ ] `components/responses/ResponseTable.tsx` -- Sortable, paginated
-- [ ] `components/responses/ResponseDetail.tsx` -- View individual response
-- [ ] `components/responses/ExportDialog.tsx` -- Choose format, columns, download
-- [ ] Dashboard stats (response count, completion rate, recent activity)
-- [ ] Tests: response submission, validation, export
+- [x] `pages/ResponsesPage.tsx` -- Table of responses with filters
+- [x] `components/responses/ResponseTable.tsx` -- Sortable, paginated
+- [x] `components/responses/ResponseDetail.tsx` -- View individual response
+- [x] `components/responses/ExportDialog.tsx` -- Choose format, columns, download
+- [x] Dashboard stats (response count, completion rate, recent activity)
+- [x] Tests: response submission, validation, export
 
 See: [API Reference](API_REFERENCE.md) for response submission and export endpoint details.
 
@@ -365,17 +364,17 @@ See: [API Reference](API_REFERENCE.md) for response submission and export endpoi
 
 **Goal**: Participants, quotas, assessments, webhooks, and multi-language support.
 
-- [ ] Migration: `participants`, `quotas`, `assessments`, `webhooks` tables
-- [ ] Participant token system for survey access control
-- [ ] Rate limiting (slowapi)
-- [ ] Quota service: enforce limits on response submission
-- [ ] Assessment service: score responses, return messages
-- [ ] Webhook service: register, async delivery with retries, HMAC signing
-- [ ] Webhook events: `response.started`, `response.completed`, `survey.activated`, `survey.closed`, `quota.reached`
-- [ ] Multi-language: `translations` JSONB on surveys, groups, questions, and options
-- [ ] Survey versioning (version field + history)
-- [ ] OpenAPI spec polish (tags, descriptions, examples)
-- [ ] Tests: quotas, assessments, webhooks, multi-language
+- [x] Migration: `participants`, `quotas`, `assessments`, `webhooks` tables
+- [x] Participant token system for survey access control
+- [x] Rate limiting (slowapi)
+- [x] Quota service: enforce limits on response submission
+- [x] Assessment service: score responses, return messages
+- [x] Webhook service: register, async delivery with retries, HMAC signing
+- [x] Webhook events: `response.started`, `response.completed`, `survey.activated`, `survey.closed`, `quota.reached`
+- [x] Multi-language: `translations` JSONB on surveys, groups, questions, and options
+- [x] Survey versioning (version field + history)
+- [x] OpenAPI spec polish (tags, descriptions, examples)
+- [x] Tests: quotas, assessments, webhooks, multi-language
 
 See: [Database Schema](DATABASE_SCHEMA.md) for the participants, quotas, assessments, and webhooks table definitions. See: [API Reference](API_REFERENCE.md) for all related endpoints.
 

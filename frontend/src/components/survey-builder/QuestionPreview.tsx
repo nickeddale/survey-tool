@@ -35,6 +35,8 @@ type QuestionType =
   | 'ranking'
   | 'image_picker'
   | 'matrix'
+  | 'matrix_single'
+  | 'matrix_multiple'
   | 'matrix_dropdown'
   | 'matrix_dynamic'
   | 'numeric'
@@ -63,6 +65,8 @@ const questionPreviewMap: Record<QuestionType, FC<QuestionPreviewProps>> = {
   image_picker: SpecialPreview,
   // Matrix types
   matrix: MatrixPreview,
+  matrix_single: MatrixPreview,
+  matrix_multiple: MatrixPreview,
   matrix_dropdown: MatrixPreview,
   matrix_dynamic: MatrixPreview,
   // Scalar types
@@ -104,8 +108,13 @@ export function QuestionPreview({ question, interactive = false }: QuestionPrevi
       {/* Question header */}
       <div className="space-y-1">
         <div className="flex items-start gap-1">
-          <p className="text-sm font-medium text-foreground leading-snug" data-testid="preview-title">
-            {question.title || <span className="text-muted-foreground italic">Untitled question</span>}
+          <p
+            className="text-sm font-medium text-foreground leading-snug"
+            data-testid="preview-title"
+          >
+            {question.title || (
+              <span className="text-muted-foreground italic">Untitled question</span>
+            )}
           </p>
           {question.is_required && (
             <span

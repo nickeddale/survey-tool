@@ -41,7 +41,7 @@ describe('ParticipantTable', () => {
         onEdit={vi.fn()}
         onDelete={vi.fn()}
         onCopyLink={vi.fn()}
-      />,
+      />
     )
     expect(screen.getByTestId('empty-state')).toBeInTheDocument()
   })
@@ -54,7 +54,7 @@ describe('ParticipantTable', () => {
         onEdit={vi.fn()}
         onDelete={vi.fn()}
         onCopyLink={vi.fn()}
-      />,
+      />
     )
     expect(screen.getByText('alice@example.com')).toBeInTheDocument()
   })
@@ -67,7 +67,7 @@ describe('ParticipantTable', () => {
         onEdit={vi.fn()}
         onDelete={vi.fn()}
         onCopyLink={vi.fn()}
-      />,
+      />
     )
     const tokenEl = screen.getByTestId('participant-token-p1')
     expect(tokenEl.textContent).toBe('••••1234')
@@ -81,7 +81,7 @@ describe('ParticipantTable', () => {
         onEdit={vi.fn()}
         onDelete={vi.fn()}
         onCopyLink={vi.fn()}
-      />,
+      />
     )
     expect(screen.getByText('∞')).toBeInTheDocument()
   })
@@ -94,7 +94,7 @@ describe('ParticipantTable', () => {
         onEdit={vi.fn()}
         onDelete={vi.fn()}
         onCopyLink={vi.fn()}
-      />,
+      />
     )
     expect(screen.getByText('3')).toBeInTheDocument()
   })
@@ -107,7 +107,7 @@ describe('ParticipantTable', () => {
         onEdit={vi.fn()}
         onDelete={vi.fn()}
         onCopyLink={vi.fn()}
-      />,
+      />
     )
     expect(screen.getByTestId('participant-completed-badge-p2')).toBeInTheDocument()
   })
@@ -120,7 +120,7 @@ describe('ParticipantTable', () => {
         onEdit={vi.fn()}
         onDelete={vi.fn()}
         onCopyLink={vi.fn()}
-      />,
+      />
     )
     expect(screen.getByTestId('participant-pending-badge-p1')).toBeInTheDocument()
   })
@@ -136,7 +136,7 @@ describe('ParticipantTable', () => {
         onEdit={onEdit}
         onDelete={vi.fn()}
         onCopyLink={vi.fn()}
-      />,
+      />
     )
 
     await user.click(screen.getByTestId('participant-edit-p1'))
@@ -154,7 +154,7 @@ describe('ParticipantTable', () => {
         onEdit={vi.fn()}
         onDelete={onDelete}
         onCopyLink={vi.fn()}
-      />,
+      />
     )
 
     await user.click(screen.getByTestId('participant-delete-p1'))
@@ -172,7 +172,7 @@ describe('ParticipantTable', () => {
         onEdit={vi.fn()}
         onDelete={vi.fn()}
         onCopyLink={onCopyLink}
-      />,
+      />
     )
 
     await user.click(screen.getByTestId('participant-copy-link-p1'))
@@ -187,7 +187,7 @@ describe('ParticipantTable', () => {
         onEdit={vi.fn()}
         onDelete={vi.fn()}
         onCopyLink={vi.fn()}
-      />,
+      />
     )
 
     expect(screen.getByText('Email')).toBeInTheDocument()
@@ -207,7 +207,7 @@ describe('ParticipantTable', () => {
         onEdit={vi.fn()}
         onDelete={vi.fn()}
         onCopyLink={vi.fn()}
-      />,
+      />
     )
     expect(screen.getByRole('cell', { name: '—' })).toBeInTheDocument()
   })

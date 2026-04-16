@@ -532,3 +532,74 @@ export interface ParticipantListResponse {
   per_page: number
   pages: number
 }
+
+// ---------------------------------------------------------------------------
+// Email Invitation types (matching backend EmailInvitationCreate,
+// EmailInvitationResponse, EmailInvitationListResponse, EmailInvitationStats,
+// EmailInvitationBatchCreate, EmailInvitationBatchResponse)
+// ---------------------------------------------------------------------------
+
+export type EmailInvitationType = 'invite' | 'reminder'
+
+export interface EmailInvitationCreate {
+  recipient_email: string
+  recipient_name?: string
+  subject?: string
+  invitation_type?: EmailInvitationType
+}
+
+export interface EmailInvitationBatchCreate {
+  items: Array<{ email: string; name?: string }>
+  subject?: string
+}
+
+export interface EmailInvitationResponse {
+  id: string
+  survey_id: string
+  recipient_email: string
+  recipient_name: string | null
+  subject: string | null
+  invitation_type: EmailInvitationType
+  status: string
+  sent_at: string | null
+  delivered_at: string | null
+  opened_at: string | null
+  clicked_at: string | null
+  bounced_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface EmailInvitationListResponse {
+  items: EmailInvitationResponse[]
+  total: number
+  page: number
+  per_page: number
+  pages: number
+}
+
+export interface EmailInvitationStats {
+  sent: number
+  delivered: number
+  bounced: number
+  failed: number
+  open_rate: number
+  click_rate: number
+}
+
+export interface EmailInvitationBatchResponse {
+  sent: number
+  failed: number
+  skipped: number
+}
+
+export interface SendRemindersRequest {
+  days_since_invite?: number | null
+  max_reminders?: number | null
+}
+
+export interface SendRemindersResponse {
+  sent: number
+  skipped: number
+  failed: number
+}

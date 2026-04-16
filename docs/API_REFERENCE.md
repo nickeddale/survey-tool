@@ -118,7 +118,7 @@ Register a new user account.
 
 ### POST /auth/login
 
-Authenticate and receive JWT tokens.
+Authenticate and receive a JWT access token. The refresh token is set as an httpOnly cookie (not included in the JSON response body).
 
 **Request Body**
 
@@ -134,11 +134,12 @@ Authenticate and receive JWT tokens.
 ```json
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "token_type": "bearer",
   "expires_in": 3600
 }
 ```
+
+> **Note:** The `refresh_token` is set as an httpOnly cookie in the response. It is not included in the JSON body.
 
 **Errors**
 
@@ -150,26 +151,23 @@ Authenticate and receive JWT tokens.
 
 ### POST /auth/refresh
 
-Refresh an expired access token.
+Refresh an expired access token. The refresh token is read from the httpOnly cookie set during login — no request body is needed.
 
 **Request Body**
 
-```json
-{
-  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
+None. The refresh token is read from cookies.
 
 **Response** `200 OK`
 
 ```json
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "token_type": "bearer",
   "expires_in": 3600
 }
 ```
+
+> **Note:** A new `refresh_token` httpOnly cookie is also set in the response.
 
 **Errors**
 
@@ -181,15 +179,11 @@ Refresh an expired access token.
 
 ### POST /auth/logout
 
-Invalidate the current refresh token.
+Invalidate the current refresh token. The refresh token is read from the httpOnly cookie — no request body is needed.
 
 **Request Body**
 
-```json
-{
-  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
+None. The refresh token is read from cookies.
 
 **Response** `204 No Content`
 
@@ -207,8 +201,7 @@ Get the current authenticated user's profile.
   "email": "user@example.com",
   "name": "Jane Doe",
   "is_active": true,
-  "created_at": "2026-03-31T12:00:00Z",
-  "updated_at": "2026-03-31T12:00:00Z"
+  "created_at": "2026-03-31T12:00:00Z"
 }
 ```
 
@@ -237,8 +230,7 @@ All fields are optional.
   "email": "user@example.com",
   "name": "Jane Smith",
   "is_active": true,
-  "created_at": "2026-03-31T12:00:00Z",
-  "updated_at": "2026-03-31T14:30:00Z"
+  "created_at": "2026-03-31T12:00:00Z"
 }
 ```
 
@@ -284,23 +276,18 @@ List all API keys for the current user. The full key value is never returned.
 **Response** `200 OK`
 
 ```json
-{
-  "items": [
-    {
-      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
-      "name": "CI Pipeline Key",
-      "key_prefix": "svt_a1b2",
-      "scopes": ["surveys:read", "surveys:write", "responses:read"],
-      "is_active": true,
-      "last_used_at": "2026-03-31T15:00:00Z",
-      "expires_at": "2027-03-31T00:00:00Z",
-      "created_at": "2026-03-31T12:00:00Z"
-    }
-  ],
-  "total": 1,
-  "page": 1,
-  "per_page": 20
-}
+[
+  {
+    "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+    "name": "CI Pipeline Key",
+    "key_prefix": "svt_a1b2",
+    "scopes": ["surveys:read", "surveys:write", "responses:read"],
+    "is_active": true,
+    "last_used_at": "2026-03-31T15:00:00Z",
+    "expires_at": "2027-03-31T00:00:00Z",
+    "created_at": "2026-03-31T12:00:00Z"
+  }
+]
 ```
 
 ---
@@ -564,6 +551,29 @@ Close an active survey, preventing new responses.
 |--------|-----------------|---------------------------------|
 | 404    | `NOT_FOUND`     | Survey not found                |
 | 422    | `UNPROCESSABLE` | Survey must be in active status |
+
+---
+
+### POST /surveys/{id}/archive
+
+Archive a closed survey.
+
+**Response** `200 OK`
+
+```json
+{
+  "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+  "status": "archived",
+  "..."
+}
+```
+
+**Errors**
+
+| Status | Code            | Message                          |
+|--------|-----------------|----------------------------------|
+| 404    | `NOT_FOUND`     | Survey not found                 |
+| 422    | `UNPROCESSABLE` | Survey must be in closed status  |
 
 ---
 
@@ -912,9 +922,9 @@ Reorder question groups within a survey.
 
 ## Questions
 
-All question endpoints are nested under a survey: `/api/v1/surveys/{survey_id}/questions`.
+All question endpoints are nested under a survey and group: `/api/v1/surveys/{survey_id}/groups/{group_id}/questions`.
 
-### POST /surveys/{survey_id}/questions
+### POST /surveys/{survey_id}/groups/{group_id}/questions
 
 Create a new question.
 
@@ -922,7 +932,6 @@ Create a new question.
 
 ```json
 {
-  "group_id": "d4e5f6a7-b8c9-0123-def0-234567890123",
   "question_type": "radio",
   "code": "Q1",
   "title": "How satisfied are you with our service?",
@@ -940,7 +949,7 @@ Create a new question.
 }
 ```
 
-Required fields: `group_id`, `question_type`, `title`. `code` is auto-generated if omitted.
+Required fields: `question_type`, `title`. `code` is auto-generated if omitted.
 
 **Response** `201 Created`
 
@@ -978,17 +987,9 @@ Required fields: `group_id`, `question_type`, `title`. `code` is auto-generated 
 
 ---
 
-### GET /surveys/{survey_id}/questions
+### GET /surveys/{survey_id}/groups/{group_id}/questions
 
-List all questions for a survey.
-
-**Query Parameters**
-
-| Parameter  | Type   | Description                          |
-|------------|--------|--------------------------------------|
-| `page`     | int    | Page number (default: 1)             |
-| `per_page` | int    | Items per page (default: 20)         |
-| `group_id` | UUID   | Filter questions by question group   |
+List all questions for a group.
 
 **Response** `200 OK`
 
@@ -1015,7 +1016,7 @@ List all questions for a survey.
 
 ---
 
-### GET /surveys/{survey_id}/questions/{id}
+### GET /surveys/{survey_id}/groups/{group_id}/questions/{id}
 
 Get a question with its answer options and subquestions.
 
@@ -1069,7 +1070,7 @@ Get a question with its answer options and subquestions.
 
 ---
 
-### PATCH /surveys/{survey_id}/questions/{id}
+### PATCH /surveys/{survey_id}/groups/{group_id}/questions/{id}
 
 Update a question.
 
@@ -1101,7 +1102,7 @@ Returns the full updated question object.
 
 ---
 
-### DELETE /surveys/{survey_id}/questions/{id}
+### DELETE /surveys/{survey_id}/groups/{group_id}/questions/{id}
 
 Delete a question and all its answer options and subquestions.
 
@@ -1115,7 +1116,7 @@ Delete a question and all its answer options and subquestions.
 
 ---
 
-### PATCH /surveys/{survey_id}/questions/reorder
+### PATCH /surveys/{survey_id}/groups/{group_id}/questions/reorder
 
 Reorder questions within their group or move between groups.
 
@@ -1161,9 +1162,9 @@ Reorder questions within their group or move between groups.
 
 ## Answer Options
 
-All answer option endpoints are nested under a question: `/api/v1/surveys/{survey_id}/questions/{question_id}/options`.
+All answer option endpoints are nested under a question: `/api/v1/surveys/{survey_id}/groups/{group_id}/questions/{question_id}/options`.
 
-### POST /surveys/{survey_id}/questions/{question_id}/options
+### POST /surveys/{survey_id}/groups/{group_id}/questions/{question_id}/options
 
 Create a new answer option.
 
@@ -1202,7 +1203,7 @@ Required fields: `code`, `title`.
 
 ---
 
-### GET /surveys/{survey_id}/questions/{question_id}/options
+### GET /surveys/{survey_id}/groups/{group_id}/questions/{question_id}/options
 
 List all answer options for a question, ordered by `sort_order`.
 
@@ -1236,7 +1237,7 @@ List all answer options for a question, ordered by `sort_order`.
 
 ---
 
-### PATCH /surveys/{survey_id}/questions/{question_id}/options/{id}
+### PATCH /surveys/{survey_id}/groups/{group_id}/questions/{question_id}/options/{id}
 
 Update an answer option.
 
@@ -1263,7 +1264,7 @@ Returns the full updated answer option object.
 
 ---
 
-### DELETE /surveys/{survey_id}/questions/{question_id}/options/{id}
+### DELETE /surveys/{survey_id}/groups/{group_id}/questions/{question_id}/options/{id}
 
 Delete an answer option.
 
@@ -1277,7 +1278,7 @@ Delete an answer option.
 
 ---
 
-### PATCH /surveys/{survey_id}/questions/{question_id}/options/reorder
+### PATCH /surveys/{survey_id}/groups/{group_id}/questions/{question_id}/options/reorder
 
 Reorder answer options within a question.
 

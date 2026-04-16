@@ -335,7 +335,7 @@ def test_rating_int():
 
 
 def test_number_float():
-    q = _make_question("Q1", "number")
+    q = _make_question("Q1", "numeric")
     a = _make_answer(q, 3.14)
     ctx = build_expression_context(_make_response([a]))
     assert abs(ctx["Q1"] - 3.14) < 1e-10
@@ -469,7 +469,7 @@ class TestCoerceValue:
         assert _coerce_value(5, "rating") == 5
 
     def test_numeric_type_float(self):
-        result = _coerce_value(2.5, "number")
+        result = _coerce_value(2.5, "numeric")
         assert abs(result - 2.5) < 1e-10
 
     def test_boolean_type_bool(self):

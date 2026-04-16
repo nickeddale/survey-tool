@@ -3,7 +3,12 @@ import { Copy, Check } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
-import type { WebhookResponse, WebhookCreate, WebhookEvent, SurveyResponse } from '../../types/survey'
+import type {
+  WebhookResponse,
+  WebhookCreate,
+  WebhookEvent,
+  SurveyResponse,
+} from '../../types/survey'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -68,9 +73,7 @@ function WebhookForm({
   const isEdit = Boolean(webhook)
 
   const [url, setUrl] = useState(webhook?.url ?? '')
-  const [selectedEvents, setSelectedEvents] = useState<WebhookEvent[]>(
-    webhook?.events ?? [],
-  )
+  const [selectedEvents, setSelectedEvents] = useState<WebhookEvent[]>(webhook?.events ?? [])
   const [surveyId, setSurveyId] = useState<string>(webhook?.survey_id ?? '')
   const [isActive, setIsActive] = useState(webhook?.is_active ?? true)
   const [validationError, setValidationError] = useState<string | null>(null)
@@ -94,9 +97,7 @@ function WebhookForm({
 
   function toggleEvent(event: WebhookEvent) {
     setSelectedEvents((prev) =>
-      prev.includes(event)
-        ? prev.filter((e) => e !== event)
-        : [...prev, event],
+      prev.includes(event) ? prev.filter((e) => e !== event) : [...prev, event]
     )
   }
 
@@ -159,10 +160,7 @@ function WebhookForm({
     >
       <div className="bg-background rounded-lg shadow-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="p-6">
-          <h2
-            id="webhook-form-title"
-            className="text-lg font-semibold text-foreground mb-4"
-          >
+          <h2 id="webhook-form-title" className="text-lg font-semibold text-foreground mb-4">
             {isEdit ? 'Edit Webhook' : 'Create Webhook'}
           </h2>
 
@@ -316,11 +314,7 @@ function WebhookForm({
                 {createdSecret ? 'Done' : 'Cancel'}
               </Button>
               {!createdSecret && (
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  data-testid="webhook-form-submit"
-                >
+                <Button type="submit" disabled={isLoading} data-testid="webhook-form-submit">
                   {isLoading ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Webhook'}
                 </Button>
               )}

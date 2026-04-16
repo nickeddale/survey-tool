@@ -1,9 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  getAccessToken,
-  setTokens,
-  clearTokens,
-} from '../tokenService'
+import { getAccessToken, setTokens, clearTokens } from '../tokenService'
 
 const ACCESS = 'test-access-token'
 

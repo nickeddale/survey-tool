@@ -46,8 +46,7 @@ interface ProgressBarProps {
 
 function ProgressBar({ current, limit }: ProgressBarProps) {
   const pct = limit > 0 ? Math.min(100, Math.round((current / limit) * 100)) : 0
-  const color =
-    pct >= 80 ? 'bg-red-500' : pct >= 50 ? 'bg-yellow-500' : 'bg-green-500'
+  const color = pct >= 80 ? 'bg-red-500' : pct >= 50 ? 'bg-yellow-500' : 'bg-green-500'
 
   return (
     <div className="w-full" data-testid="quota-progress-bar">
@@ -102,7 +101,10 @@ function ConfirmDeleteModal({
             Are you sure you want to delete &quot;{quotaName}&quot;? This action cannot be undone.
           </p>
           {error && (
-            <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+            <div
+              className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+              role="alert"
+            >
               {error}
             </div>
           )}
@@ -190,15 +192,20 @@ function QuotasPage() {
   useEffect(() => {
     if (!surveyId) return
     let cancelled = false
-    surveyService.getSurvey(surveyId).then((survey) => {
-      if (!cancelled) {
-        const allQuestions = survey.groups.flatMap((g) => g.questions)
-        setQuestions(allQuestions)
-      }
-    }).catch(() => {
-      // Non-critical — condition builder just won't have question options
-    })
-    return () => { cancelled = true }
+    surveyService
+      .getSurvey(surveyId)
+      .then((survey) => {
+        if (!cancelled) {
+          const allQuestions = survey.groups.flatMap((g) => g.questions)
+          setQuestions(allQuestions)
+        }
+      })
+      .catch(() => {
+        // Non-critical — condition builder just won't have question options
+      })
+    return () => {
+      cancelled = true
+    }
   }, [surveyId])
 
   // ---------------------------------------------------------------------------
@@ -246,7 +253,7 @@ function QuotasPage() {
         setFormLoading(false)
       }
     },
-    [surveyId, editingQuota, loadQuotas],
+    [surveyId, editingQuota, loadQuotas]
   )
 
   // ---------------------------------------------------------------------------
@@ -310,7 +317,7 @@ function QuotasPage() {
         setTogglingId(null)
       }
     },
-    [surveyId, togglingId],
+    [surveyId, togglingId]
   )
 
   // ---------------------------------------------------------------------------
@@ -376,7 +383,10 @@ function QuotasPage() {
 
       {/* Global error */}
       {error && (
-        <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+        <div
+          className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+          role="alert"
+        >
           {error}
         </div>
       )}
@@ -402,10 +412,14 @@ function QuotasPage() {
               <thead className="bg-muted/50">
                 <tr>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Name</th>
-                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">Progress</th>
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+                    Progress
+                  </th>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Action</th>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Status</th>
-                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">Actions</th>
+                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -452,18 +466,12 @@ function QuotasPage() {
                           onClick={() => handleToggleActive(quota)}
                           disabled={togglingId === quota.id}
                           aria-label={
-                            quota.is_active
-                              ? `Deactivate ${quota.name}`
-                              : `Activate ${quota.name}`
+                            quota.is_active ? `Deactivate ${quota.name}` : `Activate ${quota.name}`
                           }
                           className="h-8 w-8 text-muted-foreground hover:text-foreground"
                           data-testid={`quota-toggle-${quota.id}`}
                         >
-                          {quota.is_active ? (
-                            <ToggleRight size={15} />
-                          ) : (
-                            <ToggleLeft size={15} />
-                          )}
+                          {quota.is_active ? <ToggleRight size={15} /> : <ToggleLeft size={15} />}
                         </Button>
 
                         {/* Edit */}

@@ -137,7 +137,7 @@ async def test_batched_aggregation_returns_correct_aggregates(client: AsyncClien
         client, headers, survey_id, group_id, title="Text", question_type="short_text"
     )
     q_num = await add_question(
-        client, headers, survey_id, group_id, title="Num", question_type="number"
+        client, headers, survey_id, group_id, title="Num", question_type="numeric"
     )
     q_choice = await add_question(
         client, headers, survey_id, group_id, title="Choice", question_type="single_choice"
@@ -188,7 +188,7 @@ async def test_batched_aggregation_returns_correct_aggregates(client: AsyncClien
     assert by_type["short_text"]["stats"]["response_count"] == 2
 
     # Numeric: mean=(10+20+30)/3=20, min=10, max=30
-    num_stats = by_type["number"]["stats"]
+    num_stats = by_type["numeric"]["stats"]
     assert num_stats["response_count"] == 3
     assert abs(num_stats["mean"] - 20.0) < 0.01
     assert abs(num_stats["min"] - 10.0) < 0.01
@@ -349,7 +349,7 @@ async def test_statistics_query_count_bounded_regardless_of_questions(client: As
         question_ids.append(q_id)
     for i in range(3):
         q_id = await add_question(
-            client, headers, survey_id, group_id, title=f"Num {i}", question_type="number"
+            client, headers, survey_id, group_id, title=f"Num {i}", question_type="numeric"
         )
         question_ids.append(q_id)
     for i in range(2):

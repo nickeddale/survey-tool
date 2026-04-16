@@ -18,7 +18,14 @@ interface RichTextEditorProps {
   errorId?: string
 }
 
-export function RichTextEditor({ value, onChange, onBlur, hasErrors, editorId, errorId }: RichTextEditorProps) {
+export function RichTextEditor({
+  value,
+  onChange,
+  onBlur,
+  hasErrors,
+  editorId,
+  errorId,
+}: RichTextEditorProps) {
   const editor = useEditor({
     extensions: [StarterKit],
     content: value,

@@ -31,7 +31,7 @@ function validate(
   isRequired: boolean,
   isMultiSelect: boolean,
   minChoices: number | null,
-  maxChoices: number | null,
+  maxChoices: number | null
 ): string[] {
   const errs: string[] = []
 
@@ -56,7 +56,12 @@ function validate(
 // Component
 // ---------------------------------------------------------------------------
 
-export function ImagePickerInput({ value, onChange, question, errors: externalErrors }: ImagePickerInputProps) {
+export function ImagePickerInput({
+  value,
+  onChange,
+  question,
+  errors: externalErrors,
+}: ImagePickerInputProps) {
   const s = (question.settings ?? {}) as Partial<ImagePickerSettings>
   const multiSelect = s.multi_select ?? false
   const minChoices = s.min_choices ?? null

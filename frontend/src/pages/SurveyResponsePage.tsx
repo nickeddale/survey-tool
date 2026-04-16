@@ -59,13 +59,16 @@ function SurveyResponsePage() {
     return survey.groups.flatMap((g) => g.questions)
   }, [survey])
 
-  const { hiddenQuestions, hiddenGroups, pipedTexts, nextQuestionId } =
-    useFlowResolution(screen === 'form' ? survey_id : undefined, answers, surveyQuestions)
+  const { hiddenQuestions, hiddenGroups, pipedTexts, nextQuestionId } = useFlowResolution(
+    screen === 'form' ? survey_id : undefined,
+    answers,
+    surveyQuestions
+  )
 
   const availableLanguages = useMemo(() => {
     if (!survey) return []
     const langs = new Set<string>([survey.default_language])
-    Object.keys(survey.translations ?? {}).forEach(l => langs.add(l))
+    Object.keys(survey.translations ?? {}).forEach((l) => langs.add(l))
     return Array.from(langs)
   }, [survey])
 
@@ -80,15 +83,19 @@ function SurveyResponsePage() {
         if (!cancelled) setSurvey(data)
       } catch (err) {
         if (!cancelled) {
-          setLoadError(err instanceof ApiError ? err.message : 'Failed to load survey. Please try again.')
+          setLoadError(
+            err instanceof ApiError ? err.message : 'Failed to load survey. Please try again.'
+          )
         }
       } finally {
         if (!cancelled) setIsLoading(false)
       }
     }
     load()
-    return () => { cancelled = true }
-  }, [survey_id, activeLang]) // eslint-disable-line react-hooks/exhaustive-deps
+    return () => {
+      cancelled = true
+    }
+  }, [survey_id, activeLang])
 
   function handleLangChange(lang: string) {
     setActiveLang(lang)
@@ -135,14 +142,16 @@ function SurveyResponsePage() {
       clearErrors()
       setScreen('form')
     } catch (err) {
-      setSubmitError(err instanceof ApiError ? err.message : 'Failed to start survey. Please try again.')
+      setSubmitError(
+        err instanceof ApiError ? err.message : 'Failed to start survey. Please try again.'
+      )
     } finally {
       setIsStarting(false)
     }
   }, [survey_id, survey, clearErrors])
 
   const handleChange = useCallback((questionId: string, value: QuestionAnswer) => {
-    setAnswers(prev => ({ ...prev, [questionId]: value }))
+    setAnswers((prev) => ({ ...prev, [questionId]: value }))
   }, [])
 
   const handleNext = useCallback(async () => {
@@ -150,13 +159,23 @@ function SurveyResponsePage() {
     const currentGroup = sortedGroups[currentPage]
     if (!currentGroup) return
     const currentQuestions = [...currentGroup.questions].sort(
-      (a, b) => a.sort_order - b.sort_order,
+      (a, b) => a.sort_order - b.sort_order
     ) as BuilderQuestion[]
     const valid = validateAll(currentQuestions, answers)
     if (!valid) return
-    try { await responseService.saveProgress(survey_id, responseId, answersToInput(answers, questionTypeMap)) } catch { /* Non-fatal */ }
+    try {
+      await responseService.saveProgress(
+        survey_id,
+        responseId,
+        answersToInput(answers, questionTypeMap)
+      )
+    } catch {
+      /* Non-fatal */
+    }
     if (nextQuestionId && onePagePerGroup) {
-      const targetIndex = sortedGroups.findIndex((g) => g.questions.some((q) => q.id === nextQuestionId))
+      const targetIndex = sortedGroups.findIndex((g) =>
+        g.questions.some((q) => q.id === nextQuestionId)
+      )
       if (targetIndex !== -1 && targetIndex !== currentPage) {
         setCurrentPage(targetIndex)
         clearErrors()
@@ -171,7 +190,18 @@ function SurveyResponsePage() {
     if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
-  }, [survey, survey_id, responseId, sortedGroups, currentPage, answers, validateAll, clearErrors, nextQuestionId, onePagePerGroup])
+  }, [
+    survey,
+    survey_id,
+    responseId,
+    sortedGroups,
+    currentPage,
+    answers,
+    validateAll,
+    clearErrors,
+    nextQuestionId,
+    onePagePerGroup,
+  ])
 
   const handlePrev = useCallback(() => {
     if (currentPage > 0) {
@@ -185,29 +215,56 @@ function SurveyResponsePage() {
   const handleSubmit = useCallback(async () => {
     if (!survey || !survey_id || !responseId) return
     const pageQuestions = onePagePerGroup
-      ? ([...sortedGroups[currentPage]?.questions ?? []].sort((a, b) => a.sort_order - b.sort_order) as BuilderQuestion[])
+      ? ([...(sortedGroups[currentPage]?.questions ?? [])].sort(
+          (a, b) => a.sort_order - b.sort_order
+        ) as BuilderQuestion[])
       : (flattenQuestions(sortedGroups) as BuilderQuestion[])
     if (!validateAll(pageQuestions, answers)) return
     setIsSubmitting(true)
     setSubmitError(null)
     try {
-      await responseService.saveProgress(survey_id, responseId, answersToInput(answers, questionTypeMap))
-      await responseService.completeResponse(survey_id, responseId, answersToInput(answers, questionTypeMap))
+      await responseService.saveProgress(
+        survey_id,
+        responseId,
+        answersToInput(answers, questionTypeMap)
+      )
+      await responseService.completeResponse(
+        survey_id,
+        responseId,
+        answersToInput(answers, questionTypeMap)
+      )
       clearStoredResponseId(survey_id)
       setScreen('end')
     } catch (err) {
-      setSubmitError(err instanceof ApiError ? err.message : 'Failed to submit response. Please try again.')
+      setSubmitError(
+        err instanceof ApiError ? err.message : 'Failed to submit response. Please try again.'
+      )
     } finally {
       setIsSubmitting(false)
     }
-  }, [survey, survey_id, responseId, onePagePerGroup, sortedGroups, currentPage, answers, validateAll])
+  }, [
+    survey,
+    survey_id,
+    responseId,
+    onePagePerGroup,
+    sortedGroups,
+    currentPage,
+    answers,
+    validateAll,
+  ])
 
   if (isLoading) return <ResponseSkeleton />
 
   if (loadError || !survey) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4" data-testid="response-load-error">
-        <div className="p-4 text-sm text-destructive bg-destructive/10 rounded-md max-w-md text-center" role="alert">
+      <div
+        className="flex flex-col items-center justify-center min-h-screen gap-4"
+        data-testid="response-load-error"
+      >
+        <div
+          className="p-4 text-sm text-destructive bg-destructive/10 rounded-md max-w-md text-center"
+          role="alert"
+        >
           {loadError ?? 'Failed to load survey.'}
         </div>
       </div>

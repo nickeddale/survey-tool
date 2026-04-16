@@ -3,7 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Play } from 'lucide-react'
 import webhookService from '../services/webhookService'
 import surveyService from '../services/surveyService'
-import type { WebhookResponse, WebhookCreate, SurveyResponse, WebhookCreateResponse } from '../types/survey'
+import type {
+  WebhookResponse,
+  WebhookCreate,
+  SurveyResponse,
+  WebhookCreateResponse,
+} from '../types/survey'
 import { ApiError } from '../types/api'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
@@ -73,10 +78,14 @@ function ConfirmDeleteModal({
             Delete Webhook
           </h2>
           <p className="text-sm text-muted-foreground mb-4">
-            Are you sure you want to delete the webhook for &quot;{displayUrl}&quot;? This action cannot be undone.
+            Are you sure you want to delete the webhook for &quot;{displayUrl}&quot;? This action
+            cannot be undone.
           </p>
           {error && (
-            <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+            <div
+              className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+              role="alert"
+            >
               {error}
             </div>
           )}
@@ -134,7 +143,11 @@ function WebhooksPage() {
 
   // Test webhook state (per-webhook)
   const [testingId, setTestingId] = useState<string | null>(null)
-  const [testResult, setTestResult] = useState<{ id: string; success: boolean; message: string } | null>(null)
+  const [testResult, setTestResult] = useState<{
+    id: string
+    success: boolean
+    message: string
+  } | null>(null)
 
   // ---------------------------------------------------------------------------
   // Load webhooks
@@ -166,14 +179,19 @@ function WebhooksPage() {
   // Load surveys for the survey selector
   useEffect(() => {
     let cancelled = false
-    surveyService.fetchSurveys({ per_page: 100 }).then((data) => {
-      if (!cancelled) {
-        setSurveys(data.items)
-      }
-    }).catch(() => {
-      // Non-critical — survey selector just won't have options
-    })
-    return () => { cancelled = true }
+    surveyService
+      .fetchSurveys({ per_page: 100 })
+      .then((data) => {
+        if (!cancelled) {
+          setSurveys(data.items)
+        }
+      })
+      .catch(() => {
+        // Non-critical — survey selector just won't have options
+      })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   // ---------------------------------------------------------------------------
@@ -211,7 +229,7 @@ function WebhooksPage() {
           closeForm()
           await loadWebhooks()
         } else {
-          const created = await webhookService.createWebhook(data) as WebhookCreateResponse
+          const created = (await webhookService.createWebhook(data)) as WebhookCreateResponse
           // Stay on the form to show the secret, but reload the list
           setCreatedSecret(created.secret)
           await loadWebhooks()
@@ -226,7 +244,7 @@ function WebhooksPage() {
         setFormLoading(false)
       }
     },
-    [editingWebhook, loadWebhooks],
+    [editingWebhook, loadWebhooks]
   )
 
   // ---------------------------------------------------------------------------
@@ -290,7 +308,7 @@ function WebhooksPage() {
         setTogglingId(null)
       }
     },
-    [togglingId],
+    [togglingId]
   )
 
   // ---------------------------------------------------------------------------
@@ -309,7 +327,7 @@ function WebhooksPage() {
           success: result.success,
           message: result.success
             ? `Test succeeded (HTTP ${result.status_code})`
-            : result.error ?? 'Test failed',
+            : (result.error ?? 'Test failed'),
         })
       } catch (err) {
         setTestResult({
@@ -321,7 +339,7 @@ function WebhooksPage() {
         setTestingId(null)
       }
     },
-    [testingId],
+    [testingId]
   )
 
   // ---------------------------------------------------------------------------
@@ -401,7 +419,10 @@ function WebhooksPage() {
 
       {/* Global error */}
       {error && (
-        <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+        <div
+          className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+          role="alert"
+        >
           {error}
         </div>
       )}
@@ -445,7 +466,9 @@ function WebhooksPage() {
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Events</th>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Survey</th>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Status</th>
-                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">Actions</th>
+                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -523,11 +546,7 @@ function WebhooksPage() {
                           className="h-8 w-8 text-muted-foreground hover:text-foreground"
                           data-testid={`webhook-toggle-${webhook.id}`}
                         >
-                          {webhook.is_active ? (
-                            <ToggleRight size={15} />
-                          ) : (
-                            <ToggleLeft size={15} />
-                          )}
+                          {webhook.is_active ? <ToggleRight size={15} /> : <ToggleLeft size={15} />}
                         </Button>
 
                         {/* Edit */}

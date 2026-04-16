@@ -27,7 +27,10 @@ export function ConfirmModal({
           </h2>
           <p className="text-sm text-muted-foreground mb-4">{message}</p>
           {error && (
-            <div className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+            <div
+              className="mb-4 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+              role="alert"
+            >
               {error}
             </div>
           )}
