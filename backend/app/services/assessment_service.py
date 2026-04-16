@@ -27,6 +27,63 @@ from app.models.response_answer import ResponseAnswer
 from app.schemas.assessment import AssessmentResponse, AssessmentScoreResponse
 
 
+SCORABLE_CELL_TYPES: frozenset[str] = frozenset({"dropdown", "radio", "rating", "checkbox"})
+
+
+def _extract_matrix_dropdown_codes(
+    val: dict,
+    question_id: uuid.UUID,
+    subquestion_id_map: dict[uuid.UUID, dict[str, uuid.UUID]],
+    settings_map: dict[uuid.UUID, dict],
+) -> list[tuple[str, uuid.UUID | None]]:
+    """Extract (option_code, subquestion_id) tuples from a matrix_dropdown answer.
+
+    matrix_dropdown answer format: {"SQ001": {"col1": "5", "col2": "text"}, ...}
+    Only columns whose type is in SCORABLE_CELL_TYPES contribute option codes.
+    """
+    column_types: dict[str, str] = (settings_map.get(question_id) or {}).get("column_types") or {}
+    sq_code_map = subquestion_id_map.get(question_id, {})
+    result: list[tuple[str, uuid.UUID | None]] = []
+    for sq_code, col_dict in val.items():
+        if not isinstance(col_dict, dict):
+            continue
+        sq_id = sq_code_map.get(sq_code)
+        for col_name, cell_value in col_dict.items():
+            col_type = column_types.get(col_name, "")
+            if col_type not in SCORABLE_CELL_TYPES:
+                continue
+            if cell_value is None:
+                continue
+            result.append((str(cell_value), sq_id))
+    return result
+
+
+def _extract_matrix_dynamic_codes(
+    val: list,
+    question_id: uuid.UUID,
+    settings_map: dict[uuid.UUID, dict],
+) -> list[tuple[str, None]]:
+    """Extract (option_code, None) tuples from a matrix_dynamic answer.
+
+    matrix_dynamic answer format: [{"col1": "Alice", "col2": "5"}, ...]
+    Rows are user-defined and have no subquestion IDs — always returns sq_id=None.
+    Only columns whose type is in SCORABLE_CELL_TYPES contribute option codes.
+    """
+    column_types: dict[str, str] = (settings_map.get(question_id) or {}).get("column_types") or {}
+    result: list[tuple[str, None]] = []
+    for row in val:
+        if not isinstance(row, dict):
+            continue
+        for col_name, cell_value in row.items():
+            col_type = column_types.get(col_name, "")
+            if col_type not in SCORABLE_CELL_TYPES:
+                continue
+            if cell_value is None:
+                continue
+            result.append((str(cell_value), None))
+    return result
+
+
 def _extract_matrix_single_codes(
     val: dict,
     question_id: uuid.UUID,
@@ -137,8 +194,13 @@ async def compute_score(
         q.id: q.question_type for q in questions
     }
 
+    # Build question settings map for matrix_dropdown/matrix_dynamic scoring
+    question_settings_map: dict[uuid.UUID, dict] = {
+        q.id: (q.settings or {}) for q in questions
+    }
+
     # Find matrix question IDs that need subquestion lookup
-    matrix_types = {"matrix_single", "matrix_multiple"}
+    matrix_types = {"matrix_single", "matrix_multiple", "matrix_dropdown"}
     matrix_qids = [q.id for q in questions if q.question_type in matrix_types]
 
     # Load subquestions for matrix questions and build subquestion_id_map
@@ -163,8 +225,11 @@ async def compute_score(
             continue
         q_type = question_type_map.get(ra.question_id, "")
         if isinstance(val, list):
-            # Multi-select: list of codes (no subquestion)
-            entries = [(str(c), None) for c in val if c is not None]
+            if q_type == "matrix_dynamic":
+                entries = _extract_matrix_dynamic_codes(val, ra.question_id, question_settings_map)
+            else:
+                # Multi-select: list of codes (no subquestion)
+                entries = [(str(c), None) for c in val if c is not None]
         elif isinstance(val, str):
             # Single select stored as string (no subquestion)
             entries = [(val, None)]
@@ -173,6 +238,10 @@ async def compute_score(
                 entries = _extract_matrix_single_codes(val, ra.question_id, subquestion_id_map)
             elif q_type == "matrix_multiple":
                 entries = _extract_matrix_multiple_codes(val, ra.question_id, subquestion_id_map)
+            elif q_type == "matrix_dropdown":
+                entries = _extract_matrix_dropdown_codes(
+                    val, ra.question_id, subquestion_id_map, question_settings_map
+                )
             else:
                 # Other dict-valued question types — skip for scoring
                 continue

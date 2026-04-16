@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-16T18:56:11.856Z",
+  "lastUpdated": "2026-04-16T19:13:12.884Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5043,6 +5043,28 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md",
+      "ticketId": "ISS-267",
+      "title": "Extend assessment scoring to support matrix_dropdown and matrix_dynamic answers",
+      "date": "2026-04-16",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "refactoring",
+        "bug-fix",
+        "feature",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -5286,7 +5308,8 @@
       "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md",
       "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md",
       "2026-04-16-iss-265-add-subquestion-scope-to-assessment-model-and-migr.md",
-      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md"
+      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md",
+      "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5496,7 +5519,8 @@
       "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
       "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
       "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
-      "2026-04-16-iss-265-add-subquestion-scope-to-assessment-model-and-migr.md"
+      "2026-04-16-iss-265-add-subquestion-scope-to-assessment-model-and-migr.md",
+      "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5662,7 +5686,8 @@
       "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
       "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md",
       "2026-04-16-iss-265-add-subquestion-scope-to-assessment-model-and-migr.md",
-      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md"
+      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md",
+      "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5894,7 +5919,8 @@
       "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md",
       "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md",
       "2026-04-16-iss-265-add-subquestion-scope-to-assessment-model-and-migr.md",
-      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md"
+      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md",
+      "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5959,7 +5985,8 @@
       "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
       "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
       "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
-      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md"
+      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md",
+      "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md"
     ],
     "bug-fix": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6187,7 +6214,8 @@
       "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md",
       "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md",
       "2026-04-16-iss-265-add-subquestion-scope-to-assessment-model-and-migr.md",
-      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md"
+      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md",
+      "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6421,7 +6449,8 @@
       "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md",
       "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md",
       "2026-04-16-iss-265-add-subquestion-scope-to-assessment-model-and-migr.md",
-      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md"
+      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md",
+      "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6631,7 +6660,8 @@
       "2026-04-16-iss-261-backend-typeerror-unhashable-list-in-relevance-cac.md",
       "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md",
       "2026-04-16-iss-265-add-subquestion-scope-to-assessment-model-and-migr.md",
-      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md"
+      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md",
+      "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6803,7 +6833,8 @@
       "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
       "2026-04-16-iss-260-matrix-dynamic-validator-incorrectly-requires-subq.md",
       "2026-04-16-iss-265-add-subquestion-scope-to-assessment-model-and-migr.md",
-      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md"
+      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md",
+      "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -7023,7 +7054,8 @@
       "2026-04-16-iss-259-matrix-response-submission-fails-422-validator-run.md",
       "2026-04-16-iss-263-matrix-dropdown-rating-cell-value-sent-as-string-i.md",
       "2026-04-16-iss-265-add-subquestion-scope-to-assessment-model-and-migr.md",
-      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md"
+      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md",
+      "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -7167,7 +7199,8 @@
       "2026-04-14-iss-246-email-invitations-duplicate-alembic-migration-revi.md",
       "2026-04-16-iss-258-matrix-dynamic-frontendbackend-settings-key-name-m.md",
       "2026-04-16-iss-265-add-subquestion-scope-to-assessment-model-and-migr.md",
-      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md"
+      "2026-04-16-iss-266-extend-assessment-scoring-to-support-matrixsingle.md",
+      "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",
