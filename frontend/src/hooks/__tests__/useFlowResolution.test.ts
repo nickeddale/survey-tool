@@ -21,7 +21,7 @@ const SURVEY_ID = 'test-survey-123'
 // ---------------------------------------------------------------------------
 
 beforeEach(() => {
-  localStorage.removeItem('devtracker_refresh_token')
+  localStorage.removeItem('survey_tool_refresh_token')
 })
 
 afterEach(() => {

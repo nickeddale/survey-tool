@@ -88,7 +88,7 @@ frontend/
 ### Backend
 - Tests use function-scoped fixtures that create/drop all tables per test
 - `conftest.py` creates ENUM types, overrides `get_db` dependency, resets rate limiter
-- Default test DB URL falls back to `test-postgres:5432/devtracker` if `DATABASE_URL` not set
+- Default test DB URL falls back to `test-postgres:5432/survey_tool` if `DATABASE_URL` not set
 - Key fixtures: `engine`, `session` (AsyncSession), `client` (httpx.AsyncClient)
 
 ### Frontend

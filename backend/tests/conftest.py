@@ -25,7 +25,7 @@ if _env_url.startswith("postgresql://"):
     )
 elif not _env_url:
     os.environ["DATABASE_URL"] = (
-        "postgresql+asyncpg://postgres:postgres@test-postgres:5432/devtracker"
+        "postgresql+asyncpg://postgres:postgres@test-postgres:5432/survey_tool"
     )
 
 import pytest

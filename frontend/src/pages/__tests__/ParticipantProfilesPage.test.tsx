@@ -42,7 +42,7 @@ describe('ParticipantProfilesPage', () => {
     localStorage.clear()
     resetAuthStore()
     setTokens(mockTokens.access_token)
-    localStorage.removeItem('devtracker_refresh_token')
+    localStorage.removeItem('survey_tool_refresh_token')
     useAuthStore.setState({
       user: mockUser,
       isAuthenticated: true,

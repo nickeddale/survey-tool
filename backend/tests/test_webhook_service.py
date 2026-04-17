@@ -680,7 +680,7 @@ TEST_DATABASE_URL = None  # resolved at module load via conftest
 async def wh_engine():
     """Create a fresh test DB engine for webhook service tests."""
     import os
-    db_url = os.environ.get("DATABASE_URL", "postgresql+asyncpg://postgres:postgres@test-postgres:5432/devtracker")
+    db_url = os.environ.get("DATABASE_URL", "postgresql+asyncpg://postgres:postgres@test-postgres:5432/survey_tool")
     if db_url.startswith("postgresql://"):
         db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
 
