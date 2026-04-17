@@ -1,4 +1,8 @@
-import type { ResponseDetailFull, ResponseAnswerDetail } from '../../types/survey'
+import type {
+  ResponseDetailFull,
+  ResponseAnswerDetail,
+  MatrixColumnHeader,
+} from '../../types/survey'
 import { Badge } from '../ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 
@@ -61,45 +65,337 @@ export function formatAnswerValue(value: unknown): string {
   return String(value)
 }
 
-function MatrixAnswerGrid({
+// ---------------------------------------------------------------------------
+// Matrix grid table styles (shared)
+// ---------------------------------------------------------------------------
+
+const TABLE_CLS = 'w-full text-xs border border-border rounded'
+const TH_CLS = 'px-3 py-2 font-medium text-muted-foreground text-left'
+const TH_CENTER_CLS = 'px-3 py-2 font-medium text-muted-foreground text-center'
+const TD_LABEL_CLS = 'px-3 py-2 text-muted-foreground whitespace-nowrap'
+const TD_CLS = 'px-3 py-2 text-center text-foreground'
+
+// ---------------------------------------------------------------------------
+// MatrixSingleAnswerGrid — radio grid (matrix / matrix_single)
+// Each subquestion is a row; each answer option is a column.
+// Selected cells show a checkmark; others are empty.
+// ---------------------------------------------------------------------------
+
+function MatrixSingleAnswerGrid({
   answers,
+  columnHeaders,
   questionCode,
 }: {
   answers: ResponseAnswerDetail[]
+  columnHeaders: MatrixColumnHeader[]
   questionCode: string
 }) {
-  // Collect unique subquestion labels (rows) for this matrix question
-  const rows = Array.from(
-    new Map(
-      answers
-        .filter((a) => a.question_code.startsWith(questionCode) && a.subquestion_label)
-        .map((a) => [a.subquestion_label!, a])
-    ).values()
-  )
+  if (answers.length === 0 || columnHeaders.length === 0) return null
 
-  if (rows.length === 0) return null
+  // Map option code -> title for quick lookup
+  const colTitleByCode = new Map(columnHeaders.map((c) => [c.code, c.title]))
 
   return (
     <div className="overflow-x-auto mt-1" data-testid={`matrix-grid-${questionCode}`}>
-      <table className="w-full text-xs border border-border rounded" role="table">
+      <table className={TABLE_CLS} role="table">
         <thead className="bg-muted/50">
           <tr>
-            <th className="text-left px-3 py-2 font-medium text-muted-foreground">Subquestion</th>
-            <th className="text-left px-3 py-2 font-medium text-muted-foreground">Answer</th>
+            <th className={TH_CLS}>Subquestion</th>
+            {columnHeaders.map((col) => (
+              <th key={col.code} className={TH_CENTER_CLS}>
+                {col.title}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
-          {rows.map((answer) => (
-            <tr key={answer.question_id} className="bg-card">
-              <td className="px-3 py-2 text-muted-foreground">{answer.subquestion_label}</td>
-              <td className="px-3 py-2 text-foreground">
-                {answer.selected_option_title ?? formatAnswerValue(answer.value)}
-              </td>
+          {answers.map((answer) => {
+            const selectedCode = answer.value != null ? String(answer.value) : null
+            return (
+              <tr key={answer.question_id} className="bg-card">
+                <td className={TD_LABEL_CLS}>{answer.subquestion_label ?? answer.question_code}</td>
+                {columnHeaders.map((col) => {
+                  const isSelected = selectedCode === col.code
+                  return (
+                    <td key={col.code} className={TD_CLS}>
+                      {isSelected ? (
+                        <span
+                          title={colTitleByCode.get(col.code)}
+                          aria-label="selected"
+                          className="text-green-600 font-bold"
+                        >
+                          ✓
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground/30">·</span>
+                      )}
+                    </td>
+                  )
+                })}
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// MatrixMultipleAnswerGrid — checkbox grid (matrix_multiple)
+// Each subquestion is a row; each answer option is a column.
+// Selected cells show a checkmark (value is array of option codes per subquestion).
+// ---------------------------------------------------------------------------
+
+function MatrixMultipleAnswerGrid({
+  answers,
+  columnHeaders,
+  questionCode,
+}: {
+  answers: ResponseAnswerDetail[]
+  columnHeaders: MatrixColumnHeader[]
+  questionCode: string
+}) {
+  if (answers.length === 0 || columnHeaders.length === 0) return null
+
+  return (
+    <div className="overflow-x-auto mt-1" data-testid={`matrix-grid-${questionCode}`}>
+      <table className={TABLE_CLS} role="table">
+        <thead className="bg-muted/50">
+          <tr>
+            <th className={TH_CLS}>Subquestion</th>
+            {columnHeaders.map((col) => (
+              <th key={col.code} className={TH_CENTER_CLS}>
+                {col.title}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border">
+          {answers.map((answer) => {
+            // value is an array of selected option codes for this subquestion
+            const selected = new Set(Array.isArray(answer.value) ? (answer.value as string[]) : [])
+            return (
+              <tr key={answer.question_id} className="bg-card">
+                <td className={TD_LABEL_CLS}>{answer.subquestion_label ?? answer.question_code}</td>
+                {columnHeaders.map((col) => (
+                  <td key={col.code} className={TD_CLS}>
+                    {selected.has(col.code) ? (
+                      <span aria-label="selected" className="text-green-600 font-bold">
+                        ✓
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground/30">·</span>
+                    )}
+                  </td>
+                ))}
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// MatrixDropdownAnswerGrid — per-cell values (matrix_dropdown)
+// Each subquestion is a row; each answer option (column) has a per-cell value.
+// value shape: {"SQ001": {"col1": "val1", "col2": "val2"}, ...}
+// We receive one answer per subquestion.
+// ---------------------------------------------------------------------------
+
+function MatrixDropdownAnswerGrid({
+  answers,
+  columnHeaders,
+  questionCode,
+}: {
+  answers: ResponseAnswerDetail[]
+  columnHeaders: MatrixColumnHeader[]
+  questionCode: string
+}) {
+  if (answers.length === 0 || columnHeaders.length === 0) return null
+
+  return (
+    <div className="overflow-x-auto mt-1" data-testid={`matrix-grid-${questionCode}`}>
+      <table className={TABLE_CLS} role="table">
+        <thead className="bg-muted/50">
+          <tr>
+            <th className={TH_CLS}>Subquestion</th>
+            {columnHeaders.map((col) => (
+              <th key={col.code} className={TH_CLS}>
+                {col.title}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border">
+          {answers.map((answer) => {
+            const rowValues =
+              answer.value != null &&
+              typeof answer.value === 'object' &&
+              !Array.isArray(answer.value)
+                ? (answer.value as Record<string, unknown>)
+                : {}
+            return (
+              <tr key={answer.question_id} className="bg-card">
+                <td className={TD_LABEL_CLS}>{answer.subquestion_label ?? answer.question_code}</td>
+                {columnHeaders.map((col) => {
+                  const cellVal = rowValues[col.code]
+                  return (
+                    <td key={col.code} className="px-3 py-2 text-foreground">
+                      {cellVal != null ? (
+                        <span>{formatAnswerValue(cellVal)}</span>
+                      ) : (
+                        <span className="text-muted-foreground italic text-xs">—</span>
+                      )}
+                    </td>
+                  )
+                })}
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// MatrixDynamicAnswerGrid — row-based dynamic grid (matrix_dynamic)
+// value shape: [{"col1": "val1", "col2": "val2"}, ...]
+// Stored as a single answer on the parent question (not subquestions).
+// ---------------------------------------------------------------------------
+
+function MatrixDynamicAnswerGrid({
+  answer,
+  columnHeaders,
+  questionCode,
+}: {
+  answer: ResponseAnswerDetail
+  columnHeaders: MatrixColumnHeader[]
+  questionCode: string
+}) {
+  const rows = Array.isArray(answer.value) ? (answer.value as Record<string, unknown>[]) : []
+  if (rows.length === 0 || columnHeaders.length === 0) return null
+
+  return (
+    <div className="overflow-x-auto mt-1" data-testid={`matrix-grid-${questionCode}`}>
+      <table className={TABLE_CLS} role="table">
+        <thead className="bg-muted/50">
+          <tr>
+            <th className={TH_CLS}>#</th>
+            {columnHeaders.map((col) => (
+              <th key={col.code} className={TH_CLS}>
+                {col.title}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border">
+          {rows.map((row, i) => (
+            <tr key={i} className="bg-card">
+              <td className={TD_LABEL_CLS}>{i + 1}</td>
+              {columnHeaders.map((col) => {
+                const cellVal = row[col.code]
+                return (
+                  <td key={col.code} className="px-3 py-2 text-foreground">
+                    {cellVal != null ? (
+                      <span>{formatAnswerValue(cellVal)}</span>
+                    ) : (
+                      <span className="text-muted-foreground italic text-xs">—</span>
+                    )}
+                  </td>
+                )
+              })}
             </tr>
           ))}
         </tbody>
       </table>
     </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// MatrixAnswerGrid — dispatcher for all matrix types
+// ---------------------------------------------------------------------------
+
+function MatrixAnswerGrid({
+  answers,
+  questionCode,
+  questionType,
+}: {
+  answers: ResponseAnswerDetail[]
+  questionCode: string
+  questionType: string
+}) {
+  // Collect column headers from any subquestion answer that has them
+  // (all subquestions share the same parent, so first non-null set wins)
+  let columnHeaders: MatrixColumnHeader[] = []
+  for (const a of answers) {
+    if (a.matrix_column_headers && a.matrix_column_headers.length > 0) {
+      columnHeaders = a.matrix_column_headers
+      break
+    }
+  }
+
+  // matrix_dynamic: single answer with array value — answers[0] is the parent answer
+  if (questionType === 'matrix_dynamic') {
+    const parentAnswer = answers[0]
+    if (!parentAnswer) return null
+    // For matrix_dynamic, column headers come from the answer itself if subquestions
+    // aren't used — fall back to deriving column names from the first row object keys
+    const derivedHeaders: MatrixColumnHeader[] =
+      columnHeaders.length > 0
+        ? columnHeaders
+        : Array.isArray(parentAnswer.value) && (parentAnswer.value as unknown[]).length > 0
+          ? Object.keys((parentAnswer.value as Record<string, unknown>[])[0]).map((k) => ({
+              code: k,
+              title: k,
+            }))
+          : []
+    return (
+      <MatrixDynamicAnswerGrid
+        answer={parentAnswer}
+        columnHeaders={derivedHeaders}
+        questionCode={questionCode}
+      />
+    )
+  }
+
+  // Subquestion-based matrix types
+  const subquestionAnswers = answers.filter(
+    (a) => a.subquestion_label != null || a.question_code.includes('_SQ')
+  )
+  if (subquestionAnswers.length === 0) return null
+
+  if (questionType === 'matrix_multiple') {
+    return (
+      <MatrixMultipleAnswerGrid
+        answers={subquestionAnswers}
+        columnHeaders={columnHeaders}
+        questionCode={questionCode}
+      />
+    )
+  }
+
+  if (questionType === 'matrix_dropdown') {
+    return (
+      <MatrixDropdownAnswerGrid
+        answers={subquestionAnswers}
+        columnHeaders={columnHeaders}
+        questionCode={questionCode}
+      />
+    )
+  }
+
+  // Default: matrix / matrix_single (radio grid)
+  return (
+    <MatrixSingleAnswerGrid
+      answers={subquestionAnswers}
+      columnHeaders={columnHeaders}
+      questionCode={questionCode}
+    />
   )
 }
 
@@ -165,6 +461,14 @@ function groupAnswers(answers: ResponseAnswerDetail[]): AnswerGroup[] {
       })
     }
     groups.get(groupKey)!.answers.push(answer)
+  }
+
+  // matrix_dynamic answers are stored on the parent question itself (not subquestions)
+  // so we need to flag them as matrix parents too
+  for (const group of groups.values()) {
+    if (group.questionType === 'matrix_dynamic' && !group.isMatrixParent) {
+      group.isMatrixParent = true
+    }
   }
 
   return Array.from(groups.values())
@@ -266,7 +570,11 @@ function ResponseDetail({ response }: ResponseDetailProps) {
                   </div>
 
                   {group.isMatrixParent ? (
-                    <MatrixAnswerGrid answers={group.answers} questionCode={group.questionCode} />
+                    <MatrixAnswerGrid
+                      answers={group.answers}
+                      questionCode={group.questionCode}
+                      questionType={group.questionType}
+                    />
                   ) : (
                     <div className="pl-2">
                       {group.answers.map((answer) => (

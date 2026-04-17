@@ -224,6 +224,11 @@ export interface ResponseListResponse {
   pages: number
 }
 
+export interface MatrixColumnHeader {
+  code: string
+  title: string
+}
+
 export interface ResponseAnswerDetail {
   question_id: string
   question_code: string
@@ -233,6 +238,7 @@ export interface ResponseAnswerDetail {
   values: unknown[] | null
   selected_option_title: string | null
   subquestion_label: string | null
+  matrix_column_headers: MatrixColumnHeader[] | null
 }
 
 export interface ResponseDetailFull {

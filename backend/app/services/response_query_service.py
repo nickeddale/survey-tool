@@ -248,7 +248,7 @@ _DETAIL_MATRIX_TYPES = {"matrix", "matrix_single", "matrix_multiple", "matrix_dr
 
 def _build_enriched_answer(answer: ResponseAnswer) -> "ResponseAnswerDetail":
     """Build a ResponseAnswerDetail from a ResponseAnswer ORM object (with question loaded)."""
-    from app.schemas.response import ResponseAnswerDetail
+    from app.schemas.response import MatrixColumnHeader, ResponseAnswerDetail
 
     question = answer.question
     raw_value = answer.value
@@ -262,8 +262,21 @@ def _build_enriched_answer(answer: ResponseAnswer) -> "ResponseAnswerDetail":
                 break
 
     subquestion_label: str | None = None
+    matrix_column_headers: list[MatrixColumnHeader] | None = None
     if question.question_type in _DETAIL_MATRIX_TYPES and question.parent_id is not None:
         subquestion_label = question.title
+        # Load column headers from the parent question's answer options
+        parent = question.parent
+        if parent is not None:
+            try:
+                parent_options = list(parent.answer_options)
+                if parent_options:
+                    matrix_column_headers = [
+                        MatrixColumnHeader(code=opt.code, title=opt.title or opt.code)
+                        for opt in sorted(parent_options, key=lambda o: o.sort_order)
+                    ]
+            except Exception:
+                pass
 
     values: list[Any] | None = None
     if question.question_type == "multiple_choice" and isinstance(raw_value, list):
@@ -278,6 +291,7 @@ def _build_enriched_answer(answer: ResponseAnswer) -> "ResponseAnswerDetail":
         values=values,
         selected_option_title=selected_option_title,
         subquestion_label=subquestion_label,
+        matrix_column_headers=matrix_column_headers,
     )
 
 
@@ -309,6 +323,10 @@ async def get_response_detail(
             selectinload(Response.answers).selectinload(ResponseAnswer.question).selectinload(
                 Question.subquestions
             ),
+            selectinload(Response.answers)
+            .selectinload(ResponseAnswer.question)
+            .selectinload(Question.parent)
+            .selectinload(Question.answer_options),
         )
     )
     response = result.scalar_one_or_none()
