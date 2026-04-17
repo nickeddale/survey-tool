@@ -8,6 +8,7 @@ import {
   BarChart2,
   Users,
   Mail,
+  Eye,
 } from 'lucide-react'
 import { Button } from '../ui/button'
 import type { ModalType } from './types'
@@ -151,6 +152,15 @@ export function SurveyActions({
           Edit
         </Button>
       )}
+      <Button
+        variant="outline"
+        onClick={() => onNavigate(`/surveys/${surveyId}/preview`)}
+        aria-label="Preview survey"
+        data-testid="preview-button"
+      >
+        <Eye size={14} />
+        Preview
+      </Button>
       <Button
         variant="outline"
         onClick={() => onOpenModal('clone')}
