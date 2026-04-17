@@ -110,6 +110,13 @@ class ResponseResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 
+class MatrixColumnHeader(BaseModel):
+    """A single column header for a matrix question grid (answer option code + title)."""
+
+    code: str
+    title: str
+
+
 class ResponseAnswerDetail(BaseModel):
     """Enriched answer schema including question metadata and resolved labels."""
 
@@ -121,6 +128,7 @@ class ResponseAnswerDetail(BaseModel):
     values: list[Any] | None = None
     selected_option_title: str | None = None
     subquestion_label: str | None = None
+    matrix_column_headers: list[MatrixColumnHeader] | None = None
 
 
 class ResponseDetail(BaseModel):
