@@ -5,6 +5,7 @@ import type {
   AssessmentResponse,
   AssessmentListResponse,
   AssessmentScoreResponse,
+  AssessmentSummaryResponse,
 } from '../types/survey'
 
 export interface AssessmentFetchParams {
@@ -61,6 +62,13 @@ class AssessmentService {
   ): Promise<AssessmentScoreResponse> {
     const response = await apiClient.get<AssessmentScoreResponse>(
       `/surveys/${surveyId}/responses/${responseId}/assessment`
+    )
+    return response.data
+  }
+
+  async getAssessmentSummary(surveyId: string): Promise<AssessmentSummaryResponse> {
+    const response = await apiClient.get<AssessmentSummaryResponse>(
+      `/surveys/${surveyId}/assessments/summary`
     )
     return response.data
   }
