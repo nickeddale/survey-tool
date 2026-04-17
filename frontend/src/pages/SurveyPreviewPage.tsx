@@ -189,8 +189,8 @@ function SurveyPreviewPage() {
     screen === 'welcome' ? 0 : screen === 'end' ? totalGroups : currentGroupIndex + 1
   const progressTotal = totalGroups
 
-  const handleReturnToBuilder = () => {
-    navigate(`/surveys/${id}/builder`)
+  const handleReturnToSurvey = () => {
+    navigate(`/surveys/${id}`)
   }
 
   const handleStart = () => {
@@ -273,11 +273,11 @@ function SurveyPreviewPage() {
           variant="outline"
           size="sm"
           className="ml-auto h-8 gap-1 border-amber-400 text-amber-700 hover:bg-amber-100"
-          onClick={handleReturnToBuilder}
-          data-testid="return-to-builder-button"
+          onClick={handleReturnToSurvey}
+          data-testid="return-to-survey-button"
         >
           <ArrowLeft size={14} />
-          Return to Builder
+          Return to Survey
         </Button>
       </header>
 

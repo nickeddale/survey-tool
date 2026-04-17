@@ -37,6 +37,7 @@ function renderPreview(surveyId = SURVEY_ID) {
         <Routes>
           <Route path="/surveys/:id/preview" element={<SurveyPreviewPage />} />
           <Route path="/surveys/:id/builder" element={<div data-testid="survey-builder-page" />} />
+          <Route path="/surveys/:id" element={<div data-testid="survey-detail-page" />} />
           <Route path="/surveys" element={<div data-testid="surveys-page" />} />
         </Routes>
       </AuthProvider>
@@ -106,10 +107,10 @@ describe('welcome screen', () => {
     expect(screen.getByTestId('preview-banner-text')).toHaveTextContent(/preview mode/i)
   })
 
-  it('shows Return to Builder button in banner', async () => {
+  it('shows Return to Survey button in banner', async () => {
     renderPreview()
 
-    await waitFor(() => expect(screen.getByTestId('return-to-builder-button')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByTestId('return-to-survey-button')).toBeInTheDocument())
   })
 
   it('shows welcome screen on initial load', async () => {
@@ -512,18 +513,18 @@ describe('end screen', () => {
 // Return to Builder navigation
 // ---------------------------------------------------------------------------
 
-describe('Return to Builder', () => {
-  it('navigates to builder page when Return to Builder is clicked', async () => {
+describe('Return to Survey', () => {
+  it('navigates to survey detail page when Return to Survey is clicked', async () => {
     const user = userEvent.setup()
     renderPreview()
 
-    await waitFor(() => expect(screen.getByTestId('return-to-builder-button')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByTestId('return-to-survey-button')).toBeInTheDocument())
 
     await act(async () => {
-      await user.click(screen.getByTestId('return-to-builder-button'))
+      await user.click(screen.getByTestId('return-to-survey-button'))
     })
 
-    await waitFor(() => expect(screen.getByTestId('survey-builder-page')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByTestId('survey-detail-page')).toBeInTheDocument())
   })
 })
 
