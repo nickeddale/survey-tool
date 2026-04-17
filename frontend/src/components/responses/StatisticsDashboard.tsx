@@ -11,6 +11,7 @@ import type {
 } from '../../types/survey'
 import responseService from '../../services/responseService'
 import { ApiError } from '../../types/api'
+import AssessmentSummary from './AssessmentSummary'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -374,6 +375,11 @@ function StatisticsDashboard({ surveyId }: StatisticsDashboardProps) {
           No question statistics available yet.
         </div>
       ) : null}
+
+      {/* Assessment aggregate summary (hidden when no assessment rules defined) */}
+      <div className="mt-6">
+        <AssessmentSummary surveyId={surveyId} />
+      </div>
     </div>
   )
 }

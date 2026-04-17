@@ -439,6 +439,23 @@ export interface AssessmentScoreResponse {
   matching_assessments: AssessmentResponse[]
 }
 
+export interface AssessmentBandSummary {
+  name: string
+  min_score: number
+  max_score: number
+  message: string
+  count: number
+  percentage: number
+}
+
+export interface AssessmentSummaryResponse {
+  total_responses: number
+  average_score: number | null
+  min_score: number | null
+  max_score: number | null
+  bands: AssessmentBandSummary[]
+}
+
 // ---------------------------------------------------------------------------
 // Webhook types (matching backend WebhookCreate, WebhookUpdate,
 // WebhookResponse, WebhookListResponse)

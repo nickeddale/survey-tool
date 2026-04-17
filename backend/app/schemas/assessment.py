@@ -59,3 +59,20 @@ class AssessmentListResponse(BaseModel):
 class AssessmentScoreResponse(BaseModel):
     score: Decimal
     matching_assessments: list[AssessmentResponse]
+
+
+class AssessmentBandSummary(BaseModel):
+    name: str
+    min_score: Decimal
+    max_score: Decimal
+    message: str
+    count: int
+    percentage: float
+
+
+class AssessmentSummaryResponse(BaseModel):
+    total_responses: int
+    average_score: Decimal | None
+    min_score: Decimal | None
+    max_score: Decimal | None
+    bands: list[AssessmentBandSummary]

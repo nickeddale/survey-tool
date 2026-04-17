@@ -1724,6 +1724,186 @@ async def test_score_matrix_dynamic_question_scope_and_no_subquestion_scores(cli
     assert "QNoMatch" not in matching_names
 
 
+# ---------------------------------------------------------------------------
+# Assessment Summary Endpoint Tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_summary_no_assessment_rules_returns_404(client: AsyncClient):
+    """GET /assessments/summary returns 404 when no assessment rules are defined."""
+    headers = await auth_headers(client, "summary_no_rules@example.com")
+    survey_id = await create_survey(client, headers)
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/assessments/summary",
+        headers=headers,
+    )
+    assert resp.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_summary_no_completed_responses_returns_empty_distribution(client: AsyncClient):
+    """GET /assessments/summary with rules but no completed responses returns zero counts."""
+    headers = await auth_headers(client, "summary_no_responses@example.com")
+    survey_id = await create_survey(client, headers)
+
+    # Create assessment rules
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="Low", min_score=0, max_score=5),
+        headers=headers,
+    )
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="High", min_score=6, max_score=10),
+        headers=headers,
+    )
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/assessments/summary",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["total_responses"] == 0
+    assert data["average_score"] is None
+    assert data["min_score"] is None
+    assert data["max_score"] is None
+    assert len(data["bands"]) == 2
+    for band in data["bands"]:
+        assert band["count"] == 0
+        assert band["percentage"] == 0.0
+
+    # Verify no internal ORM fields leak
+    assert "id" not in data
+    assert "survey_id" not in data
+    for band in data["bands"]:
+        assert "id" not in band
+        assert "survey_id" not in band
+
+
+@pytest.mark.asyncio
+async def test_summary_multiple_responses_across_bands(client: AsyncClient):
+    """GET /assessments/summary aggregates scores from multiple completed responses."""
+    headers = await auth_headers(client, "summary_multi@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+
+    q_id = await create_question(client, headers, survey_id, group_id, code="Q1")
+    # Option A = score 3, Option B = score 8
+    await create_answer_option(client, headers, survey_id, q_id, "A", 3)
+    await create_answer_option(client, headers, survey_id, q_id, "B", 8)
+
+    await activate_survey(client, headers, survey_id)
+
+    # Assessment bands
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="Low", min_score=0, max_score=5),
+        headers=headers,
+    )
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="High", min_score=6, max_score=10),
+        headers=headers,
+    )
+
+    # Submit 2 responses with score=3 (Low band), 1 response with score=8 (High band)
+    for _ in range(2):
+        response_id = await submit_response(
+            client, survey_id, answers=[{"question_id": q_id, "value": "A"}]
+        )
+        # Mark complete
+        await client.patch(
+            f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/complete",
+            json={},
+        )
+
+    response_id = await submit_response(
+        client, survey_id, answers=[{"question_id": q_id, "value": "B"}]
+    )
+    await client.patch(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/complete",
+        json={},
+    )
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/assessments/summary",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["total_responses"] == 3
+    # Average: (3+3+8)/3 = 14/3 ≈ 4.666...
+    assert data["average_score"] is not None
+    assert abs(float(data["average_score"]) - (14 / 3)) < 0.01
+    assert float(data["min_score"]) == 3.0
+    assert float(data["max_score"]) == 8.0
+
+    bands_by_name = {b["name"]: b for b in data["bands"]}
+    assert bands_by_name["Low"]["count"] == 2
+    assert abs(bands_by_name["Low"]["percentage"] - 66.7) < 1.0
+    assert bands_by_name["High"]["count"] == 1
+    assert abs(bands_by_name["High"]["percentage"] - 33.3) < 1.0
+
+    # Band percentages should sum close to 100% (only exact for non-overlapping bands)
+    total_pct = sum(b["percentage"] for b in data["bands"])
+    assert abs(total_pct - 100.0) < 1.0
+
+
+@pytest.mark.asyncio
+async def test_summary_ignores_incomplete_responses(client: AsyncClient):
+    """GET /assessments/summary only counts completed responses, not incomplete ones."""
+    headers = await auth_headers(client, "summary_incomplete@example.com")
+    survey_id = await create_survey(client, headers)
+    group_id = await create_group(client, headers, survey_id)
+
+    q_id = await create_question(client, headers, survey_id, group_id, code="Q1")
+    await create_answer_option(client, headers, survey_id, q_id, "A", 5)
+
+    await activate_survey(client, headers, survey_id)
+
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="Band", min_score=0, max_score=10),
+        headers=headers,
+    )
+
+    # Submit one incomplete response (don't mark it complete)
+    await submit_response(client, survey_id, answers=[{"question_id": q_id, "value": "A"}])
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/assessments/summary",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    # Incomplete response should not be counted
+    assert data["total_responses"] == 0
+    assert data["average_score"] is None
+
+
+@pytest.mark.asyncio
+async def test_summary_wrong_owner_returns_404(client: AsyncClient):
+    """GET /assessments/summary returns 404 for a survey not owned by the user."""
+    headers1 = await auth_headers(client, "summown1@example.com")
+    headers2 = await auth_headers(client, "summown2@example.com")
+    survey_id = await create_survey(client, headers1)
+
+    await client.post(
+        f"{SURVEYS_URL}/{survey_id}/assessments",
+        json=assessment_payload(name="Band"),
+        headers=headers1,
+    )
+
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/assessments/summary",
+        headers=headers2,
+    )
+    assert resp.status_code == 404
+
+
 @pytest.mark.asyncio
 async def test_score_backward_compat_string_and_list_answers_unchanged(client: AsyncClient):
     """Backward compatibility: string and list answers still produce identical scores."""

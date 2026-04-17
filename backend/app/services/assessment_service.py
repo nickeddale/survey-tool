@@ -24,7 +24,13 @@ from app.models.answer_option import AnswerOption
 from app.models.assessment import Assessment
 from app.models.question import Question
 from app.models.response_answer import ResponseAnswer
-from app.schemas.assessment import AssessmentResponse, AssessmentScoreResponse
+from app.models.response import Response
+from app.schemas.assessment import (
+    AssessmentBandSummary,
+    AssessmentResponse,
+    AssessmentScoreResponse,
+    AssessmentSummaryResponse,
+)
 
 
 SCORABLE_CELL_TYPES: frozenset[str] = frozenset({"dropdown", "radio", "rating", "checkbox"})
@@ -355,3 +361,105 @@ def _filter_matching(
         if min_s <= score <= max_s:
             matching.append(a)
     return matching
+
+
+async def compute_assessment_summary(
+    session: AsyncSession,
+    survey_id: uuid.UUID,
+) -> AssessmentSummaryResponse:
+    """Compute aggregate assessment statistics across all completed responses.
+
+    Steps:
+        1. Load all Assessment rules for the survey. If none exist, raise 404.
+        2. Query all completed response IDs for the survey.
+        3. Call compute_score() for each response.
+        4. Aggregate: total score, min/max, per-band hit counts.
+        5. Return AssessmentSummaryResponse with the aggregated stats.
+
+    Args:
+        session: The async database session.
+        survey_id: The UUID of the survey.
+
+    Returns:
+        AssessmentSummaryResponse with aggregated data.
+
+    Raises:
+        ValueError: When the survey has no assessment rules defined (signals 404).
+    """
+    # Step 1: Load assessment rules
+    all_assessments = await _load_assessments(session, survey_id)
+    if not all_assessments:
+        raise ValueError("no_assessment_rules")
+
+    # Step 2: Load completed response IDs
+    result = await session.execute(
+        select(Response.id)
+        .where(
+            Response.survey_id == survey_id,
+            Response.status == "complete",
+        )
+    )
+    response_ids: list[uuid.UUID] = list(result.scalars().all())
+
+    total_responses = len(response_ids)
+
+    if total_responses == 0:
+        # No completed responses — return empty summary with zero distribution
+        bands = [
+            AssessmentBandSummary(
+                name=a.name,
+                min_score=Decimal(str(a.min_score)),
+                max_score=Decimal(str(a.max_score)),
+                message=a.message,
+                count=0,
+                percentage=0.0,
+            )
+            for a in all_assessments
+        ]
+        return AssessmentSummaryResponse(
+            total_responses=0,
+            average_score=None,
+            min_score=None,
+            max_score=None,
+            bands=bands,
+        )
+
+    # Step 3: Compute score for each completed response
+    scores: list[Decimal] = []
+    band_counts: dict[uuid.UUID, int] = {a.id: 0 for a in all_assessments}
+
+    for response_id in response_ids:
+        score_result = await compute_score(session, survey_id, response_id)
+        score = score_result.score
+        scores.append(score)
+
+        # Count how many responses fall in each band
+        for matched in score_result.matching_assessments:
+            if matched.id in band_counts:
+                band_counts[matched.id] += 1
+
+    # Step 4: Aggregate stats
+    total_score = sum(scores)
+    average_score = total_score / Decimal(str(total_responses))
+    min_score = min(scores)
+    max_score = max(scores)
+
+    bands = [
+        AssessmentBandSummary(
+            name=a.name,
+            min_score=Decimal(str(a.min_score)),
+            max_score=Decimal(str(a.max_score)),
+            message=a.message,
+            count=band_counts[a.id],
+            percentage=round(band_counts[a.id] / total_responses * 100, 1),
+        )
+        for a in all_assessments
+    ]
+
+    return AssessmentSummaryResponse(
+        total_responses=total_responses,
+        average_score=average_score,
+        min_score=min_score,
+        max_score=max_score,
+        bands=bands,
+    )
