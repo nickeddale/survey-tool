@@ -64,7 +64,7 @@ describe('SurveyFormPage', () => {
     // This prevents AuthProvider from calling initialize() on mount, which would
     // trigger async state updates (setPendingInit, setUser) outside act().
     setTokens(mockTokens.access_token)
-    localStorage.removeItem('devtracker_refresh_token')
+    localStorage.removeItem('survey_tool_refresh_token')
     // Pre-populate auth store so authenticated API calls work correctly.
     useAuthStore.setState({
       user: mockUser,

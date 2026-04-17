@@ -58,7 +58,7 @@ describe('DashboardPage', () => {
     // This prevents AuthProvider from calling initialize() on mount, which would
     // trigger async state updates outside act().
     setTokens(mockTokens.access_token)
-    localStorage.removeItem('devtracker_refresh_token')
+    localStorage.removeItem('survey_tool_refresh_token')
   })
 
   describe('loading state', () => {

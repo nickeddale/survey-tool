@@ -60,7 +60,7 @@ describe('SurveysPage', () => {
     // which would trigger async state updates (setPendingInit, set user) outside act().
     // The mock JWT has exp=9999999999, so no proactive refresh occurs either.
     setTokens(mockTokens.access_token)
-    localStorage.removeItem('devtracker_refresh_token')
+    localStorage.removeItem('survey_tool_refresh_token')
     // Pre-populate the auth store so components that check isAuthenticated work correctly
     useAuthStore.setState({
       user: mockUser,

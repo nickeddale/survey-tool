@@ -21,7 +21,7 @@ import { getDefaultSettings } from '../../types/questionSettings'
 beforeEach(() => {
   // Prevent AuthProvider.initialize() from triggering async state updates
   // outside act() when a refresh token is in localStorage.
-  localStorage.removeItem('devtracker_refresh_token')
+  localStorage.removeItem('survey_tool_refresh_token')
 })
 
 function makeQuestion(
