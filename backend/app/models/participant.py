@@ -29,6 +29,12 @@ class Participant(Base):
         nullable=False,
         index=True,
     )
+    profile_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("participant_profiles.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
     external_id: Mapped[str | None] = mapped_column(
         String(255),
         nullable=True,
@@ -74,6 +80,7 @@ class Participant(Base):
     )
 
     survey = relationship("Survey", lazy="raise")
+    profile = relationship("ParticipantProfile", back_populates="participants", lazy="raise")
     responses = relationship(
         "Response",
         back_populates="participant",

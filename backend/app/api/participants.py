@@ -5,6 +5,7 @@ import uuid
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, Query, Request, status
+from pydantic import BaseModel
 from sqlalchemy import and_, func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,6 +15,7 @@ from app.dependencies import get_current_user, pagination_params, require_scope
 from app.utils.pagination import PaginationParams
 from app.limiter import RATE_LIMITS, limiter
 from app.models.participant import Participant
+from app.models.participant_profile import ParticipantProfile
 from app.models.survey import Survey
 from app.models.user import User
 from app.schemas.participant import (
@@ -25,6 +27,10 @@ from app.schemas.participant import (
     ParticipantUpdate,
 )
 from app.utils.errors import ConflictError, NotFoundError
+
+
+class AssignFromProfilesPayload(BaseModel):
+    profile_ids: list[uuid.UUID]
 
 router = APIRouter(prefix="/surveys", tags=["participants"])
 
@@ -326,3 +332,61 @@ async def delete_participant(
     participant = await _get_participant_or_404(session, parsed_participant_id, parsed_survey_id)
     await session.delete(participant)
     await session.flush()
+
+
+@router.post(
+    "/{survey_id}/participants/from-profiles",
+    response_model=list[ParticipantCreateResponse],
+    status_code=status.HTTP_201_CREATED,
+    summary="Assign profiles to a survey",
+    description="Create per-survey participant records from existing profiles. Each gets a unique token.",
+)
+@limiter.limit(RATE_LIMITS["default_mutating"])
+async def assign_participants_from_profiles(
+    request: Request,
+    survey_id: str,
+    payload: AssignFromProfilesPayload,
+    current_user: User = Depends(get_current_user),
+    _scope: None = Depends(require_scope("surveys:write")),
+    session: AsyncSession = Depends(get_db),
+) -> list[ParticipantCreateResponse]:
+    """Create per-survey participants from profile IDs. Returns tokens (shown only at creation)."""
+    parsed_survey_id = _parse_survey_id(survey_id)
+    await _get_survey_or_404(session, parsed_survey_id, current_user.id)
+
+    # Verify all profiles exist
+    profiles_result = await session.execute(
+        select(ParticipantProfile).where(ParticipantProfile.id.in_(payload.profile_ids))
+    )
+    profiles = {p.id: p for p in profiles_result.scalars().all()}
+
+    missing = [str(pid) for pid in payload.profile_ids if pid not in profiles]
+    if missing:
+        from app.utils.errors import NotFoundError
+        raise NotFoundError(f"Profiles not found: {', '.join(missing)}")
+
+    participants = []
+    for profile_id in payload.profile_ids:
+        profile = profiles[profile_id]
+        token = secrets.token_urlsafe(24)
+        participant = Participant(
+            id=uuid.uuid4(),
+            survey_id=parsed_survey_id,
+            profile_id=profile.id,
+            email=profile.email,
+            token=token,
+            completed=False,
+        )
+        session.add(participant)
+        participants.append(participant)
+
+    try:
+        await session.flush()
+    except IntegrityError:
+        await session.rollback()
+        raise ConflictError("One or more participants could not be created (duplicate token)")
+
+    for p in participants:
+        await session.refresh(p)
+
+    return [ParticipantCreateResponse.model_validate(p) for p in participants]

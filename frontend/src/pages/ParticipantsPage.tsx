@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { AlertCircle, ArrowLeft, Plus, Upload, Search, Link } from 'lucide-react'
+import { AlertCircle, ArrowLeft, Plus, Upload, Search, Link, Users } from 'lucide-react'
 import participantService from '../services/participantService'
 import type {
   ParticipantResponse,
@@ -16,6 +16,7 @@ import ParticipantTable, {
 } from '../components/participants/ParticipantTable'
 import ParticipantForm from '../components/participants/ParticipantForm'
 import CsvImportDialog from '../components/participants/CsvImportDialog'
+import AddFromProfilesDialog from '../components/participant-profiles/AddFromProfilesDialog'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -164,6 +165,10 @@ function ParticipantsPage() {
   // CSV import state
   const [showCsvImport, setShowCsvImport] = useState(false)
   const [importResults, setImportResults] = useState<ParticipantCreateResponse[] | null>(null)
+
+  // Copy link error state
+  // Add from profiles state
+  const [showAddFromProfiles, setShowAddFromProfiles] = useState(false)
 
   // Copy link error state
   const [copyLinkError, setCopyLinkError] = useState<string | null>(null)
@@ -402,6 +407,18 @@ function ParticipantsPage() {
         <ImportResultsModal created={importResults} onClose={() => setImportResults(null)} />
       )}
 
+      {showAddFromProfiles && (
+        <AddFromProfilesDialog
+          surveyId={surveyId ?? ''}
+          onComplete={(created) => {
+            setShowAddFromProfiles(false)
+            void loadParticipants()
+            void created
+          }}
+          onCancel={() => setShowAddFromProfiles(false)}
+        />
+      )}
+
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <Button
@@ -414,6 +431,15 @@ function ParticipantsPage() {
           <ArrowLeft size={18} />
         </Button>
         <h1 className="text-2xl font-bold text-foreground flex-1">Participant Management</h1>
+        <Button
+          variant="outline"
+          onClick={() => setShowAddFromProfiles(true)}
+          className="gap-1.5"
+          data-testid="add-from-profiles-button"
+        >
+          <Users size={15} />
+          Add from Profiles
+        </Button>
         <Button
           variant="outline"
           onClick={() => setShowCsvImport(true)}

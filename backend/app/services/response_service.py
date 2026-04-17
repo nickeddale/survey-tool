@@ -25,6 +25,7 @@ from app.models.response_answer import ResponseAnswer
 from app.models.survey import Survey
 from app.services import audit_service
 from app.services.event_dispatcher import get_dispatcher
+from app.services.participant_profile_service import get_or_create_profile_by_email
 from app.services.response_crud_service import (
     _check_survey_requires_participants,
     _validate_participant_token,
@@ -120,6 +121,16 @@ async def create_response(
             token_prefix=token[:8] if len(token) >= 8 else token,
             uses_remaining=uses_after,
         )
+
+        # Auto-create or link a ParticipantProfile when the participant has an email
+        if participant.email and participant.profile_id is None:
+            try:
+                profile = await get_or_create_profile_by_email(session, participant.email)
+                participant.profile_id = profile.id
+                await session.flush()
+            except Exception:
+                # Non-fatal: profile auto-population failure should not break response creation
+                pass
 
     # Validate all answers before persisting anything
     if answers:

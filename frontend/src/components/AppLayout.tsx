@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, ClipboardList, Settings, Menu, X, LogOut } from 'lucide-react'
+import { LayoutDashboard, ClipboardList, Settings, Menu, X, LogOut, Users } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
 function AppLayout() {
@@ -29,6 +29,14 @@ function AppLayout() {
       <NavLink to="/surveys" className={navLinkClass} onClick={() => setSidebarOpen(false)}>
         <ClipboardList size={18} />
         Surveys
+      </NavLink>
+      <NavLink
+        to="/participant-profiles"
+        className={navLinkClass}
+        onClick={() => setSidebarOpen(false)}
+      >
+        <Users size={18} />
+        Profiles
       </NavLink>
       <NavLink to="/settings" className={navLinkClass} onClick={() => setSidebarOpen(false)}>
         <Settings size={18} />
