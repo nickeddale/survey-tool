@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-17T19:06:14.800Z",
+  "lastUpdated": "2026-04-17T19:33:43.879Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5215,6 +5215,27 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-17-iss-277-participant-profile-system.md",
+      "ticketId": "ISS-277",
+      "title": "Participant Profile System",
+      "date": "2026-04-17",
+      "categories": [
+        "testing",
+        "api",
+        "database",
+        "ui",
+        "bug-fix",
+        "feature",
+        "security",
+        "documentation",
+        "config",
+        "ci-cd"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -5467,7 +5488,8 @@
       "2026-04-17-iss-273-when-viewing-a-response-display-matrix-answers-in.md",
       "2026-04-17-iss-274-add-a-way-to-preview-a-given-survey-regardless-of.md",
       "2026-04-17-iss-275-display-assessment-results-on-response-detail-page.md",
-      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md"
+      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md",
+      "2026-04-17-iss-277-participant-profile-system.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5686,7 +5708,8 @@
       "2026-04-17-iss-273-when-viewing-a-response-display-matrix-answers-in.md",
       "2026-04-17-iss-274-add-a-way-to-preview-a-given-survey-regardless-of.md",
       "2026-04-17-iss-275-display-assessment-results-on-response-detail-page.md",
-      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md"
+      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md",
+      "2026-04-17-iss-277-participant-profile-system.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5857,7 +5880,8 @@
       "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md",
       "2026-04-16-iss-272-translation-patch-endpoints-blocked-on-active-surv.md",
       "2026-04-17-iss-273-when-viewing-a-response-display-matrix-answers-in.md",
-      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md"
+      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md",
+      "2026-04-17-iss-277-participant-profile-system.md"
     ],
     "ui": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6099,7 +6123,8 @@
       "2026-04-17-iss-273-when-viewing-a-response-display-matrix-answers-in.md",
       "2026-04-17-iss-274-add-a-way-to-preview-a-given-survey-regardless-of.md",
       "2026-04-17-iss-275-display-assessment-results-on-response-detail-page.md",
-      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md"
+      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md",
+      "2026-04-17-iss-277-participant-profile-system.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6404,7 +6429,8 @@
       "2026-04-17-iss-273-when-viewing-a-response-display-matrix-answers-in.md",
       "2026-04-17-iss-274-add-a-way-to-preview-a-given-survey-regardless-of.md",
       "2026-04-17-iss-275-display-assessment-results-on-response-detail-page.md",
-      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md"
+      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md",
+      "2026-04-17-iss-277-participant-profile-system.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6647,7 +6673,8 @@
       "2026-04-17-iss-273-when-viewing-a-response-display-matrix-answers-in.md",
       "2026-04-17-iss-274-add-a-way-to-preview-a-given-survey-regardless-of.md",
       "2026-04-17-iss-275-display-assessment-results-on-response-detail-page.md",
-      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md"
+      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md",
+      "2026-04-17-iss-277-participant-profile-system.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6862,7 +6889,8 @@
       "2026-04-16-iss-267-extend-assessment-scoring-to-support-matrixdropdow.md",
       "2026-04-16-iss-272-translation-patch-endpoints-blocked-on-active-surv.md",
       "2026-04-17-iss-273-when-viewing-a-response-display-matrix-answers-in.md",
-      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md"
+      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md",
+      "2026-04-17-iss-277-participant-profile-system.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -7040,7 +7068,8 @@
       "2026-04-16-iss-268-add-subquestion-scope-ui-to-assessment-form.md",
       "2026-04-16-iss-272-translation-patch-endpoints-blocked-on-active-surv.md",
       "2026-04-17-iss-273-when-viewing-a-response-display-matrix-answers-in.md",
-      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md"
+      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md",
+      "2026-04-17-iss-277-participant-profile-system.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -7268,7 +7297,8 @@
       "2026-04-16-iss-272-translation-patch-endpoints-blocked-on-active-surv.md",
       "2026-04-17-iss-273-when-viewing-a-response-display-matrix-answers-in.md",
       "2026-04-17-iss-274-add-a-way-to-preview-a-given-survey-regardless-of.md",
-      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md"
+      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md",
+      "2026-04-17-iss-277-participant-profile-system.md"
     ],
     "security": [
       "2026-04-01-iss-003-task-13-user-model-and-registration-endpoint.md",
@@ -7417,7 +7447,8 @@
       "2026-04-16-iss-272-translation-patch-endpoints-blocked-on-active-surv.md",
       "2026-04-17-iss-273-when-viewing-a-response-display-matrix-answers-in.md",
       "2026-04-17-iss-274-add-a-way-to-preview-a-given-survey-regardless-of.md",
-      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md"
+      "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md",
+      "2026-04-17-iss-277-participant-profile-system.md"
     ],
     "frontend": [
       "2026-04-02-iss-036-210-frontend-test-infrastructure-and-initial-tests.md",

@@ -23,6 +23,7 @@ from app.api.email_invitations import router as email_invitations_router
 from app.api.email_tracking import router as email_tracking_router
 from app.api.webhooks import router as webhooks_router
 from app.api.logic import router as logic_router
+from app.api.participant_profiles import router as participant_profiles_router
 from app.api.participants import router as participants_router
 from app.api.question_groups import router as question_groups_router
 from app.api.questions import router as questions_router
@@ -468,6 +469,7 @@ app.include_router(questions_router, prefix="/api/v1")
 app.include_router(subquestions_router, prefix="/api/v1")
 app.include_router(answer_options_router, prefix="/api/v1")
 app.include_router(responses_router, prefix="/api/v1")
+app.include_router(participant_profiles_router, prefix="/api/v1")
 app.include_router(participants_router, prefix="/api/v1")
 app.include_router(quotas_router, prefix="/api/v1")
 app.include_router(assessments_router, prefix="/api/v1")

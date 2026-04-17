@@ -470,6 +470,33 @@ export const mockParticipants = [
   },
 ]
 
+export const mockProfiles = [
+  {
+    id: 'pp000000-0000-0000-0000-000000000001',
+    email: 'alice@example.com',
+    first_name: 'Alice',
+    last_name: 'Smith',
+    phone: null,
+    organization: 'Acme Corp',
+    attributes: null,
+    tags: ['vip'],
+    created_at: '2024-01-10T10:00:00Z',
+    updated_at: '2024-01-10T10:00:00Z',
+  },
+  {
+    id: 'pp000000-0000-0000-0000-000000000002',
+    email: 'bob@example.com',
+    first_name: 'Bob',
+    last_name: null,
+    phone: null,
+    organization: null,
+    attributes: null,
+    tags: null,
+    created_at: '2024-01-11T10:00:00Z',
+    updated_at: '2024-01-11T10:00:00Z',
+  },
+]
+
 // ---------------------------------------------------------------------------
 // Handlers
 // ---------------------------------------------------------------------------
@@ -1821,5 +1848,158 @@ export const handlers = [
       )
     }
     return HttpResponse.json({ sent: 2, skipped: 1, failed: 0 }, { status: 200 })
+  }),
+
+  // ---------------------------------------------------------------------------
+  // Participant Profiles
+  // ---------------------------------------------------------------------------
+
+  // GET /api/v1/participant-profiles
+  http.get(`${BASE}/participant-profiles`, ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 }
+      )
+    }
+    return HttpResponse.json(
+      {
+        items: mockProfiles,
+        total: mockProfiles.length,
+        page: 1,
+        per_page: 20,
+        pages: 1,
+      },
+      { status: 200 }
+    )
+  }),
+
+  // POST /api/v1/participant-profiles
+  http.post(`${BASE}/participant-profiles`, async ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 }
+      )
+    }
+    const body = (await request.json()) as Record<string, unknown>
+    const profile = {
+      id: 'pp000000-0000-0000-0000-000000000001',
+      email: body['email'] as string,
+      first_name: (body['first_name'] as string | null) ?? null,
+      last_name: (body['last_name'] as string | null) ?? null,
+      phone: null,
+      organization: null,
+      attributes: null,
+      tags: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+    return HttpResponse.json(profile, { status: 201 })
+  }),
+
+  // POST /api/v1/participant-profiles/batch
+  http.post(`${BASE}/participant-profiles/batch`, async ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 }
+      )
+    }
+    const body = (await request.json()) as { items: Array<Record<string, unknown>> }
+    const profiles = body.items.map((item, i) => ({
+      id: `pp000000-0000-0000-0000-00000000000${i + 1}`,
+      email: item['email'] as string,
+      first_name: null,
+      last_name: null,
+      phone: null,
+      organization: null,
+      attributes: null,
+      tags: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }))
+    return HttpResponse.json(profiles, { status: 201 })
+  }),
+
+  // GET /api/v1/participant-profiles/:profileId
+  http.get(`${BASE}/participant-profiles/:profileId`, ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 }
+      )
+    }
+    const profile = mockProfiles.find((p) => p.id === params['profileId'])
+    if (!profile) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Participant profile not found' } },
+        { status: 404 }
+      )
+    }
+    return HttpResponse.json({ ...profile, survey_history: [] }, { status: 200 })
+  }),
+
+  // PATCH /api/v1/participant-profiles/:profileId
+  http.patch(`${BASE}/participant-profiles/:profileId`, async ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 }
+      )
+    }
+    const profile = mockProfiles.find((p) => p.id === params['profileId'])
+    if (!profile) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'Participant profile not found' } },
+        { status: 404 }
+      )
+    }
+    const body = (await request.json()) as Record<string, unknown>
+    return HttpResponse.json({ ...profile, ...body }, { status: 200 })
+  }),
+
+  // DELETE /api/v1/participant-profiles/:profileId
+  http.delete(`${BASE}/participant-profiles/:profileId`, ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 }
+      )
+    }
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  // POST /api/v1/surveys/:surveyId/participants/from-profiles
+  http.post(`${BASE}/surveys/:surveyId/participants/from-profiles`, async ({ request }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 }
+      )
+    }
+    const body = (await request.json()) as { profile_ids: string[] }
+    const participants = body.profile_ids.map((profileId, i) => ({
+      id: `pa000000-0000-0000-0000-00000000000${i + 1}`,
+      survey_id: '10000000-0000-0000-0000-000000000001',
+      profile_id: profileId,
+      external_id: null,
+      email: 'assigned@example.com',
+      attributes: null,
+      uses_remaining: null,
+      valid_from: null,
+      valid_until: null,
+      completed: false,
+      created_at: new Date().toISOString(),
+      token: 'mock-token-' + i,
+    }))
+    return HttpResponse.json(participants, { status: 201 })
   }),
 ]

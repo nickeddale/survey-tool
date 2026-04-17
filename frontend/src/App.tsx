@@ -19,6 +19,7 @@ import QuotasPage from './pages/QuotasPage'
 import AssessmentsPage from './pages/AssessmentsPage'
 import WebhooksPage from './pages/WebhooksPage'
 import ParticipantsPage from './pages/ParticipantsPage'
+import ParticipantProfilesPage from './pages/ParticipantProfilesPage'
 import EmailInvitationsPage from './pages/EmailInvitationsPage'
 import SettingsPage from './pages/SettingsPage'
 import NotFoundPage from './pages/NotFoundPage'
@@ -54,6 +55,7 @@ function App() {
                 <Route path="/surveys/:id/participants" element={<ParticipantsPage />} />
                 <Route path="/surveys/:id/email-invitations" element={<EmailInvitationsPage />} />
                 <Route path="/surveys/:id" element={<SurveyDetailPage />} />
+                <Route path="/participant-profiles" element={<ParticipantProfilesPage />} />
                 <Route path="/webhooks" element={<WebhooksPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/surveys" element={<SurveysPage />} />

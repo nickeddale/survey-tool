@@ -634,3 +634,67 @@ export interface SendRemindersResponse {
   skipped: number
   failed: number
 }
+
+// ---------------------------------------------------------------------------
+// Participant Profile types (matching backend schemas/participant_profile.py)
+// ---------------------------------------------------------------------------
+
+export interface ParticipantProfileCreate {
+  email: string
+  first_name?: string | null
+  last_name?: string | null
+  phone?: string | null
+  organization?: string | null
+  attributes?: Record<string, unknown> | null
+  tags?: string[] | null
+}
+
+export interface ParticipantProfileBatchCreate {
+  items: ParticipantProfileCreate[]
+}
+
+export interface ParticipantProfileUpdate {
+  email?: string | null
+  first_name?: string | null
+  last_name?: string | null
+  phone?: string | null
+  organization?: string | null
+  attributes?: Record<string, unknown> | null
+  tags?: string[] | null
+}
+
+export interface SurveyParticipationSummary {
+  survey_id: string
+  participant_id: string
+  completed: boolean
+  created_at: string
+}
+
+export interface ParticipantProfileResponse {
+  id: string
+  email: string
+  first_name: string | null
+  last_name: string | null
+  phone: string | null
+  organization: string | null
+  attributes: Record<string, unknown> | null
+  tags: string[] | null
+  created_at: string
+  updated_at: string
+}
+
+export interface ParticipantProfileDetailResponse extends ParticipantProfileResponse {
+  survey_history: SurveyParticipationSummary[]
+}
+
+export interface ParticipantProfileListResponse {
+  items: ParticipantProfileResponse[]
+  total: number
+  page: number
+  per_page: number
+  pages: number
+}
+
+export interface AssignFromProfilesPayload {
+  profile_ids: string[]
+}
