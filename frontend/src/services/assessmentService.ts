@@ -4,6 +4,7 @@ import type {
   AssessmentUpdate,
   AssessmentResponse,
   AssessmentListResponse,
+  AssessmentScoreResponse,
 } from '../types/survey'
 
 export interface AssessmentFetchParams {
@@ -52,6 +53,16 @@ class AssessmentService {
 
   async deleteAssessment(surveyId: string, assessmentId: string): Promise<void> {
     await apiClient.delete(`/surveys/${surveyId}/assessments/${assessmentId}`)
+  }
+
+  async getResponseAssessment(
+    surveyId: string,
+    responseId: string
+  ): Promise<AssessmentScoreResponse> {
+    const response = await apiClient.get<AssessmentScoreResponse>(
+      `/surveys/${surveyId}/responses/${responseId}/assessment`
+    )
+    return response.data
   }
 }
 

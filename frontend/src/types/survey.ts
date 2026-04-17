@@ -434,6 +434,11 @@ export interface AssessmentListResponse {
   total_pages: number
 }
 
+export interface AssessmentScoreResponse {
+  score: number
+  matching_assessments: AssessmentResponse[]
+}
+
 // ---------------------------------------------------------------------------
 // Webhook types (matching backend WebhookCreate, WebhookUpdate,
 // WebhookResponse, WebhookListResponse)

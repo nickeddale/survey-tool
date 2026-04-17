@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-17T18:44:41.651Z",
+  "lastUpdated": "2026-04-17T18:53:16.792Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5178,6 +5178,22 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-17-iss-275-display-assessment-results-on-response-detail-page.md",
+      "ticketId": "ISS-275",
+      "title": "Display assessment results on response detail page",
+      "date": "2026-04-17",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -5428,7 +5444,8 @@
       "2026-04-16-iss-270-builder-translationeditor-not-rendered-when-transl.md",
       "2026-04-16-iss-272-translation-patch-endpoints-blocked-on-active-surv.md",
       "2026-04-17-iss-273-when-viewing-a-response-display-matrix-answers-in.md",
-      "2026-04-17-iss-274-add-a-way-to-preview-a-given-survey-regardless-of.md"
+      "2026-04-17-iss-274-add-a-way-to-preview-a-given-survey-regardless-of.md",
+      "2026-04-17-iss-275-display-assessment-results-on-response-detail-page.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5645,7 +5662,8 @@
       "2026-04-16-iss-270-builder-translationeditor-not-rendered-when-transl.md",
       "2026-04-16-iss-272-translation-patch-endpoints-blocked-on-active-surv.md",
       "2026-04-17-iss-273-when-viewing-a-response-display-matrix-answers-in.md",
-      "2026-04-17-iss-274-add-a-way-to-preview-a-given-survey-regardless-of.md"
+      "2026-04-17-iss-274-add-a-way-to-preview-a-given-survey-regardless-of.md",
+      "2026-04-17-iss-275-display-assessment-results-on-response-detail-page.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6055,7 +6073,8 @@
       "2026-04-16-iss-270-builder-translationeditor-not-rendered-when-transl.md",
       "2026-04-16-iss-272-translation-patch-endpoints-blocked-on-active-surv.md",
       "2026-04-17-iss-273-when-viewing-a-response-display-matrix-answers-in.md",
-      "2026-04-17-iss-274-add-a-way-to-preview-a-given-survey-regardless-of.md"
+      "2026-04-17-iss-274-add-a-way-to-preview-a-given-survey-regardless-of.md",
+      "2026-04-17-iss-275-display-assessment-results-on-response-detail-page.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6358,7 +6377,8 @@
       "2026-04-16-iss-270-builder-translationeditor-not-rendered-when-transl.md",
       "2026-04-16-iss-272-translation-patch-endpoints-blocked-on-active-surv.md",
       "2026-04-17-iss-273-when-viewing-a-response-display-matrix-answers-in.md",
-      "2026-04-17-iss-274-add-a-way-to-preview-a-given-survey-regardless-of.md"
+      "2026-04-17-iss-274-add-a-way-to-preview-a-given-survey-regardless-of.md",
+      "2026-04-17-iss-275-display-assessment-results-on-response-detail-page.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6599,7 +6619,8 @@
       "2026-04-16-iss-270-builder-translationeditor-not-rendered-when-transl.md",
       "2026-04-16-iss-272-translation-patch-endpoints-blocked-on-active-surv.md",
       "2026-04-17-iss-273-when-viewing-a-response-display-matrix-answers-in.md",
-      "2026-04-17-iss-274-add-a-way-to-preview-a-given-survey-regardless-of.md"
+      "2026-04-17-iss-274-add-a-way-to-preview-a-given-survey-regardless-of.md",
+      "2026-04-17-iss-275-display-assessment-results-on-response-detail-page.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
