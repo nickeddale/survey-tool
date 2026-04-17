@@ -1317,6 +1317,28 @@ export const handlers = [
     return new HttpResponse(null, { status: 204 })
   }),
 
+  // GET /api/v1/surveys/:surveyId/responses/:responseId/assessment
+  http.get(`${BASE}/surveys/:surveyId/responses/:responseId/assessment`, ({ request, params }) => {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { detail: { code: 'UNAUTHORIZED', message: 'Not authenticated' } },
+        { status: 401 }
+      )
+    }
+    // Return matching assessments for surveys that have them defined
+    const surveyAssessments = mockAssessments.filter((a) => a.survey_id === params.surveyId)
+    if (surveyAssessments.length === 0) {
+      return HttpResponse.json(
+        { detail: { code: 'NOT_FOUND', message: 'No assessments defined for this survey' } },
+        { status: 404 }
+      )
+    }
+    const score = 9
+    const matching = surveyAssessments.filter((a) => a.min_score <= score && a.max_score >= score)
+    return HttpResponse.json({ score, matching_assessments: matching }, { status: 200 })
+  }),
+
   // ---------------------------------------------------------------------------
   // Webhook endpoints
   // ---------------------------------------------------------------------------

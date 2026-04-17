@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import responseService from '../services/responseService'
-import type { ResponseDetailFull } from '../types/survey'
+import assessmentService from '../services/assessmentService'
+import type { ResponseDetailFull, AssessmentScoreResponse } from '../types/survey'
 import { ApiError } from '../types/api'
 import { Button } from '../components/ui/button'
 import { Card, CardContent } from '../components/ui/card'
 import { Skeleton } from '../components/ui/skeleton'
 import ResponseDetail from '../components/responses/ResponseDetail'
+import { AssessmentResults, AssessmentResultsSkeleton } from '../components/responses/AssessmentResults'
 
 // ---------------------------------------------------------------------------
 // Loading skeleton
@@ -40,6 +42,10 @@ function ResponseDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [notFound, setNotFound] = useState(false)
 
+  const [assessmentResult, setAssessmentResult] = useState<AssessmentScoreResponse | null>(null)
+  const [assessmentLoading, setAssessmentLoading] = useState(false)
+  const [assessmentError, setAssessmentError] = useState<string | null>(null)
+
   // ---------------------------------------------------------------------------
   // Load response detail
   // ---------------------------------------------------------------------------
@@ -70,6 +76,38 @@ function ResponseDetailPage() {
     }
 
     load()
+    return () => {
+      cancelled = true
+    }
+  }, [surveyId, responseId])
+
+  // ---------------------------------------------------------------------------
+  // Load assessment score (404 means no assessments defined — silently skip)
+  // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    if (!surveyId || !responseId) return
+    let cancelled = false
+
+    async function loadAssessment() {
+      setAssessmentLoading(true)
+      setAssessmentError(null)
+      try {
+        const data = await assessmentService.getResponseAssessment(surveyId!, responseId!)
+        if (!cancelled) setAssessmentResult(data)
+      } catch (err) {
+        if (!cancelled) {
+          // 404 means the survey has no assessment rules — don't show the section
+          if (!(err instanceof ApiError && err.status === 404)) {
+            setAssessmentError('Failed to load assessment results.')
+          }
+        }
+      } finally {
+        if (!cancelled) setAssessmentLoading(false)
+      }
+    }
+
+    loadAssessment()
     return () => {
       cancelled = true
     }
@@ -166,6 +204,27 @@ function ResponseDetailPage() {
       )}
 
       <ResponseDetail response={response} />
+
+      {/* Assessment results */}
+      {assessmentLoading && (
+        <div className="mt-6">
+          <AssessmentResultsSkeleton />
+        </div>
+      )}
+      {!assessmentLoading && assessmentError && (
+        <div
+          className="mt-6 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+          role="alert"
+          data-testid="assessment-error"
+        >
+          {assessmentError}
+        </div>
+      )}
+      {!assessmentLoading && !assessmentError && assessmentResult && (
+        <div className="mt-6">
+          <AssessmentResults result={assessmentResult} />
+        </div>
+      )}
     </div>
   )
 }
