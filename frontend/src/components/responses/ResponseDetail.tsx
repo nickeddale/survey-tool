@@ -367,7 +367,19 @@ function MatrixAnswerGrid({
   const subquestionAnswers = answers.filter(
     (a) => a.subquestion_label != null || a.question_code.includes('_SQ')
   )
-  if (subquestionAnswers.length === 0) return null
+  // If no subquestion structure found (parent-stored format: single answer with object value),
+  // fall back to flat text rendering so data is still visible
+  if (subquestionAnswers.length === 0) {
+    return (
+      <div className="pl-2">
+        {answers.map((answer) => (
+          <span key={answer.question_id} className="text-sm text-foreground">
+            {formatAnswerValue(answer.value)}
+          </span>
+        ))}
+      </div>
+    )
+  }
 
   if (questionType === 'matrix_multiple') {
     return (
@@ -463,10 +475,18 @@ function groupAnswers(answers: ResponseAnswerDetail[]): AnswerGroup[] {
     groups.get(groupKey)!.answers.push(answer)
   }
 
-  // matrix_dynamic answers are stored on the parent question itself (not subquestions)
-  // so we need to flag them as matrix parents too
+  // Matrix answers (all types) may be stored on the parent question itself (not subquestions),
+  // in which case they need to be flagged as matrix parents so MatrixAnswerGrid is used.
+  // Subquestion-based answers already have isMatrixParent=true from the _SQ regex match above.
+  const MATRIX_TYPES = [
+    'matrix',
+    'matrix_single',
+    'matrix_multiple',
+    'matrix_dropdown',
+    'matrix_dynamic',
+  ]
   for (const group of groups.values()) {
-    if (group.questionType === 'matrix_dynamic' && !group.isMatrixParent) {
+    if (MATRIX_TYPES.includes(group.questionType) && !group.isMatrixParent) {
       group.isMatrixParent = true
     }
   }
