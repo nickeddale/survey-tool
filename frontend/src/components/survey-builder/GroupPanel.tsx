@@ -54,7 +54,9 @@ const QUESTION_TYPES = [
   { type: 'single_choice', label: 'Single Choice' },
   { type: 'multiple_choice', label: 'Multiple Choice' },
   { type: 'dropdown', label: 'Dropdown' },
-  { type: 'number', label: 'Number' },
+  { type: 'numeric', label: 'Number' },
+  { type: 'matrix_single', label: 'Matrix (Single)' },
+  { type: 'matrix_multiple', label: 'Matrix (Multi)' },
   { type: 'matrix_dropdown', label: 'Matrix Dropdown' },
   { type: 'matrix_dynamic', label: 'Matrix Dynamic' },
 ]

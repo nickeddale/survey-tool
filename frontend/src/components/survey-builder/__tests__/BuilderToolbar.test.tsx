@@ -149,7 +149,7 @@ describe('Add Question dropdown', () => {
       expect(screen.getByTestId('add-question-type-single_choice')).toBeInTheDocument()
       expect(screen.getByTestId('add-question-type-multiple_choice')).toBeInTheDocument()
       expect(screen.getByTestId('add-question-type-dropdown')).toBeInTheDocument()
-      expect(screen.getByTestId('add-question-type-number')).toBeInTheDocument()
+      expect(screen.getByTestId('add-question-type-numeric')).toBeInTheDocument()
     })
   })
 
