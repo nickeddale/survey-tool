@@ -295,6 +295,64 @@ def _build_enriched_answer(answer: ResponseAnswer) -> "ResponseAnswerDetail":
     )
 
 
+def _expand_parent_matrix_answer(answer: ResponseAnswer) -> "list[ResponseAnswerDetail]":
+    """Expand a parent-stored matrix answer dict into virtual per-subquestion entries.
+
+    When matrix answers are stored as a single JSON dict on the parent question
+    (e.g. {"SQ001": "A3", "SQ002": "A4"}), no subquestion answer records exist.
+    This function creates virtual ResponseAnswerDetail objects — one per subquestion
+    key — each with proper subquestion_label and matrix_column_headers populated.
+
+    Returns an empty list if the answer cannot be expanded (wrong type, no subquestions).
+    """
+    from app.schemas.response import MatrixColumnHeader, ResponseAnswerDetail
+
+    question = answer.question
+    raw_value = answer.value
+
+    if not isinstance(raw_value, dict) or not raw_value:
+        return []
+
+    # Build column headers from this parent question's answer options
+    matrix_column_headers: list[MatrixColumnHeader] | None = None
+    try:
+        parent_options = list(question.answer_options)
+        if parent_options:
+            matrix_column_headers = [
+                MatrixColumnHeader(code=opt.code, title=opt.title or opt.code)
+                for opt in sorted(parent_options, key=lambda o: o.sort_order)
+            ]
+    except Exception:
+        pass
+
+    # Build a map from subquestion code -> subquestion title using loaded subquestions
+    subquestion_title_by_code: dict[str, str] = {}
+    try:
+        for sq in question.subquestions:
+            subquestion_title_by_code[sq.code] = sq.title
+    except Exception:
+        pass
+
+    virtual_entries: list[ResponseAnswerDetail] = []
+    for sq_code, sq_value in raw_value.items():
+        subquestion_label = subquestion_title_by_code.get(sq_code, sq_code)
+        virtual_entries.append(
+            ResponseAnswerDetail(
+                question_id=question.id,
+                question_code=f"{question.code}_{sq_code}",
+                question_title=f"{question.title} — {subquestion_label}",
+                question_type=question.question_type,
+                value=sq_value,
+                values=sq_value if isinstance(sq_value, list) else None,
+                selected_option_title=None,
+                subquestion_label=subquestion_label,
+                matrix_column_headers=matrix_column_headers,
+            )
+        )
+
+    return virtual_entries
+
+
 async def get_response_detail(
     session: AsyncSession,
     survey_id: uuid.UUID,
@@ -320,9 +378,10 @@ async def get_response_detail(
             selectinload(Response.answers).selectinload(ResponseAnswer.question).selectinload(
                 Question.answer_options
             ),
-            selectinload(Response.answers).selectinload(ResponseAnswer.question).selectinload(
-                Question.subquestions
-            ),
+            selectinload(Response.answers)
+            .selectinload(ResponseAnswer.question)
+            .selectinload(Question.subquestions)
+            .selectinload(Question.answer_options),
             selectinload(Response.answers)
             .selectinload(ResponseAnswer.question)
             .selectinload(Question.parent)
@@ -334,7 +393,21 @@ async def get_response_detail(
     if response is None:
         raise NotFoundError("Response not found")
 
-    enriched_answers = [_build_enriched_answer(a) for a in response.answers]
+    enriched_answers = []
+    for a in response.answers:
+        question = a.question
+        # Parent matrix question with a dict value: expand into virtual subquestion entries
+        if (
+            question.parent_id is None
+            and question.question_type in _DETAIL_MATRIX_TYPES
+            and question.question_type != "matrix_dynamic"
+            and isinstance(a.value, dict)
+        ):
+            expanded = _expand_parent_matrix_answer(a)
+            if expanded:
+                enriched_answers.extend(expanded)
+                continue
+        enriched_answers.append(_build_enriched_answer(a))
 
     return {
         "id": response.id,
