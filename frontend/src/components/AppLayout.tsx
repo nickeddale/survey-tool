@@ -58,7 +58,7 @@ function AppLayout() {
           >
             <Menu size={20} />
           </button>
-          <span className="text-base font-semibold text-foreground">DevTracker</span>
+          <span className="text-base font-semibold text-foreground">Survey Tool</span>
         </div>
 
         <div className="flex items-center gap-3">
