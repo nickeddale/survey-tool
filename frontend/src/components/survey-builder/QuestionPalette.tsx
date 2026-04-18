@@ -19,7 +19,7 @@ export const QUESTION_TYPES = [
   { type: 'single_choice', label: 'Single Choice', icon: ToggleLeft },
   { type: 'multiple_choice', label: 'Multiple Choice', icon: CheckSquare },
   { type: 'dropdown', label: 'Dropdown', icon: List },
-  { type: 'number', label: 'Number', icon: Hash },
+  { type: 'numeric', label: 'Number', icon: Hash },
   { type: 'matrix_single', label: 'Matrix (Single)', icon: Grid3x3 },
   { type: 'matrix_multiple', label: 'Matrix (Multi)', icon: Grid3x3 },
   { type: 'matrix_dropdown', label: 'Matrix (Dropdown)', icon: Grid3x3 },
