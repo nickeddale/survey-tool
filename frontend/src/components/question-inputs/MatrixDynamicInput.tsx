@@ -13,7 +13,7 @@
  * Response format: { values: [{ [colCode]: cellValue, ... }, ...] }
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { BuilderQuestion } from '../../store/builderStore'
 import type { MatrixDynamicSettings } from '../../types/questionSettings'
 import { ValidationErrors } from '../common/ValidationErrors'
@@ -46,11 +46,22 @@ export function MatrixDynamicInput({
   const addRowText = s.add_row_text ?? 'Add row'
   const removeRowText = s.remove_row_text ?? 'Remove'
 
+  // Use the larger of default_row_count and min_rows as the initial row count.
+  const initialRowCount = Math.max(rowCount, minRowCount)
+
   // Use internal state so cell edits work without parent re-renders.
-  // Initialize from value prop if non-empty, otherwise create rowCount empty rows.
+  // Initialize from value prop if non-empty, otherwise create initialRowCount empty rows.
   const [rows, setRows] = useState<Record<string, string>[]>(() =>
-    value.length > 0 ? value : Array.from({ length: rowCount }, () => ({}))
+    value.length > 0 ? value : Array.from({ length: initialRowCount }, () => ({}))
   )
+
+  // Re-sync rows when default_row_count setting changes and there is no user-entered value.
+  useEffect(() => {
+    if (value.length === 0 && rows.length !== initialRowCount) {
+      setRows(Array.from({ length: initialRowCount }, () => ({})))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialRowCount])
 
   const displayErrors = externalErrors ?? []
   const hasErrors = displayErrors.length > 0
