@@ -3091,3 +3091,125 @@ async def test_matrix_complete_missing_answer_on_required_parent_returns_422(
     assert "SQ001" not in error_codes
     assert "SQ002" not in error_codes
     assert "SQ003" not in error_codes
+
+
+# --------------------------------------------------------------------------- #
+# ISS-283: Matrix table rendering — answers stored on parent question
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.asyncio
+async def test_response_detail_parent_stored_matrix_expands_to_subquestion_rows(
+    client: AsyncClient,
+):
+    """Response detail for a parent-stored matrix dict value returns virtual subquestion rows.
+
+    When a matrix answer is submitted as a dict on the parent question_id (e.g.
+    {"SQ001": "A1", "SQ002": "A2"}), the detail endpoint must return one entry per
+    subquestion key — each with non-null subquestion_label and matrix_column_headers —
+    instead of a single flat entry with a raw dict value.
+    """
+    headers = await auth_headers(client, email="iss283_matrix_detail@example.com")
+    survey_id = await create_survey(client, headers, title="ISS-283 Matrix Detail Survey")
+
+    # Create a group
+    group_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups",
+        json={"title": "Matrix Group"},
+        headers=headers,
+    )
+    assert group_resp.status_code == 201
+    group_id = group_resp.json()["id"]
+
+    # Create parent matrix_single question
+    parent_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+        json={"title": "Satisfaction Matrix", "question_type": "matrix_single", "code": "MAT_ISS283"},
+        headers=headers,
+    )
+    assert parent_resp.status_code == 201
+    parent_id = parent_resp.json()["id"]
+
+    # Add two subquestions (row labels)
+    for i, (sq_code, sq_title) in enumerate([("SQ001", "Speed"), ("SQ002", "Quality")], start=1):
+        sq_resp = await client.post(
+            f"{SURVEYS_URL}/{survey_id}/groups/{group_id}/questions",
+            json={
+                "title": sq_title,
+                "question_type": "matrix_single",
+                "code": sq_code,
+                "parent_id": parent_id,
+                "sort_order": i,
+            },
+            headers=headers,
+        )
+        assert sq_resp.status_code == 201
+
+    # Add two answer options (column headers) to the parent
+    for opt_code, opt_title in [("A1", "Poor"), ("A2", "Good")]:
+        opt_resp = await client.post(
+            f"{SURVEYS_URL}/{survey_id}/questions/{parent_id}/options",
+            json={"code": opt_code, "title": opt_title},
+            headers=headers,
+        )
+        assert opt_resp.status_code == 201
+
+    await activate_survey(client, headers, survey_id)
+
+    # Submit a response with the matrix answer stored as a dict on the parent question_id
+    post_resp = await client.post(
+        f"{SURVEYS_URL}/{survey_id}/responses",
+        json={
+            "answers": [
+                {
+                    "question_id": parent_id,
+                    "value": {"SQ001": "A1", "SQ002": "A2"},
+                }
+            ]
+        },
+    )
+    assert post_resp.status_code == 201
+    response_id = post_resp.json()["id"]
+
+    # Fetch the response detail
+    resp = await client.get(
+        f"{SURVEYS_URL}/{survey_id}/responses/{response_id}/detail",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+
+    answers = body["answers"]
+    # Should be expanded into 2 virtual subquestion entries (one per SQ key)
+    assert len(answers) == 2, f"Expected 2 virtual subquestion rows, got {len(answers)}: {answers}"
+
+    # Each entry should have question_code containing the SQ code
+    answer_codes = {a["question_code"] for a in answers}
+    assert "MAT_ISS283_SQ001" in answer_codes
+    assert "MAT_ISS283_SQ002" in answer_codes
+
+    # Each entry should have subquestion_label populated
+    for answer in answers:
+        assert answer["subquestion_label"] is not None, (
+            f"subquestion_label must not be null for {answer['question_code']}"
+        )
+        assert answer["matrix_column_headers"] is not None, (
+            f"matrix_column_headers must not be null for {answer['question_code']}"
+        )
+        assert len(answer["matrix_column_headers"]) == 2
+
+    # Verify the subquestion labels match the defined subquestion titles
+    label_by_code = {a["question_code"]: a["subquestion_label"] for a in answers}
+    assert label_by_code["MAT_ISS283_SQ001"] == "Speed"
+    assert label_by_code["MAT_ISS283_SQ002"] == "Quality"
+
+    # Verify column header codes and titles
+    col_headers = answers[0]["matrix_column_headers"]
+    col_codes = {h["code"] for h in col_headers}
+    assert "A1" in col_codes
+    assert "A2" in col_codes
+
+    # Verify that each virtual entry carries the correct per-row value
+    value_by_code = {a["question_code"]: a["value"] for a in answers}
+    assert value_by_code["MAT_ISS283_SQ001"] == "A1"
+    assert value_by_code["MAT_ISS283_SQ002"] == "A2"
