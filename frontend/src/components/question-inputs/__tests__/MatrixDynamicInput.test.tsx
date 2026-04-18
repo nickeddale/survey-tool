@@ -106,6 +106,48 @@ describe('MatrixDynamicInput — rendering', () => {
     expect(screen.getByTestId('matrix-dynamic-row-2')).toBeInTheDocument()
   })
 
+  it('renders 2 rows when default_row_count=2 and value is empty', () => {
+    const question = makeQuestion({
+      settings: makeSettings({ default_row_count: 2 }),
+    })
+    render(<MatrixDynamicInput value={[]} onChange={vi.fn()} question={question} />)
+    expect(screen.getByTestId('matrix-dynamic-row-0')).toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dynamic-row-1')).toBeInTheDocument()
+    expect(screen.queryByTestId('matrix-dynamic-row-2')).not.toBeInTheDocument()
+  })
+
+  it('re-initializes rows when default_row_count prop changes and value is empty', () => {
+    const question1 = makeQuestion({ settings: makeSettings({ default_row_count: 1 }) })
+    const question2 = makeQuestion({ settings: makeSettings({ default_row_count: 3 }) })
+    const { rerender } = render(
+      <MatrixDynamicInput value={[]} onChange={vi.fn()} question={question1} />
+    )
+    expect(screen.getByTestId('matrix-dynamic-row-0')).toBeInTheDocument()
+    expect(screen.queryByTestId('matrix-dynamic-row-1')).not.toBeInTheDocument()
+
+    rerender(<MatrixDynamicInput value={[]} onChange={vi.fn()} question={question2} />)
+    expect(screen.getByTestId('matrix-dynamic-row-0')).toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dynamic-row-1')).toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dynamic-row-2')).toBeInTheDocument()
+  })
+
+  it('does not reset user-entered rows when default_row_count prop changes', () => {
+    const question1 = makeQuestion({ settings: makeSettings({ default_row_count: 1 }) })
+    const question2 = makeQuestion({ settings: makeSettings({ default_row_count: 3 }) })
+    const userValue = [{ col1: 'Alice' }, { col1: 'Bob' }]
+    const { rerender } = render(
+      <MatrixDynamicInput value={userValue} onChange={vi.fn()} question={question1} />
+    )
+    expect(screen.getByTestId('matrix-dynamic-row-0')).toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dynamic-row-1')).toBeInTheDocument()
+
+    // Even when question changes, rows with user data should not be reset
+    rerender(<MatrixDynamicInput value={userValue} onChange={vi.fn()} question={question2} />)
+    expect(screen.getByTestId('matrix-dynamic-row-0')).toBeInTheDocument()
+    expect(screen.getByTestId('matrix-dynamic-row-1')).toBeInTheDocument()
+    expect(screen.queryByTestId('matrix-dynamic-row-2')).not.toBeInTheDocument()
+  })
+
   it('renders rows from value prop when provided', () => {
     const options = [makeOption({ code: 'col1' })]
     const question = makeQuestion({ answer_options: options })
