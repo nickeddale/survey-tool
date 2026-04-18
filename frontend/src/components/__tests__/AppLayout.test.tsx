@@ -65,7 +65,7 @@ describe('AppLayout', () => {
       renderAppLayout()
 
       await waitFor(() => {
-        expect(screen.getByText('DevTracker')).toBeInTheDocument()
+        expect(screen.getByText('Survey Tool')).toBeInTheDocument()
       })
     })
 

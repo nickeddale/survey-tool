@@ -86,7 +86,7 @@ function RegisterPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl text-center">Create an account</CardTitle>
-          <CardDescription className="text-center">Join DevTracker today</CardDescription>
+          <CardDescription className="text-center">Join Survey Tool today</CardDescription>
         </CardHeader>
         <CardContent>
           {error && (
