@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastUpdated": "2026-04-18T07:38:00.436Z",
+  "lastUpdated": "2026-04-18T07:45:28.762Z",
   "lessons": [
     {
       "file": "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5313,6 +5313,24 @@
       "filesModified": [],
       "outcome": "success",
       "complexity": "medium"
+    },
+    {
+      "file": "2026-04-18-iss-281-assessment-summary-endpoint-returns-404-on-statist.md",
+      "ticketId": "ISS-281",
+      "title": "Assessment summary endpoint returns 404 on statistics page",
+      "date": "2026-04-18",
+      "categories": [
+        "testing",
+        "api",
+        "ui",
+        "bug-fix",
+        "feature",
+        "documentation",
+        "config"
+      ],
+      "filesModified": [],
+      "outcome": "success",
+      "complexity": "medium"
     }
   ],
   "categoryIndex": {
@@ -5570,7 +5588,8 @@
       "2026-04-17-iss-278-rebrand-the-project-to-survey-tool-instead-of-usin.md",
       "2026-04-18-iss-256-matrix-dynamic-initial-rowcount-setting-not-honore.md",
       "2026-04-18-iss-279-rebrand-ui-still-shows-devtracker-instead-of-surve.md",
-      "2026-04-18-iss-280-matrix-answers-on-response-detail-page-not-rendere.md"
+      "2026-04-18-iss-280-matrix-answers-on-response-detail-page-not-rendere.md",
+      "2026-04-18-iss-281-assessment-summary-endpoint-returns-404-on-statist.md"
     ],
     "api": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -5792,7 +5811,8 @@
       "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md",
       "2026-04-17-iss-277-participant-profile-system.md",
       "2026-04-17-iss-278-rebrand-the-project-to-survey-tool-instead-of-usin.md",
-      "2026-04-18-iss-280-matrix-answers-on-response-detail-page-not-rendere.md"
+      "2026-04-18-iss-280-matrix-answers-on-response-detail-page-not-rendere.md",
+      "2026-04-18-iss-281-assessment-summary-endpoint-returns-404-on-statist.md"
     ],
     "database": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6214,7 +6234,8 @@
       "2026-04-17-iss-278-rebrand-the-project-to-survey-tool-instead-of-usin.md",
       "2026-04-18-iss-256-matrix-dynamic-initial-rowcount-setting-not-honore.md",
       "2026-04-18-iss-279-rebrand-ui-still-shows-devtracker-instead-of-surve.md",
-      "2026-04-18-iss-280-matrix-answers-on-response-detail-page-not-rendere.md"
+      "2026-04-18-iss-280-matrix-answers-on-response-detail-page-not-rendere.md",
+      "2026-04-18-iss-281-assessment-summary-endpoint-returns-404-on-statist.md"
     ],
     "refactoring": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6525,7 +6546,8 @@
       "2026-04-17-iss-277-participant-profile-system.md",
       "2026-04-17-iss-278-rebrand-the-project-to-survey-tool-instead-of-usin.md",
       "2026-04-18-iss-256-matrix-dynamic-initial-rowcount-setting-not-honore.md",
-      "2026-04-18-iss-280-matrix-answers-on-response-detail-page-not-rendere.md"
+      "2026-04-18-iss-280-matrix-answers-on-response-detail-page-not-rendere.md",
+      "2026-04-18-iss-281-assessment-summary-endpoint-returns-404-on-statist.md"
     ],
     "feature": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6773,7 +6795,8 @@
       "2026-04-17-iss-278-rebrand-the-project-to-survey-tool-instead-of-usin.md",
       "2026-04-18-iss-256-matrix-dynamic-initial-rowcount-setting-not-honore.md",
       "2026-04-18-iss-279-rebrand-ui-still-shows-devtracker-instead-of-surve.md",
-      "2026-04-18-iss-280-matrix-answers-on-response-detail-page-not-rendere.md"
+      "2026-04-18-iss-280-matrix-answers-on-response-detail-page-not-rendere.md",
+      "2026-04-18-iss-281-assessment-summary-endpoint-returns-404-on-statist.md"
     ],
     "performance": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -6991,7 +7014,8 @@
       "2026-04-17-iss-276-aggregate-assessment-results-across-all-survey-res.md",
       "2026-04-17-iss-277-participant-profile-system.md",
       "2026-04-17-iss-278-rebrand-the-project-to-survey-tool-instead-of-usin.md",
-      "2026-04-18-iss-280-matrix-answers-on-response-detail-page-not-rendere.md"
+      "2026-04-18-iss-280-matrix-answers-on-response-detail-page-not-rendere.md",
+      "2026-04-18-iss-281-assessment-summary-endpoint-returns-404-on-statist.md"
     ],
     "config": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",
@@ -7173,7 +7197,8 @@
       "2026-04-17-iss-277-participant-profile-system.md",
       "2026-04-17-iss-278-rebrand-the-project-to-survey-tool-instead-of-usin.md",
       "2026-04-18-iss-256-matrix-dynamic-initial-rowcount-setting-not-honore.md",
-      "2026-04-18-iss-280-matrix-answers-on-response-detail-page-not-rendere.md"
+      "2026-04-18-iss-280-matrix-answers-on-response-detail-page-not-rendere.md",
+      "2026-04-18-iss-281-assessment-summary-endpoint-returns-404-on-statist.md"
     ],
     "ci-cd": [
       "2026-04-01-iss-001-task-11-project-scaffolding-and-docker-setup.md",

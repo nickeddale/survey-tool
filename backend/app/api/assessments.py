@@ -193,6 +193,28 @@ async def list_assessments(
 
 
 @router.get(
+    "/{survey_id}/assessments/summary",
+    response_model=AssessmentSummaryResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get aggregate assessment summary for a survey",
+    description="Compute scores for all completed responses and return aggregate statistics: average score, min/max, and distribution across assessment bands.",
+)
+async def get_assessment_summary(
+    survey_id: str,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> AssessmentSummaryResponse:
+    """Return aggregate assessment statistics across all completed responses."""
+    parsed_survey_id = _parse_survey_id(survey_id)
+    await _get_survey_or_404(session, parsed_survey_id, current_user.id)
+
+    try:
+        return await compute_assessment_summary(session, parsed_survey_id)
+    except ValueError:
+        raise NotFoundError("No assessment rules defined for this survey")
+
+
+@router.get(
     "/{survey_id}/assessments/{assessment_id}",
     response_model=AssessmentResponse,
     status_code=status.HTTP_200_OK,
@@ -310,25 +332,3 @@ async def get_response_assessment(
 
     result = await compute_score(session, parsed_survey_id, parsed_response_id)
     return result
-
-
-@router.get(
-    "/{survey_id}/assessments/summary",
-    response_model=AssessmentSummaryResponse,
-    status_code=status.HTTP_200_OK,
-    summary="Get aggregate assessment summary for a survey",
-    description="Compute scores for all completed responses and return aggregate statistics: average score, min/max, and distribution across assessment bands.",
-)
-async def get_assessment_summary(
-    survey_id: str,
-    current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db),
-) -> AssessmentSummaryResponse:
-    """Return aggregate assessment statistics across all completed responses."""
-    parsed_survey_id = _parse_survey_id(survey_id)
-    await _get_survey_or_404(session, parsed_survey_id, current_user.id)
-
-    try:
-        return await compute_assessment_summary(session, parsed_survey_id)
-    except ValueError:
-        raise NotFoundError("No assessment rules defined for this survey")
